@@ -47,9 +47,9 @@ pnpm-debug.log*
 tmp/
 .*temp/
 out-tsc/
-tasks
-T003-test_report.json
-deployment_status.json
+
+# Multi-agent transient artifacts (all under .task_temp/)
+test_report.json
 
 # Playwright
 playwright-report/
@@ -81,15 +81,6 @@ playwright/.auth/
 .serverless/
 
 # Prisma generated client
-prisma/generated/
+**/prisma/generated/
 
-# Agent transient artifacts
-test_report.json
-TDD_*_PHASE_REPORT.md
 
-# Multi-agent workflow artifacts (not for version control)
-Task.DAG.json
-WAIVE.md
-incident_report.md
-**/HANDOVER.md
-**/TASK_LOG.md
