@@ -1,0 +1,69 @@
+{
+  "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "_comment_main": "Stryker Mutation Testing Configuration for booking-backend (NestJS v11+). Core modules: auth, appointments, time-slots, rate-limiter, cache. Kill rate threshold >= 80%. Run: npm run test:mutation",
+  "mutate": [
+    "src/modules/auth/**/*.service.ts",
+    "src/modules/auth/**/*.guard.ts",
+    "src/modules/auth/**/*.strategy.ts",
+    "src/modules/appointments/**/*.service.ts",
+    "src/modules/appointments/**/*.controller.ts",
+    "src/modules/time-slots/**/*.service.ts",
+    "src/modules/time-slots/**/*.controller.ts",
+    "src/modules/rate-limiter/**/*.ts",
+    "src/modules/cache/**/*.service.ts",
+    "src/common/**/*.ts"
+  ],
+  "testRunner": "jest",
+  "jest": {
+    "configFile": "jest.config.js",
+    "projectType": "custom",
+    "config": {
+      "testTimeout": 60000,
+      "testPathIgnorePatterns": ["/e2e/", "/integration/"]
+    }
+  },
+  "thresholds": {
+    "high": 80,
+    "low": 60,
+    "break": 80
+  },
+  "mutator": {
+    "plugins": [],
+    "excludedMutations": []
+  },
+  "coverageAnalysis": "perTest",
+  "maxConcurrentTestRuns": 8,
+  "reporters": [
+    "progress",
+    "clear-text",
+    "html"
+  ],
+  "htmlReporter": {
+    "baseDir": "reports/mutation"
+  },
+  "ignorePatterns": [
+    "coverage/**/*",
+    "dist/**/*",
+    "node_modules/**/*",
+    "reports/**/*",
+    "prisma/**/*",
+    ".git/**/*"
+  ],
+  "ignoreStatic": true,
+  "checkers": ["typescript"],
+  "typescript": {
+    "checkers": ["typescript"],
+    "compilerOptions": {
+      "noEmit": true
+    }
+  },
+  "buildCommand": "",
+  "cleanTempDir": true,
+  "dryRun": {
+    "count": 1,
+    "timeoutMs": 120000
+  },
+  "timeoutMs": 120000,
+  "symlinkNodeModules": true,
+  "disableTypeChecks": true
+}

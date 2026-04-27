@@ -1,0 +1,84 @@
+.time-slots-container {
+  padding: 1rem;
+}
+
+.time-slots {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.75rem;
+}
+
+.slot-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  border: 2px solid var(--border-color, #e0e0e0);
+  border-radius: 8px;
+  background: var(--background-color, #fff);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.slot-button:hover:not(:disabled) {
+  border-color: var(--primary-color, #1976d2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.slot-button.selected {
+  border-color: var(--primary-color, #1976d2);
+  background-color: var(--primary-light, #e3f2fd);
+}
+
+.slot-button.unavailable {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: var(--disabled-bg, #f5f5f5);
+}
+
+.time {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: var(--text-primary, #333);
+}
+
+.date {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #666);
+  margin-top: 0.25rem;
+}
+
+.badge {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background-color: var(--error-color, #f44336);
+  color: white;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+}
+
+.loading,
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-secondary, #666);
+}
+
+.error {
+  text-align: center;
+  padding: 2rem;
+  color: var(--error-color, #f44336);
+}
+
+.error button {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: var(--primary-color, #1976d2);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}

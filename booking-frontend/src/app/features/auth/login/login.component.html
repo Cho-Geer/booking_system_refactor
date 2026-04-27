@@ -1,0 +1,32 @@
+<div class="login-container">
+  <div class="login-card">
+    @if (error()) {
+      <div class="error-message global-error">
+        <p>{{ error() }}</p>
+      </div>
+    }
+
+    <app-auth-form
+      [activeTab]="activeTab"
+      [contactType]="contactType"
+      [codeLoginStep]="codeLoginStep"
+      [acceptTerms]="acceptTerms"
+      [isLoading]="isLoading()"
+      [countdown]="countdown"
+      [passwordForm]="passwordForm"
+      [codeLoginForm]="codeLoginForm"
+      (tabSwitch)="switchTab($event)"
+      (formSubmit)="onSubmit()"
+      (sendCode)="sendVerifyCode()"
+      (contactTypeChange)="contactType = $event"
+      (acceptTermsChange)="acceptTerms = $event"
+      (stepChange)="codeLoginStep = $event"
+    />
+
+    @defer {
+      <div class="footer-links">
+        <a routerLink="/auth/register" class="register-link">注册新账号</a>
+      </div>
+    }
+  </div>
+</div>

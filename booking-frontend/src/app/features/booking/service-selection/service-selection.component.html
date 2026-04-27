@@ -1,0 +1,22 @@
+<div class="services">
+  @if (isLoading()) {
+    <div class="loading" role="status" aria-live="polite">Loading services...</div>
+  } @else {
+    @for (service of services(); track service.id) {
+      <div
+        class="service-card"
+        (click)="selectService(service)"
+        [class.selected]="isSelected(service)"
+        tabindex="0"
+        (keydown.enter)="selectService(service)"
+      >
+        <h3>{{ service.name }}</h3>
+        <p>{{ service.description }}</p>
+        <div class="service-meta">
+          <span class="duration">{{ service.durationMinutes }} min</span>
+          <span class="price">{{ service.price | currency }}</span>
+        </div>
+      </div>
+    }
+  }
+</div>

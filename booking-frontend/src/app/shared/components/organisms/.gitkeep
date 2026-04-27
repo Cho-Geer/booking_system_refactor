@@ -1,0 +1,13 @@
+# Atomic Design: Organisms
+
+功能区块层 - 由分子组件组成的复杂功能模块
+
+## 组件分类规则
+- 导航栏 (Navbar)
+- 页脚 (Footer)
+- 侧边栏 (Sidebar)
+- 表单面板 (FormPanel)
+- 列表视图 (ListView)
+
+## 当前状态
+目录已创建，待后续开发中添加组织组件

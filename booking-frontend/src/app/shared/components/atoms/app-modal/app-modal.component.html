@@ -1,0 +1,15 @@
+<p-dialog
+  [visible]="visible() ?? false"
+  [header]="header()"
+  [closable]="closable() ?? false"
+  [dismissableMask]="dismissableMask() ?? false"
+  [draggable]="draggable() ?? false"
+  [resizable]="resizable() ?? false"
+  [modal]="modal() ?? false"
+  [position]="position()"
+  [styleClass]="styleClass()"
+  [appendTo]="appendTo() || 'body'"
+  (visibleChange)="visibleChange.emit($event)"
+>
+  <ng-content />
+</p-dialog>

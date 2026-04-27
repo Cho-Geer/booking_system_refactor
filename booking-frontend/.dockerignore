@@ -1,0 +1,74 @@
+# Dependencies
+node_modules/
+
+# Environment files
+.env
+.env.*
+.env.local
+.env.development
+.env.production
+
+# Test files
+*.test.ts
+*.test.js
+*.spec.ts
+*.spec.js
+**/*.test.*
+**/*.spec.*
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Build output (will be built inside container)
+dist/
+build/
+
+# Version control
+.git/
+.gitignore
+.gitattributes
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Angular cache
+.angular/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Documentation
+README.md
+LICENSE
+CHANGELOG.md
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+Jenkinsfile
+
+# Docker files (prevent recursive copy)
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Project config (not needed at runtime)
+tsconfig.json
+tsconfig.app.json
+tsconfig.spec.json
+eslint.config.*
+.prettierrc
+.editorconfig
+test_report.json

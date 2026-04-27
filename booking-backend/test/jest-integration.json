@@ -1,0 +1,30 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": "..",
+  "testRegex": ".integration.spec.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "collectCoverageFrom": [
+    "src/**/*.(t|j)s",
+    "!src/**/*.module.ts",
+    "!src/main.ts",
+    "!src/**/*.spec.ts",
+    "!src/**/*.e2e-spec.ts"
+  ],
+  "coverageDirectory": "../coverage-integration",
+  "testEnvironment": "node",
+  "moduleNameMapper": {
+    "^@/(.*)$": "<rootDir>/src/$1",
+    "^@common/(.*)$": "<rootDir>/src/common/$1",
+    "^@modules/(.*)$": "<rootDir>/src/modules/$1"
+  },
+  "setupFilesAfterEnv": ["<rootDir>/test/setup-integration.ts"],
+  "globalSetup": "<rootDir>/test/global-setup-integration.ts",
+  "globalTeardown": "<rootDir>/test/global-teardown-integration.ts",
+  "verbose": true,
+  "detectOpenHandles": true,
+  "forceExit": true,
+  "maxWorkers": 1,
+  "testTimeout": 30000
+}

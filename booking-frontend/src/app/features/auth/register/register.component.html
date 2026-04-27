@@ -1,0 +1,103 @@
+<div class="register-container">
+  <div class="register-card">
+    <h2>欢迎注册</h2>
+
+    <div class="login-link">
+      已有账号? <a routerLink="/auth/login">登录</a>
+    </div>
+
+    @if (error()) {
+      <div class="error-message global-error">
+        <p>{{ error() }}</p>
+      </div>
+    }
+
+    <!-- Step Indicator -->
+    <div class="step-indicator">
+      <div class="step" [class.active]="currentStep === 1" [class.completed]="currentStep > 1">
+        <span class="step-number">1</span>
+        <span class="step-label">联系方式</span>
+      </div>
+      <div class="step-connector" [class.completed]="currentStep > 1"></div>
+      <div class="step" [class.active]="currentStep === 2">
+        <span class="step-number">2</span>
+        <span class="step-label">完成注册</span>
+      </div>
+    </div>
+
+    <!-- Step 1: Send Verification Code -->
+    @if (currentStep === 1) {
+      <form [formGroup]="step1Form" (ngSubmit)="onSendCode()">
+        <div class="form-group">
+          <label>联系方式类型</label>
+          <div class="contact-type-selector">
+            <button
+              type="button"
+              class="type-btn"
+              [class.active]="contactType === ContactType.EMAIL"
+              (click)="contactType = ContactType.EMAIL"
+            >
+              邮箱
+            </button>
+            <button
+              type="button"
+              class="type-btn"
+              [class.active]="contactType === ContactType.PHONE"
+              (click)="contactType = ContactType.PHONE"
+            >
+              手机号
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="contact">{{ contactType === ContactType.EMAIL ? '邮箱' : '手机号' }}</label>
+          <input
+            id="contact"
+            [type]="contactType === ContactType.EMAIL ? 'email' : 'tel'"
+            formControlName="contact"
+            [placeholder]="contactType === ContactType.EMAIL ? 'Enter your email' : 'Enter your phone number'"
+            [class.error]="isStep1FieldInvalid('contact')"
+          />
+          @if (isStep1FieldInvalid('contact')) {
+            <div class="error-message">
+              @if (step1Form.get('contact')?.errors?.['required']) {
+                <span>{{ contactType === ContactType.EMAIL ? 'Email is required' : 'Phone number is required' }}</span>
+              }
+              @if (step1Form.get('contact')?.errors?.['email']) {
+                <span>Please enter a valid email address</span>
+              }
+            </div>
+          }
+        </div>
+
+        <button
+          type="submit"
+          class="btn-primary"
+          [disabled]="step1Form.invalid || isLoading()"
+        >
+          @if (isLoading()) {
+            <span>发送中...</span>
+          } @else {
+            <span>发送验证码</span>
+          }
+        </button>
+      </form>
+    }
+
+    <!-- Step 2: Complete Registration -->
+    @if (currentStep === 2) {
+      <app-register-form
+        [step2Form]="step2Form"
+        [countdown]="countdown"
+        [isLoading]="isLoading()"
+        [acceptTerms]="acceptTerms"
+        [passwordRequirements]="passwordRequirements"
+        (codeRequested)="sendVerifyCode()"
+        (formSubmitted)="onCompleteRegistration()"
+        (backRequested)="goToStep1()"
+        (termsChanged)="acceptTerms = $event"
+      />
+    }
+  </div>
+</div>

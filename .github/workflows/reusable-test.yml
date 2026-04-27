@@ -1,0 +1,166 @@
+name: Reusable Test Workflow
+
+on:
+  workflow_call:
+    inputs:
+      test_type:
+        description: 'Type of test to run: unit, integration, or e2e'
+        required: true
+        type: string
+      working_directory:
+        description: 'Working directory for the test (e.g., booking-backend, booking-frontend)'
+        required: false
+        type: string
+        default: '.'
+      node_version:
+        description: 'Node.js version to use'
+        required: false
+        type: string
+        default: '22'
+      coverage_enabled:
+        description: 'Whether to enable code coverage'
+        required: false
+        type: boolean
+        default: true
+      upload_coverage:
+        description: 'Whether to upload coverage to Codecov'
+        required: false
+        type: boolean
+        default: true
+      timeout_minutes:
+        description: 'Timeout in minutes for the test job'
+        required: false
+        type: number
+        default: 30
+      custom_env_vars:
+        description: 'JSON string of additional environment variables'
+        required: false
+        type: string
+        default: '{}'
+
+jobs:
+  run-tests:
+    name: Run ${{ inputs.test_type }} Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ inputs.timeout_minutes }}
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: test_db
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+          cache: 'npm'
+          cache-dependency-path: ${{ inputs.working_directory }}/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ${{ inputs.working_directory }}
+        run: npm ci
+
+      - name: Generate Prisma Client
+        if: inputs.working_directory == 'booking-backend'
+        working-directory: ${{ inputs.working_directory }}
+        run: npx prisma generate
+
+      - name: Run database migrations
+        if: inputs.working_directory == 'booking-backend'
+        working-directory: ${{ inputs.working_directory }}
+        run: npx prisma migrate deploy
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db?schema=public
+
+      - name: Seed test data
+        if: inputs.working_directory == 'booking-backend' && inputs.test_type != 'unit'
+        working-directory: ${{ inputs.working_directory }}
+        run: npx prisma db seed
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db?schema=public
+
+      - name: Run unit tests
+        if: inputs.test_type == 'unit'
+        working-directory: ${{ inputs.working_directory }}
+        run: |
+          if [ "${{ inputs.coverage_enabled }}" = "true" ]; then
+            npm test -- --coverage --coverageReporters=text --coverageReporters=lcov
+          else
+            npm test
+          fi
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db?schema=public
+          REDIS_URL: redis://localhost:6379
+          JWT_SECRET: test-secret-ci
+          JWT_REFRESH_SECRET: test-refresh-secret-ci
+
+      - name: Run integration tests
+        if: inputs.test_type == 'integration'
+        working-directory: ${{ inputs.working_directory }}
+        run: |
+          if [ "${{ inputs.coverage_enabled }}" = "true" ]; then
+            npm run test:integration -- --coverage --coverageReporters=text --coverageReporters=lcov
+          else
+            npm run test:integration
+          fi
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db?schema=public
+          REDIS_URL: redis://localhost:6379
+          JWT_SECRET: test-secret-ci
+          JWT_REFRESH_SECRET: test-refresh-secret-ci
+          NODE_ENV: test
+
+      - name: Run E2E tests
+        if: inputs.test_type == 'e2e'
+        working-directory: ${{ inputs.working_directory }}
+        run: |
+          npx playwright install --with-deps chromium firefox webkit
+          npx playwright test
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:4200
+          BACKEND_BASE_URL: http://localhost:3000
+          NODE_ENV: test
+
+      - name: Upload coverage to Codecov
+        if: inputs.coverage_enabled && inputs.upload_coverage && (inputs.test_type == 'unit' || inputs.test_type == 'integration')
+        uses: codecov/codecov-action@v4
+        with:
+          directory: ${{ inputs.working_directory }}/coverage
+          fail_ci_if_error: false
+          verbose: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.test_type }}-test-results-${{ inputs.working_directory }}
+          path: |
+            ${{ inputs.working_directory }}/coverage/
+            ${{ inputs.working_directory }}/test-results/
+            ${{ inputs.working_directory }}/playwright-report/
+          retention-days: 14

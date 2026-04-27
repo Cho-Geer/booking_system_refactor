@@ -1,0 +1,50 @@
+# Dependencies
+node_modules/
+
+# Environment files (secrets must not be baked into image)
+.env
+.env.*
+!.env.example
+
+# Test files
+*.test.*
+*.spec.ts
+coverage/
+
+# Build output (rebuilt inside container)
+dist/
+
+# Version control
+.git/
+.gitignore
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Prisma migration history (schema is copied, migrations run via migration image)
+prisma/migrations/
+
+# Test / docs
+test/
+docs/
+README.md
+
+# CI/CD
+.github/
+
+# Other
+.eslintrc*
+.prettierrc*
+nest-cli.json
+tsconfig*.json

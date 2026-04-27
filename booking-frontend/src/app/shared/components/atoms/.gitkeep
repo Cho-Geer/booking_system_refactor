@@ -1,0 +1,14 @@
+# Atomic Design: Atoms
+
+基础UI组件层 - 不可再分的最小UI单元
+
+## 组件分类规则
+- 按钮 (Button)
+- 输入框 (Input)
+- 图标 (Icon)
+- 标签 (Label/Badge)
+- 分隔线 (Divider)
+- 加载指示器 (Spinner)
+
+## 当前状态
+目录已创建，待后续开发中添加原子组件

@@ -1,0 +1,12 @@
+<p-select
+  [options]="options()"
+  [optionLabel]="optionLabel()"
+  [optionValue]="optionValue()"
+  [placeholder]="placeholder()"
+  [disabled]="disabled()"
+  [class.ng-invalid]="invalid()"
+  [variant]="variant()"
+  [filter]="filter()"
+  [styleClass]="styleClass()"
+  (onChange)="onModelChange($event.value)"
+/>

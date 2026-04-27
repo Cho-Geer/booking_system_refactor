@@ -1,0 +1,291 @@
+{
+  "version": "1.0.0",
+  "generated": "2026-04-15",
+  "description": "Role-Based Access Control Permission Matrix for Booking System",
+  
+  "roles": {
+    "USER": {
+      "name": "Regular User",
+      "description": "Customer who can book appointments and manage their profile",
+      "permissions": [
+        "user:read:own",
+        "user:update:own",
+        "service:read",
+        "booking:create",
+        "booking:read:own",
+        "booking:update:own",
+        "booking:cancel:own",
+        "timeslot:read"
+      ]
+    },
+    
+    "ADMIN": {
+      "name": "System Administrator",
+      "description": "Full system access including user management and system configuration",
+      "permissions": [
+        "user:read:own",
+        "user:update:own",
+        "service:read",
+        "booking:create",
+        "booking:read:own",
+        "booking:update:own",
+        "booking:cancel:own",
+        "timeslot:read",
+        "user:read:any",
+        "user:update:any",
+        "user:delete:any",
+        "user:role:update",
+        "service:create",
+        "service:update",
+        "service:delete",
+        "service:toggle",
+        "booking:read:any",
+        "booking:update:any",
+        "booking:cancel:any",
+        "timeslot:create",
+        "timeslot:update",
+        "timeslot:delete",
+        "system:config:read",
+        "system:config:update",
+        "audit:read"
+      ]
+    }
+  },
+  
+  "permissions": {
+    "user": [
+      {
+        "permission": "user:read:own",
+        "description": "Read own user profile",
+        "endpoints": ["GET /v1/users/profile"],
+        "dataScope": "self"
+      },
+      {
+        "permission": "user:update:own",
+        "description": "Update own user profile",
+        "endpoints": ["PUT /v1/users/profile"],
+        "dataScope": "self"
+      },
+      {
+        "permission": "user:read:any",
+        "description": "Read any user profile",
+        "endpoints": ["GET /v1/users", "GET /v1/users/:id"],
+        "dataScope": "all"
+      },
+      {
+        "permission": "user:update:any",
+        "description": "Update any user profile",
+        "endpoints": ["PUT /v1/users/:id"],
+        "dataScope": "all"
+      },
+      {
+        "permission": "user:delete:any",
+        "description": "Delete any user",
+        "endpoints": ["DELETE /v1/users/:id"],
+        "dataScope": "all"
+      },
+      {
+        "permission": "user:role:update",
+        "description": "Update user role",
+        "endpoints": ["PATCH /v1/users/:id/role"],
+        "dataScope": "all"
+      }
+    ],
+    
+    "service": [
+      {
+        "permission": "service:read",
+        "description": "View available services",
+        "endpoints": ["GET /v1/services"],
+        "dataScope": "all"
+      },
+      {
+        "permission": "service:create",
+        "description": "Create new service",
+        "endpoints": ["POST /v1/services"],
+        "dataScope": "all"
+      },
+      {
+        "permission": "service:update",
+        "description": "Update existing service",
+        "endpoints": ["PUT /v1/services/:id"],
+        "dataScope": "all"
+      },
+      {
+        "permission": "service:delete",
+        "description": "Delete service",
+        "endpoints": ["DELETE /v1/services/:id"],
+        "dataScope": "all"
+      },
+      {
+        "permission": "service:toggle",
+        "description": "Activate/deactivate service",
+        "endpoints": ["PATCH /v1/services/:id/active"],
+        "dataScope": "all"
+      }
+    ],
+    
+    "booking": [
+      {
+        "permission": "booking:create",
+        "description": "Create new booking",
+        "endpoints": ["POST /v1/bookings"],
+        "dataScope": "self",
+        "highConcurrency": true
+      },
+      {
+        "permission": "booking:read:own",
+        "description": "View own bookings",
+        "endpoints": ["GET /v1/bookings"],
+        "dataScope": "self"
+      },
+      {
+        "permission": "booking:read:any",
+        "description": "View any booking",
+        "endpoints": ["GET /v1/bookings", "GET /v1/bookings/:id"],
+        "dataScope": "all"
+      },
+      {
+        "permission": "booking:update:own",
+        "description": "Update own booking",
+        "endpoints": ["PUT /v1/bookings/:id"],
+        "dataScope": "self"
+      },
+      {
+        "permission": "booking:update:any",
+        "description": "Update any booking",
+        "endpoints": ["PUT /v1/bookings/:id"],
+        "dataScope": "all"
+      },
+      {
+        "permission": "booking:cancel:own",
+        "description": "Cancel own booking",
+        "endpoints": ["PATCH /v1/bookings/:id/cancel"],
+        "dataScope": "self"
+      },
+      {
+        "permission": "booking:cancel:any",
+        "description": "Cancel any booking",
+        "endpoints": ["PATCH /v1/bookings/:id/cancel"],
+        "dataScope": "all"
+      }
+    ],
+    
+    "timeslot": [
+      {
+        "permission": "timeslot:read",
+        "description": "View available time slots",
+        "endpoints": ["GET /v1/time-slots/available"],
+        "dataScope": "all"
+      },
+      {
+        "permission": "timeslot:create",
+        "description": "Create new time slots",
+        "endpoints": ["POST /v1/time-slots"],
+        "dataScope": "all"
+      },
+      {
+        "permission": "timeslot:update",
+        "description": "Update time slots",
+        "endpoints": ["PUT /v1/time-slots/:id"],
+        "dataScope": "all"
+      },
+      {
+        "permission": "timeslot:delete",
+        "description": "Delete time slots",
+        "endpoints": ["DELETE /v1/time-slots/:id"],
+        "dataScope": "all"
+      }
+    ],
+    
+    "system": [
+      {
+        "permission": "system:config:read",
+        "description": "Read system configuration",
+        "endpoints": ["GET /v1/system/config"],
+        "dataScope": "all"
+      },
+      {
+        "permission": "system:config:update",
+        "description": "Update system configuration",
+        "endpoints": ["PUT /v1/system/config"],
+        "dataScope": "all"
+      }
+    ],
+    
+    "audit": [
+      {
+        "permission": "audit:read",
+        "description": "Read audit logs",
+        "endpoints": ["GET /v1/audit/logs"],
+        "dataScope": "all"
+      }
+    ]
+  },
+  
+  "dataScopeRules": {
+    "self": "User can only access their own data",
+    "all": "User can access all data in the system"
+  },
+  
+  "permissionHierarchy": {
+    "user:read:any": ["user:read:own"],
+    "user:update:any": ["user:update:own"],
+    "booking:read:any": ["booking:read:own"],
+    "booking:update:any": ["booking:update:own"],
+    "booking:cancel:any": ["booking:cancel:own"]
+  },
+  
+  "apiEndpoints": {
+    "/v1/auth": {
+      "login": {
+        "method": "POST",
+        "permissionRequired": false,
+        "authenticationRequired": false
+      },
+      "register": {
+        "method": "POST",
+        "permissionRequired": false,
+        "authenticationRequired": false
+      },
+      "refresh": {
+        "method": "POST",
+        "permissionRequired": false,
+        "authenticationRequired": false
+      },
+      "logout": {
+        "method": "POST",
+        "permissionRequired": "user:read:own",
+        "authenticationRequired": true
+      }
+    },
+    
+    "/v1/users": {
+      "getProfile": {
+        "method": "GET",
+        "path": "/profile",
+        "permissionRequired": "user:read:own",
+        "authenticationRequired": true
+      },
+      "updateProfile": {
+        "method": "PUT",
+        "path": "/profile",
+        "permissionRequired": "user:update:own",
+        "authenticationRequired": true
+      },
+      "getAllUsers": {
+        "method": "GET",
+        "permissionRequired": "user:read:any",
+        "authenticationRequired": true,
+        "roles": ["ADMIN"]
+      },
+      "getUser": {
+        "method": "GET",
+        "path": "/:id",
+        "permissionRequired": "user:read:any",
+        "authenticationRequired": true,
+        "roles": ["ADMIN"]
+      }
+    }
+  }
+}

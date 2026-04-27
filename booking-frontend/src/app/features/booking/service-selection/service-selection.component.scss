@@ -1,0 +1,59 @@
+.services {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.service-card {
+  border: 2px solid var(--border-color, #e0e0e0);
+  border-radius: 8px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--background-color, #fff);
+}
+
+.service-card:hover {
+  border-color: var(--primary-color, #1976d2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.service-card.selected {
+  border-color: var(--primary-color, #1976d2);
+  background-color: var(--primary-light, #e3f2fd);
+}
+
+.service-card h3 {
+  margin: 0 0 0.5rem;
+  color: var(--text-primary, #333);
+}
+
+.service-card p {
+  margin: 0 0 1rem;
+  color: var(--text-secondary, #666);
+  font-size: 0.9rem;
+}
+
+.service-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.duration {
+  color: var(--text-secondary, #666);
+  font-size: 0.9rem;
+}
+
+.price {
+  font-weight: bold;
+  color: var(--primary-color, #1976d2);
+  font-size: 1.1rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-secondary, #666);
+}

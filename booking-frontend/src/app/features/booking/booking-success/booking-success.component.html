@@ -1,0 +1,60 @@
+<div class="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+  <div class="max-w-md w-full text-center">
+    <!-- Success Checkmark Icon -->
+    <div class="success-icon-wrapper mx-auto mb-6">
+      <div class="success-icon-circle">
+        <span class="success-checkmark" aria-hidden="true">&#10003;</span>
+      </div>
+    </div>
+
+    <!-- Heading -->
+    <h1 class="text-3xl font-bold text-gray-900 mb-2">Booking Confirmed!</h1>
+    <p class="text-gray-600 mb-8">Your appointment has been successfully scheduled.</p>
+
+    <!-- Booking Details -->
+    @if (selectedSlot(); as slot) {
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Booking Details</h2>
+        <dl class="space-y-3 text-left">
+          <div class="flex justify-between">
+            <dt class="text-gray-500">Date</dt>
+            <dd class="font-medium text-gray-900">{{ slot.date | date: 'fullDate' }}</dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-gray-500">Time</dt>
+            <dd class="font-medium text-gray-900">{{ slot.time }}</dd>
+          </div>
+        </dl>
+      </div>
+    } @else {
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <p class="text-gray-500">No booking details available.</p>
+      </div>
+    }
+
+    <!-- Confirmation Email -->
+    @if (currentUser(); as user) {
+      <p class="text-sm text-gray-500 mb-8">
+        A confirmation email has been sent to <span class="font-medium text-gray-700">{{ user.email }}</span>
+      </p>
+    }
+
+    <!-- Action Buttons -->
+    <div class="space-y-3">
+      <button
+        type="button"
+        class="w-full px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+        (click)="viewMyBookings()"
+      >
+        View My Bookings
+      </button>
+      <button
+        type="button"
+        class="w-full px-6 py-3 bg-white text-gray-700 font-medium rounded-lg border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+        (click)="goHome()"
+      >
+        Back to Home
+      </button>
+    </div>
+  </div>
+</div>

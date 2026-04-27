@@ -1,0 +1,65 @@
+<div class="confirmation-container">
+  @if (!hasSelection()) {
+    <div class="empty-state">
+      <h2>No booking selected</h2>
+      <p>Please select a time slot to proceed with booking.</p>
+      <button routerLink="/booking" class="btn-primary" aria-label="Go back to booking page">
+        Back to Booking
+      </button>
+    </div>
+  } @else {
+    <div class="confirmation-card">
+      <h2>Booking Confirmation</h2>
+
+      <div class="booking-details">
+        <div class="detail-row">
+          <span class="label">Service:</span>
+          <span class="value">{{ selectedServiceName() }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Date:</span>
+          <span class="value">{{ selectedSlot()?.date | date:'fullDate' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Time:</span>
+          <span class="value">{{ selectedSlot()?.time }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Duration:</span>
+          <span class="value">{{ serviceDuration() }} minutes</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Price:</span>
+          <span class="value price">{{ servicePrice() | currency }}</span>
+        </div>
+      </div>
+
+      @if (error()) {
+        <div class="error-message">
+          <p>{{ error() }}</p>
+        </div>
+      }
+
+      <div class="actions">
+        <button
+          class="btn-secondary"
+          (click)="cancelBooking()"
+          [disabled]="isProcessing()"
+        >
+          Cancel
+        </button>
+        <button
+          class="btn-primary"
+          (click)="confirmBooking()"
+          [disabled]="isProcessing()"
+        >
+          @if (isProcessing()) {
+            Processing...
+          } @else {
+            Confirm Booking
+          }
+        </button>
+      </div>
+    </div>
+  }
+</div>

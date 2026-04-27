@@ -1,0 +1,33 @@
+<div class="time-slots-container">
+  @if (isLoading()) {
+    <div class="loading" role="status" aria-live="polite">Loading available time slots...</div>
+  } @else if (error()) {
+    <div class="error" role="alert" aria-live="assertive">
+      <p>{{ error() }}</p>
+      <button (click)="retryLoad()" aria-label="Retry loading time slots">Retry</button>
+    </div>
+  } @else {
+    <div class="time-slots">
+      @for (slot of availableSlots(); track slot.id) {
+        <button
+          class="slot-button"
+          [class.selected]="isSelected(slot)"
+          [class.unavailable]="!slot.isActive"
+          [disabled]="!slot.isActive"
+          (click)="onSlotClick(slot)"
+          type="button"
+        >
+          <span class="time">{{ slot.time }}</span>
+          <span class="date">{{ slot.date | date:'mediumDate' }}</span>
+          @if (!slot.isActive) {
+            <span class="badge">已预约</span>
+          }
+        </button>
+      } @empty {
+        <div class="empty-state">
+          <p>No available time slots</p>
+        </div>
+      }
+    </div>
+  }
+</div>

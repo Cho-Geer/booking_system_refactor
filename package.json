@@ -1,0 +1,31 @@
+{
+  "name": "booking_system_refactor",
+  "version": "1.0.0",
+  "description": "[![Backend CI](https://github.com/${{ github.repository_owner }}/booking-system/actions/workflows/backend-ci.yml/badge.svg)](https://github.com/${{ github.repository_owner }}/booking-system/actions/workflows/backend-ci.yml)\r [![Frontend CI](https://github.com/${{ github.repository_owner }}/booking-system/actions/workflows/frontend-ci.yml/badge.svg)](https://github.com/${{ github.repository_owner }}/booking-system/actions/workflows/frontend-ci.yml)\r [![E2E Tests](https://github.com/${{ github.repository_owner }}/booking-system/actions/workflows/e2e-ci.yml/badge.svg)](https://github.com/${{ github.repository_owner }}/booking-system/actions/workflows/e2e-ci.yml)\r [![Code Coverage](https://codecov.io/gh/${{ github.repository_owner }}/booking-system/branch/main/graph/badge.svg)](https://codecov.io/gh/${{ github.repository_owner }}/booking-system)",
+  "main": "index.js",
+  "bin": {
+    "qoder": "./scripts/qoder-cli.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "test:e2e:all": "npx playwright test --project=chromium & npx playwright show-report",
+    "prepare": "husky",
+    "qoder:hash": "node scripts/update-machine-hash.js update",
+    "qoder:hash:verify": "node scripts/update-machine-hash.js verify",
+    "qoder:hash:help": "node scripts/update-machine-hash.js help",
+    "qoder:state": "node scripts/qoder-cli.js state",
+    "qoder:task": "node scripts/orchestrator-task-scheduler.js",
+    "qoder:task:status": "node scripts/orchestrator-task-scheduler.js status",
+    "qoder:task:schedule": "node scripts/orchestrator-task-scheduler.js schedule",
+    "qoder:validate": "node scripts/orchestrator-task-scheduler.js validate"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.59.1",
+    "ajv": "^8.18.0",
+    "ajv-formats": "^3.0.1",
+    "husky": "^9.1.7"
+  }
+}

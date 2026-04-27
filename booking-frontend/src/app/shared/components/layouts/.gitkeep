@@ -1,0 +1,12 @@
+# Atomic Design: Layouts
+
+布局骨架层 - 定义页面整体布局结构
+
+## 组件分类规则
+- 主布局 (MainLayout)
+- 认证布局 (AuthLayout)
+- 后台布局 (AdminLayout)
+- 空白布局 (BlankLayout)
+
+## 当前状态
+目录已创建，待后续开发中添加布局组件

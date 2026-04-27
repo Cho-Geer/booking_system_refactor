@@ -1,0 +1,13 @@
+# Atomic Design: Molecules
+
+组合组件层 - 由多个原子组件组合而成的功能单元
+
+## 组件分类规则
+- 表单组 (FormGroup)
+- 卡片 (Card)
+- 搜索框 (SearchBar)
+- 导航项 (NavItem)
+- 时间选择器 (TimeSelector)
+
+## 当前状态
+目录已创建，待后续开发中添加分子组件

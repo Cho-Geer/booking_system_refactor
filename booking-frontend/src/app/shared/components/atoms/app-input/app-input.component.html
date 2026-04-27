@@ -1,0 +1,13 @@
+<input
+  pInputText
+  [value]="value()"
+  [placeholder]="placeholder()"
+  [disabled]="disabled()"
+  [readOnly]="readonly()"
+  [attr.aria-label]="ariaLabel() || placeholder()"
+  [attr.type]="type()"
+  [class.ng-invalid]="invalid()"
+  [class.ng-dirty]="invalid()"
+  [class]="styleClass()"
+  (input)="onInput($event)"
+/>
