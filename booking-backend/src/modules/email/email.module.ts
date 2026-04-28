@@ -4,6 +4,7 @@ import { BullModule } from "@nestjs/bullmq";
 import * as nodemailer from "nodemailer";
 import { EmailService } from "./email.service";
 import { EmailWorker } from "./email.worker";
+import { EmailProcessor } from "./email.processor";
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { EmailWorker } from "./email.worker";
     },
     EmailService,
     EmailWorker,
+    EmailProcessor,
   ],
   exports: [EmailService],
 })

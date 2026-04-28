@@ -27,10 +27,7 @@ export interface SettledResult {
  * @returns The task result if the lock was acquired, or `null` if another instance holds the lock.
  */
 export async function withDistributedLock<T>(
-  cacheService: {
-    acquireLock(key: string, ttl: number): Promise<boolean>;
-    releaseLock(key: string): Promise<void>;
-  },
+  cacheService: { acquireLock(key: string, ttl: number): Promise<boolean>; releaseLock(key: string): Promise<void> },
   options: LockOptions,
   task: LockTask<T>,
 ): Promise<T | null> {

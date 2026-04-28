@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  NestInterceptor,
-  ExecutionContext,
-  CallHandler,
-} from "@nestjs/common";
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from "@nestjs/common";
 import { Observable } from "rxjs";
 import { ClsService } from "nestjs-cls";
 
@@ -28,7 +23,10 @@ export class RequestIdInterceptor implements NestInterceptor {
    * @param next - The call handler to proceed with request processing
    * @returns An observable of the response
    */
-  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
+  intercept(
+    context: ExecutionContext,
+    next: CallHandler,
+  ): Observable<unknown> {
     const request = context.switchToHttp().getRequest();
 
     const requestId =

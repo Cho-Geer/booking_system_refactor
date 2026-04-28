@@ -243,7 +243,6 @@ describe('RetentionService', () => {
       mockPrismaService.appointment.updateMany.mockResolvedValue({ count: 5 });
       mockPrismaService.systemLog.deleteMany.mockResolvedValue({ count: 100 });
       mockPrismaService.userSession.deleteMany.mockResolvedValue({ count: 50 });
-      mockPrismaService.activityLog.deleteMany.mockResolvedValue({ count: 200 });
 
       await service.handleCron();
 
@@ -251,7 +250,6 @@ describe('RetentionService', () => {
       expect(mockPrismaService.appointment.updateMany).toHaveBeenCalled();
       expect(mockPrismaService.systemLog.deleteMany).toHaveBeenCalled();
       expect(mockPrismaService.userSession.deleteMany).toHaveBeenCalled();
-      expect(mockPrismaService.activityLog.deleteMany).toHaveBeenCalled();
       expect(mockCacheService.releaseLock).toHaveBeenCalledWith('retention:cleanup:lock');
     });
 
@@ -272,7 +270,6 @@ describe('RetentionService', () => {
       mockPrismaService.appointment.updateMany.mockResolvedValue({ count: 5 });
       mockPrismaService.systemLog.deleteMany.mockResolvedValue({ count: 100 });
       mockPrismaService.userSession.deleteMany.mockResolvedValue({ count: 50 });
-      mockPrismaService.activityLog.deleteMany.mockResolvedValue({ count: 200 });
 
       await service.handleCron();
 
@@ -288,7 +285,6 @@ describe('RetentionService', () => {
       mockPrismaService.appointment.updateMany.mockRejectedValue(new Error('DB error'));
       mockPrismaService.systemLog.deleteMany.mockResolvedValue({ count: 100 });
       mockPrismaService.userSession.deleteMany.mockResolvedValue({ count: 50 });
-      mockPrismaService.activityLog.deleteMany.mockResolvedValue({ count: 200 });
 
       const errorSpy = jest.spyOn(Logger.prototype, 'error').mockImplementation();
 
@@ -303,7 +299,6 @@ describe('RetentionService', () => {
       mockPrismaService.appointment.updateMany.mockRejectedValue(new Error('DB error 1'));
       mockPrismaService.systemLog.deleteMany.mockRejectedValue(new Error('DB error 2'));
       mockPrismaService.userSession.deleteMany.mockRejectedValue(new Error('DB error 3'));
-      mockPrismaService.activityLog.deleteMany.mockRejectedValue(new Error('DB error 4'));
 
       const errorSpy = jest.spyOn(Logger.prototype, 'error').mockImplementation();
 
@@ -318,7 +313,6 @@ describe('RetentionService', () => {
       mockPrismaService.appointment.updateMany.mockRejectedValue(new Error('DB error'));
       mockPrismaService.systemLog.deleteMany.mockResolvedValue({ count: 100 });
       mockPrismaService.userSession.deleteMany.mockResolvedValue({ count: 50 });
-      mockPrismaService.activityLog.deleteMany.mockResolvedValue({ count: 200 });
 
       const errorSpy = jest.spyOn(Logger.prototype, 'error').mockImplementation();
 
@@ -326,7 +320,6 @@ describe('RetentionService', () => {
 
       expect(mockPrismaService.systemLog.deleteMany).toHaveBeenCalled();
       expect(mockPrismaService.userSession.deleteMany).toHaveBeenCalled();
-      expect(mockPrismaService.activityLog.deleteMany).toHaveBeenCalled();
       expect(errorSpy).toHaveBeenCalled();
 
       errorSpy.mockRestore();
@@ -337,69 +330,13 @@ describe('RetentionService', () => {
       mockPrismaService.appointment.updateMany.mockRejectedValue(new Error('DB error 1'));
       mockPrismaService.systemLog.deleteMany.mockRejectedValue(new Error('DB error 2'));
       mockPrismaService.userSession.deleteMany.mockRejectedValue(new Error('DB error 3'));
-      mockPrismaService.activityLog.deleteMany.mockRejectedValue(new Error('DB error 4'));
 
       const errorSpy = jest.spyOn(Logger.prototype, 'error').mockImplementation();
 
       await expect(service.handleCron()).resolves.not.toThrow();
 
-      expect(errorSpy).toHaveBeenCalledTimes(4);
+      expect(errorSpy).toHaveBeenCalledTimes(3);
       errorSpy.mockRestore();
-    });
-
-    /**
-     * ====================================================================
-     * RED PHASE: Test that cleanupOldActivityLogs is NOT yet called in cron.
-     * This test will FAIL in RED phase because the call is missing.
-     * After GREEN phase fix, it will PASS.
-     * ====================================================================
-     */
-    it('[RED] should call cleanupOldActivityLogs along with other cleanup tasks in handleCron', async () => {
-      mockCacheService.acquireLock.mockResolvedValue(true);
-      mockPrismaService.appointment.updateMany.mockResolvedValue({ count: 5 });
-      mockPrismaService.systemLog.deleteMany.mockResolvedValue({ count: 100 });
-      mockPrismaService.userSession.deleteMany.mockResolvedValue({ count: 50 });
-      mockPrismaService.activityLog.deleteMany.mockResolvedValue({ count: 200 });
-
-      await service.handleCron();
-
-      // This assertion will FAIL in RED phase because cleanupOldActivityLogs
-      // is not yet included in the Promise.allSettled array in handleCron()
-      expect(mockPrismaService.activityLog.deleteMany).toHaveBeenCalled();
-      expect(mockPrismaService.appointment.updateMany).toHaveBeenCalled();
-      expect(mockPrismaService.systemLog.deleteMany).toHaveBeenCalled();
-      expect(mockPrismaService.userSession.deleteMany).toHaveBeenCalled();
-    });
-
-    it('[RED] should call cleanupOldActivityLogs even when other tasks have no data', async () => {
-      mockCacheService.acquireLock.mockResolvedValue(true);
-      mockPrismaService.appointment.updateMany.mockResolvedValue({ count: 0 });
-      mockPrismaService.systemLog.deleteMany.mockResolvedValue({ count: 0 });
-      mockPrismaService.userSession.deleteMany.mockResolvedValue({ count: 0 });
-      mockPrismaService.activityLog.deleteMany.mockResolvedValue({ count: 200 });
-
-      await service.handleCron();
-
-      // This assertion will FAIL in RED phase because cleanupOldActivityLogs
-      // is not yet included in the Promise.allSettled array in handleCron()
-      expect(mockPrismaService.activityLog.deleteMany).toHaveBeenCalled();
-    });
-
-    it('[RED] should log "Cleaned old activity logs" when activity logs are cleaned', async () => {
-      mockCacheService.acquireLock.mockResolvedValue(true);
-      mockPrismaService.appointment.updateMany.mockResolvedValue({ count: 5 });
-      mockPrismaService.systemLog.deleteMany.mockResolvedValue({ count: 100 });
-      mockPrismaService.userSession.deleteMany.mockResolvedValue({ count: 50 });
-      mockPrismaService.activityLog.deleteMany.mockResolvedValue({ count: 200 });
-
-      loggerSpy.mockClear();
-      await service.handleCron();
-
-      // This assertion will FAIL in RED phase because the activity log cleanup
-      // message is not yet included in processSettledResults
-      expect(loggerSpy).toHaveBeenCalledWith(
-        expect.stringContaining('activity logs'),
-      );
     });
   });
 });

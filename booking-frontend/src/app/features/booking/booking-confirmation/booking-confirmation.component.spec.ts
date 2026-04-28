@@ -5,7 +5,7 @@ import { BookingConfirmationComponent } from './booking-confirmation.component';
 import { BookingStore, TimeSlot } from '../../../stores/booking/booking.store';
 import { AuthStore, User } from '../../../stores/auth/auth.store';
 import { BookingService } from '../booking.service';
-import { inject, signal } from '@angular/core';
+import { signal } from '@angular/core';
 
 describe('BookingConfirmationComponent', () => {
   let component: BookingConfirmationComponent;
@@ -83,22 +83,7 @@ describe('BookingConfirmationComponent', () => {
 
     fixture = TestBed.createComponent(BookingConfirmationComponent);
     component = fixture.componentInstance;
-    TestBed.runInInjectionContext(() => {
-      router = inject(Router);
-    });
-  });
-
-  describe('[RED] injection verification', () => {
-    it('[RED] should inject Router via TestBed.inject', () => {
-      expect(router).toBeDefined();
-      expect(router.navigate).toBeInstanceOf(Function);
-    });
-
-    it('[RED] should allow Router to be used for navigation', () => {
-      jest.spyOn(router, 'navigate');
-      router.navigate(['/test']);
-      expect(router.navigate).toHaveBeenCalledWith(['/test']);
-    });
+    router = TestBed.inject(Router);
   });
 
   describe('initialization', () => {

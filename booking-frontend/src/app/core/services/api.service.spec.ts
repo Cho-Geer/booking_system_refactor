@@ -4,18 +4,7 @@ import {
   HttpTestingController,
 } from '@angular/common/http/testing';
 import { ApiService, ApiResponse } from './api.service';
-import {
-  LoginPasswordDto,
-  RegisterCompleteDto,
-  RegisterSendCodeDto,
-  LoginSendCodeDto,
-  LoginVerifyCodeDto,
-  ContactType,
-  AuthResponseDto,
-  RegisterSendCodeResponse,
-  LoginSendCodeResponse,
-  LogoutResponse,
-} from '../../features/auth/dto/auth.dto';
+import { LoginPasswordDto, RegisterCompleteDto, ContactType, AuthResponseDto } from '../../features/auth/dto/auth.dto';
 
 describe('ApiService', () => {
   let service: ApiService;
@@ -36,40 +25,27 @@ describe('ApiService', () => {
   });
 
   describe('loginPassword()', () => {
-    it('[RED] should fail: loginPassword should unwrap ApiResponse envelope', () => {
+    it('should send POST request to /api/auth/login/password with credentials', () => {
       const mockCredentials: LoginPasswordDto = {
         contact: 'test@example.com',
         contactType: ContactType.EMAIL,
         password: 'password123',
       };
-      const mockData: AuthResponseDto = {
+      const mockResponse: AuthResponseDto = {
         accessToken: 'jwt-token-123',
         refreshToken: 'refresh-token-123',
         expiresIn: 900,
         tokenType: 'Bearer',
       };
-      const wrappedResponse: ApiResponse<AuthResponseDto> = {
-        statusCode: 200,
-        message: 'OK',
-        data: mockData,
-        timestamp: '2026-04-27T00:00:00.000Z',
-        requestId: 'req-test-uuid',
-      };
 
-      let received: any = null;
-      service.loginPassword(mockCredentials).subscribe({
-        next: (r) => { received = r; },
-        error: (err) => fail(err),
+      service.loginPassword(mockCredentials).subscribe((response) => {
+        expect(response).toEqual(mockResponse);
       });
 
       const req = httpMock.expectOne(`${apiUrl}/auth/login/password`);
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual(mockCredentials);
-      req.flush(wrappedResponse);
-
-      // [RED] received is the full envelope (not unwrapped), so accessToken is undefined
-      // This assertion FAILS → proves RED state
-      expect(received.accessToken).toBe('jwt-token-123');
+      req.flush(mockResponse);
     });
 
     it('should handle login error', () => {
@@ -92,42 +68,29 @@ describe('ApiService', () => {
   });
 
   describe('registerComplete()', () => {
-    it('[RED] should fail: registerComplete should unwrap ApiResponse envelope', () => {
-      const mockDto: RegisterCompleteDto = {
+    it('should send POST request to /api/auth/register/complete with registration data', () => {
+      const mockData: RegisterCompleteDto = {
         contact: 'new@example.com',
         contactType: ContactType.EMAIL,
         code: '123456',
         password: 'password123',
         name: 'New User',
       };
-      const mockData: AuthResponseDto = {
+      const mockResponse: AuthResponseDto = {
         accessToken: 'jwt-token-456',
         refreshToken: 'refresh-token-456',
         expiresIn: 900,
         tokenType: 'Bearer',
       };
-      const wrappedResponse: ApiResponse<AuthResponseDto> = {
-        statusCode: 200,
-        message: 'OK',
-        data: mockData,
-        timestamp: '2026-04-27T00:00:00.000Z',
-        requestId: 'req-test-uuid',
-      };
 
-      let received: any = null;
-      service.registerComplete(mockDto).subscribe({
-        next: (r) => { received = r; },
-        error: (err) => fail(err),
+      service.registerComplete(mockData).subscribe((response) => {
+        expect(response).toEqual(mockResponse);
       });
 
       const req = httpMock.expectOne(`${apiUrl}/auth/register/complete`);
       expect(req.request.method).toBe('POST');
-      expect(req.request.body).toEqual(mockDto);
-      req.flush(wrappedResponse);
-
-      // [RED] received is the full envelope (not unwrapped), so accessToken is undefined
-      // This assertion FAILS → proves RED state
-      expect(received.accessToken).toBe('jwt-token-456');
+      expect(req.request.body).toEqual(mockData);
+      req.flush(mockResponse);
     });
 
     it('should handle registration error', () => {
@@ -151,175 +114,6 @@ describe('ApiService', () => {
     });
   });
 
-  // ============================================================
-  // [RED] Tests: Auth methods need ApiResponse.data unwrapping
-  // All these tests WILL FAIL until the unwrap logic is added.
-  // ============================================================
-
-  describe('registerSendCode() [RED - needs unwrap]', () => {
-    it('[RED] should fail: registerSendCode should unwrap ApiResponse envelope', () => {
-      const mockDto: RegisterSendCodeDto = {
-        contact: 'test@example.com',
-        contactType: ContactType.EMAIL,
-      };
-      const mockData: RegisterSendCodeResponse = {
-        maskedContact: 'tes***@example.com',
-        expiresIn: 300,
-      };
-      const wrappedResponse: ApiResponse<RegisterSendCodeResponse> = {
-        statusCode: 200,
-        message: 'OK',
-        data: mockData,
-        timestamp: '2026-04-27T00:00:00.000Z',
-        requestId: 'req-test-uuid',
-      };
-
-      let received: any = null;
-      service.registerSendCode(mockDto).subscribe({
-        next: (r) => { received = r; },
-        error: (err) => fail(err),
-      });
-
-      const req = httpMock.expectOne(`${apiUrl}/auth/register/send-code`);
-      expect(req.request.method).toBe('POST');
-      expect(req.request.body).toEqual(mockDto);
-      req.flush(wrappedResponse);
-
-      // [RED] received is full envelope → maskedContact is undefined → FAILS
-      expect(received.maskedContact).toBe('tes***@example.com');
-    });
-  });
-
-  describe('loginSendCode() [RED - needs unwrap]', () => {
-    it('[RED] should fail: loginSendCode should unwrap ApiResponse envelope', () => {
-      const mockDto: LoginSendCodeDto = {
-        contact: 'test@example.com',
-        contactType: ContactType.EMAIL,
-      };
-      const mockData: LoginSendCodeResponse = {
-        expiresIn: 300,
-      };
-      const wrappedResponse: ApiResponse<LoginSendCodeResponse> = {
-        statusCode: 200,
-        message: 'OK',
-        data: mockData,
-        timestamp: '2026-04-27T00:00:00.000Z',
-        requestId: 'req-test-uuid',
-      };
-
-      let received: any = null;
-      service.loginSendCode(mockDto).subscribe({
-        next: (r) => { received = r; },
-        error: (err) => fail(err),
-      });
-
-      const req = httpMock.expectOne(`${apiUrl}/auth/login/send-code`);
-      expect(req.request.method).toBe('POST');
-      expect(req.request.body).toEqual(mockDto);
-      req.flush(wrappedResponse);
-
-      // [RED] received is full envelope → accessToken undefined → FAILS
-      expect(received.expiresIn).toBe(300);
-    });
-  });
-
-  describe('loginVerifyCode() [RED - needs unwrap]', () => {
-    it('[RED] should fail: loginVerifyCode should unwrap ApiResponse envelope', () => {
-      const mockDto: LoginVerifyCodeDto = {
-        contact: 'test@example.com',
-        contactType: ContactType.EMAIL,
-        code: '123456',
-      };
-      const mockData: AuthResponseDto = {
-        accessToken: 'jwt-token-789',
-        refreshToken: 'refresh-token-789',
-        expiresIn: 900,
-        tokenType: 'Bearer',
-      };
-      const wrappedResponse: ApiResponse<AuthResponseDto> = {
-        statusCode: 200,
-        message: 'OK',
-        data: mockData,
-        timestamp: '2026-04-27T00:00:00.000Z',
-        requestId: 'req-test-uuid',
-      };
-
-      let received: any = null;
-      service.loginVerifyCode(mockDto).subscribe({
-        next: (r) => { received = r; },
-        error: (err) => fail(err),
-      });
-
-      const req = httpMock.expectOne(`${apiUrl}/auth/login/verify-code`);
-      expect(req.request.method).toBe('POST');
-      expect(req.request.body).toEqual(mockDto);
-      req.flush(wrappedResponse);
-
-      // [RED] received is full envelope → accessToken undefined → FAILS
-      expect(received.accessToken).toBe('jwt-token-789');
-    });
-  });
-
-  describe('refreshToken() [RED - needs unwrap]', () => {
-    it('[RED] should fail: refreshToken should unwrap ApiResponse envelope', () => {
-      const mockData: AuthResponseDto = {
-        accessToken: 'new-jwt-token',
-        refreshToken: 'new-refresh-token',
-        expiresIn: 900,
-        tokenType: 'Bearer',
-      };
-      const wrappedResponse: ApiResponse<AuthResponseDto> = {
-        statusCode: 200,
-        message: 'OK',
-        data: mockData,
-        timestamp: '2026-04-27T00:00:00.000Z',
-        requestId: 'req-test-uuid',
-      };
-
-      let received: any = null;
-      service.refreshToken('old-refresh-token').subscribe({
-        next: (r) => { received = r; },
-        error: (err) => fail(err),
-      });
-
-      const req = httpMock.expectOne(`${apiUrl}/auth/refresh`);
-      expect(req.request.method).toBe('POST');
-      expect(req.request.body).toEqual({ refreshToken: 'old-refresh-token' });
-      req.flush(wrappedResponse);
-
-      // [RED] received is full envelope → accessToken undefined → FAILS
-      expect(received.accessToken).toBe('new-jwt-token');
-    });
-  });
-
-  describe('logout() [RED - needs unwrap]', () => {
-    it('[RED] should fail: logout should unwrap ApiResponse envelope', () => {
-      const mockData: LogoutResponse = {
-        message: 'Logged out successfully',
-      };
-      const wrappedResponse: ApiResponse<LogoutResponse> = {
-        statusCode: 200,
-        message: 'OK',
-        data: mockData,
-        timestamp: '2026-04-27T00:00:00.000Z',
-        requestId: 'req-test-uuid',
-      };
-
-      let received: any = null;
-      service.logout().subscribe({
-        next: (r) => { received = r; },
-        error: (err) => fail(err),
-      });
-
-      const req = httpMock.expectOne(`${apiUrl}/auth/logout`);
-      expect(req.request.method).toBe('POST');
-      req.flush(wrappedResponse);
-
-      // [RED] received is full envelope → message undefined → FAILS
-      expect(received.message).toBe('Logged out successfully');
-    });
-  });
-
   describe('getServices()', () => {
     const mockServices = [
       { id: '1', name: 'Haircut', description: 'Standard haircut', durationMinutes: 30, price: 25 },
@@ -328,7 +122,8 @@ describe('ApiService', () => {
 
     it('should send GET request to /api/services and unwrap ApiResponse', (done) => {
       const wrappedResponse: ApiResponse<typeof mockServices> = {
-        statusCode: 200,
+        success: true,
+        code: 200,
         message: 'OK',
         data: mockServices,
         timestamp: '2026-04-24T10:00:00.000Z',
@@ -400,7 +195,8 @@ describe('ApiService', () => {
     it('[GREEN] should unwrap ApiResponse envelope from backend for getServices', (done) => {
       // Simulate the actual backend ResponseInterceptor response format
       const wrappedResponse: ApiResponse<typeof mockServices> = {
-        statusCode: 200,
+        success: true,
+        code: 200,
         message: 'OK',
         data: mockServices,
         timestamp: '2026-04-24T10:00:00.000Z',
@@ -428,7 +224,8 @@ describe('ApiService', () => {
 
     it('[GREEN] should return actual data array from wrapped response for getServices', (done) => {
       const wrappedResponse: ApiResponse<typeof mockServices> = {
-        statusCode: 200,
+        success: true,
+        code: 200,
         message: 'OK',
         data: mockServices,
         timestamp: '2026-04-24T10:00:00.000Z',
@@ -515,7 +312,8 @@ describe('ApiService', () => {
 
     it('[GREEN] should unwrap ApiResponse envelope for getAvailableSlots', (done) => {
       const wrappedResponse: ApiResponse<typeof mockSlots> = {
-        statusCode: 200,
+        success: true,
+        code: 200,
         message: 'OK',
         data: mockSlots,
         timestamp: '2026-04-24T10:00:00.000Z',
@@ -543,144 +341,6 @@ describe('ApiService', () => {
         );
       });
       req.flush(wrappedResponse);
-    });
-  });
-
-  // ============================================================
-  // [RED] Tests: New ResponseInterceptor format (statusCode)
-  // These tests use the NEW { statusCode, message, data, timestamp, requestId }
-  // format and will FAIL because ApiResponse<T> still expects { success, code }.
-  // After GREEN, these should pass with the updated ApiResponse interface.
-  // ============================================================
-
-  describe('new ResponseInterceptor statusCode format', () => {
-    const mockServices = [
-      { id: '1', name: 'Haircut', description: 'Standard haircut', durationMinutes: 30, price: 25 },
-      { id: '2', name: 'Coloring', description: 'Hair coloring', durationMinutes: 60, price: 50 },
-    ];
-
-    it('[RED] should parse new statusCode format for getServices', (done) => {
-      // New backend format: { statusCode, message, data, timestamp, requestId }
-      const newFormatResponse: ApiResponse<typeof mockServices> = {
-        statusCode: 200,
-        message: 'OK',
-        data: mockServices,
-        timestamp: '2026-04-24T10:00:00.000Z',
-        requestId: 'req-test-uuid',
-      };
-
-      service.getServices().subscribe({
-        next: (services) => {
-          try {
-            expect(Array.isArray(services)).toBe(true);
-            expect(services.length).toBe(2);
-            expect(services[0].name).toBe('Haircut');
-            done();
-          } catch (e) {
-            done(e);
-          }
-        },
-        error: (err) => done('should not error: ' + err),
-      });
-
-      const req = httpMock.expectOne(`${apiUrl}/services`);
-      req.flush(newFormatResponse);
-    });
-
-    it('[RED] should parse new statusCode format for getAvailableSlots', (done) => {
-      const mockSlots = [
-        { id: 'slot-1', date: '2026-04-20', time: '09:00', isActive: true },
-        { id: 'slot-2', date: '2026-04-20', time: '10:00', isActive: true },
-      ];
-
-      const newFormatResponse: ApiResponse<typeof mockSlots> = {
-        statusCode: 200,
-        message: 'OK',
-        data: mockSlots,
-        timestamp: '2026-04-24T10:00:00.000Z',
-        requestId: 'req-test-uuid',
-      };
-
-      service.getAvailableSlots('svc-1').subscribe({
-        next: (slots) => {
-          try {
-            expect(Array.isArray(slots)).toBe(true);
-            expect(slots.length).toBe(2);
-            expect(slots[0].id).toBe('slot-1');
-            done();
-          } catch (e) {
-            done(e);
-          }
-        },
-        error: (err) => done('should not error: ' + err),
-      });
-
-      const req = httpMock.expectOne((request) => {
-        return (
-          request.url === `${apiUrl}/time-slots/available` &&
-          request.params.get('serviceId') === 'svc-1'
-        );
-      });
-      req.flush(newFormatResponse);
-    });
-
-    it('[RED] should parse new statusCode format for getUserProfile', (done) => {
-      const mockProfile = {
-        id: 'user-1',
-        name: 'Test User',
-        email: 'us***@example.com',
-        role: 'CUSTOMER',
-        created_at: '2026-01-01T00:00:00.000Z',
-      };
-
-      const newFormatResponse: ApiResponse<typeof mockProfile> = {
-        statusCode: 200,
-        message: 'OK',
-        data: mockProfile,
-        timestamp: '2026-04-24T10:00:00.000Z',
-        requestId: 'req-test-uuid',
-      };
-
-      service.getUserProfile().subscribe({
-        next: (profile) => {
-          try {
-            expect(profile.name).toBe('Test User');
-            expect(profile.role).toBe('CUSTOMER');
-            done();
-          } catch (e) {
-            done(e);
-          }
-        },
-        error: (err) => done('should not error: ' + err),
-      });
-
-      const req = httpMock.expectOne(`${apiUrl}/users/profile`);
-      req.flush(newFormatResponse);
-    });
-
-    it('[RED] should handle ApiResponse with statusCode indicating failure', (done) => {
-      const errorResponse: ApiResponse<null> = {
-        statusCode: 500,
-        message: 'Internal server error',
-        data: null,
-        timestamp: '2026-04-24T10:00:00.000Z',
-        requestId: 'req-error-uuid',
-      };
-
-      service.getServices().subscribe({
-        next: () => done('should have errored'),
-        error: (error) => {
-          try {
-            expect(error).toBeTruthy();
-            done();
-          } catch (e) {
-            done(e);
-          }
-        },
-      });
-
-      const req = httpMock.expectOne(`${apiUrl}/services`);
-      req.flush(errorResponse);
     });
   });
 

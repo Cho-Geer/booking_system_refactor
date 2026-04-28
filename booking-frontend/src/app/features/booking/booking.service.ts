@@ -54,8 +54,8 @@ export class BookingService {
       this.store.confirmSlotReservation(slotId);
 
       return {
-        status: 'SUCCESS' as const,
-        slot: { id: slotId, date: new Date().toISOString(), time: '', isActive: false },
+        status: 'SUCCESS',
+        slot: response.slot,
       };
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Reservation failed';

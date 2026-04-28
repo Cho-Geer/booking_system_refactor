@@ -47,7 +47,11 @@ export class ServicesController {
     @Query("pageSize", ParseIntPipe) pageSize: number = 10,
     @Query("isActive") isActive?: boolean,
   ) {
-    return this.servicesService.findAll(page, pageSize, isActive);
+    return this.servicesService.findAll(
+      page,
+      pageSize,
+      isActive,
+    );
   }
 
   @Get(":id")

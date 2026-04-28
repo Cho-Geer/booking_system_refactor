@@ -1,6 +1,6 @@
-import { Injectable, Logger } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import * as crypto from "crypto";
+import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import * as crypto from 'crypto';
 
 export interface EncryptedPayload {
   iv: string;
@@ -20,21 +20,21 @@ export interface EncryptedPayload {
 @Injectable()
 export class EncryptionService {
   private readonly logger = new Logger(EncryptionService.name);
-  private readonly algorithm = "aes-256-gcm";
+  private readonly algorithm = 'aes-256-gcm';
   private readonly encryptionKey: Buffer;
 
   constructor(private readonly configService: ConfigService) {
-    const keyBase64 = this.configService.get<string>("PII_ENCRYPTION_KEY");
+    const keyBase64 = this.configService.get<string>('PII_ENCRYPTION_KEY');
     if (!keyBase64) {
-      throw new Error("PII_ENCRYPTION_KEY environment variable is required");
+      throw new Error('PII_ENCRYPTION_KEY environment variable is required');
     }
     // 支持 32 字节 raw key 或 Base64 编码的 key
     if (keyBase64.length === 64) {
       // Hex encoded 32-byte key
-      this.encryptionKey = Buffer.from(keyBase64, "hex");
+      this.encryptionKey = Buffer.from(keyBase64, 'hex');
     } else {
       // Base64 encoded key
-      this.encryptionKey = Buffer.from(keyBase64, "base64");
+      this.encryptionKey = Buffer.from(keyBase64, 'base64');
     }
 
     if (this.encryptionKey.length !== 32) {
@@ -43,7 +43,7 @@ export class EncryptionService {
       );
     }
 
-    this.logger.log("EncryptionService initialized with AES-256-GCM");
+    this.logger.log('EncryptionService initialized with AES-256-GCM');
   }
 
   /**
@@ -53,20 +53,16 @@ export class EncryptionService {
    */
   async encrypt(plaintext: string): Promise<EncryptedPayload> {
     const iv = crypto.randomBytes(16);
-    const cipher = crypto.createCipheriv(
-      this.algorithm,
-      this.encryptionKey,
-      iv,
-    );
+    const cipher = crypto.createCipheriv(this.algorithm, this.encryptionKey, iv);
 
-    let ciphertext = cipher.update(plaintext, "utf8", "base64");
-    ciphertext += cipher.final("base64");
+    let ciphertext = cipher.update(plaintext, 'utf8', 'base64');
+    ciphertext += cipher.final('base64');
 
     const authTag = cipher.getAuthTag();
 
     return {
-      iv: iv.toString("base64"),
-      authTag: authTag.toString("base64"),
+      iv: iv.toString('base64'),
+      authTag: authTag.toString('base64'),
       ciphertext,
     };
   }
@@ -86,13 +82,13 @@ export class EncryptionService {
     const decipher = crypto.createDecipheriv(
       this.algorithm,
       this.encryptionKey,
-      Buffer.from(iv, "base64"),
+      Buffer.from(iv, 'base64'),
     );
 
-    decipher.setAuthTag(Buffer.from(authTag, "base64"));
+    decipher.setAuthTag(Buffer.from(authTag, 'base64'));
 
-    let plaintext = decipher.update(ciphertext, "base64", "utf8");
-    plaintext += decipher.final("utf8");
+    let plaintext = decipher.update(ciphertext, 'base64', 'utf8');
+    plaintext += decipher.final('utf8');
 
     return plaintext;
   }
@@ -102,6 +98,6 @@ export class EncryptionService {
    * 用于初始化 PII_ENCRYPTION_KEY 环境变量
    */
   static generateKey(): string {
-    return crypto.randomBytes(32).toString("base64");
+    return crypto.randomBytes(32).toString('base64');
   }
 }

@@ -25,10 +25,10 @@ export function maskPhone(phone: string): string {
  * @returns 脱敏后的邮箱（如 us***@example.com）
  */
 export function maskEmail(email: string): string {
-  if (!email || !email.includes("@")) {
+  if (!email || !email.includes('@')) {
     return email;
   }
-  const [localPart, domain] = email.split("@");
+  const [localPart, domain] = email.split('@');
   if (localPart.length <= 2) {
     return `${localPart}***@${domain}`;
   }

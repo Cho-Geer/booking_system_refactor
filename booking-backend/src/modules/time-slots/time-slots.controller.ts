@@ -49,7 +49,12 @@ export class TimeSlotsController {
     @Query("page", ParseIntPipe) page: number = 1,
     @Query("pageSize", ParseIntPipe) pageSize: number = 10,
   ) {
-    return this.timeSlotsService.findAll(serviceId, isActive, page, pageSize);
+    return this.timeSlotsService.findAll(
+      serviceId,
+      isActive,
+      page,
+      pageSize,
+    );
   }
 
   @Get("available")

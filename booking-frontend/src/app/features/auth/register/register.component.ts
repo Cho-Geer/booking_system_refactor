@@ -18,9 +18,6 @@ import {
   RegisterSendCodeDto,
   RegisterCompleteDto,
 } from '../dto/auth.dto';
-import { RegisterFormComponent } from '../../../shared/components/molecules/register-form/register-form.component';
-import { switchMap, catchError, takeUntil } from 'rxjs/operators';
-import { of, Subject } from 'rxjs';
 
 // Password strength validator matching backend requirements
 const passwordStrengthValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
@@ -31,7 +28,7 @@ const passwordStrengthValidator: ValidatorFn = (control: AbstractControl): Valid
   const hasLowerCase = /[a-z]/.test(value);
   const hasNumber = /\d/.test(value);
   const hasSpecialChar = /[@$!%*?&]/.test(value);
-  const isValidLength = value.length >= 12;
+  const isValidLength = value.length >= 8;
 
   const valid = hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar && isValidLength;
 
@@ -49,7 +46,7 @@ const passwordStrengthValidator: ValidatorFn = (control: AbstractControl): Valid
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterModule, CommonModule, FormsModule, RegisterFormComponent],
+  imports: [ReactiveFormsModule, RouterModule, CommonModule, FormsModule],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',
 })
@@ -59,7 +56,6 @@ export class RegisterComponent implements OnDestroy {
   private api = inject(ApiService);
   private socketService = inject(SocketService);
   private router = inject(Router);
-  private destroy$ = new Subject<void>();
 
   // Step state: 1 = send code, 2 = complete registration
   currentStep = 1;
@@ -91,14 +87,12 @@ export class RegisterComponent implements OnDestroy {
     { validators: this.passwordMatchValidator }
   );
 
-  // Signals (no $ suffix per convention - $ is for Observables only)
-  isLoading = this.authStore.isLoading;
-  error = this.authStore.error;
+  // Observable signals (with $ suffix per convention)
+  isLoading$ = this.authStore.isLoading;
+  error$ = this.authStore.error;
 
   ngOnDestroy(): void {
     this.clearCountdown();
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 
   // Step 1: Send verification code
@@ -122,9 +116,7 @@ export class RegisterComponent implements OnDestroy {
       contactType: this.contactType,
     };
 
-    this.api.registerSendCode(dto).pipe(
-      takeUntil(this.destroy$),
-    ).subscribe({
+    this.api.registerSendCode(dto).subscribe({
       next: () => {
         this.authStore.setLoading(false);
         this.currentStep = 2;
@@ -158,32 +150,35 @@ export class RegisterComponent implements OnDestroy {
       name,
     };
 
-    this.api.registerComplete(dto).pipe(
-      switchMap((response) => {
+    this.api.registerComplete(dto).subscribe({
+      next: (response) => {
+        // Store tokens (auth response has no user object)
         this.authStore.loginSuccess(response.accessToken, response.refreshToken);
-        return this.api.getUserProfile().pipe(
-          catchError(() => of(null))
-        );
-      }),
-      takeUntil(this.destroy$),
-    ).subscribe({
-      next: (profile) => {
-        if (profile) {
-          this.authStore.setUserProfile({
-            id: profile.id,
-            name: profile.name,
-            role: profile.role,
-            email: profile.email,
-            phone: profile.phone,
-            createdAt: profile.created_at,
-          });
-        }
-        this.socketService.connect();
-        this.router.navigate(['/booking']);
-        this.authStore.setLoading(false);
+        
+        // Fetch user profile separately
+        this.api.getUserProfile().subscribe({
+          next: (profile) => {
+            this.authStore.setUserProfile({
+              id: profile.id,
+              name: profile.name,
+              role: profile.role,
+              email: profile.email,
+              phone: profile.phone,
+              createdAt: profile.created_at,
+            });
+            
+            // Connect socket and redirect
+            this.socketService.connect();
+            this.router.navigate(['/booking']);
+          },
+          error: () => {
+            // Even if profile fetch fails, user is logged in
+            this.socketService.connect();
+            this.router.navigate(['/booking']);
+          },
+        });
       },
       error: (err) => {
-        this.authStore.setLoading(false);
         this.authStore.setError(err.message || 'Registration failed. Please check your information and try again.');
       },
     });
@@ -246,7 +241,7 @@ export class RegisterComponent implements OnDestroy {
   get passwordRequirements() {
     const val = this.step2Form.get('password')?.value || '';
     return {
-      hasMinLength: val.length >= 12,
+      hasMinLength: val.length >= 8,
       hasUpperCase: /[A-Z]/.test(val),
       hasLowerCase: /[a-z]/.test(val),
       hasNumber: /\d/.test(val),

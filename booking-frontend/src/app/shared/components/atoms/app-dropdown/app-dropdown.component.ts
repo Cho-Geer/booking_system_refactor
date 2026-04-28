@@ -13,7 +13,7 @@ export type DropdownVariant = 'filled' | 'outlined';
 })
 export class AppDropdownComponent {
   /** An array of selectable items. */
-  readonly options = input<any[]>([]);
+  readonly options = input<unknown[]>([]);
 
   /** Name of the label field of an option. */
   readonly optionLabel = input<string>();
@@ -46,9 +46,9 @@ export class AppDropdownComponent {
   readonly styleClass = input<string>();
 
   /** Emitted when the selected value changes. */
-  readonly valueChange = output<any>();
+  readonly valueChange = output<unknown>();
 
-  onModelChange(value: any): void {
+  onModelChange(value: unknown): void {
     this.valueChange.emit(value);
   }
 }

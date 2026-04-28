@@ -50,6 +50,15 @@ out-tsc/
 
 # Multi-agent transient artifacts (all under .task_temp/)
 test_report.json
+TASK_LOG.md
+HANDOVER.md
+green_report.json
+red_report.json
+refactor_report.json
+guardian_report.json
+guardian_report.md
+deployment_status.json
+incident_report.md
 
 # Playwright
 playwright-report/

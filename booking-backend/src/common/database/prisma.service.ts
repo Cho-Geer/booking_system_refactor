@@ -35,7 +35,9 @@ export class PrismaService
       // In non-production environments, log the host info only (safely)
       try {
         const url = new URL(dbUrl);
-        this.logger.log(`Connecting to database at ${url.host}${url.pathname}`);
+        this.logger.log(
+          `Connecting to database at ${url.host}${url.pathname}`,
+        );
       } catch {
         this.logger.log("Connecting to database...");
       }

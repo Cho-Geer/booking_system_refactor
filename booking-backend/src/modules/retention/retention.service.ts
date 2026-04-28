@@ -42,19 +42,13 @@ export class RetentionService {
           this.cleanupExpiredAppointments(),
           this.cleanupOldSystemLogs(),
           this.cleanupInactiveSessions(),
-          this.cleanupOldActivityLogs(),
         ]);
 
-        processSettledResults(
-          results,
-          [
-            "Archived expired appointments",
-            "Deleted old system logs",
-            "Cleaned inactive sessions",
-            "Cleaned old activity logs",
-          ],
-          this.logger,
-        );
+        processSettledResults(results, [
+          "Archived expired appointments",
+          "Deleted old system logs",
+          "Cleaned inactive sessions",
+        ], this.logger);
 
         this.logger.log("Daily data retention cleanup completed");
       },

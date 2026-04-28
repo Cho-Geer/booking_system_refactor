@@ -224,9 +224,8 @@ model Appointment {
   histories AppointmentHistory[]
   notifications Notification[]
 
-  // 注意: appointment_slot_occupied 唯一索引已改为部分唯一索引（WHERE status IN ('PENDING','CONFIRMED','COMPLETED')）
-  // 该约束通过 SQL 迁移实现（见 prisma/migrations/20260422_fix_p1_003_partial_unique_index/migration.sql）
-  // Prisma 6.x 不支持带 WHERE 子句的部分唯一索引，因此在 schema 层移除，仅在数据库层面维护
+  // 部分唯一索引 - 高并发核心 (通过 SQL 迁移实现部分索引)
+  @@unique([timeSlotId, appointmentDate, slotSequence], map: "appointment_slot_occupied")
 
   @@map("appointments")
   @@index([userId, appointmentDate])

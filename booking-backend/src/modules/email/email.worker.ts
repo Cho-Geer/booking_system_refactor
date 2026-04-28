@@ -3,6 +3,7 @@ import { Logger } from "@nestjs/common";
 import { Inject } from "@nestjs/common";
 import { Job } from "bullmq";
 import type { Transporter } from "nodemailer";
+import { EmailProcessor } from "./email.processor";
 
 export interface EmailJobData {
   to: string;
@@ -23,6 +24,7 @@ export class EmailWorker extends WorkerHost {
 
   constructor(
     @Inject("EMAIL_TRANSPORTER") private readonly transporter: Transporter,
+    private readonly emailProcessor: EmailProcessor,
   ) {
     super();
   }
@@ -30,6 +32,11 @@ export class EmailWorker extends WorkerHost {
   async process(
     job: Job<EmailJobData>,
   ): Promise<{ sent: boolean; messageId?: string }> {
+    // Delegate verification-email jobs to the dedicated EmailProcessor
+    if (job.name === "verification-email") {
+      return this.emailProcessor.sendVerificationEmail(job.data);
+    }
+
     const { to, subject, html, text } = job.data;
 
     this.logger.log(`Processing email job ${job.id}: ${subject} -> ${to}`);

@@ -14,7 +14,7 @@ import { DatabaseModule } from "./common/database/database.module";
 import { AuthModule } from "./modules/auth/auth.module";
 import { UsersModule } from "./modules/users/users.module";
 import { ServicesModule } from "./modules/services/services.module";
-import { AppointmentsModule } from "./modules/appointments/appointments.module";
+import { AppointmentModule } from "./modules/appointments/appointment.module";
 import { TimeSlotsModule } from "./modules/time-slots/time-slots.module";
 import { EmailModule } from "./modules/email/email.module";
 import { NotificationsModule } from "./modules/notifications/notifications.module";
@@ -76,7 +76,7 @@ import { EncryptionModule } from "./modules/encryption/encryption.module";
     AuthModule,
     UsersModule,
     ServicesModule,
-    AppointmentsModule,
+    AppointmentModule,
     TimeSlotsModule,
     EmailModule,
     NotificationsModule,

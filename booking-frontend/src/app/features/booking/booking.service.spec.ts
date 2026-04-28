@@ -43,20 +43,6 @@ describe('BookingService', () => {
     service = TestBed.inject(BookingService);
   });
 
-  describe('[RED] injection verification', () => {
-    it('[RED] should inject BookingService via TestBed.inject', () => {
-      expect(service).toBeDefined();
-      expect(service).toBeInstanceOf(BookingService);
-    });
-
-    it('[RED] should have BookingService methods available', () => {
-      expect(typeof service.generatePreferSeq).toBe('function');
-      expect(typeof service.generateIdempotencyKey).toBe('function');
-      expect(typeof service.reserveSlot).toBe('function');
-      expect(typeof service.cancelBooking).toBe('function');
-    });
-  });
-
   describe('generatePreferSeq()', () => {
     it('should return a number between 0 and maxSlots - 1', () => {
       const maxSlots = 10;

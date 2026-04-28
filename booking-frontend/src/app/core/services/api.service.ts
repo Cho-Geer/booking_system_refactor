@@ -19,38 +19,14 @@ import { Service, TimeSlot, ReservationResponse } from '../../shared/dto';
 /**
  * Standard API response envelope as produced by the backend ResponseInterceptor.
  * All backend responses (both GET and POST/DELETE) are wrapped in this format.
- *
- * @see contract.yaml -> response_formats.success_response
- * Format: { statusCode, message, data, timestamp, requestId }
  */
 export interface ApiResponse<T> {
-  statusCode: number;
+  success: boolean;
+  code: number;
   message: string;
   data: T;
   timestamp: string;
   requestId: string;
-}
-
-/**
- * Checks whether an ApiResponse has a successful statusCode (2xx range).
- * Throws an Error if the statusCode indicates failure (4xx or 5xx).
- */
-function validateApiResponse<T>(response: ApiResponse<T>): ApiResponse<T> {
-  if (response.statusCode < 200 || response.statusCode >= 300) {
-    throw new Error(response.message || `Request failed with status ${response.statusCode}`);
-  }
-  return response;
-}
-
-/**
- * RxJS pipe operator that unwraps the standard ApiResponse envelope.
- * Validates the statusCode via validateApiResponse and extracts `.data`.
- *
- * Usage:
- *   http.get<ApiResponse<T>>(url).pipe(unwrapResponse<T>(), catchError(...))
- */
-function unwrapResponse<T>() {
-  return map((response: ApiResponse<T>) => validateApiResponse(response).data);
 }
 
 // Re-export DTOs for backward compatibility
@@ -82,11 +58,8 @@ export class ApiService {
    */
   registerSendCode(dto: RegisterSendCodeDto): Observable<RegisterSendCodeResponse> {
     return this.http
-      .post<ApiResponse<RegisterSendCodeResponse>>(`${this.apiUrl}/auth/register/send-code`, dto)
-      .pipe(
-        unwrapResponse<RegisterSendCodeResponse>(),
-        catchError(this.handleError)
-      );
+      .post<RegisterSendCodeResponse>(`${this.apiUrl}/auth/register/send-code`, dto)
+      .pipe(catchError(this.handleError));
   }
 
   /**
@@ -95,11 +68,8 @@ export class ApiService {
    */
   registerComplete(dto: RegisterCompleteDto): Observable<AuthResponseDto> {
     return this.http
-      .post<ApiResponse<AuthResponseDto>>(`${this.apiUrl}/auth/register/complete`, dto)
-      .pipe(
-        unwrapResponse<AuthResponseDto>(),
-        catchError(this.handleError)
-      );
+      .post<AuthResponseDto>(`${this.apiUrl}/auth/register/complete`, dto)
+      .pipe(catchError(this.handleError));
   }
 
   /**
@@ -108,11 +78,8 @@ export class ApiService {
    */
   loginSendCode(dto: LoginSendCodeDto): Observable<LoginSendCodeResponse> {
     return this.http
-      .post<ApiResponse<LoginSendCodeResponse>>(`${this.apiUrl}/auth/login/send-code`, dto)
-      .pipe(
-        unwrapResponse<LoginSendCodeResponse>(),
-        catchError(this.handleError)
-      );
+      .post<LoginSendCodeResponse>(`${this.apiUrl}/auth/login/send-code`, dto)
+      .pipe(catchError(this.handleError));
   }
 
   /**
@@ -121,11 +88,8 @@ export class ApiService {
    */
   loginVerifyCode(dto: LoginVerifyCodeDto): Observable<AuthResponseDto> {
     return this.http
-      .post<ApiResponse<AuthResponseDto>>(`${this.apiUrl}/auth/login/verify-code`, dto)
-      .pipe(
-        unwrapResponse<AuthResponseDto>(),
-        catchError(this.handleError)
-      );
+      .post<AuthResponseDto>(`${this.apiUrl}/auth/login/verify-code`, dto)
+      .pipe(catchError(this.handleError));
   }
 
   /**
@@ -134,11 +98,8 @@ export class ApiService {
    */
   loginPassword(dto: LoginPasswordDto): Observable<AuthResponseDto> {
     return this.http
-      .post<ApiResponse<AuthResponseDto>>(`${this.apiUrl}/auth/login/password`, dto)
-      .pipe(
-        unwrapResponse<AuthResponseDto>(),
-        catchError(this.handleError)
-      );
+      .post<AuthResponseDto>(`${this.apiUrl}/auth/login/password`, dto)
+      .pipe(catchError(this.handleError));
   }
 
   /**
@@ -147,11 +108,8 @@ export class ApiService {
    */
   refreshToken(refreshToken: string): Observable<AuthResponseDto> {
     return this.http
-      .post<ApiResponse<AuthResponseDto>>(`${this.apiUrl}/auth/refresh`, { refreshToken })
-      .pipe(
-        unwrapResponse<AuthResponseDto>(),
-        catchError(this.handleError)
-      );
+      .post<AuthResponseDto>(`${this.apiUrl}/auth/refresh`, { refreshToken })
+      .pipe(catchError(this.handleError));
   }
 
   /**
@@ -160,11 +118,8 @@ export class ApiService {
    */
   logout(): Observable<LogoutResponse> {
     return this.http
-      .post<ApiResponse<LogoutResponse>>(`${this.apiUrl}/auth/logout`, {})
-      .pipe(
-        unwrapResponse<LogoutResponse>(),
-        catchError(this.handleError)
-      );
+      .post<LogoutResponse>(`${this.apiUrl}/auth/logout`, {})
+      .pipe(catchError(this.handleError));
   }
 
   // ==========================================
@@ -175,8 +130,8 @@ export class ApiService {
     return this.http
       .get<ApiResponse<Service[]>>(`${this.apiUrl}/services`)
       .pipe(
+        map(response => response.data),
         retry(2),
-        map(response => validateApiResponse(response).data),
         catchError(this.handleError)
       );
   }
@@ -204,8 +159,8 @@ export class ApiService {
     return this.http
       .get<ApiResponse<TimeSlot[]>>(`${this.apiUrl}/time-slots/available`, { params })
       .pipe(
-        retry(2),
         map(response => response.data),
+        retry(2),
         catchError(this.handleError)
       );
   }

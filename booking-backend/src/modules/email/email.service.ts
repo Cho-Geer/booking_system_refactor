@@ -58,25 +58,26 @@ export class EmailService implements OnModuleInit {
     subject,
     html,
     text,
-  }: SendEmailDto): Promise<{ success: boolean; messageId?: string }> {
-    try {
-      const info = await this.transporter.sendMail({
-        from: process.env.SMTP_FROM || "noreply@bookingsystem.com",
-        to,
-        subject,
-        html,
-        text,
-      });
+  }: SendEmailDto): Promise<{ success: boolean; jobId?: string }> {
+    const job = await this.emailQueue.add(
+      "verification-email",
+      { to, subject, html, text },
+      {
+        attempts: 3,
+        backoff: {
+          type: "exponential",
+          delay: 2000,
+        },
+        removeOnComplete: true,
+        removeOnFail: false,
+      },
+    );
 
-      this.logger.log(`Email sent to ${to} with messageId: ${info.messageId}`);
-      return { success: true, messageId: info.messageId };
-    } catch (error) {
-      this.logger.error(
-        `Failed to send email to ${to}: ${error.message}`,
-        error.stack,
-      );
-      throw error;
-    }
+    this.logger.log(
+      `Queued verification email for ${to} (Job ID: ${job.id})`,
+    );
+
+    return { success: true, jobId: job.id };
   }
 
   async sendAppointmentConfirmation(

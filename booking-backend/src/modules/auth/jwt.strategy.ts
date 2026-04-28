@@ -1,16 +1,23 @@
-import { ExtractJwt, Strategy } from "passport-jwt";
-import { PassportStrategy } from "@nestjs/passport";
-import { Injectable, UnauthorizedException } from "@nestjs/common";
-import { PrismaService } from "../../common/database/prisma.service";
-import { loadJwtSecret } from "../../config/jwt.config";
+import { ExtractJwt, Strategy } from 'passport-jwt';
+import { PassportStrategy } from '@nestjs/passport';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { PrismaService } from '../../common/database/prisma.service';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
-  constructor(private readonly prisma: PrismaService) {
+export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
+  constructor(
+    configService: ConfigService,
+    private readonly prisma: PrismaService,
+  ) {
+    const jwtSecret = configService.get<string>('JWT_SECRET');
+    if (!jwtSecret) {
+      throw new Error('JWT_SECRET environment variable is required');
+    }
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: loadJwtSecret(),
+      secretOrKey: jwtSecret,
     });
   }
 
@@ -28,8 +35,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
       },
     });
 
-    if (!user || user.status !== "ACTIVE") {
-      throw new UnauthorizedException("User not found or inactive");
+    if (!user || user.status !== 'ACTIVE') {
+      throw new UnauthorizedException('User not found or inactive');
     }
 
     // 返回用户信息（不含 PII 加密字段）

@@ -26,18 +26,10 @@ const mockAppointmentsService = {
   remove: jest.fn(),
 };
 
-interface MockRequest {
-  user: {
-    id: string;
-    sub: string;
-    type: string;
-  };
-}
-
 describe('AppointmentsController', () => {
   let controller: AppointmentsController;
   let service: typeof mockAppointmentsService;
-  let mockReq: MockRequest;
+  let mockReq: any;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({

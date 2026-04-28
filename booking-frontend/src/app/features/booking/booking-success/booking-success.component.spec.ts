@@ -3,7 +3,7 @@ import { provideRouter, Router } from '@angular/router';
 import { BookingSuccessComponent } from './booking-success.component';
 import { BookingStore } from '../../../stores/booking/booking.store';
 import { AuthStore } from '../../../stores/auth/auth.store';
-import { inject, signal } from '@angular/core';
+import { signal } from '@angular/core';
 
 describe('BookingSuccessComponent', () => {
   let fixture: ComponentFixture<BookingSuccessComponent>;
@@ -49,25 +49,9 @@ describe('BookingSuccessComponent', () => {
 
     fixture = TestBed.createComponent(BookingSuccessComponent);
     component = fixture.componentInstance;
-    TestBed.runInInjectionContext(() => {
-      router = inject(Router);
-    });
+    router = TestBed.inject(Router);
     jest.spyOn(router, 'navigate').mockReturnValue(Promise.resolve(true));
     fixture.detectChanges();
-  });
-
-  describe('[RED] injection verification', () => {
-    it('[RED] should inject Router via TestBed.inject', () => {
-      expect(router).toBeDefined();
-      // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(router.navigate).toEqual(expect.any(Function));
-    });
-
-    it('[RED] should allow Router navigation after injection', () => {
-      // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(router.navigate).toEqual(expect.any(Function));
-      expect(typeof router.navigate).toBe('function');
-    });
   });
 
   it('should create', () => {

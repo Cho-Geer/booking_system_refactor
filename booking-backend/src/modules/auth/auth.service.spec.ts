@@ -25,51 +25,8 @@ import { isIntegrationMode } from '../../../test/setup/test-env';
 import { createTestModule, TestModule } from '../../../test/helpers/create-test-module';
 import { createTestUser } from '../../../test/fixtures/database.fixture';
 
-// Mock type for PrismaClient as used in these tests
-interface MockPrismaClient {
-  user: {
-    findUnique: jest.Mock;
-    findFirst: jest.Mock;
-    update: jest.Mock;
-    create: jest.Mock;
-  };
-  userSession: {
-    findUnique: jest.Mock;
-    update: jest.Mock;
-    updateMany: jest.Mock;
-    create: jest.Mock;
-  };
-  $transaction: jest.Mock;
-  $disconnect: jest.Mock;
-  emailVerificationCode?: {
-    findFirst: jest.Mock;
-    update: jest.Mock;
-    deleteMany: jest.Mock;
-    create: jest.Mock;
-  };
-}
-
-// Mock type for Prisma $transaction callback
-interface MockTxUserSession {
-  update: jest.Mock;
-  create: jest.Mock;
-}
-
-interface MockTx {
-  userSession: MockTxUserSession;
-}
-
-// Type for accessing private members of AuthService in tests
-interface AuthServicePrivateAccess {
-  emailService: { sendEmail: jest.Mock };
-  verificationService: { generateCode: jest.Mock; verifyCode: jest.Mock; deleteCode: jest.Mock };
-  cacheService: { setSession: jest.Mock; get: jest.Mock; set: jest.Mock; delete: jest.Mock };
-  constantTimeLoginDelay(): Promise<void>;
-  mapUserTypeToRole(userType: string): string;
-}
-
 // Create a complete mock PrismaClient
-const createMockPrismaClient = (): MockPrismaClient => ({
+const createMockPrismaClient = () => ({
   user: {
     findUnique: jest.fn(),
     findFirst: jest.fn(),
@@ -95,7 +52,7 @@ jest.mock('bcryptjs', () => ({
 describe('AuthService', () => {
   let service: AuthService;
   let jwtService: JwtService;
-  let mockPrismaClient: MockPrismaClient;
+  let mockPrismaClient: any;
 
   const mockJwtService = {
     sign: jest.fn(),
@@ -247,7 +204,7 @@ describe('AuthService', () => {
       const mockEmailService = {
         sendEmail: jest.fn().mockRejectedValue(new Error('SMTP error')),
       };
-      (service as unknown as AuthServicePrivateAccess).emailService = mockEmailService;
+      (service as any).emailService = mockEmailService;
 
       const dto: RegisterSendCodeDto = {
         contact: 'test@example.com',
@@ -266,11 +223,9 @@ describe('AuthService', () => {
   describe('registerComplete', () => {
     it('should throw BadRequestException if verification code is invalid', async () => {
       const mockVerificationService = {
-        generateCode: jest.fn(),
         verifyCode: jest.fn().mockResolvedValue({ success: false }),
-        deleteCode: jest.fn(),
       };
-      (service as unknown as AuthServicePrivateAccess).verificationService = mockVerificationService;
+      (service as any).verificationService = mockVerificationService;
 
       const dto: RegisterCompleteDto = {
         contact: 'test@example.com',
@@ -647,7 +602,7 @@ describe('AuthService', () => {
       // Call the private method multiple times and verify random distribution
       for (let i = 0; i < 10; i++) {
         const start = Date.now();
-        await (service as unknown as AuthServicePrivateAccess).constantTimeLoginDelay();
+        await (service as any).constantTimeLoginDelay();
         const elapsed = Date.now() - start;
         delayValues.push(elapsed);
       }
@@ -739,7 +694,7 @@ describe('AuthService', () => {
       const mockEmailService = {
         sendEmail: jest.fn().mockRejectedValue(new Error('SMTP error')),
       };
-      (service as unknown as AuthServicePrivateAccess).emailService = mockEmailService;
+      (service as any).emailService = mockEmailService;
 
       const dto: LoginSendCodeDto = {
         contact: 'test@example.com',
@@ -813,11 +768,9 @@ describe('AuthService', () => {
       });
 
       const mockVerificationService = {
-        generateCode: jest.fn(),
         verifyCode: jest.fn().mockResolvedValue({ success: false }),
-        deleteCode: jest.fn(),
       };
-      (service as unknown as AuthServicePrivateAccess).verificationService = mockVerificationService;
+      (service as any).verificationService = mockVerificationService;
 
       const dto: LoginVerifyCodeDto = {
         contact: 'test@example.com',
@@ -927,11 +880,8 @@ describe('AuthService', () => {
       mockPrismaClient.userSession.updateMany.mockResolvedValue({ count: 1 });
       const mockCacheService = {
         setSession: jest.fn().mockResolvedValue(undefined),
-        get: jest.fn(),
-        set: jest.fn(),
-        delete: jest.fn(),
       };
-      (service as unknown as AuthServicePrivateAccess).cacheService = mockCacheService;
+      (service as any).cacheService = mockCacheService;
 
       await service.logout('user-123', 'access-token', 'refresh-token');
 
@@ -966,11 +916,8 @@ describe('AuthService', () => {
       // and uses that jti as the blacklist key
       const mockCacheService = {
         setSession: jest.fn().mockResolvedValue(undefined),
-        get: jest.fn(),
-        set: jest.fn(),
-        delete: jest.fn(),
       };
-      (service as unknown as AuthServicePrivateAccess).cacheService = mockCacheService;
+      (service as any).cacheService = mockCacheService;
 
       // Act
       await service.logout(TEST_USER_ID, TEST_ACCESS_TOKEN, TEST_REFRESH_TOKEN);
@@ -986,11 +933,8 @@ describe('AuthService', () => {
       // Arrange
       const mockCacheService = {
         setSession: jest.fn().mockResolvedValue(undefined),
-        get: jest.fn(),
-        set: jest.fn(),
-        delete: jest.fn(),
       };
-      (service as unknown as AuthServicePrivateAccess).cacheService = mockCacheService;
+      (service as any).cacheService = mockCacheService;
 
       // Act
       await service.logout(TEST_USER_ID, TEST_ACCESS_TOKEN, TEST_REFRESH_TOKEN);
@@ -1004,11 +948,8 @@ describe('AuthService', () => {
       jest.spyOn(crypto, 'randomUUID');
       const mockCacheService = {
         setSession: jest.fn().mockResolvedValue(undefined),
-        get: jest.fn(),
-        set: jest.fn(),
-        delete: jest.fn(),
       };
-      (service as unknown as AuthServicePrivateAccess).cacheService = mockCacheService;
+      (service as any).cacheService = mockCacheService;
 
       // Act
       await service.logout(TEST_USER_ID, TEST_ACCESS_TOKEN, TEST_REFRESH_TOKEN);
@@ -1034,11 +975,8 @@ describe('AuthService', () => {
       // This test verifies logout passes the correct TTL-conscious key
       const mockCacheService = {
         setSession: jest.fn().mockResolvedValue(undefined),
-        get: jest.fn(),
-        set: jest.fn(),
-        delete: jest.fn(),
       };
-      (service as unknown as AuthServicePrivateAccess).cacheService = mockCacheService;
+      (service as any).cacheService = mockCacheService;
 
       // Act
       await service.logout(TEST_USER_ID, TEST_ACCESS_TOKEN, TEST_REFRESH_TOKEN);
@@ -1167,7 +1105,7 @@ describe('AuthService', () => {
       mockPrismaClient.userSession.findUnique.mockResolvedValue(mockSession);
 
       mockPrismaClient.$transaction.mockImplementation(
-        async (callback: (tx: MockTx) => Promise<unknown>) => {
+        async (callback: (tx: any) => Promise<any>) => {
           return callback({
             userSession: {
               update: mockPrismaClient.userSession.update.mockResolvedValue({}),
@@ -1195,22 +1133,22 @@ describe('AuthService', () => {
 
   describe('mapUserTypeToRole', () => {
     it('should map CUSTOMER to CUSTOMER (per contract.yaml Role enum)', () => {
-      const result = (service as unknown as AuthServicePrivateAccess).mapUserTypeToRole('CUSTOMER');
+      const result = (service as any).mapUserTypeToRole('CUSTOMER');
       expect(result).toBe('CUSTOMER');
     });
 
     it('should map ADMIN to ADMIN (per contract.yaml Role enum)', () => {
-      const result = (service as unknown as AuthServicePrivateAccess).mapUserTypeToRole('ADMIN');
+      const result = (service as any).mapUserTypeToRole('ADMIN');
       expect(result).toBe('ADMIN');
     });
 
     it('should map SUPER_ADMIN to SUPER_ADMIN (per contract.yaml Role enum)', () => {
-      const result = (service as unknown as AuthServicePrivateAccess).mapUserTypeToRole('SUPER_ADMIN');
+      const result = (service as any).mapUserTypeToRole('SUPER_ADMIN');
       expect(result).toBe('SUPER_ADMIN');
     });
 
     it('should map unknown type to CUSTOMER as default', () => {
-      const result = (service as unknown as AuthServicePrivateAccess).mapUserTypeToRole('UNKNOWN_TYPE');
+      const result = (service as any).mapUserTypeToRole('UNKNOWN_TYPE');
       expect(result).toBe('CUSTOMER');
     });
   });
@@ -1296,9 +1234,9 @@ if (isIntegrationMode()) {
   describe('AuthService (Integration - Real Database)', () => {
     let testModule: TestModule;
     let authService: AuthService;
-    let mockJwtService: { sign: jest.Mock; verify: jest.Mock };
-    let mockEncryptionService: { encrypt: jest.Mock; decrypt: jest.Mock };
-    let mockHashService: { hashWithPepper: jest.Mock };
+    let mockJwtService: any;
+    let mockEncryptionService: any;
+    let mockHashService: any;
 
     beforeAll(async () => {
       // Restore all mocks to ensure PrismaClient is the real implementation
@@ -1402,7 +1340,7 @@ if (isIntegrationMode()) {
       await testModule.resetDatabase();
 
       // Re-setup all mocks after resetMocks clears implementations
-      mockJwtService.sign.mockImplementation((payload, options) => {
+      mockJwtService.sign.mockImplementation((payload: any, options: any) => {
         if (options && options.secret === 'test-jwt-secret') {
           return 'mock-access-jwt-token';
         }
@@ -1438,7 +1376,7 @@ if (isIntegrationMode()) {
           verifyCode: jest.fn().mockResolvedValue({ success: true }),
           deleteCode: jest.fn(),
         };
-        (authService as unknown as AuthServicePrivateAccess).verificationService = mockVerificationService;
+        (authService as any).verificationService = mockVerificationService;
 
         const result = await authService.registerComplete(dto);
 

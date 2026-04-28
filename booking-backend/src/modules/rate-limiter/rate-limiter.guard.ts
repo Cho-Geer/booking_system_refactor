@@ -239,6 +239,10 @@ export class RateLimitGuard implements CanActivate {
     if (body && typeof body.email === "string") {
       return body.email.toLowerCase().trim();
     }
+    // LoginSendCodeDto uses 'contact' field instead of 'email'
+    if (body && typeof body.contact === "string") {
+      return body.contact.toLowerCase().trim();
+    }
     return undefined;
   }
 

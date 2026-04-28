@@ -39,7 +39,10 @@ export class AppointmentsController {
   @ApiOperation({ summary: "Create a new appointment" })
   @ApiResponse({ status: 201, description: "Appointment created" })
   @ApiResponse({ status: 409, description: "Time slot not available" })
-  async create(@Body() createAppointmentDto: CreateAppointmentDto, @Req() req) {
+  async create(
+    @Body() createAppointmentDto: CreateAppointmentDto,
+    @Req() req,
+  ) {
     const userId = req?.user?.id;
     return this.appointmentsService.create(createAppointmentDto, userId);
   }
@@ -55,7 +58,12 @@ export class AppointmentsController {
     @Query("status") status?: AppointmentStatus,
     @Query("userId") userId?: string,
   ) {
-    return this.appointmentsService.findAll(page, pageSize, status, userId);
+    return this.appointmentsService.findAll(
+      page,
+      pageSize,
+      status,
+      userId,
+    );
   }
 
   @Get("my")
@@ -68,7 +76,12 @@ export class AppointmentsController {
     @Query("pageSize", ParseIntPipe) pageSize: number = 10,
   ) {
     const userId = req?.user?.id;
-    return this.appointmentsService.findAll(page, pageSize, undefined, userId);
+    return this.appointmentsService.findAll(
+      page,
+      pageSize,
+      undefined,
+      userId,
+    );
   }
 
   @Get(":id")

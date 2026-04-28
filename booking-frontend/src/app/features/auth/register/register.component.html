@@ -6,9 +6,9 @@
       已有账号? <a routerLink="/auth/login">登录</a>
     </div>
 
-    @if (error()) {
+    @if (error$()) {
       <div class="error-message global-error">
-        <p>{{ error() }}</p>
+        <p>{{ error$() }}</p>
       </div>
     }
 
@@ -74,9 +74,9 @@
         <button
           type="submit"
           class="btn-primary"
-          [disabled]="step1Form.invalid || isLoading()"
+          [disabled]="step1Form.invalid || isLoading$()"
         >
-          @if (isLoading()) {
+          @if (isLoading$()) {
             <span>发送中...</span>
           } @else {
             <span>发送验证码</span>
@@ -87,17 +87,166 @@
 
     <!-- Step 2: Complete Registration -->
     @if (currentStep === 2) {
-      <app-register-form
-        [step2Form]="step2Form"
-        [countdown]="countdown"
-        [isLoading]="isLoading()"
-        [acceptTerms]="acceptTerms"
-        [passwordRequirements]="passwordRequirements"
-        (codeRequested)="sendVerifyCode()"
-        (formSubmitted)="onCompleteRegistration()"
-        (backRequested)="goToStep1()"
-        (termsChanged)="acceptTerms = $event"
-      />
+      <form [formGroup]="step2Form" (ngSubmit)="onCompleteRegistration()">
+        <div class="form-group">
+          <label for="code">验证码</label>
+          <div class="verify-input-wrapper">
+            <input
+              id="code"
+              type="text"
+              inputmode="numeric"
+              pattern="\d{6}"
+              formControlName="code"
+              placeholder="Enter 6-digit code"
+              maxlength="6"
+              [class.error]="isStep2FieldInvalid('code')"
+            />
+            <button
+              type="button"
+              class="btn-get-code"
+              [disabled]="countdown > 0"
+              (click)="sendVerifyCode()"
+            >
+              @if (countdown > 0) {
+                {{ countdown }}s
+              } @else {
+                重新发送
+              }
+            </button>
+          </div>
+          @if (isStep2FieldInvalid('code')) {
+            <div class="error-message">
+              <span>请输入6位数字验证码</span>
+            </div>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="name">姓名</label>
+          <input
+            id="name"
+            type="text"
+            formControlName="name"
+            placeholder="Enter your name"
+            [class.error]="isStep2FieldInvalid('name')"
+          />
+          @if (isStep2FieldInvalid('name')) {
+            <div class="error-message">
+              @if (step2Form.get('name')?.errors?.['required']) {
+                <span>姓名不能为空</span>
+              }
+              @if (step2Form.get('name')?.errors?.['minlength']) {
+                <span>姓名至少2个字符</span>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="password">密码</label>
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            placeholder="Set login password"
+            [class.error]="isStep2FieldInvalid('password')"
+          />
+          @if (isStep2FieldInvalid('password')) {
+            <div class="error-message">
+              @if (step2Form.get('password')?.errors?.['passwordStrength']) {
+                <span>密码不符合要求</span>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">确认密码</label>
+          <input
+            id="confirmPassword"
+            type="password"
+            formControlName="confirmPassword"
+            placeholder="Confirm your password"
+            [class.error]="isStep2FieldInvalid('confirmPassword')"
+          />
+          @if (isStep2FieldInvalid('confirmPassword')) {
+            <div class="error-message">
+              @if (step2Form.get('confirmPassword')?.errors?.['required']) {
+                <span>请确认密码</span>
+              }
+              @if (step2Form.get('confirmPassword')?.errors?.['passwordMismatch']) {
+                <span>两次密码输入不一致</span>
+              }
+            </div>
+          }
+        </div>
+
+        @defer {
+          <div class="password-requirements">
+            <ul>
+              <li [class.valid]="passwordRequirements.hasMinLength">
+                <input type="checkbox" [attr.checked]="passwordRequirements.hasMinLength ? '' : null" disabled />
+                <span>至少 8 个字符</span>
+              </li>
+              <li [class.valid]="passwordRequirements.hasUpperCase">
+                <input type="checkbox" [attr.checked]="passwordRequirements.hasUpperCase ? '' : null" disabled />
+                <span>至少一个大写字母 (A-Z)</span>
+              </li>
+              <li [class.valid]="passwordRequirements.hasLowerCase">
+                <input type="checkbox" [attr.checked]="passwordRequirements.hasLowerCase ? '' : null" disabled />
+                <span>至少一个小写字母 (a-z)</span>
+              </li>
+              <li [class.valid]="passwordRequirements.hasNumber">
+                <input type="checkbox" [attr.checked]="passwordRequirements.hasNumber ? '' : null" disabled />
+                <span>至少一个数字 (0-9)</span>
+              </li>
+              <li [class.valid]="passwordRequirements.hasSpecialChar">
+                <input type="checkbox" [attr.checked]="passwordRequirements.hasSpecialChar ? '' : null" disabled />
+                <span>至少一个特殊字符 (@$!%?&)</span>
+              </li>
+            </ul>
+          </div>
+        } @placeholder {
+          <div class="password-requirements-placeholder">
+            <span class="placeholder-text">Password requirements will appear as you type...</span>
+          </div>
+        }
+
+        <div class="terms-checkbox">
+          <label>
+            <input
+              type="checkbox"
+              [(ngModel)]="acceptTerms"
+              [ngModelOptions]="{standalone: true}"
+            />
+            <span class="terms-text">
+              我已阅读并同意
+              <a routerLink="/legal/terms" target="_blank">服务条款</a>、
+              <a routerLink="/legal/child-protection" target="_blank">儿童保护政策</a>
+              和
+              <a routerLink="/legal/privacy" target="_blank">隐私政策</a>
+            </span>
+          </label>
+        </div>
+
+        <div class="step-actions">
+          <button type="button" class="btn-secondary" (click)="goToStep1()">
+            返回
+          </button>
+          <button
+            type="submit"
+            class="btn-primary"
+            [disabled]="step2Form.invalid || isLoading$() || !acceptTerms"
+            aria-label="Complete registration"
+          >
+            @if (isLoading$()) {
+              <span>注册中...</span>
+            } @else {
+              <span>完成注册</span>
+            }
+          </button>
+        </div>
+      </form>
     }
   </div>
 </div>

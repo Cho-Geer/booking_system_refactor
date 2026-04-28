@@ -16,14 +16,11 @@ import {
   LoginSendCodeDto,
   LoginVerifyCodeDto,
 } from '../dto/auth.dto';
-import { AuthFormComponent } from '../../../shared/components/molecules/auth-form/auth-form.component';
-import { switchMap, catchError, takeUntil } from 'rxjs/operators';
-import { of, Subject } from 'rxjs';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterModule, CommonModule, FormsModule, AuthFormComponent],
+  imports: [ReactiveFormsModule, RouterModule, CommonModule, FormsModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })
@@ -33,7 +30,6 @@ export class LoginComponent implements OnDestroy {
   private api = inject(ApiService);
   private socketService = inject(SocketService);
   private router = inject(Router);
-  private destroy$ = new Subject<void>();
 
   // Tab state: 'password' = password login, 'code' = verification code login
   activeTab: 'password' | 'code' = 'password';
@@ -64,14 +60,12 @@ export class LoginComponent implements OnDestroy {
     code: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]],
   });
 
-  // Signals (no $ suffix per convention - $ is for Observables only)
-  isLoading = this.authStore.isLoading;
-  error = this.authStore.error;
+  // Observable signals (with $ suffix per convention)
+  isLoading$ = this.authStore.isLoading;
+  error$ = this.authStore.error;
 
   ngOnDestroy(): void {
     this.clearCountdown();
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 
   switchTab(tab: 'password' | 'code'): void {
@@ -97,32 +91,35 @@ export class LoginComponent implements OnDestroy {
       password,
     };
 
-    this.api.loginPassword(dto).pipe(
-      switchMap((response) => {
+    this.api.loginPassword(dto).subscribe({
+      next: (response) => {
+        // Store tokens (auth response has no user object)
         this.authStore.loginSuccess(response.accessToken, response.refreshToken);
-        return this.api.getUserProfile().pipe(
-          catchError(() => of(null))
-        );
-      }),
-      takeUntil(this.destroy$),
-    ).subscribe({
-      next: (profile) => {
-        if (profile) {
-          this.authStore.setUserProfile({
-            id: profile.id,
-            name: profile.name,
-            role: profile.role,
-            email: profile.email,
-            phone: profile.phone,
-            createdAt: profile.created_at,
-          });
-        }
-        this.socketService.connect();
-        this.router.navigate(['/booking']);
-        this.authStore.setLoading(false);
+        
+        // Fetch user profile separately
+        this.api.getUserProfile().subscribe({
+          next: (profile) => {
+            this.authStore.setUserProfile({
+              id: profile.id,
+              name: profile.name,
+              role: profile.role,
+              email: profile.email,
+              phone: profile.phone,
+              createdAt: profile.created_at,
+            });
+            
+            // Connect socket and redirect
+            this.socketService.connect();
+            this.router.navigate(['/booking']);
+          },
+          error: () => {
+            // Even if profile fetch fails, user is logged in
+            this.socketService.connect();
+            this.router.navigate(['/booking']);
+          },
+        });
       },
       error: (err) => {
-        this.authStore.setLoading(false);
         this.authStore.setError(err.message || 'Login failed. Please check your credentials and try again.');
       },
     });
@@ -149,9 +146,7 @@ export class LoginComponent implements OnDestroy {
       contactType: this.contactType,
     };
 
-    this.api.loginSendCode(dto).pipe(
-      takeUntil(this.destroy$),
-    ).subscribe({
+    this.api.loginSendCode(dto).subscribe({
       next: () => {
         this.authStore.setLoading(false);
         this.codeLoginStep = 2;
@@ -181,32 +176,35 @@ export class LoginComponent implements OnDestroy {
       code,
     };
 
-    this.api.loginVerifyCode(dto).pipe(
-      switchMap((response) => {
+    this.api.loginVerifyCode(dto).subscribe({
+      next: (response) => {
+        // Store tokens (auth response has no user object)
         this.authStore.loginSuccess(response.accessToken, response.refreshToken);
-        return this.api.getUserProfile().pipe(
-          catchError(() => of(null))
-        );
-      }),
-      takeUntil(this.destroy$),
-    ).subscribe({
-      next: (profile) => {
-        if (profile) {
-          this.authStore.setUserProfile({
-            id: profile.id,
-            name: profile.name,
-            role: profile.role,
-            email: profile.email,
-            phone: profile.phone,
-            createdAt: profile.created_at,
-          });
-        }
-        this.socketService.connect();
-        this.router.navigate(['/booking']);
-        this.authStore.setLoading(false);
+        
+        // Fetch user profile separately
+        this.api.getUserProfile().subscribe({
+          next: (profile) => {
+            this.authStore.setUserProfile({
+              id: profile.id,
+              name: profile.name,
+              role: profile.role,
+              email: profile.email,
+              phone: profile.phone,
+              createdAt: profile.created_at,
+            });
+            
+            // Connect socket and redirect
+            this.socketService.connect();
+            this.router.navigate(['/booking']);
+          },
+          error: () => {
+            // Even if profile fetch fails, user is logged in
+            this.socketService.connect();
+            this.router.navigate(['/booking']);
+          },
+        });
       },
       error: (err) => {
-        this.authStore.setLoading(false);
         this.authStore.setError(err.message || 'Verification failed. Please check your code and try again.');
       },
     });
@@ -244,5 +242,15 @@ export class LoginComponent implements OnDestroy {
       this.countdownTimer = null;
     }
     this.countdown = 0;
+  }
+
+  isPasswordFieldInvalid(fieldName: string): boolean {
+    const field = this.passwordForm.get(fieldName);
+    return !!(field && field.invalid && (field.dirty || field.touched));
+  }
+
+  isCodeFieldInvalid(fieldName: string): boolean {
+    const field = this.codeLoginForm.get(fieldName);
+    return !!(field && field.invalid && (field.dirty || field.touched));
   }
 }

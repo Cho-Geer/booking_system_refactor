@@ -189,42 +189,43 @@ describe('JwtStrategy', () => {
 });
 
 describe('JwtStrategy - Constructor Validation', () => {
-  const originalEnv = process.env;
-
-  afterEach(() => {
-    process.env = originalEnv;
-  });
-
   it('should throw error when JWT_SECRET is missing', async () => {
-    // 临时移除 JWT_SECRET 并 mock fs.existsSync 以排除 Docker Secret 文件
-    jest.resetModules();
-    process.env = { ...originalEnv };
-    delete process.env.JWT_SECRET;
-
-    const fs = require('fs');
-    jest.spyOn(fs, 'existsSync').mockReturnValue(false);
+    const badConfigService = {
+      get: jest.fn().mockReturnValue(undefined),
+    };
 
     await expect(
       Test.createTestingModule({
         providers: [
           JwtStrategy,
           {
+            provide: ConfigService,
+            useValue: badConfigService,
+          },
+          {
             provide: PrismaService,
             useValue: mockPrisma,
           },
         ],
       }).compile(),
-    ).rejects.toThrow('JWT_SECRET is not configured');
-
-    jest.restoreAllMocks();
+    ).rejects.toThrow('JWT_SECRET environment variable is required');
   });
 
   it('should initialize successfully when JWT_SECRET is provided', async () => {
-    process.env.JWT_SECRET = 'valid-secret-for-test';
+    const goodConfigService = {
+      get: jest.fn((key: string) => {
+        if (key === 'JWT_SECRET') return 'valid-secret';
+        return undefined;
+      }),
+    };
 
     const module = await Test.createTestingModule({
       providers: [
         JwtStrategy,
+        {
+          provide: ConfigService,
+          useValue: goodConfigService,
+        },
         {
           provide: PrismaService,
           useValue: mockPrisma,
