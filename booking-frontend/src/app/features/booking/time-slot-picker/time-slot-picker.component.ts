@@ -1,7 +1,8 @@
 import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { Subscription } from 'rxjs';
-import { BookingStore, TimeSlot } from '../../../stores/booking/booking.store';
+import { BookingStore } from '../../../stores/booking/booking.store';
+import { TimeSlot } from '../../../shared/dto/time-slot.dto';
 import { BookingService } from '../booking.service';
 import { SocketService, SlotUpdateEvent } from '../../../core/services/socket.service';
 
@@ -37,7 +38,7 @@ export class TimeSlotPickerComponent implements OnInit, OnDestroy {
   }
 
   onSlotClick(slot: TimeSlot): void {
-    if (!slot.isActive) {
+    if (!slot.available) {
       return;
     }
 
@@ -57,7 +58,7 @@ export class TimeSlotPickerComponent implements OnInit, OnDestroy {
     const currentSlots = this.store.slots();
     const updatedSlots = currentSlots.map((slot) =>
       slot.id === update.slotId
-        ? { ...slot, isActive: update.isActive, bookedBy: update.bookedBy }
+        ? { ...slot, available: update.isActive, bookedBy: update.bookedBy }
         : slot
     );
     this.store.loadSlots(updatedSlots);

@@ -1,19 +1,7 @@
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
 import { computed } from '@angular/core';
-
-export interface TimeSlot {
-  id: string;
-  date: string;
-  time: string;
-  isActive: boolean;
-  bookedBy?: string;
-}
-
-export interface ReservationResponse {
-  status: 'SUCCESS' | 'FAILED' | 'PENDING';
-  slot: TimeSlot;
-  message?: string;
-}
+import { TimeSlot } from '../../shared/dto/time-slot.dto';
+import { ReservationResponse } from '../../shared/dto/booking.dto';
 
 export interface BookingState {
   slots: TimeSlot[];
@@ -35,8 +23,8 @@ export const BookingStore = signalStore(
   { providedIn: 'root' },
   withState<BookingState>(initialBookingState),
   withComputed(({ slots, selectedSlot, activeBookings }) => ({
-    availableSlots: computed(() => slots().filter(slot => slot.isActive)),
-    bookedSlots: computed(() => slots().filter(slot => !slot.isActive)),
+    availableSlots: computed(() => slots().filter(slot => slot.available)),
+    bookedSlots: computed(() => slots().filter(slot => !slot.available)),
     hasSelection: computed(() => selectedSlot() !== null),
   })),
   withMethods((store) => ({
@@ -54,7 +42,7 @@ export const BookingStore = signalStore(
       const currentSlots = store.slots();
       const updatedSlots = currentSlots.map(slot =>
         slot.id === slotId
-          ? { ...slot, isActive: false, bookedBy: userId }
+          ? { ...slot, available: false, bookedBy: userId }
           : slot
       );
       
@@ -70,7 +58,7 @@ export const BookingStore = signalStore(
       const currentSlots = store.slots();
       const updatedSlots = currentSlots.map(slot =>
         slot.id === slotId
-          ? { ...slot, isActive: true, bookedBy: undefined }
+          ? { ...slot, available: true, bookedBy: undefined }
           : slot
       );
       
@@ -91,17 +79,17 @@ export const BookingStore = signalStore(
       const currentSlots = store.slots();
       const targetSlot = currentSlots.find(slot => slot.id === params.slotId);
       
-      if (!targetSlot || !targetSlot.isActive) {
+      if (!targetSlot || !targetSlot.available) {
         return {
           status: 'FAILED',
-          slot: targetSlot ?? { id: params.slotId, date: '', time: '', isActive: false },
+          slot: targetSlot ?? { id: params.slotId, startTime: '', endTime: '', capacity: 0, bookedCount: 0, available: false },
           message: 'Slot is no longer available',
         };
       }
       
       const updatedSlots = currentSlots.map(slot =>
         slot.id === params.slotId
-          ? { ...slot, isActive: false }
+          ? { ...slot, available: false }
           : slot
       );
       
@@ -113,7 +101,7 @@ export const BookingStore = signalStore(
 
       return {
         status: 'SUCCESS',
-        slot: { ...targetSlot, isActive: false },
+        slot: { ...targetSlot, available: false },
       };
     },
 
@@ -125,7 +113,7 @@ export const BookingStore = signalStore(
       const currentSlots = store.slots();
       const updatedSlots = currentSlots.map(slot =>
         slot.id === slotId
-          ? { ...slot, isActive: false }
+          ? { ...slot, available: false }
           : slot
       );
 
@@ -146,7 +134,7 @@ export const BookingStore = signalStore(
       const currentSlots = store.slots();
       const updatedSlots = currentSlots.map(slot =>
         slot.id === slotId
-          ? { ...slot, isActive: true }
+          ? { ...slot, available: true }
           : slot
       );
 

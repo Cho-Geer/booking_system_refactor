@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { BookingService } from './booking.service';
-import { BookingStore, ReservationResponse } from '../../stores/booking/booking.store';
+import { BookingStore } from '../../stores/booking/booking.store';
+import { ReservationResponse } from '../../shared/dto/booking.dto';
 import { ApiService } from '../../core/services/api.service';
 import { of, throwError } from 'rxjs';
 
@@ -13,7 +14,7 @@ describe('BookingService', () => {
   beforeEach(() => {
     const mockReservationResponse: ReservationResponse = {
       status: 'SUCCESS',
-      slot: { id: 'slot-1', date: '2026-04-20', time: '09:00', isActive: false },
+      slot: { id: 'slot-1', startTime: '2026-04-20T09:00:00', endTime: '2026-04-20T10:00:00', capacity: 5, bookedCount: 0, available: false },
     };
 
     storeMock = {
@@ -129,7 +130,7 @@ describe('BookingService', () => {
       // This test proves the old behavior (no API call) no longer applies
       apiServiceMock.createAppointment.mockReturnValue(of({
         status: 'SUCCESS' as const,
-        slot: { id: 'slot-1', date: '2026-04-20', time: '09:00', isActive: false },
+        slot: { id: 'slot-1', startTime: '2026-04-20T09:00:00', endTime: '2026-04-20T10:00:00', capacity: 5, bookedCount: 0, available: false },
       }));
 
       await service.reserveSlot('slot-1', 10);
@@ -141,7 +142,7 @@ describe('BookingService', () => {
     it('[RED] should fail: should call apiService.createAppointment with correct parameters', async () => {
       apiServiceMock.createAppointment.mockReturnValue(of({
         status: 'SUCCESS' as const,
-        slot: { id: 'slot-1', date: '2026-04-20', time: '09:00', isActive: false },
+        slot: { id: 'slot-1', startTime: '2026-04-20T09:00:00', endTime: '2026-04-20T10:00:00', capacity: 5, bookedCount: 0, available: false },
       }));
 
       await service.reserveSlot('slot-1', 10);
@@ -156,7 +157,7 @@ describe('BookingService', () => {
     it('[RED] should fail: should call store.confirmSlotReservation on API success', async () => {
       apiServiceMock.createAppointment.mockReturnValue(of({
         status: 'SUCCESS' as const,
-        slot: { id: 'slot-1', date: '2026-04-20', time: '09:00', isActive: false },
+        slot: { id: 'slot-1', startTime: '2026-04-20T09:00:00', endTime: '2026-04-20T10:00:00', capacity: 5, bookedCount: 0, available: false },
       }));
 
       await service.reserveSlot('slot-1', 10);
@@ -176,7 +177,7 @@ describe('BookingService', () => {
     it('[RED] should fail: should return ReservationResponse on success', async () => {
       apiServiceMock.createAppointment.mockReturnValue(of({
         status: 'SUCCESS' as const,
-        slot: { id: 'slot-1', date: '2026-04-20', time: '09:00', isActive: false },
+        slot: { id: 'slot-1', startTime: '2026-04-20T09:00:00', endTime: '2026-04-20T10:00:00', capacity: 5, bookedCount: 0, available: false },
       }));
 
       const result = await service.reserveSlot('slot-1', 10);
@@ -205,19 +206,16 @@ describe('BookingService', () => {
   });
 
   // ==========================================
-  // TYPE UNIFICATION: RED phase - DTO TimeSlot
+  // TYPE UNIFICATION: GREEN phase - DTO TimeSlot
   // ==========================================
   //
-  // These tests document the expected behavior AFTER TimeSlot type unification.
-  // Currently the service's error fallback constructs { id, date, time, isActive } (store type)
-  // instead of { id, startTime, endTime, capacity, bookedCount, available } (DTO type).
-  // These tests MUST FAIL with the current code.
+  // These tests verify that the error fallback in reserveSlot() returns DTO-compatible fields.
+  // After unification, the error fallback constructs { id, startTime, endTime, capacity, bookedCount, available }.
 
   describe('[TYPE-UNIFICATION] reserveSlot should return DTO-compatible TimeSlot', () => {
-    it('[RED] should fail: reserveSlot error response slot should have DTO fields (startTime/endTime/available)', async () => {
-      // The error path in reserveSlot() constructs a fallback slot using store-type fields:
-      //   { id: slotId, date: '', time: '', isActive: true }
-      // After unification, the error fallback should use DTO fields instead
+    it('should have DTO fields (startTime/endTime/available) in error fallback', async () => {
+      // The error path in reserveSlot() constructs a fallback slot with DTO fields:
+      //   { id: slotId, startTime: '', endTime: '', capacity: 0, bookedCount: 0, available: true }
       apiServiceMock.createAppointment.mockReturnValue(throwError(() => new Error('API Error')));
 
       const result = await service.reserveSlot('slot-1', 10);

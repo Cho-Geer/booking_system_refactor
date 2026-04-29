@@ -18,11 +18,11 @@
         </div>
         <div class="detail-row">
           <span class="label">Date:</span>
-          <span class="value">{{ selectedSlot()?.date | date:'fullDate' }}</span>
+          <span class="value">{{ selectedSlot()?.startTime | date:'fullDate' }}</span>
         </div>
         <div class="detail-row">
           <span class="label">Time:</span>
-          <span class="value">{{ selectedSlot()?.time }}</span>
+          <span class="value">{{ selectedSlot()?.startTime | date:'shortTime' }}</span>
         </div>
         <div class="detail-row">
           <span class="label">Duration:</span>

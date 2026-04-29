@@ -188,7 +188,7 @@
     {
       "id": "FIX-TIMESLOT-TYPES",
       "title": "[RED] Write failing tests for TimeSlot type unification",
-      "status": "in_progress",
+      "status": "completed",
       "owner": "@Coder-FE",
       "type": "test"
     }

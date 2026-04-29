@@ -18,11 +18,11 @@
         <dl class="space-y-3 text-left">
           <div class="flex justify-between">
             <dt class="text-gray-500">Date</dt>
-            <dd class="font-medium text-gray-900">{{ slot.date | date: 'fullDate' }}</dd>
+            <dd class="font-medium text-gray-900">{{ slot.startTime | date: 'fullDate' }}</dd>
           </div>
           <div class="flex justify-between">
             <dt class="text-gray-500">Time</dt>
-            <dd class="font-medium text-gray-900">{{ slot.time }}</dd>
+            <dd class="font-medium text-gray-900">{{ slot.startTime | date:'shortTime' }}</dd>
           </div>
         </dl>
       </div>

@@ -12,14 +12,14 @@
         <button
           class="slot-button"
           [class.selected]="isSelected(slot)"
-          [class.unavailable]="!slot.isActive"
-          [disabled]="!slot.isActive"
+          [class.unavailable]="!slot.available"
+          [disabled]="!slot.available"
           (click)="onSlotClick(slot)"
           type="button"
         >
-          <span class="time">{{ slot.time }}</span>
-          <span class="date">{{ slot.date | date:'mediumDate' }}</span>
-          @if (!slot.isActive) {
+          <span class="time">{{ slot.startTime | date:'shortTime' }}</span>
+          <span class="date">{{ slot.startTime | date:'mediumDate' }}</span>
+          @if (!slot.available) {
             <span class="badge">已预约</span>
           }
         </button>

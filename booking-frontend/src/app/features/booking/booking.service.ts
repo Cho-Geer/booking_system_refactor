@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
-import { BookingStore, ReservationResponse } from '../../stores/booking/booking.store';
+import { BookingStore } from '../../stores/booking/booking.store';
+import { ReservationResponse } from '../../shared/dto/booking.dto';
 import { ApiService } from '../../core/services/api.service';
 import { lastValueFrom } from 'rxjs';
 
@@ -65,7 +66,7 @@ export class BookingService {
 
       return {
         status: 'FAILED',
-        slot: { id: slotId, date: '', time: '', isActive: true },
+        slot: { id: slotId, startTime: '', endTime: '', capacity: 0, bookedCount: 0, available: true },
         message: errorMessage,
       };
     }
