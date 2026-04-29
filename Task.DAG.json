@@ -193,11 +193,11 @@
       "type": "test"
     },
     {
-      "id": "SIGNAL-MIGRATION",
-      "title": "Signal migration for booking-frontend internal properties",
+      "id": "FIX-API-RESPONSE-WRAP",
+      "title": "Fix POST auth methods to unwrap ResponseInterceptor envelope",
       "status": "completed",
       "owner": "@Coder-FE",
-      "type": "refactor"
+      "type": "fix"
     }
   ],
   "dag": {
@@ -289,9 +289,9 @@
           "description": "FIX-TIMESLOT-TYPES RED completed. 3 failing tests written for TimeSlot type unification: (1) availableSlots with DTO fields, (2) bookedSlots with DTO fields, (3) reserveSlot error response DTO fields."
         },
         {
-          "version": "5.0.0",
+          "version": "4.7.0",
           "date": "2026-04-30",
-          "description": "SIGNAL-MIGRATION completed. All 5 frontend components migrated to Angular signals: LoginComponent (4 props → signal), RegisterComponent (4 props → signal), AuthFormComponent (8 @Input/6 @Output → input()/output()), TimeSlotPickerComponent (Subscription → takeUntilDestroyed), BookingConfirmationComponent (placeholder fns → signal). 11 files changed. Typecheck ✅, 103/109 tests passing."
+          "description": "FIX-API-RESPONSE-WRAP completed. Fixed 4 POST auth methods (loginVerifyCode, loginPassword, registerComplete, refreshToken) to add map(response => response.data) to unwrap ResponseInterceptor envelope."
         }
       ]
     },
@@ -921,45 +921,35 @@
           ]
         }
       },
-      "FIX-TIMESLOT-TYPES": {
-        "id": "FIX-TIMESLOT-TYPES",
-        "name": "[RED] Write failing tests for TimeSlot type unification",
-        "description": "RED 阶段：编写3个测试证明 store TimeSlot 与 DTO TimeSlot 类型不兼容。当前 store 类型 { id, date, time, isActive, bookedBy } 与 DTO 类型 { id, startTime, endTime, capacity, bookedCount, available } 字段不一致。",
-        "status": "in_progress",
-        "dependencies": [],
-        "assignee": "@Coder-FE",
-        "type": "test",
-        "priority": "P1",
-        "target_files": [
-          "booking-frontend/src/app/stores/booking/booking.store.spec.ts",
-          "booking-frontend/src/app/features/booking/booking.service.spec.ts"
-        ],
-        "definition_of_done": "3个 RED 测试编写完成且执行失败（证明当前代码与 DTO 类型不兼容）"
-      },
-      "SIGNAL-MIGRATION": {
-        "id": "SIGNAL-MIGRATION",
-        "name": "Signal migration for booking-frontend internal properties",
-        "description": "Convert LoginComponent, RegisterComponent, AuthFormComponent, TimeSlotPickerComponent, BookingConfirmationComponent internal properties to Angular signals. Replace @Input/@Output decorators with input()/output(). Replace Subscription with takeUntilDestroyed().",
-        "status": "completed",
-        "dependencies": [],
-        "assignee": "@Coder-FE",
-        "type": "refactor",
-        "priority": "P2",
-        "target_files": [
-          "booking-frontend/src/app/features/auth/login/login.component.ts",
-          "booking-frontend/src/app/features/auth/login/login.component.html",
-          "booking-frontend/src/app/features/auth/login/login.component.spec.ts",
-          "booking-frontend/src/app/features/auth/register/register.component.ts",
-          "booking-frontend/src/app/features/auth/register/register.component.html",
-          "booking-frontend/src/app/features/auth/register/register.component.spec.ts",
-          "booking-frontend/src/app/features/booking/time-slot-picker/time-slot-picker.component.ts",
-          "booking-frontend/src/app/features/booking/booking-confirmation/booking-confirmation.component.ts",
-          "booking-frontend/src/app/shared/components/molecules/auth-form/auth-form.component.ts",
-          "booking-frontend/src/app/shared/components/molecules/auth-form/auth-form.component.html",
-          "booking-frontend/src/app/shared/components/molecules/auth-form/auth-form.component.spec.ts"
-        ],
-        "definition_of_done": "Typecheck passes, lint passes, 103/109 tests passing (6 pre-existing failures unchanged)"
-      }
+    "FIX-TIMESLOT-TYPES": {
+      "id": "FIX-TIMESLOT-TYPES",
+      "name": "[RED] Write failing tests for TimeSlot type unification",
+      "description": "RED阶段: 编写3个测试证明store TimeSlot与DTO TimeSlot类型不兼容. 当前store类型: { id, date, time, isActive, bookedBy }, DTO类型: { id, startTime, endTime, capacity, bookedCount, available }, 字段不一致.",
+      "status": "in_progress",
+      "dependencies": [],
+      "assignee": "@Coder-FE",
+      "type": "test",
+      "priority": "P1",
+      "target_files": [
+        "booking-frontend/src/app/stores/booking/booking.store.spec.ts",
+        "booking-frontend/src/app/features/booking/booking.service.spec.ts"
+      ],
+      "definition_of_done": "3个RED测试编写完成且执行失败(证明当前代码与DTO类型不兼容)."
+    },
+    "FIX-API-RESPONSE-WRAP": {
+      "id": "FIX-API-RESPONSE-WRAP",
+      "name": "Fix POST auth methods to unwrap ResponseInterceptor envelope",
+      "description": "Auth服务的POST登录验证、登录密码、注册完成、刷新Token方法未添加map(response => response.data)来解包ResponseInterceptor,导致Auth存储的Token为undefined,后续的请求触发\"No auth token\"错误.",
+      "status": "completed",
+      "dependencies": [],
+      "assignee": "@Coder-FE",
+      "type": "fix",
+      "priority": "P0",
+      "target_files": [
+        "booking-frontend/src/app/core/services/api.service.ts"
+      ],
+      "definition_of_done": "All 4 POST auth methods have map(response => response.data) added, TypeScript types are correct, authentication works properly with tokens being correctly stored and passed."
+    }
     }
   }
 }

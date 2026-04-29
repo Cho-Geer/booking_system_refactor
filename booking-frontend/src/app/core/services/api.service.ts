@@ -68,8 +68,8 @@ export class ApiService {
    */
   registerComplete(dto: RegisterCompleteDto): Observable<AuthResponseDto> {
     return this.http
-      .post<AuthResponseDto>(`${this.apiUrl}/auth/register/complete`, dto)
-      .pipe(catchError(this.handleError));
+      .post<ApiResponse<AuthResponseDto>>(`${this.apiUrl}/auth/register/complete`, dto)
+      .pipe(map(response => response.data), catchError(this.handleError));
   }
 
   /**
@@ -88,8 +88,8 @@ export class ApiService {
    */
   loginVerifyCode(dto: LoginVerifyCodeDto): Observable<AuthResponseDto> {
     return this.http
-      .post<AuthResponseDto>(`${this.apiUrl}/auth/login/verify-code`, dto)
-      .pipe(catchError(this.handleError));
+      .post<ApiResponse<AuthResponseDto>>(`${this.apiUrl}/auth/login/verify-code`, dto)
+      .pipe(map(response => response.data), catchError(this.handleError));
   }
 
   /**
@@ -98,8 +98,8 @@ export class ApiService {
    */
   loginPassword(dto: LoginPasswordDto): Observable<AuthResponseDto> {
     return this.http
-      .post<AuthResponseDto>(`${this.apiUrl}/auth/login/password`, dto)
-      .pipe(catchError(this.handleError));
+      .post<ApiResponse<AuthResponseDto>>(`${this.apiUrl}/auth/login/password`, dto)
+      .pipe(map(response => response.data), catchError(this.handleError));
   }
 
   /**
@@ -108,8 +108,8 @@ export class ApiService {
    */
   refreshToken(refreshToken: string): Observable<AuthResponseDto> {
     return this.http
-      .post<AuthResponseDto>(`${this.apiUrl}/auth/refresh`, { refreshToken })
-      .pipe(catchError(this.handleError));
+      .post<ApiResponse<AuthResponseDto>>(`${this.apiUrl}/auth/refresh`, { refreshToken })
+      .pipe(map(response => response.data), catchError(this.handleError));
   }
 
   /**
