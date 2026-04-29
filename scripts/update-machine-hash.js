@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Qoder State Hash Manager
+ * Keystone State Hash Manager
  * 自动计算并更新契约文件的SHA256哈希值
  *
  * 契约列表从 machine.json contracts 动态读取，file 字段为 git-root-relative 路径。
@@ -10,7 +10,7 @@
  *   node scripts/update-machine-hash.js verify  - 校验哈希匹配（CI门禁用）
  *   node scripts/update-machine-hash.js <key>   - 更新指定契约的哈希值
  *
- * @author Qoder Multi-Agent System
+ * @author Keystone Multi-Agent System
  * @version 2.0.0
  */
 
@@ -19,7 +19,7 @@ const crypto = require('crypto');
 const path = require('path');
 
 // Git 仓库根目录（所有契约 file 路径相对于此）
-const GIT_ROOT = path.resolve(__dirname, '..', '..');
+const GIT_ROOT = path.resolve(__dirname, '..');
 const MACHINE_FILE = path.join(GIT_ROOT, '.opencode', 'state', 'machine.json');
 
 /**
@@ -100,7 +100,7 @@ function getContractKeys(machine) {
  * 更新所有契约哈希值
  */
 function updateAllHashes() {
-  console.log('🔧 [Qoder Hash Manager] Updating all contract hashes...\n');
+  console.log('🔧 [Keystone Hash Manager] Updating all contract hashes...\n');
 
   const machine = loadMachineJson();
   const timestamp = new Date().toISOString();
@@ -163,7 +163,7 @@ function updateSingleHash(key) {
     process.exit(1);
   }
 
-  console.log(`🔧 [Qoder Hash Manager] Updating hash for ${key}...\n`);
+  console.log(`🔧 [Keystone Hash Manager] Updating hash for ${key}...\n`);
 
   const contract = machine.contracts[key];
   const relativePath = contract.file;
@@ -201,7 +201,7 @@ function updateSingleHash(key) {
  * @returns {boolean} - 是否全部匹配
  */
 function verifyHashes() {
-  console.log('🔍 [Qoder Hash Manager] Verifying contract hashes...\n');
+  console.log('🔍 [Keystone Hash Manager] Verifying contract hashes...\n');
 
   const machine = loadMachineJson();
   let allMatch = true;
@@ -252,7 +252,7 @@ function showHelp() {
   const keys = machine ? getContractKeys(machine) : [];
 
   console.log(`
-Qoder State Hash Manager v2.0.0
+Keystone State Hash Manager v2.0.0
 
 契约列表从 machine.json contracts 动态读取。
 

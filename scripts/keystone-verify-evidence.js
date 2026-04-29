@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /**
- * Qoder Evidence Validator
+ * Keystone Evidence Validator
  * 验证任务生命周期转换所需的证据文件
  *
  * 用法:
- *   node scripts/qoder-verify-evidence.js
+ *   node scripts/keystone-verify-evidence.js
  */
 
 const fs = require('fs');
@@ -85,19 +85,19 @@ function validateEvidenceFile(filePath, schema, taskId) {
 }
 
 function main() {
-  log('🔍 [Qoder] 验证任务生命周期证据文件...', 'blue');
+  log('🔍 [Keystone] 验证任务生命周期证据文件...', 'blue');
 
   // 加载 machine.json
   const machine = loadJSON(MACHINE_FILE);
   if (!machine) {
-    log('⚠️ [Qoder] machine.json 未找到，跳过验证', 'yellow');
+    log('⚠️ [Keystone] machine.json 未找到，跳过验证', 'yellow');
     process.exit(0);
   }
 
   // 加载 Task.DAG.json
   const taskDAG = loadJSON(TASK_DAG_FILE);
   if (!taskDAG || !taskDAG.tasks) {
-    log('⚠️ [Qoder] Task.DAG.json 未找到或格式错误，跳过验证', 'yellow');
+    log('⚠️ [Keystone] Task.DAG.json 未找到或格式错误，跳过验证', 'yellow');
     process.exit(0);
   }
 
@@ -136,12 +136,12 @@ function main() {
 
   if (hasError) {
     log('', 'reset');
-    log('❌ [Qoder] 证据文件验证失败', 'red');
+    log('❌ [Keystone] 证据文件验证失败', 'red');
     process.exit(1);
   }
 
   log('', 'reset');
-  log('✅ [Qoder] 所有证据文件验证通过', 'green');
+  log('✅ [Keystone] 所有证据文件验证通过', 'green');
   process.exit(0);
 }
 

@@ -1,44 +1,44 @@
 #!/usr/bin/env node
 /**
- * Qoder CLI - 状态机管理工具
- * 提供 qoder state 系列命令
+ * Keystone CLI - 状态机管理工具
+ * 提供 keystone state 系列命令
  *
  * Usage:
- *   qoder state update-contract-hash [key]  - 更新契约哈希
- *   qoder state verify                      - 校验契约哈希
- *   qoder state task set <id> <status>      - 设置任务状态
- *   qoder state task get                    - 获取当前任务
- *   qoder state task transition <to>        - 流转任务状态
- *   qoder state audit-log                   - 查看审计日志
+ *   keystone state update-contract-hash [key]  - 更新契约哈希
+ *   keystone state verify                      - 校验契约哈希
+ *   keystone state task set <id> <status>      - 设置任务状态
+ *   keystone state task get                    - 获取当前任务
+ *   keystone state task transition <to>        - 流转任务状态
+ *   keystone state audit-log                   - 查看审计日志
  *
- * @author Qoder Multi-Agent System
+ * @author Keystone Multi-Agent System
  * @version 1.0.0
  */
 
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-
 const PROJECT_ROOT = path.resolve(__dirname, '..');
-const MACHINE_FILE = path.join(PROJECT_ROOT, '..', '.opencode', 'state', 'machine.json');
+
+const MACHINE_FILE = path.join(PROJECT_ROOT, '.opencode', 'state', 'machine.json');
 
 // 契约文件配置
 const CONTRACTS = {
   'backend-api': {
-    path: 'booking_system_refactor/contract.yaml',
+    path: 'contract.yaml',
     owner: '@Architect'
   },
   'prisma-schema': {
-    path: 'booking_system_refactor/booking-backend/prisma/schema.prisma',
+    path: 'booking-backend/prisma/schema.prisma',
     owner: '@Coder-BE'
   },
   'frontend-dto': {
-    path: 'booking_system_refactor/booking-frontend/src/app/shared/dto/',
+    path: 'booking-frontend/src/app/shared/dto/',
     owner: '@Coder-FE',
     isDirectory: true
   },
   'frontend-environment': {
-    path: 'booking_system_refactor/booking-frontend/src/environments/environment.ts',
+    path: 'booking-frontend/src/environments/environment.ts',
     owner: '@Coder-FE'
   }
 };
@@ -58,7 +58,7 @@ function calculateSHA256(content) {
 }
 
 function getFileHash(relativePath, isDirectory = false) {
-  const fullPath = path.join(PROJECT_ROOT, '..', relativePath);
+  const fullPath = path.join(PROJECT_ROOT, relativePath);
 
   if (!fs.existsSync(fullPath)) {
     return null;
@@ -100,7 +100,7 @@ function saveMachineJson(data) {
 // ==================== State Commands ====================
 
 function updateContractHash(key = null) {
-  console.log(`${colors.blue}🔧 [Qoder] Updating contract hash(es)...${colors.reset}\n`);
+  console.log(`${colors.blue}🔧 [Keystone] Updating contract hash(es)...${colors.reset}\n`);
 
   const machine = loadMachineJson();
   const timestamp = new Date().toISOString();
@@ -157,7 +157,7 @@ function updateContractHash(key = null) {
 }
 
 function verifyContracts() {
-  console.log(`${colors.blue}🔍 [Qoder] Verifying contract hashes...${colors.reset}\n`);
+  console.log(`${colors.blue}🔍 [Keystone] Verifying contract hashes...${colors.reset}\n`);
 
   const machine = loadMachineJson();
   let allMatch = true;
@@ -192,7 +192,7 @@ function verifyContracts() {
     return true;
   } else {
     console.log(`${colors.red}💥 Hash mismatch detected!${colors.reset}`);
-    console.log(`\n💡 Run "qoder state update-contract-hash" to fix.`);
+    console.log(`\n💡 Run "keystone state update-contract-hash" to fix.`);
     return false;
   }
 }
@@ -279,10 +279,10 @@ function showAuditLog(limit = 10) {
 
 function showHelp() {
   console.log(`
-${colors.blue}Qoder State CLI${colors.reset} - 状态机管理工具
+${colors.blue}Keystone State CLI${colors.reset} - 状态机管理工具
 
 ${colors.yellow}Usage:${colors.reset}
-  qoder <command> [options]
+  keystone <command> [options]
 
 ${colors.yellow}Commands:${colors.reset}
   ${colors.green}state update-contract-hash [key]${colors.reset}  更新契约哈希（不指定key则更新所有）
@@ -293,12 +293,12 @@ ${colors.yellow}Commands:${colors.reset}
   ${colors.green}state audit-log [limit]${colors.reset}           查看审计日志（默认10条）
 
 ${colors.yellow}Examples:${colors.reset}
-  qoder state update-contract-hash
-  qoder state update-contract-hash frontend-dto
-  qoder state verify
-  qoder state task get
-  qoder state task transition InProgress
-  qoder state audit-log 20
+  keystone state update-contract-hash
+  keystone state update-contract-hash frontend-dto
+  keystone state verify
+  keystone state task get
+  keystone state task transition InProgress
+  keystone state audit-log 20
 `);
 }
 

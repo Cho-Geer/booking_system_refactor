@@ -9,7 +9,7 @@
  * 3. 自动流转任务状态
  * 4. 熔断重试策略
  *
- * @author Qoder Multi-Agent System
+ * @author Keystone Multi-Agent System
  * @version 1.0.0
  */
 
@@ -17,7 +17,7 @@ const fs = require('fs');
 const path = require('path');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..');
-const MACHINE_FILE = path.join(PROJECT_ROOT, '..', '.opencode', 'state', 'machine.json');
+const MACHINE_FILE = path.join(PROJECT_ROOT, '.opencode', 'state', 'machine.json');
 
 // Agent 调度配置
 const AGENT_SCHEDULE = {
