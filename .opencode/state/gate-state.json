@@ -455,23 +455,127 @@
       "session_id": "cg_ses_1777454457278",
       "created_at": "2026-04-29T09:20:57.278Z",
       "task_description": "Fix GREEN phase: add getProfile() method to UsersService to complete the incomplete TDD cycle. The RED phase was written, but the service implementation was never added.",
-      "gate_status": "armed",
+      "gate_status": "completed",
       "last_check_failed_items": [],
       "plan_summary": "Fix GREEN phase: Coder-BE adds getProfile() to UsersService, runs tests, runs typecheck, commits with [Green] marker",
       "confirmed_at": "2026-04-29T09:21:05.181Z",
-      "consumed_at": null,
-      "audit": null
+      "consumed_at": "2026-04-29T09:25:16.957Z",
+      "audit": {
+        "execution_summary": "Coder-BE dispatched via /dispatch protocol. Added getProfile() to UsersService. 28/28 tests passed. Typecheck passed. Committed with [Green] marker. 5 Keystone phases all passed.",
+        "completed_at": "2026-04-29T09:25:16.957Z"
+      }
     },
     "cg_ses_1777454529527": {
       "session_id": "cg_ses_1777454529527",
       "created_at": "2026-04-29T09:22:09.527Z",
       "task_description": "Fix GREEN phase: add getProfile() to UsersService",
-      "gate_status": "armed",
+      "gate_status": "completed",
       "last_check_failed_items": [],
       "plan_summary": "Add getProfile() to UsersService: read spec, implement method, run tests, typecheck, create artifacts, commit",
       "confirmed_at": "2026-04-29T09:22:17.453Z",
-      "consumed_at": null,
-      "audit": null
+      "consumed_at": "2026-04-29T09:24:55.281Z",
+      "audit": {
+        "execution_summary": "GREEN phase for FIX-P1-004 completed: Added getProfile(id) method to UsersService delegating to findOne(id). All 28 users service tests passed (including 2 new RED tests). Typecheck has no new errors. Committed with Keystone validation passing all 5 phases.",
+        "completed_at": "2026-04-29T09:24:55.281Z"
+      }
+    },
+    "cg_ses_1777459544899": {
+      "session_id": "cg_ses_1777459544899",
+      "created_at": "2026-04-29T10:45:44.900Z",
+      "task_description": "Multi-agent TDD fix: Unify frontend TimeSlot types. RED→GREEN phases via Coder-FE dispatch, then Guardian review. Store's duplicated TimeSlot must align with DTO TimeSlot from time-slot.dto.ts.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Multi-agent TDD: Coder-FE RED (failing tests) → Coder-FE GREEN (unify TimeSlot types) → Guardian review. Fix store DTO alignment.",
+      "confirmed_at": "2026-04-29T10:45:52.255Z",
+      "consumed_at": "2026-04-29T11:10:48.007Z",
+      "audit": {
+        "execution_summary": "Multi-agent TDD complete: RED (Coder-FE wrote 3 failing tests) → GREEN (Coder-FE unified TimeSlot types across 9 files) → Guardian review (PASS with flag: migration correct, pre-existing test infra issue NG0400 in setup-jest.ts). Build passes.",
+        "completed_at": "2026-04-29T11:10:48.007Z"
+      }
+    },
+    "cg_ses_1777460005886": {
+      "session_id": "cg_ses_1777460005886",
+      "created_at": "2026-04-29T10:53:25.886Z",
+      "task_description": "RED phase: Write failing tests for TimeSlot type unification",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "RED: Write failing tests for TimeSlot unification",
+      "confirmed_at": "2026-04-29T10:53:30.761Z",
+      "consumed_at": "2026-04-29T10:53:37.107Z",
+      "audit": {
+        "execution_summary": "RED phase completed: Wrote 3 failing tests for TimeSlot type unification. Test 1: availableSlots with DTO TimeSlot (Expected 1, got 0 - all filtered out due to isActive vs available mismatch). Test 2: bookedSlots with DTO TimeSlot (Expected 1, got 2 - all included due to !isActive being true for all). Test 3: reserveSlot error response DTO fields (Expected startTime/endTime/available, got date/time/isActive). All 3 tests FAIL as expected. Committed with [Red] FIX-TIMESLOT-TYPES. Keystone validation passed.",
+        "completed_at": "2026-04-29T10:53:37.107Z"
+      }
+    },
+    "cg_ses_1777460071577": {
+      "session_id": "cg_ses_1777460071577",
+      "created_at": "2026-04-29T10:54:31.577Z",
+      "task_description": "GREEN phase — Unify TimeSlot types with DTO in booking-frontend",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "GREEN phase: Unify TimeSlot types with DTO in booking-frontend",
+      "confirmed_at": "2026-04-29T11:04:42.221Z",
+      "consumed_at": "2026-04-29T11:04:47.099Z",
+      "audit": {
+        "execution_summary": "GREEN phase: Removed local TimeSlot/ReservationResponse from booking.store.ts; imported DTO types; updated isActive→available in store/service/templates; fixed fallback slots to DTO fields; updated 3 component templates; build succeeds; all 18 booking.service.spec.ts tests pass; committed as [Green] FIX-TIMESLOT-TYPES",
+        "completed_at": "2026-04-29T11:04:47.099Z"
+      }
+    },
+    "cg_ses_1777463097025": {
+      "session_id": "cg_ses_1777463097025",
+      "created_at": "2026-04-29T11:44:57.025Z",
+      "task_description": "Fix test infrastructure: remove manual TestBed.initTestEnvironment() from setup-jest.ts (blocked by jest-preset-angular which already handles it)",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Remove 4 redundant lines from setup-jest.ts (TestBed.initTestEnvironment conflicts with jest-preset-angular). Single file, low risk.",
+      "confirmed_at": "2026-04-29T11:45:01.981Z",
+      "consumed_at": "2026-04-29T11:45:29.313Z",
+      "audit": {
+        "execution_summary": "Fixed test infrastructure: removed TestBed.initTestEnvironment() from setup-jest.ts (conflicted with jest-preset-angular NG0400). Tests restored: 25/34 suites pass (9 pre-existing failures unrelated). Keystone 5 phases all passed.",
+        "completed_at": "2026-04-29T11:45:29.313Z"
+      }
+    },
+    "cg_ses_1777464513396": {
+      "session_id": "cg_ses_1777464513396",
+      "created_at": "2026-04-29T12:08:33.396Z",
+      "task_description": "Fix 3 build warnings: 1) Sass @import deprecation silence, 2) raise component style budget to 6kB, 3) extract shared auth SCSS partial to deduplicate login/register styles",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix 3 build warnings: silence Sass @import deprecation in angular.json, raise anyComponentStyle budget 4kB→6kB, extract shared _auth-form.scss partial, update Task.DAG.json",
+      "confirmed_at": "2026-04-29T12:08:37.435Z",
+      "consumed_at": "2026-04-29T12:10:17.019Z",
+      "audit": {
+        "execution_summary": "Fixed 3 build warnings: (1) silenced Sass @import deprecation in angular.json, (2) raised anyComponentStyle budget 4kB→6kB, (3) extracted shared _auth-form.scss partial (login 335→90 lines, register 374→96 lines). Net -244 lines. Build clean with zero warnings.",
+        "completed_at": "2026-04-29T12:10:17.019Z"
+      }
+    },
+    "cg_ses_1777476553573": {
+      "session_id": "cg_ses_1777476553573",
+      "created_at": "2026-04-29T15:29:13.573Z",
+      "task_description": "Signal migration for booking-frontend components: convert LoginComponent, RegisterComponent, TimeSlotPickerComponent, BookingConfirmationComponent internal properties to Angular signals, update templates and tests, verify with typecheck + lint + tests",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Signal migration for 4 frontend components + test updates + typecheck/lint/test verification, followed by Guardian review",
+      "confirmed_at": "2026-04-29T15:29:35.608Z",
+      "consumed_at": "2026-04-29T15:50:08.957Z",
+      "audit": {
+        "execution_summary": "Signal migration completed for all 5 phases: LoginComponent (3 files), RegisterComponent (3 files), TimeSlotPickerComponent (1 file), BookingConfirmationComponent (1 file), AuthFormComponent (3 files). Coder-FE implemented all changes. Guardian reviewed all 11 files — 0 violations, 0 regressions. Typecheck ✅, 103/109 tests passing (6 pre-existing).",
+        "completed_at": "2026-04-29T15:50:08.957Z"
+      }
+    },
+    "cg_ses_1777476655983": {
+      "session_id": "cg_ses_1777476655983",
+      "created_at": "2026-04-29T15:30:55.983Z",
+      "task_description": "Migrate internal properties to Angular signals in booking-frontend: Convert LoginComponent, RegisterComponent, TimeSlotPickerComponent, BookingConfirmationComponent, and AuthFormComponent to use Angular signals. Remove lifecycle hooks, replace @Input/@Output with signal-based input()/output(), remove $ suffix from signal names, and update templates/specs accordingly.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Migrate 5 components (Login, Register, TimeSlotPicker, BookingConfirmation, AuthForm) to Angular signals - convert properties to signals, replace @Input/@Output with input()/output(), remove $ suffix, switch to DestroyRef, update all templates and specs.",
+      "confirmed_at": "2026-04-29T15:31:08.203Z",
+      "consumed_at": "2026-04-29T15:44:46.535Z",
+      "audit": {
+        "execution_summary": "Phase 1-5: Migrated all 5 components to Angular signals. LoginComponent (activeTab, contactType, acceptTerms, countdown → signal; removed $ suffix; removed DoCheck/OnChanges/AfterViewChecked). RegisterComponent (currentStep, contactType, acceptTerms, countdown → signal; removed $ suffix). TimeSlotPickerComponent (OnDestroy/Subscription → DestroyRef/takeUntilDestroyed). BookingConfirmationComponent (arrow functions → signal). AuthFormComponent (@Input/@Output → input/output). Fixed setup-jest.ts TestBed.initTestEnvironment. Build: PASS. Tests: 103/109 passed (6 pre-existing failures).",
+        "completed_at": "2026-04-29T15:44:46.535Z"
+      }
     }
   }
 }

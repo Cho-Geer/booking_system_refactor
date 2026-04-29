@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy } from '@angular/core';
+import { Component, inject, OnDestroy, signal } from '@angular/core';
 import {
   ReactiveFormsModule,
   FormBuilder,
@@ -58,17 +58,17 @@ export class RegisterComponent implements OnDestroy {
   private router = inject(Router);
 
   // Step state: 1 = send code, 2 = complete registration
-  currentStep = 1;
+  currentStep = signal(1);
 
   // Contact type selection
-  contactType = ContactType.EMAIL;
+  contactType = signal(ContactType.EMAIL);
   ContactType = ContactType; // Expose enum to template
 
   // Terms acceptance
-  acceptTerms = false;
+  acceptTerms = signal(false);
 
   // Countdown state
-  countdown = 0;
+  countdown = signal(0);
   private countdownTimer: ReturnType<typeof setInterval> | null = null;
 
   // Step 1 Form: Contact info
@@ -87,9 +87,9 @@ export class RegisterComponent implements OnDestroy {
     { validators: this.passwordMatchValidator }
   );
 
-  // Observable signals (with $ suffix per convention)
-  isLoading$ = this.authStore.isLoading;
-  error$ = this.authStore.error;
+  // Signal references from store
+  isLoading = this.authStore.isLoading;
+  error = this.authStore.error;
 
   ngOnDestroy(): void {
     this.clearCountdown();
@@ -97,7 +97,7 @@ export class RegisterComponent implements OnDestroy {
 
   // Step 1: Send verification code
   onSendCode(): void {
-    if (this.countdown > 0) return;
+    if (this.countdown() > 0) return;
 
     const contactControl = this.step1Form.get('contact');
     if (contactControl?.invalid) {
@@ -113,13 +113,13 @@ export class RegisterComponent implements OnDestroy {
 
     const dto: RegisterSendCodeDto = {
       contact: contact.trim(),
-      contactType: this.contactType,
+      contactType: this.contactType(),
     };
 
     this.api.registerSendCode(dto).subscribe({
       next: () => {
         this.authStore.setLoading(false);
-        this.currentStep = 2;
+        this.currentStep.set(2);
         this.startCountdown();
       },
       error: (err) => {
@@ -131,7 +131,7 @@ export class RegisterComponent implements OnDestroy {
 
   // Step 2: Complete registration
   onCompleteRegistration(): void {
-    if (this.authStore.isLoading() || this.step2Form.invalid || !this.acceptTerms) return;
+    if (this.authStore.isLoading() || this.step2Form.invalid || !this.acceptTerms()) return;
 
     const contact = this.step1Form.get('contact')?.value;
     if (!contact) return;
@@ -144,7 +144,7 @@ export class RegisterComponent implements OnDestroy {
 
     const dto: RegisterCompleteDto = {
       contact: contact.trim(),
-      contactType: this.contactType,
+      contactType: this.contactType(),
       code,
       password,
       name,
@@ -186,7 +186,7 @@ export class RegisterComponent implements OnDestroy {
 
   // Go back to step 1
   goToStep1(): void {
-    this.currentStep = 1;
+    this.currentStep.set(1);
     this.authStore.setError(null);
     this.clearCountdown();
   }
@@ -196,10 +196,10 @@ export class RegisterComponent implements OnDestroy {
   }
 
   startCountdown(): void {
-    this.countdown = 60;
+    this.countdown.set(60);
     this.countdownTimer = setInterval(() => {
-      this.countdown--;
-      if (this.countdown <= 0) {
+      this.countdown.update(c => c - 1);
+      if (this.countdown() <= 0) {
         this.clearCountdown();
       }
     }, 1000);
@@ -210,7 +210,7 @@ export class RegisterComponent implements OnDestroy {
       clearInterval(this.countdownTimer);
       this.countdownTimer = null;
     }
-    this.countdown = 0;
+    this.countdown.set(0);
   }
 
   passwordMatchValidator(

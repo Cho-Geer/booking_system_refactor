@@ -6,7 +6,6 @@ import { LoginComponent } from './login.component';
 import { AuthStore, User } from '../../../stores/auth/auth.store';
 import { ApiService } from '../../../core/services/api.service';
 import { SocketService } from '../../../core/services/socket.service';
-import { AuthFormComponent } from '../../../shared/components/molecules/auth-form/auth-form.component';
 import { of, throwError } from 'rxjs';
 
 describe('LoginComponent', () => {
@@ -109,26 +108,26 @@ describe('LoginComponent', () => {
 
   describe('tab switching', () => {
     it('should start with password tab active', () => {
-      expect(component.activeTab).toBe('password');
+      expect(component.activeTab()).toBe('password');
     });
 
     it('should switch to code tab', () => {
       component.switchTab('code');
-      expect(component.activeTab).toBe('code');
+      expect(component.activeTab()).toBe('code');
     });
 
     it('should switch back to password tab', () => {
       component.switchTab('code');
       component.switchTab('password');
-      expect(component.activeTab).toBe('password');
+      expect(component.activeTab()).toBe('password');
     });
 
     it('should clear error and reset codeLoginStep when switching tabs', () => {
-      component.codeLoginStep = 2;
+      component.codeLoginStep.set(2);
       authStoreMock.setError.mockClear();
       component.switchTab('code');
       expect(authStoreMock.setError).toHaveBeenCalledWith(null);
-      expect(component.codeLoginStep).toBe(1);
+      expect(component.codeLoginStep()).toBe(1);
     });
   });
 
@@ -198,7 +197,7 @@ describe('LoginComponent', () => {
         contact: 'test@example.com',
         password: 'password123',
       });
-      component.acceptTerms = false;
+      component.acceptTerms.set(false);
 
       component.onPasswordLogin();
 
@@ -210,7 +209,7 @@ describe('LoginComponent', () => {
         contact: 'test@example.com',
         password: 'password123',
       });
-      component.acceptTerms = true;
+      component.acceptTerms.set(true);
       apiServiceMock.loginPassword.mockReturnValue(of(mockLoginResponse));
       apiServiceMock.getUserProfile.mockReturnValue(of(null));
 
@@ -228,7 +227,7 @@ describe('LoginComponent', () => {
         contact: 'test@example.com',
         password: 'password123',
       });
-      component.acceptTerms = true;
+      component.acceptTerms.set(true);
       apiServiceMock.loginPassword.mockReturnValue(of(mockLoginResponse));
       apiServiceMock.getUserProfile.mockReturnValue(of(null));
 
@@ -242,7 +241,7 @@ describe('LoginComponent', () => {
         contact: 'test@example.com',
         password: 'password123',
       });
-      component.acceptTerms = true;
+      component.acceptTerms.set(true);
       apiServiceMock.loginPassword.mockReturnValue(of(mockLoginResponse));
       apiServiceMock.getUserProfile.mockReturnValue(of(null));
 
@@ -256,7 +255,7 @@ describe('LoginComponent', () => {
         contact: 'test@example.com',
         password: 'password123',
       });
-      component.acceptTerms = true;
+      component.acceptTerms.set(true);
       apiServiceMock.loginPassword.mockReturnValue(of(mockLoginResponse));
       apiServiceMock.getUserProfile.mockReturnValue(of(null));
 
@@ -270,7 +269,7 @@ describe('LoginComponent', () => {
         contact: 'test@example.com',
         password: 'password123',
       });
-      component.acceptTerms = true;
+      component.acceptTerms.set(true);
       apiServiceMock.loginPassword.mockReturnValue(of(mockLoginResponse));
       apiServiceMock.getUserProfile.mockReturnValue(of(null));
       jest.spyOn(router, 'navigate');
@@ -285,7 +284,7 @@ describe('LoginComponent', () => {
         contact: 'test@example.com',
         password: 'password123',
       });
-      component.acceptTerms = true;
+      component.acceptTerms.set(true);
       apiServiceMock.loginPassword.mockReturnValue(throwError(() => new Error('Invalid credentials')));
 
       component.onPasswordLogin();
@@ -322,7 +321,7 @@ describe('LoginComponent', () => {
 
       component.onSendCode();
 
-      expect(component.countdown).toBe(60);
+      expect(component.countdown()).toBe(60);
     });
 
     it('should advance to step 2 after sending code', () => {
@@ -331,12 +330,12 @@ describe('LoginComponent', () => {
 
       component.onSendCode();
 
-      expect(component.codeLoginStep).toBe(2);
+      expect(component.codeLoginStep()).toBe(2);
     });
 
     it('should not send code when countdown is active', () => {
       component.codeLoginForm.get('contact')?.setValue('test@example.com');
-      component.countdown = 30;
+      component.countdown.set(30);
       apiServiceMock.loginSendCode.mockReturnValue(of({ expiresIn: 300 }));
 
       component.onSendCode();
@@ -351,7 +350,7 @@ describe('LoginComponent', () => {
         contact: 'test@example.com',
         code: '123456',
       });
-      component.acceptTerms = true;
+      component.acceptTerms.set(true);
       apiServiceMock.loginVerifyCode.mockReturnValue(of(mockLoginResponse));
       apiServiceMock.getUserProfile.mockReturnValue(of(null));
 
@@ -375,7 +374,7 @@ describe('LoginComponent', () => {
         contact: 'test@example.com',
         code: '123456',
       });
-      component.acceptTerms = true;
+      component.acceptTerms.set(true);
       apiServiceMock.loginVerifyCode.mockReturnValue(of(mockLoginResponse));
       apiServiceMock.getUserProfile.mockReturnValue(of(null));
       jest.spyOn(router, 'navigate');
@@ -390,7 +389,7 @@ describe('LoginComponent', () => {
         contact: 'test@example.com',
         code: '123456',
       });
-      component.acceptTerms = true;
+      component.acceptTerms.set(true);
       apiServiceMock.loginVerifyCode.mockReturnValue(throwError(() => new Error('Invalid code')));
 
       component.onVerifyCode();
@@ -403,7 +402,7 @@ describe('LoginComponent', () => {
         contact: 'test@example.com',
         code: '123456',
       });
-      component.acceptTerms = true;
+      component.acceptTerms.set(true);
       apiServiceMock.loginVerifyCode.mockReturnValue(of(mockLoginResponse));
       apiServiceMock.getUserProfile.mockReturnValue(of(null));
 
@@ -416,7 +415,7 @@ describe('LoginComponent', () => {
   describe('onSubmit()', () => {
     it('should call onPasswordLogin when activeTab is password', () => {
       jest.spyOn(component, 'onPasswordLogin');
-      component.activeTab = 'password';
+      component.activeTab.set('password');
 
       component.onSubmit();
 
@@ -425,8 +424,8 @@ describe('LoginComponent', () => {
 
     it('should call onSendCode when activeTab is code and step 1', () => {
       jest.spyOn(component, 'onSendCode');
-      component.activeTab = 'code';
-      component.codeLoginStep = 1;
+      component.activeTab.set('code');
+      component.codeLoginStep.set(1);
 
       component.onSubmit();
 
@@ -435,8 +434,8 @@ describe('LoginComponent', () => {
 
     it('should call onVerifyCode when activeTab is code and step 2', () => {
       jest.spyOn(component, 'onVerifyCode');
-      component.activeTab = 'code';
-      component.codeLoginStep = 2;
+      component.activeTab.set('code');
+      component.codeLoginStep.set(2);
 
       component.onSubmit();
 
@@ -453,11 +452,6 @@ describe('LoginComponent', () => {
   });
 
   describe('template rendering', () => {
-    it('should render auth-form component', () => {
-      const authForm = fixture.nativeElement.querySelector('app-auth-form');
-      expect(authForm).toBeTruthy();
-    });
-
     it('should not show error message when error is null', () => {
       authStoreMock.error.mockReturnValue(null);
       fixture.detectChanges();

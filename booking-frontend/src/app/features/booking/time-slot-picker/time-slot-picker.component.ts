@@ -1,6 +1,6 @@
-import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, OnInit, DestroyRef } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { Subscription } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { BookingStore } from '../../../stores/booking/booking.store';
 import { TimeSlot } from '../../../shared/dto/time-slot.dto';
 import { BookingService } from '../booking.service';
@@ -13,12 +13,11 @@ import { SocketService, SlotUpdateEvent } from '../../../core/services/socket.se
   templateUrl: './time-slot-picker.component.html',
   styleUrl: './time-slot-picker.component.scss',
 })
-export class TimeSlotPickerComponent implements OnInit, OnDestroy {
+export class TimeSlotPickerComponent implements OnInit {
   private store = inject(BookingStore);
   private bookingService = inject(BookingService);
   private socketService = inject(SocketService);
-
-  private subscription = new Subscription();
+  private destroyRef = inject(DestroyRef);
 
   availableSlots = this.store.availableSlots;
   isLoading = this.store.isLoading;
@@ -26,15 +25,11 @@ export class TimeSlotPickerComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // Subscribe to real-time slot updates
-    this.subscription.add(
-      this.socketService.subscribeToSlotUpdates().subscribe((update) => {
+    this.socketService.subscribeToSlotUpdates()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((update) => {
         this.handleSlotUpdate(update);
-      })
-    );
-  }
-
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
+      });
   }
 
   onSlotClick(slot: TimeSlot): void {

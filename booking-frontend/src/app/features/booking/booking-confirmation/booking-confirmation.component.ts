@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { DatePipe, CurrencyPipe } from '@angular/common';
 import { BookingStore } from '../../../stores/booking/booking.store';
 import { AuthStore } from '../../../stores/auth/auth.store';
@@ -29,12 +29,9 @@ export class BookingConfirmationComponent {
   // TODO: Replace hardcoded placeholder values with real data from route state or booking store.
   // These should be populated from the selected service details passed through navigation state
   // or retrieved from the booking store based on the current selection.
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  selectedServiceName = () => PLACEHOLDER_SERVICE_NAME;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  serviceDuration = () => PLACEHOLDER_SERVICE_DURATION_MINUTES;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  servicePrice = () => PLACEHOLDER_SERVICE_PRICE;
+  selectedServiceName = signal(PLACEHOLDER_SERVICE_NAME);
+  serviceDuration = signal(PLACEHOLDER_SERVICE_DURATION_MINUTES);
+  servicePrice = signal(PLACEHOLDER_SERVICE_PRICE);
 
   confirmBooking(): void {
     const slot = this.selectedSlot();

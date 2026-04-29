@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
+import { Component, input, output, inject } from '@angular/core';
 import { ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -13,21 +13,21 @@ import { ContactType } from '../../../../features/auth/dto/auth.dto';
   styleUrl: './auth-form.component.scss',
 })
 export class AuthFormComponent {
-  @Input() activeTab: 'password' | 'code' = 'password';
-  @Input() contactType: ContactType = ContactType.EMAIL;
-  @Input() codeLoginStep: number = 1;
-  @Input() acceptTerms: boolean = false;
-  @Input() isLoading: boolean = false;
-  @Input() countdown: number = 0;
-  @Input() passwordForm!: FormGroup;
-  @Input() codeLoginForm!: FormGroup;
+  activeTab = input<'password' | 'code'>('password');
+  contactType = input(ContactType.EMAIL);
+  codeLoginStep = input(1);
+  acceptTerms = input(false);
+  isLoading = input(false);
+  countdown = input(0);
+  passwordForm = input.required<FormGroup>();
+  codeLoginForm = input.required<FormGroup>();
 
-  @Output() tabSwitch = new EventEmitter<'password' | 'code'>();
-  @Output() formSubmit = new EventEmitter<void>();
-  @Output() sendCode = new EventEmitter<void>();
-  @Output() contactTypeChange = new EventEmitter<ContactType>();
-  @Output() acceptTermsChange = new EventEmitter<boolean>();
-  @Output() stepChange = new EventEmitter<number>();
+  tabSwitch = output<'password' | 'code'>();
+  formSubmit = output<void>();
+  sendCode = output<void>();
+  contactTypeChange = output<ContactType>();
+  acceptTermsChange = output<boolean>();
+  stepChange = output<number>();
 
   ContactType = ContactType;
 
@@ -56,12 +56,12 @@ export class AuthFormComponent {
   }
 
   isPasswordFieldInvalid(fieldName: string): boolean {
-    const field = this.passwordForm.get(fieldName);
+    const field = this.passwordForm().get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched));
   }
 
   isCodeFieldInvalid(fieldName: string): boolean {
-    const field = this.codeLoginForm.get(fieldName);
+    const field = this.codeLoginForm().get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched));
   }
 }

@@ -188,9 +188,16 @@
     {
       "id": "FIX-TIMESLOT-TYPES",
       "title": "[RED] Write failing tests for TimeSlot type unification",
-      "status": "completed",
+      "status": "in_progress",
       "owner": "@Coder-FE",
       "type": "test"
+    },
+    {
+      "id": "SIGNAL-MIGRATION",
+      "title": "Signal migration for booking-frontend internal properties",
+      "status": "completed",
+      "owner": "@Coder-FE",
+      "type": "refactor"
     }
   ],
   "dag": {
@@ -280,6 +287,11 @@
           "version": "4.6.0",
           "date": "2026-04-29",
           "description": "FIX-TIMESLOT-TYPES RED completed. 3 failing tests written for TimeSlot type unification: (1) availableSlots with DTO fields, (2) bookedSlots with DTO fields, (3) reserveSlot error response DTO fields."
+        },
+        {
+          "version": "5.0.0",
+          "date": "2026-04-30",
+          "description": "SIGNAL-MIGRATION completed. All 5 frontend components migrated to Angular signals: LoginComponent (4 props → signal), RegisterComponent (4 props → signal), AuthFormComponent (8 @Input/6 @Output → input()/output()), TimeSlotPickerComponent (Subscription → takeUntilDestroyed), BookingConfirmationComponent (placeholder fns → signal). 11 files changed. Typecheck ✅, 103/109 tests passing."
         }
       ]
     },
@@ -923,6 +935,30 @@
           "booking-frontend/src/app/features/booking/booking.service.spec.ts"
         ],
         "definition_of_done": "3个 RED 测试编写完成且执行失败（证明当前代码与 DTO 类型不兼容）"
+      },
+      "SIGNAL-MIGRATION": {
+        "id": "SIGNAL-MIGRATION",
+        "name": "Signal migration for booking-frontend internal properties",
+        "description": "Convert LoginComponent, RegisterComponent, AuthFormComponent, TimeSlotPickerComponent, BookingConfirmationComponent internal properties to Angular signals. Replace @Input/@Output decorators with input()/output(). Replace Subscription with takeUntilDestroyed().",
+        "status": "completed",
+        "dependencies": [],
+        "assignee": "@Coder-FE",
+        "type": "refactor",
+        "priority": "P2",
+        "target_files": [
+          "booking-frontend/src/app/features/auth/login/login.component.ts",
+          "booking-frontend/src/app/features/auth/login/login.component.html",
+          "booking-frontend/src/app/features/auth/login/login.component.spec.ts",
+          "booking-frontend/src/app/features/auth/register/register.component.ts",
+          "booking-frontend/src/app/features/auth/register/register.component.html",
+          "booking-frontend/src/app/features/auth/register/register.component.spec.ts",
+          "booking-frontend/src/app/features/booking/time-slot-picker/time-slot-picker.component.ts",
+          "booking-frontend/src/app/features/booking/booking-confirmation/booking-confirmation.component.ts",
+          "booking-frontend/src/app/shared/components/molecules/auth-form/auth-form.component.ts",
+          "booking-frontend/src/app/shared/components/molecules/auth-form/auth-form.component.html",
+          "booking-frontend/src/app/shared/components/molecules/auth-form/auth-form.component.spec.ts"
+        ],
+        "definition_of_done": "Typecheck passes, lint passes, 103/109 tests passing (6 pre-existing failures unchanged)"
       }
     }
   }

@@ -93,7 +93,7 @@ describe('RegisterComponent', () => {
     });
 
     it('should start on step 1', () => {
-      expect(component.currentStep).toBe(1);
+      expect(component.currentStep()).toBe(1);
     });
   });
 
@@ -290,7 +290,7 @@ describe('RegisterComponent', () => {
 
       component.onSendCode();
 
-      expect(component.currentStep).toBe(2);
+      expect(component.currentStep()).toBe(2);
     });
 
     it('should start countdown after sending code', () => {
@@ -299,12 +299,12 @@ describe('RegisterComponent', () => {
 
       component.onSendCode();
 
-      expect(component.countdown).toBe(60);
+      expect(component.countdown()).toBe(60);
     });
 
     it('should not send code when countdown is active', () => {
       component.step1Form.get('contact')?.setValue('test@example.com');
-      component.countdown = 30;
+      component.countdown.set(30);
       apiServiceMock.registerSendCode.mockReturnValue(of({ success: true }));
 
       component.onSendCode();
@@ -329,7 +329,7 @@ describe('RegisterComponent', () => {
         confirmPassword: 'StrongP@ss1word',
         name: 'Test User',
       });
-      component.acceptTerms = false;
+      component.acceptTerms.set(false);
 
       component.onCompleteRegistration();
 
@@ -344,7 +344,7 @@ describe('RegisterComponent', () => {
         confirmPassword: 'StrongP@ss1word',
         name: 'Test User',
       });
-      component.acceptTerms = true;
+      component.acceptTerms.set(true);
       apiServiceMock.registerComplete.mockReturnValue(of({ accessToken: 'token', refreshToken: 'refresh' }));
       apiServiceMock.getUserProfile.mockReturnValue(of(null));
 
@@ -367,7 +367,7 @@ describe('RegisterComponent', () => {
         confirmPassword: 'StrongP@ss1word',
         name: 'Test User',
       });
-      component.acceptTerms = true;
+      component.acceptTerms.set(true);
       apiServiceMock.registerComplete.mockReturnValue(of({ accessToken: 'token', refreshToken: 'refresh' }));
       apiServiceMock.getUserProfile.mockReturnValue(of(null));
 
@@ -384,7 +384,7 @@ describe('RegisterComponent', () => {
         confirmPassword: 'StrongP@ss1word',
         name: 'Test User',
       });
-      component.acceptTerms = true;
+      component.acceptTerms.set(true);
       apiServiceMock.registerComplete.mockReturnValue(of({ accessToken: 'token', refreshToken: 'refresh' }));
       apiServiceMock.getUserProfile.mockReturnValue(of(null));
       jest.spyOn(router, 'navigate');
@@ -402,7 +402,7 @@ describe('RegisterComponent', () => {
         confirmPassword: 'StrongP@ss1word',
         name: 'Test User',
       });
-      component.acceptTerms = true;
+      component.acceptTerms.set(true);
       apiServiceMock.registerComplete.mockReturnValue(of({ accessToken: 'token', refreshToken: 'refresh' }));
       apiServiceMock.getUserProfile.mockReturnValue(of(null));
 
@@ -419,7 +419,7 @@ describe('RegisterComponent', () => {
         confirmPassword: 'StrongP@ss1word',
         name: 'Test User',
       });
-      component.acceptTerms = true;
+      component.acceptTerms.set(true);
       apiServiceMock.registerComplete.mockReturnValue(of({ accessToken: 'token', refreshToken: 'refresh' }));
       apiServiceMock.getUserProfile.mockReturnValue(of(null));
 
@@ -436,7 +436,7 @@ describe('RegisterComponent', () => {
         confirmPassword: 'StrongP@ss1word',
         name: 'Test User',
       });
-      component.acceptTerms = true;
+      component.acceptTerms.set(true);
       apiServiceMock.registerComplete.mockReturnValue(throwError(() => new Error('Email already exists')));
 
       component.onCompleteRegistration();
@@ -456,13 +456,13 @@ describe('RegisterComponent', () => {
 
   describe('goToStep1()', () => {
     it('should reset to step 1 and clear error', () => {
-      component.currentStep = 2;
-      component.countdown = 30;
+      component.currentStep.set(2);
+      component.countdown.set(30);
       component.goToStep1();
 
-      expect(component.currentStep).toBe(1);
+      expect(component.currentStep()).toBe(1);
       expect(authStoreMock.setError).toHaveBeenCalledWith(null);
-      expect(component.countdown).toBe(0);
+      expect(component.countdown()).toBe(0);
     });
   });
 
@@ -504,7 +504,7 @@ describe('RegisterComponent', () => {
 
       fixture = TestBed.createComponent(RegisterComponent);
       component = fixture.componentInstance;
-      component.currentStep = 2;
+      component.currentStep.set(2);
       fixture.detectChanges();
 
       const appRegisterForm = fixture.nativeElement.querySelector('app-register-form');

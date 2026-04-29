@@ -24,16 +24,16 @@ describe('AuthFormComponent', () => {
     component = fixture.componentInstance;
     fb = TestBed.inject(FormBuilder);
 
-    // Initialize required forms
-    component.passwordForm = fb.group({
+    // Initialize required inputs
+    fixture.componentRef.setInput('passwordForm', fb.group({
       contact: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(8)]],
-    });
+    }));
 
-    component.codeLoginForm = fb.group({
+    fixture.componentRef.setInput('codeLoginForm', fb.group({
       contact: ['', [Validators.required]],
       code: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]],
-    });
+    }));
 
     fixture.detectChanges();
   });
@@ -43,12 +43,12 @@ describe('AuthFormComponent', () => {
   });
 
   it('should initialize with default values', () => {
-    expect(component.activeTab).toBe('password');
-    expect(component.contactType).toBe(ContactType.EMAIL);
-    expect(component.codeLoginStep).toBe(1);
-    expect(component.acceptTerms).toBe(false);
-    expect(component.isLoading).toBe(false);
-    expect(component.countdown).toBe(0);
+    expect(component.activeTab()).toBe('password');
+    expect(component.contactType()).toBe(ContactType.EMAIL);
+    expect(component.codeLoginStep()).toBe(1);
+    expect(component.acceptTerms()).toBe(false);
+    expect(component.isLoading()).toBe(false);
+    expect(component.countdown()).toBe(0);
   });
 
   it('should emit tabSwitch event on tab change', () => {
@@ -88,17 +88,17 @@ describe('AuthFormComponent', () => {
   });
 
   it('should return true when password field is invalid and touched', () => {
-    component.passwordForm.get('contact')?.markAsTouched();
+    component.passwordForm().get('contact')?.markAsTouched();
     expect(component.isPasswordFieldInvalid('contact')).toBe(true);
   });
 
   it('should return false when password field is valid', () => {
-    component.passwordForm.get('contact')?.setValue('test@example.com');
+    component.passwordForm().get('contact')?.setValue('test@example.com');
     expect(component.isPasswordFieldInvalid('contact')).toBe(false);
   });
 
   it('should return true when code field is invalid and touched', () => {
-    component.codeLoginForm.get('code')?.markAsTouched();
+    component.codeLoginForm().get('code')?.markAsTouched();
     expect(component.isCodeFieldInvalid('code')).toBe(true);
   });
 

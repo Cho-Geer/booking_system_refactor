@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy } from '@angular/core';
+import { Component, inject, OnDestroy, signal } from '@angular/core';
 import {
   ReactiveFormsModule,
   FormBuilder,
@@ -32,21 +32,21 @@ export class LoginComponent implements OnDestroy {
   private router = inject(Router);
 
   // Tab state: 'password' = password login, 'code' = verification code login
-  activeTab: 'password' | 'code' = 'password';
+  activeTab = signal<'password' | 'code'>('password');
 
   // Contact type for code login
-  contactType = ContactType.EMAIL;
+  contactType = signal(ContactType.EMAIL);
   ContactType = ContactType; // Expose enum to template
 
   // Terms acceptance
-  acceptTerms = false;
+  acceptTerms = signal(false);
 
   // Countdown state
-  countdown = 0;
+  countdown = signal(0);
   private countdownTimer: ReturnType<typeof setInterval> | null = null;
 
   // Code login step: 1 = send code, 2 = verify code
-  codeLoginStep = 1;
+  codeLoginStep = signal(1);
 
   // Password Login Form
   passwordForm = this.fb.group({
@@ -60,24 +60,24 @@ export class LoginComponent implements OnDestroy {
     code: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]],
   });
 
-  // Observable signals (with $ suffix per convention)
-  isLoading$ = this.authStore.isLoading;
-  error$ = this.authStore.error;
+  // Signal references from store
+  isLoading = this.authStore.isLoading;
+  error = this.authStore.error;
 
   ngOnDestroy(): void {
     this.clearCountdown();
   }
 
   switchTab(tab: 'password' | 'code'): void {
-    this.activeTab = tab;
+    this.activeTab.set(tab);
     this.authStore.setError(null);
     this.clearCountdown();
-    this.codeLoginStep = 1;
+    this.codeLoginStep.set(1);
   }
 
   // Password Login
   onPasswordLogin(): void {
-    if (this.authStore.isLoading() || this.passwordForm.invalid || !this.acceptTerms) return;
+    if (this.authStore.isLoading() || this.passwordForm.invalid || !this.acceptTerms()) return;
 
     const { contact, password } = this.passwordForm.value;
     if (!contact || !password) return;
@@ -87,7 +87,7 @@ export class LoginComponent implements OnDestroy {
 
     const dto: LoginPasswordDto = {
       contact: contact.trim(),
-      contactType: this.contactType,
+      contactType: this.contactType(),
       password,
     };
 
@@ -95,7 +95,7 @@ export class LoginComponent implements OnDestroy {
       next: (response) => {
         // Store tokens (auth response has no user object)
         this.authStore.loginSuccess(response.accessToken, response.refreshToken);
-        
+
         // Fetch user profile separately
         this.api.getUserProfile().subscribe({
           next: (profile) => {
@@ -107,7 +107,7 @@ export class LoginComponent implements OnDestroy {
               phone: profile.phone,
               createdAt: profile.created_at,
             });
-            
+
             // Connect socket and redirect
             this.socketService.connect();
             this.router.navigate(['/booking']);
@@ -127,7 +127,7 @@ export class LoginComponent implements OnDestroy {
 
   // Code Login Step 1: Send verification code
   onSendCode(): void {
-    if (this.countdown > 0) return;
+    if (this.countdown() > 0) return;
 
     const contactControl = this.codeLoginForm.get('contact');
     if (contactControl?.invalid) {
@@ -143,13 +143,13 @@ export class LoginComponent implements OnDestroy {
 
     const dto: LoginSendCodeDto = {
       contact: contact.trim(),
-      contactType: this.contactType,
+      contactType: this.contactType(),
     };
 
     this.api.loginSendCode(dto).subscribe({
       next: () => {
         this.authStore.setLoading(false);
-        this.codeLoginStep = 2;
+        this.codeLoginStep.set(2);
         this.startCountdown();
       },
       error: (err) => {
@@ -161,7 +161,7 @@ export class LoginComponent implements OnDestroy {
 
   // Code Login Step 2: Verify code and login
   onVerifyCode(): void {
-    if (this.authStore.isLoading() || this.codeLoginForm.invalid || !this.acceptTerms) return;
+    if (this.authStore.isLoading() || this.codeLoginForm.invalid || !this.acceptTerms()) return;
 
     const contact = this.codeLoginForm.get('contact')?.value;
     const code = this.codeLoginForm.get('code')?.value;
@@ -172,7 +172,7 @@ export class LoginComponent implements OnDestroy {
 
     const dto: LoginVerifyCodeDto = {
       contact: contact.trim(),
-      contactType: this.contactType,
+      contactType: this.contactType(),
       code,
     };
 
@@ -180,7 +180,7 @@ export class LoginComponent implements OnDestroy {
       next: (response) => {
         // Store tokens (auth response has no user object)
         this.authStore.loginSuccess(response.accessToken, response.refreshToken);
-        
+
         // Fetch user profile separately
         this.api.getUserProfile().subscribe({
           next: (profile) => {
@@ -192,7 +192,7 @@ export class LoginComponent implements OnDestroy {
               phone: profile.phone,
               createdAt: profile.created_at,
             });
-            
+
             // Connect socket and redirect
             this.socketService.connect();
             this.router.navigate(['/booking']);
@@ -211,10 +211,10 @@ export class LoginComponent implements OnDestroy {
   }
 
   onSubmit(): void {
-    if (this.activeTab === 'password') {
+    if (this.activeTab() === 'password') {
       this.onPasswordLogin();
     } else {
-      if (this.codeLoginStep === 1) {
+      if (this.codeLoginStep() === 1) {
         this.onSendCode();
       } else {
         this.onVerifyCode();
@@ -227,10 +227,10 @@ export class LoginComponent implements OnDestroy {
   }
 
   startCountdown(): void {
-    this.countdown = 60;
+    this.countdown.set(60);
     this.countdownTimer = setInterval(() => {
-      this.countdown--;
-      if (this.countdown <= 0) {
+      this.countdown.update(c => c - 1);
+      if (this.countdown() <= 0) {
         this.clearCountdown();
       }
     }, 1000);
@@ -241,7 +241,7 @@ export class LoginComponent implements OnDestroy {
       clearInterval(this.countdownTimer);
       this.countdownTimer = null;
     }
-    this.countdown = 0;
+    this.countdown.set(0);
   }
 
   isPasswordFieldInvalid(fieldName: string): boolean {
