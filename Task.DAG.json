@@ -184,6 +184,13 @@
       "status": "completed",
       "owner": "@Coder-BE",
       "type": "fix"
+    },
+    {
+      "id": "FIX-TIMESLOT-TYPES",
+      "title": "[RED] Write failing tests for TimeSlot type unification",
+      "status": "in_progress",
+      "owner": "@Coder-FE",
+      "type": "test"
     }
   ],
   "dag": {
@@ -192,7 +199,7 @@
       "generated_by": "@Orchestrator",
       "generated_at": "2026-04-29T09:22:00Z",
       "phase": "REFACTOR",
-      "next_action": "FIX-P1-004 已完成；R002/R003 继续并行执行",
+      "next_action": "FIX-P1-004 已完成；FIX-TIMESLOT-TYPES RED 阶段完成（3个测试失败）；R002/R003 继续并行执行",
       "change_log": [
         {
           "version": "2.0.0",
@@ -268,6 +275,11 @@
           "version": "4.5.0",
           "date": "2026-04-29",
           "description": "FIX-P1-004 GREEN completed. Added getProfile() to UsersService delegating to findOne(). All 28 users service tests pass."
+        },
+        {
+          "version": "4.6.0",
+          "date": "2026-04-29",
+          "description": "FIX-TIMESLOT-TYPES RED completed. 3 failing tests written for TimeSlot type unification: (1) availableSlots with DTO fields, (2) bookedSlots with DTO fields, (3) reserveSlot error response DTO fields."
         }
       ]
     },
@@ -896,6 +908,21 @@
             "users.service.ts: 新增 getProfile(id) 方法，委托给 findOne(id)"
           ]
         }
+      },
+      "FIX-TIMESLOT-TYPES": {
+        "id": "FIX-TIMESLOT-TYPES",
+        "name": "[RED] Write failing tests for TimeSlot type unification",
+        "description": "RED 阶段：编写3个测试证明 store TimeSlot 与 DTO TimeSlot 类型不兼容。当前 store 类型 { id, date, time, isActive, bookedBy } 与 DTO 类型 { id, startTime, endTime, capacity, bookedCount, available } 字段不一致。",
+        "status": "in_progress",
+        "dependencies": [],
+        "assignee": "@Coder-FE",
+        "type": "test",
+        "priority": "P1",
+        "target_files": [
+          "booking-frontend/src/app/stores/booking/booking.store.spec.ts",
+          "booking-frontend/src/app/features/booking/booking.service.spec.ts"
+        ],
+        "definition_of_done": "3个 RED 测试编写完成且执行失败（证明当前代码与 DTO 类型不兼容）"
       }
     }
   }

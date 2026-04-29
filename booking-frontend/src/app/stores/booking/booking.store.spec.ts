@@ -224,4 +224,51 @@ describe('BookingStore', () => {
       expect(store.isLoading()).toBe(false);
     });
   });
+
+  // ==========================================
+  // TYPE UNIFICATION: RED phase - DTO TimeSlot
+  // ==========================================
+  //
+  // These tests document the expected behavior AFTER TimeSlot type unification.
+  // Currently the store defines its own TimeSlot with { id, date, time, isActive, bookedBy }
+  // while the DTO (time-slot.dto.ts) defines the authority TimeSlot with { id, startTime, endTime, capacity, bookedCount, available }.
+  // These tests MUST FAIL with the current code because the store's computed signals
+  // (availableSlots, bookedSlots) still reference store-specific fields (isActive) instead of DTO fields (available).
+
+  describe('[TYPE-UNIFICATION] Store should work with DTO-typed TimeSlot', () => {
+    it('[RED] should fail: store availableSlots should work with DTO-typed TimeSlot (using `available` instead of `isActive`)', () => {
+      // DTO TimeSlot uses `available` field, not `isActive`
+      // The store's `availableSlots` computed filters by `slot.isActive`
+      // which is undefined for DTO objects, making all slots appear unavailable
+      const dtoSlots = [
+        { id: '1', startTime: '09:00', endTime: '10:00', capacity: 5, bookedCount: 0, available: true },
+        { id: '2', startTime: '10:00', endTime: '11:00', capacity: 5, bookedCount: 3, available: false },
+      ];
+
+      store.loadSlots(dtoSlots as any[]);
+
+      const available = store.availableSlots();
+      // After unification, availableSlots should filter by `available` (DTO).
+      // Currently it filters by `isActive` → undefined for DTO → both filtered out → length 0
+      expect(available.length).toBe(1);
+      expect(available[0].id).toBe('1');
+    });
+
+    it('[RED] should fail: store bookedSlots should work with DTO-typed TimeSlot (using `!available` instead of `!isActive`)', () => {
+      // The store's `bookedSlots` computed filters by `!slot.isActive`
+      // For DTO objects, `!undefined` is `true`, making ALL slots appear booked
+      const dtoSlots = [
+        { id: '1', startTime: '09:00', endTime: '10:00', capacity: 5, bookedCount: 0, available: true },
+        { id: '2', startTime: '10:00', endTime: '11:00', capacity: 5, bookedCount: 3, available: false },
+      ];
+
+      store.loadSlots(dtoSlots as any[]);
+
+      const booked = store.bookedSlots();
+      // After unification, bookedSlots should filter by `!available` (DTO).
+      // Currently it filters by `!isActive` → !undefined → both included → length 2
+      expect(booked.length).toBe(1);
+      expect(booked[0].id).toBe('2');
+    });
+  });
 });

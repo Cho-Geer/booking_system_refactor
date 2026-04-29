@@ -203,4 +203,34 @@ describe('BookingService', () => {
       expect(storeMock.cancelBooking).toHaveBeenCalledWith('slot-b');
     });
   });
+
+  // ==========================================
+  // TYPE UNIFICATION: RED phase - DTO TimeSlot
+  // ==========================================
+  //
+  // These tests document the expected behavior AFTER TimeSlot type unification.
+  // Currently the service's error fallback constructs { id, date, time, isActive } (store type)
+  // instead of { id, startTime, endTime, capacity, bookedCount, available } (DTO type).
+  // These tests MUST FAIL with the current code.
+
+  describe('[TYPE-UNIFICATION] reserveSlot should return DTO-compatible TimeSlot', () => {
+    it('[RED] should fail: reserveSlot error response slot should have DTO fields (startTime/endTime/available)', async () => {
+      // The error path in reserveSlot() constructs a fallback slot using store-type fields:
+      //   { id: slotId, date: '', time: '', isActive: true }
+      // After unification, the error fallback should use DTO fields instead
+      apiServiceMock.createAppointment.mockReturnValue(throwError(() => new Error('API Error')));
+
+      const result = await service.reserveSlot('slot-1', 10);
+
+      expect(result.status).toBe('FAILED');
+
+      // After unification, the error fallback slot should have DTO fields
+      // Currently returns { id, date, time, isActive } — no startTime/endTime/available
+      expect(result.slot).toHaveProperty('startTime');
+      expect(result.slot).toHaveProperty('endTime');
+      expect(result.slot).toHaveProperty('capacity');
+      expect(result.slot).toHaveProperty('bookedCount');
+      expect(result.slot).toHaveProperty('available');
+    });
+  });
 });
