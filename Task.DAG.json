@@ -177,15 +177,22 @@
       "id": "FIX-APPOINTMENT-MODULE",
       "title": "Fix AppointmentModule→AppointmentsModule import rename",
       "status": "InProgress"
+    },
+    {
+      "id": "FIX-P1-004",
+      "title": "FIX-P1-004 - Add getProfile() to UsersService",
+      "status": "completed",
+      "owner": "@Coder-BE",
+      "type": "fix"
     }
   ],
   "dag": {
     "meta": {
       "version": "4.0.0",
       "generated_by": "@Orchestrator",
-      "generated_at": "2026-04-24T11:00:00Z",
+      "generated_at": "2026-04-29T09:22:00Z",
       "phase": "REFACTOR",
-      "next_action": "BUG-006 已完成；R002/R003 继续并行执行",
+      "next_action": "FIX-P1-004 已完成；R002/R003 继续并行执行",
       "change_log": [
         {
           "version": "2.0.0",
@@ -256,6 +263,11 @@
           "version": "4.4.0",
           "date": "2026-04-24",
           "description": "H9-final completed. PrimeNG Aura theme + Tailwind CSS v4 configured. jest.config.js updated for @primeng/@primeuix ESM support. 3 pre-existing spyOn failures unchanged."
+        },
+        {
+          "version": "4.5.0",
+          "date": "2026-04-29",
+          "description": "FIX-P1-004 GREEN completed. Added getProfile() to UsersService delegating to findOne(). All 28 users service tests pass."
         }
       ]
     },
@@ -860,6 +872,28 @@
             "src/app/app.config.ts: provideAnimationsAsync + providePrimeNG(Aura preset, dark mode .dark-mode)",
             "angular.json: added primeicons.css to styles array",
             "jest.config.js: added @primeng|@primeuix to transformIgnorePatterns"
+          ]
+        }
+      },
+      "FIX-P1-004": {
+        "id": "FIX-P1-004",
+        "name": "[GREEN] Add getProfile() to UsersService",
+        "description": "GREEN 阶段：在 users.service.ts 中添加 getProfile(id) 方法，委托给 findOne(id) 实现。RED 测试已在 users.service.spec.ts 中编写完成。",
+        "status": "completed",
+        "dependencies": [],
+        "assignee": "@Coder-BE",
+        "type": "fix",
+        "priority": "P1",
+        "target_files": [
+          "booking-backend/src/modules/users/users.service.ts"
+        ],
+        "definition_of_done": "所有 users service 测试通过 (28/28)，test_report.json 含 execution_evidence",
+        "result": {
+          "tests_passed": 28,
+          "tests_failed": 0,
+          "test_suites_passed": 1,
+          "fixes_applied": [
+            "users.service.ts: 新增 getProfile(id) 方法，委托给 findOne(id)"
           ]
         }
       }

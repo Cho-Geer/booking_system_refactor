@@ -441,10 +441,35 @@
       "session_id": "cg_ses_1777440251375",
       "created_at": "2026-04-29T05:24:11.375Z",
       "task_description": "Fix remaining Qoder references in contract.yaml, machine.schema.json, and CI workflow. Run keystone:hash. Commit inner repo.",
-      "gate_status": "armed",
+      "gate_status": "completed",
       "last_check_failed_items": [],
       "plan_summary": "Fix remaining Qoder→Keystone refs: contract.yaml (4 items), machine.schema.json (2 items), CI workflow (15+ items). Run keystone:hash. Commit inner repo.",
       "confirmed_at": "2026-04-29T05:24:15.495Z",
+      "consumed_at": "2026-04-29T05:24:28.034Z",
+      "audit": {
+        "execution_summary": "Fixed 4 FAIL items: contract.yaml (x-qoder→x-keystone, .qoder→.opencode paths, Qoder text), machine.schema.json branding, CI workflow (15 refs renamed + file rename). All hashes verified matching.",
+        "completed_at": "2026-04-29T05:24:28.034Z"
+      }
+    },
+    "cg_ses_1777454457278": {
+      "session_id": "cg_ses_1777454457278",
+      "created_at": "2026-04-29T09:20:57.278Z",
+      "task_description": "Fix GREEN phase: add getProfile() method to UsersService to complete the incomplete TDD cycle. The RED phase was written, but the service implementation was never added.",
+      "gate_status": "armed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix GREEN phase: Coder-BE adds getProfile() to UsersService, runs tests, runs typecheck, commits with [Green] marker",
+      "confirmed_at": "2026-04-29T09:21:05.181Z",
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1777454529527": {
+      "session_id": "cg_ses_1777454529527",
+      "created_at": "2026-04-29T09:22:09.527Z",
+      "task_description": "Fix GREEN phase: add getProfile() to UsersService",
+      "gate_status": "armed",
+      "last_check_failed_items": [],
+      "plan_summary": "Add getProfile() to UsersService: read spec, implement method, run tests, typecheck, create artifacts, commit",
+      "confirmed_at": "2026-04-29T09:22:17.453Z",
       "consumed_at": null,
       "audit": null
     }

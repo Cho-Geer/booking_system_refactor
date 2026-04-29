@@ -81,6 +81,14 @@ export class UsersService {
   }
 
   /**
+   * 获取用户个人资料
+   * 委托给 findOne 实现，返回脱敏后的用户信息
+   */
+  async getProfile(id: string) {
+    return this.findOne(id);
+  }
+
+  /**
    * 通过邮箱 hash 查找用户
    * 响应中使用脱敏值
    */
