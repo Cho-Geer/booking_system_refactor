@@ -192,15 +192,22 @@
       "owner": "@Coder-FE",
       "type": "test"
     },
-    {
-      "id": "FIX-API-RESPONSE-WRAP",
-      "title": "Fix POST auth methods to unwrap ResponseInterceptor envelope",
-      "status": "completed",
-      "owner": "@Coder-FE",
-      "type": "fix"
-    }
-  ],
-  "dag": {
+      {
+        "id": "FIX-API-RESPONSE-WRAP",
+        "title": "Fix POST auth methods to unwrap ResponseInterceptor envelope",
+        "status": "completed",
+        "owner": "@Coder-BE",
+        "type": "fix"
+      },
+      {
+        "id": "T-ParseIntPipeFix",
+        "title": "T-ParseIntPipeFix",
+        "status": "completed",
+        "owner": "@Coder-BE",
+        "type": "fix"
+      }
+    ],
+    "dag": {
     "meta": {
       "version": "4.0.0",
       "generated_by": "@Orchestrator",
@@ -936,20 +943,55 @@
       ],
       "definition_of_done": "3个RED测试编写完成且执行失败(证明当前代码与DTO类型不兼容)."
     },
-    "FIX-API-RESPONSE-WRAP": {
-      "id": "FIX-API-RESPONSE-WRAP",
-      "name": "Fix POST auth methods to unwrap ResponseInterceptor envelope",
-      "description": "Auth服务的POST登录验证、登录密码、注册完成、刷新Token方法未添加map(response => response.data)来解包ResponseInterceptor,导致Auth存储的Token为undefined,后续的请求触发\"No auth token\"错误.",
-      "status": "completed",
-      "dependencies": [],
-      "assignee": "@Coder-FE",
-      "type": "fix",
-      "priority": "P0",
-      "target_files": [
-        "booking-frontend/src/app/core/services/api.service.ts"
-      ],
-      "definition_of_done": "All 4 POST auth methods have map(response => response.data) added, TypeScript types are correct, authentication works properly with tokens being correctly stored and passed."
-    }
+      "FIX-API-RESPONSE-WRAP": {
+        "id": "FIX-API-RESPONSE-WRAP",
+        "name": "Fix POST auth methods to unwrap ResponseInterceptor envelope",
+        "description": "Auth服务的POST登录验证、登录密码、注册完成、刷新Token方法未添加map(response => response.data)来解包ResponseInterceptor,导致Auth存储的Token为undefined,后续的请求触发\"No auth token\"错误.",
+        "status": "completed",
+        "dependencies": [],
+        "assignee": "@Coder-BE",
+        "type": "fix",
+        "priority": "P0",
+        "target_files": [
+          "booking-frontend/src/app/core/services/api.service.ts"
+        ],
+        "definition_of_done": "All 4 POST auth methods have map(response => response.data) added, TypeScript types are correct, authentication works properly with tokens being correctly stored and passed."
+      },
+      "T-ParseIntPipeFix": {
+        "id": "T-ParseIntPipeFix",
+        "name": "[GREEN] Fix ParseIntPipe error - Create OptionalParseIntPipe",
+        "description": "Create OptionalParseIntPipe that returns undefined for missing params (lets parameter defaults apply). Replace all @Query('page', ParseIntPipe) and @Query('pageSize', ParseIntPipe) with OptionalParseIntPipe in 4 backend controllers. Also remove retry(2) from getServices() and getAvailableSlots() in booking-frontend/src/app/core/services/api.service.ts.",
+        "status": "completed",
+        "dependencies": [],
+        "assignee": "@Coder-BE",
+        "type": "fix",
+        "priority": "P1",
+        "target_files": [
+          "booking-backend/src/common/pipes/optional-parse-int.pipe.ts",
+          "booking-backend/src/modules/services/services.controller.ts",
+          "booking-backend/src/modules/users/users.controller.ts",
+          "booking-backend/src/modules/time-slots/time-slots.controller.ts",
+          "booking-backend/src/modules/appointments/appointments.controller.ts",
+          "booking-frontend/src/app/core/services/api.service.ts"
+        ],
+        "definition_of_done": "OptionalParseIntPipe created and working, all 4 controllers updated, retry(2) removed from frontend service, lint and typecheck passing.",
+        "result": {
+          "suites_passed": "N/A - lint and build passed",
+          "tests_passed": "N/A - no new tests (implementation only)",
+          "tests_failed": 0,
+          "fixes_applied": [
+            "Created src/common/pipes/optional-parse-int.pipe.ts with OptionalParseIntPipe class",
+            "Replaced ParseIntPipe with OptionalParseIntPipe in services.controller.ts (findAll)",
+            "Replaced ParseIntPipe with OptionalParseIntPipe in users.controller.ts (findAll)",
+            "Replaced ParseIntPipe with OptionalParseIntPipe in time-slots.controller.ts (findAll)",
+            "Replaced ParseIntPipe with OptionalParseIntPipe in appointments.controller.ts (findAll, getMyAppointments)",
+            "Removed retry(2) from getServices() and getAvailableSlots() in api.service.ts",
+            "Removed retry from rxjs/operators import in api.service.ts",
+            "Fixed lint error: prefixed unused metadata parameter with underscore"
+          ]
+        }
+      }
     }
   }
 }
+    

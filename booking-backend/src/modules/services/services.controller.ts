@@ -8,8 +8,8 @@ import {
   Delete,
   Query,
   UseGuards,
-  ParseIntPipe,
 } from "@nestjs/common";
+import { OptionalParseIntPipe } from "../../common/pipes/optional-parse-int.pipe";
 import {
   ApiTags,
   ApiOperation,
@@ -43,15 +43,11 @@ export class ServicesController {
   @ApiOperation({ summary: "Get all services with pagination" })
   @ApiResponse({ status: 200, description: "List of services" })
   async findAll(
-    @Query("page", ParseIntPipe) page: number = 1,
-    @Query("pageSize", ParseIntPipe) pageSize: number = 10,
+    @Query("page", OptionalParseIntPipe) page: number = 1,
+    @Query("pageSize", OptionalParseIntPipe) pageSize: number = 10,
     @Query("isActive") isActive?: boolean,
   ) {
-    return this.servicesService.findAll(
-      page,
-      pageSize,
-      isActive,
-    );
+    return this.servicesService.findAll(page, pageSize, isActive);
   }
 
   @Get(":id")

@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError, map, retry } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import {
   ContactType,
   RegisterSendCodeDto,
@@ -131,7 +131,6 @@ export class ApiService {
       .get<ApiResponse<Service[]>>(`${this.apiUrl}/services`)
       .pipe(
         map(response => response.data),
-        retry(2),
         catchError(this.handleError)
       );
   }
@@ -160,7 +159,6 @@ export class ApiService {
       .get<ApiResponse<TimeSlot[]>>(`${this.apiUrl}/time-slots/available`, { params })
       .pipe(
         map(response => response.data),
-        retry(2),
         catchError(this.handleError)
       );
   }

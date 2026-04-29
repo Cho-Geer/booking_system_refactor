@@ -10,8 +10,8 @@ import {
   UseGuards,
   Req,
   ForbiddenException,
-  ParseIntPipe,
 } from "@nestjs/common";
+import { OptionalParseIntPipe } from "../../common/pipes/optional-parse-int.pipe";
 import {
   ApiTags,
   ApiOperation,
@@ -89,8 +89,8 @@ export class UsersController {
   @ApiOperation({ summary: "Get all users with pagination" })
   @ApiResponse({ status: 200, description: "List of users" })
   async findAll(
-    @Query("page", ParseIntPipe) page: number = 1,
-    @Query("pageSize", ParseIntPipe) pageSize: number = 10,
+    @Query("page", OptionalParseIntPipe) page: number = 1,
+    @Query("pageSize", OptionalParseIntPipe) pageSize: number = 10,
   ) {
     return this.usersService.findAll(page, pageSize);
   }

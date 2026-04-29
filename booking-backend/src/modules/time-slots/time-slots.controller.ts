@@ -8,8 +8,8 @@ import {
   Delete,
   Query,
   UseGuards,
-  ParseIntPipe,
 } from "@nestjs/common";
+import { OptionalParseIntPipe } from "../../common/pipes/optional-parse-int.pipe";
 import {
   ApiTags,
   ApiOperation,
@@ -46,15 +46,10 @@ export class TimeSlotsController {
   async findAll(
     @Query("serviceId") serviceId?: string,
     @Query("isActive") isActive?: boolean,
-    @Query("page", ParseIntPipe) page: number = 1,
-    @Query("pageSize", ParseIntPipe) pageSize: number = 10,
+    @Query("page", OptionalParseIntPipe) page: number = 1,
+    @Query("pageSize", OptionalParseIntPipe) pageSize: number = 10,
   ) {
-    return this.timeSlotsService.findAll(
-      serviceId,
-      isActive,
-      page,
-      pageSize,
-    );
+    return this.timeSlotsService.findAll(serviceId, isActive, page, pageSize);
   }
 
   @Get("available")

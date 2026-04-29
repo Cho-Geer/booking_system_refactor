@@ -9,8 +9,8 @@ import {
   Query,
   Req,
   UseGuards,
-  ParseIntPipe,
 } from "@nestjs/common";
+import { OptionalParseIntPipe } from "../../common/pipes/optional-parse-int.pipe";
 import {
   ApiTags,
   ApiOperation,
@@ -39,10 +39,7 @@ export class AppointmentsController {
   @ApiOperation({ summary: "Create a new appointment" })
   @ApiResponse({ status: 201, description: "Appointment created" })
   @ApiResponse({ status: 409, description: "Time slot not available" })
-  async create(
-    @Body() createAppointmentDto: CreateAppointmentDto,
-    @Req() req,
-  ) {
+  async create(@Body() createAppointmentDto: CreateAppointmentDto, @Req() req) {
     const userId = req?.user?.id;
     return this.appointmentsService.create(createAppointmentDto, userId);
   }
@@ -53,17 +50,12 @@ export class AppointmentsController {
   @ApiOperation({ summary: "Get all appointments" })
   @ApiResponse({ status: 200, description: "List of appointments" })
   async findAll(
-    @Query("page", ParseIntPipe) page: number = 1,
-    @Query("pageSize", ParseIntPipe) pageSize: number = 10,
+    @Query("page", OptionalParseIntPipe) page: number = 1,
+    @Query("pageSize", OptionalParseIntPipe) pageSize: number = 10,
     @Query("status") status?: AppointmentStatus,
     @Query("userId") userId?: string,
   ) {
-    return this.appointmentsService.findAll(
-      page,
-      pageSize,
-      status,
-      userId,
-    );
+    return this.appointmentsService.findAll(page, pageSize, status, userId);
   }
 
   @Get("my")
@@ -72,16 +64,11 @@ export class AppointmentsController {
   @ApiResponse({ status: 200, description: "List of user appointments" })
   async getMyAppointments(
     @Req() req,
-    @Query("page", ParseIntPipe) page: number = 1,
-    @Query("pageSize", ParseIntPipe) pageSize: number = 10,
+    @Query("page", OptionalParseIntPipe) page: number = 1,
+    @Query("pageSize", OptionalParseIntPipe) pageSize: number = 10,
   ) {
     const userId = req?.user?.id;
-    return this.appointmentsService.findAll(
-      page,
-      pageSize,
-      undefined,
-      userId,
-    );
+    return this.appointmentsService.findAll(page, pageSize, undefined, userId);
   }
 
   @Get(":id")
