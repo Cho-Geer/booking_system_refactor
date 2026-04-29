@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://qoder.dev/schemas/machine.schema.json",
-  "title": "Qoder 多智能体状态机配置 Schema",
+  "$id": "https://keystone.dev/schemas/machine.schema.json",
+  "title": "Keystone 多智能体状态机配置 Schema",
   "description": "定义契约哈希、任务生命周期与强制证据链的物理约束规则",
   "type": "object",
   "required": ["meta", "contracts", "taskLifecycle"],

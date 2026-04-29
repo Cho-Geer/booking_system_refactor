@@ -4,7 +4,7 @@
     "version": "2.1.0",
     "project": "appointment-booking-system",
     "description": "强制校验契约哈希 + 任务生命周期证据链。涉及角色：@Architect(定义), @Coder-BE(实现), @Coder-FE(适配), @Guardian(审查), @Orchestrator(调度)。",
-    "lastUpdated": "2026-04-28T09:06:22.872Z"
+    "lastUpdated": "2026-04-29T05:23:48.918Z"
   },
   "currentTask": {
     "id": "BUG-009",
@@ -15,14 +15,14 @@
   "contracts": {
     "backend-api": {
       "file": "contract.yaml",
-      "hash": "sha256-287a6eb11a99b114255ac3057cd822ae0e037b5d81913a05ed2d617c91186209",
-      "lastValidated": "2026-04-23T07:33:35.824Z",
+      "hash": "sha256-860d6c67f55df3ffa8109e8ceab5072a5f9dd2d0de0373df267f856ec54e7356",
+      "lastValidated": "2026-04-29T05:23:48.918Z",
       "owner": "@Architect"
     },
     "prisma-schema": {
       "file": "booking-backend/prisma/schema.prisma",
-      "hash": "sha256-94d9022d97ac6eed4c0ca9229e8e09fc1670153488f3986fd4aa6525e364cacf",
-      "lastValidated": "2026-04-24T00:44:00.000Z",
+      "hash": "sha256-b21af8c44999669910d2002f988ee13ef611093dad72d122ef58bd985ea6791e",
+      "lastValidated": "2026-04-29T05:23:48.918Z",
       "owner": "@Coder-BE"
     },
     "frontend-dto": {
@@ -405,6 +405,20 @@
       "action": "UPDATE",
       "target": "BUG-009",
       "details": "BUG-009: 验证部分唯一索引迁移文件存在且正确。迁移文件 prisma/migrations/20260422_fix_p1_003_partial_unique_index/migration.sql 已存在，SQL内容与contract.yaml完全一致。无需创建新迁移。"
+    },
+    {
+      "timestamp": "2026-04-29T05:23:48.918Z",
+      "agent": "@Orchestrator",
+      "action": "HASH_UPDATE",
+      "target": "backend-api",
+      "details": "Hash updated from sha256-287a6eb11a99b... to sha256-860d6c67f55df..."
+    },
+    {
+      "timestamp": "2026-04-29T05:23:48.918Z",
+      "agent": "@Orchestrator",
+      "action": "HASH_UPDATE",
+      "target": "prisma-schema",
+      "details": "Hash updated from sha256-94d9022d97ac6... to sha256-b21af8c449996..."
     }
   ]
 }

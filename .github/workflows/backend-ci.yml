@@ -45,7 +45,7 @@ jobs:
 
   contract-check:
     name: Contract Hash Check
-    uses: ./.github/workflows/qoder-contract-check.yml
+    uses: ./.github/workflows/keystone-contract-check.yml
 
   lint-and-typecheck:
     name: Lint & Typecheck

@@ -1,0 +1,94 @@
+name: Keystone Contract & State Machine Check
+
+on:
+  workflow_call:
+  workflow_dispatch:
+  push:
+    branches: [main, develop]
+    paths:
+      - '.opencode/state/machine.json'
+      - '.opencode/state/machine.schema.json'
+      - 'contract.yaml'
+      - 'booking-backend/prisma/schema.prisma'
+      - 'booking-frontend/src/app/shared/dto/**'
+      - 'booking-frontend/src/environments/environment.ts'
+      - 'Task.DAG.json'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.opencode/state/machine.json'
+      - '.opencode/state/machine.schema.json'
+      - 'contract.yaml'
+      - 'booking-backend/prisma/schema.prisma'
+      - 'booking-frontend/src/app/shared/dto/**'
+      - 'booking-frontend/src/environments/environment.ts'
+      - 'Task.DAG.json'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contract-hash-check:
+    name: Contract Hash Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify Contract Hashes
+        run: |
+          echo "🔍 [Keystone CI] Verifying contract hashes..."
+          node scripts/update-machine-hash.js verify
+
+      - name: Keystone State Machine Verify
+        run: |
+          echo "🔍 [Keystone CI] Running keystone:hash:verify..."
+          npm run keystone:hash:verify
+
+      - name: Validate Evidence Files for Task Transitions
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "🔍 [Keystone CI] Validating task lifecycle evidence files..."
+          node scripts/keystone-validate.js --ci || {
+            echo "❌ [Keystone CI] Task lifecycle evidence validation failed"
+            echo ""
+            echo "Required evidence files missing or invalid:"
+            echo "  - .task_temp/{taskId}/TASK_LOG.md (for InProgress → Testing)"
+            echo "  - .task_temp/{taskId}/test_report.json (for Testing → Review)"
+            echo "  - .task_temp/{taskId}/guardian_report.md (for Review → Done)"
+            exit 1
+          }
+
+      - name: Report Status
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ [Keystone CI] All Keystone validations passed"
+          else
+            echo "❌ [Keystone CI] Keystone validation failed"
+            echo ""
+            echo "Possible causes:"
+            echo "  1. Contract file was modified but machine.json was not updated"
+            echo "  2. Manual edit to machine.json without recalculating hash"
+            echo "  3. Task state transition without required evidence files"
+            echo "  4. Evidence files do not match schema requirements"
+            echo ""
+            echo "To fix:"
+            echo "  1. Run: npm run keystone:hash"
+            echo "  2. Ensure all task transitions have required evidence files"
+            echo "  3. Commit the updated files"
+            exit 1
+          fi
