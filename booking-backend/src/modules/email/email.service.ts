@@ -73,9 +73,7 @@ export class EmailService implements OnModuleInit {
       },
     );
 
-    this.logger.log(
-      `Queued verification email for ${to} (Job ID: ${job.id})`,
-    );
+    this.logger.log(`Queued verification email for ${to} (Job ID: ${job.id})`);
 
     return { success: true, jobId: job.id };
   }

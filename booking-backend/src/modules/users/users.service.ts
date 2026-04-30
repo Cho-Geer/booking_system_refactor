@@ -1,8 +1,13 @@
-import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../../common/database/prisma.service';
-import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
-import { UserType, UserStatus } from '@prisma/client';
-import { HashService } from '../encryption/hash.service';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+  BadRequestException,
+} from "@nestjs/common";
+import { PrismaService } from "../../common/database/prisma.service";
+import { CreateUserDto, UpdateUserDto } from "./dto/user.dto";
+import { UserType, UserStatus } from "@prisma/client";
+import { HashService } from "../encryption/hash.service";
 
 @Injectable()
 export class UsersService {
@@ -20,7 +25,7 @@ export class UsersService {
       });
 
       if (existingUser) {
-        throw new ConflictException('User with this email already exists');
+        throw new ConflictException("User with this email already exists");
       }
     }
 
@@ -31,7 +36,7 @@ export class UsersService {
       });
 
       if (existingUser) {
-        throw new ConflictException('User with this phone already exists');
+        throw new ConflictException("User with this phone already exists");
       }
     }
 
@@ -53,7 +58,7 @@ export class UsersService {
         skip,
         take: pageSize,
         select: this.getSafeUserSelect(),
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
       }),
       this.prisma.user.count(),
     ]);
@@ -126,7 +131,7 @@ export class UsersService {
         where: { emailHash },
       });
       if (existingUser) {
-        throw new ConflictException('User with this email already exists');
+        throw new ConflictException("User with this email already exists");
       }
     }
 
@@ -137,7 +142,7 @@ export class UsersService {
         where: { phoneHash },
       });
       if (existingUser) {
-        throw new ConflictException('User with this phone already exists');
+        throw new ConflictException("User with this phone already exists");
       }
     }
 
@@ -155,11 +160,13 @@ export class UsersService {
     }
 
     await this.prisma.user.delete({ where: { id } });
-    return { message: 'User deleted successfully' };
+    return { message: "User deleted successfully" };
   }
 
   async updatePassword(id: string, oldPassword: string, newPassword: string) {
-    throw new BadRequestException('Password management is not supported in the current user model. Please use the authentication service.');
+    throw new BadRequestException(
+      "Password management is not supported in the current user model. Please use the authentication service.",
+    );
   }
 
   /**

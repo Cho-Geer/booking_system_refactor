@@ -1,6 +1,6 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import * as crypto from 'crypto';
+import { Injectable, Logger } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import * as crypto from "crypto";
 
 /**
  * SHA-256 + Pepper 哈希服务
@@ -16,11 +16,11 @@ export class HashService {
   private readonly pepper: string;
 
   constructor(private readonly configService: ConfigService) {
-    this.pepper = this.configService.get<string>('PII_HASH_PEPPER', '');
+    this.pepper = this.configService.get<string>("PII_HASH_PEPPER", "");
     if (!this.pepper) {
-      throw new Error('PII_HASH_PEPPER environment variable is required');
+      throw new Error("PII_HASH_PEPPER environment variable is required");
     }
-    this.logger.log('HashService initialized with SHA-256 + Pepper');
+    this.logger.log("HashService initialized with SHA-256 + Pepper");
   }
 
   /**
@@ -30,9 +30,9 @@ export class HashService {
    */
   hashWithPepper(value: string): string {
     return crypto
-      .createHash('sha256')
+      .createHash("sha256")
       .update(value + this.pepper)
-      .digest('hex');
+      .digest("hex");
   }
 
   /**
@@ -42,6 +42,6 @@ export class HashService {
    * 警告: 此值一旦设置不可更改，否则所有用户将无法登录
    */
   static generatePepper(): string {
-    return crypto.randomBytes(32).toString('base64');
+    return crypto.randomBytes(32).toString("base64");
   }
 }

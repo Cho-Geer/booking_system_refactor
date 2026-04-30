@@ -68,7 +68,12 @@ export class AppointmentsService {
     try {
       appointment = await withRetry(
         (attempt) =>
-          this.attemptAtomicCreate(createAppointmentDto, timeSlot.currentSequence, attempt, userId),
+          this.attemptAtomicCreate(
+            createAppointmentDto,
+            timeSlot.currentSequence,
+            attempt,
+            userId,
+          ),
         {
           maxRetries: MAX_RETRIES,
           baseDelayMs: BACKOFF_BASE_MS,
@@ -104,7 +109,10 @@ export class AppointmentsService {
         time: appointment.timeSlot.slotTime,
       });
     } catch (error) {
-      this.logger.error("Failed to queue appointment confirmation email:", error);
+      this.logger.error(
+        "Failed to queue appointment confirmation email:",
+        error,
+      );
     }
 
     // Send real-time booking confirmation notification
@@ -120,7 +128,10 @@ export class AppointmentsService {
         customerEmail: customerInfo.email,
       });
     } catch (error) {
-      this.logger.error("Failed to send booking confirmation notification:", error);
+      this.logger.error(
+        "Failed to send booking confirmation notification:",
+        error,
+      );
     }
 
     return appointment;
@@ -303,7 +314,10 @@ export class AppointmentsService {
           customerEmail: customerInfo.email,
         });
       } catch (error) {
-        this.logger.error("Failed to send appointment update notification:", error);
+        this.logger.error(
+          "Failed to send appointment update notification:",
+          error,
+        );
       }
     }
 
@@ -353,7 +367,10 @@ export class AppointmentsService {
         cancelReason: reason,
       });
     } catch (error) {
-      this.logger.error("Failed to queue appointment cancellation email:", error);
+      this.logger.error(
+        "Failed to queue appointment cancellation email:",
+        error,
+      );
     }
 
     try {

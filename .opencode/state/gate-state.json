@@ -576,6 +576,48 @@
         "execution_summary": "Phase 1-5: Migrated all 5 components to Angular signals. LoginComponent (activeTab, contactType, acceptTerms, countdown → signal; removed $ suffix; removed DoCheck/OnChanges/AfterViewChecked). RegisterComponent (currentStep, contactType, acceptTerms, countdown → signal; removed $ suffix). TimeSlotPickerComponent (OnDestroy/Subscription → DestroyRef/takeUntilDestroyed). BookingConfirmationComponent (arrow functions → signal). AuthFormComponent (@Input/@Output → input/output). Fixed setup-jest.ts TestBed.initTestEnvironment. Build: PASS. Tests: 103/109 passed (6 pre-existing failures).",
         "completed_at": "2026-04-29T15:44:46.535Z"
       }
+    },
+    "cg_ses_1777500024343": {
+      "session_id": "cg_ses_1777500024343",
+      "created_at": "2026-04-29T22:00:24.344Z",
+      "task_description": "Fix ParseIntPipe 'numeric string is expected' error in 4 backend controllers (services, users, time-slots, appointments). Create OptionalParseIntPipe that returns undefined for missing params (lets parameter defaults apply). Replace all @Query('page', ParseIntPipe) and @Query('pageSize', ParseIntPipe) with OptionalParseIntPipe. Also remove retry(2) from getServices() and getAvailableSlots() in booking-frontend/src/app/core/services/api.service.ts. Run lint and typecheck after changes. Commit with Task.DAG.json update.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix ParseIntPipe error: Create OptionalParseIntPipe (returns undefined for missing params), update 4 backend controllers (services, users, time-slots, appointments), remove retry(2) from frontend api.service.ts, run lint/typecheck, commit with Task.DAG.json update",
+      "confirmed_at": "2026-04-29T22:01:06.283Z",
+      "consumed_at": "2026-04-29T22:14:14.239Z",
+      "audit": {
+        "execution_summary": "Created OptionalParseIntPipe in booking-backend/src/common/pipes/optional-parse-int.pipe.ts. Updated 4 backend controllers (services, users, time-slots, appointments) to use OptionalParseIntPipe instead of ParseIntPipe for page and pageSize query parameters. Removed retry(2) from getServices() and getAvailableSlots() in booking-frontend/src/app/core/services/api.service.ts. All changes committed with Task.DAG.json update. Lint and build checks passed.",
+        "completed_at": "2026-04-29T22:14:14.239Z"
+      }
+    },
+    "cg_ses_1777501057261": {
+      "session_id": "cg_ses_1777501057261",
+      "created_at": "2026-04-29T22:17:37.261Z",
+      "task_description": "Review Coder-BE changes: OptionalParseIntPipe creation, 4 controllers updated (ParseIntPipe → OptionalParseIntPipe), retry(2) removed from api.service.ts. Verify: (1) code quality and standards compliance, (2) test_report.json has execution_evidence field, (3) HANDOVER.md exists with handover summary, (4) no security issues introduced, (5) TASK_LOG.md shows complete work record. Check commit 59aa8b5.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Review Coder-BE commit 59aa8b5: Verify OptionalParseIntPipe implementation, 4 controllers updated, retry(2) removed, test_report.json has execution_evidence, HANDOVER.md exists, TASK_LOG.md complete, no security issues",
+      "confirmed_at": "2026-04-29T22:18:10.717Z",
+      "consumed_at": "2026-04-29T22:22:13.547Z",
+      "audit": {
+        "execution_summary": "Guardian review of Coder-BE commit 59aa8b5 (T-ParseIntPipeFix): Reviewed OptionalParseIntPipe creation, 4 controller migrations, and retry(2) removal from api.service.ts. Result: FAIL — 4 critical violations found: no unit tests for pipe, no test_report.json (missing execution_evidence), no HANDOVER.md, no TASK_LOG.md. Code quality is acceptable but process gates are severely breached. P0 fixes required before resubmission.",
+        "completed_at": "2026-04-29T22:22:13.547Z"
+      }
+    },
+    "cg_ses_1777513658878": {
+      "session_id": "cg_ses_1777513658878",
+      "created_at": "2026-04-30T01:47:38.879Z",
+      "task_description": "Re-review task T-ParseIntPipeFix (commit ac14893). Verify code quality, test_execution_evidence, HANDOVER.md, TASK_LOG.md, Task.DAG.json, security, and unit tests (9/9). Produce updated PASS/FAIL verdict.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Re-review T-ParseIntPipeFix (commit ac14893): verify test_report.json execution_evidence, HANDOVER.md, TASK_LOG.md, Task.DAG.json, code quality (backend-coding-standard), security, and unit tests (9/9). Produce PASS/FAIL verdict.",
+      "confirmed_at": "2026-04-30T01:51:09.078Z",
+      "consumed_at": "2026-04-30T01:52:02.062Z",
+      "audit": {
+        "execution_summary": "Re-review T-ParseIntPipeFix (commit ac14893): All 28 checks passed. Test execution evidence verified (9/9 unit tests passing, exit_code=0, real output_summary), code quality compliant with backend-coding-standard, no security vulnerabilities, 4 controllers migrated, frontend retry(2) removed, all 5 artifacts complete. Verdict: PASS.",
+        "completed_at": "2026-04-30T01:52:02.062Z"
+      }
     }
   }
 }

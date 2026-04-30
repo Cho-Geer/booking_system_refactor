@@ -324,10 +324,10 @@ export class RateLimiterService {
     const result = await client.eval(
       LUA_RATE_LIMIT_SCRIPT,
       1, // number of keys
-      key,       // KEYS[1]
+      key, // KEYS[1]
       windowStart, // ARGV[1]
-      now,         // ARGV[2]
-      limit,       // ARGV[3]
+      now, // ARGV[2]
+      limit, // ARGV[3]
       window + 10, // ARGV[4] (window + buffer for TTL)
     );
 

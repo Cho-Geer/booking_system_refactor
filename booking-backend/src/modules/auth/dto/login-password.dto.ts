@@ -21,8 +21,7 @@ export class LoginPasswordDto {
   contactType!: ContactType;
 
   @ApiProperty({
-    description:
-      "密码（至少12个字符，包含大小写字母、数字、特殊字符）",
+    description: "密码（至少12个字符，包含大小写字母、数字、特殊字符）",
     example: "SecurePass123!",
     minLength: 12,
   })

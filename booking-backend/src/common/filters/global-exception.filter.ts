@@ -58,7 +58,9 @@ const PRISMA_ERROR_MAP: Record<
 export class GlobalExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger(GlobalExceptionFilter.name);
 
-  constructor(@Optional() @Inject(ClsService) private readonly cls?: ClsService) {}
+  constructor(
+    @Optional() @Inject(ClsService) private readonly cls?: ClsService,
+  ) {}
 
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();

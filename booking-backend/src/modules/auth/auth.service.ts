@@ -477,12 +477,11 @@ export class AuthService {
     });
 
     // 2. 解码 Access Token 提取 jti，用于构建黑名单 key
-    const decodedToken = this.jwtService.decode(accessToken) as { jti?: string } | null;
+    const decodedToken = this.jwtService.decode(accessToken) as {
+      jti?: string;
+    } | null;
     const jti = decodedToken?.jti || crypto.randomUUID();
-    await this.cacheService.setSession(
-      `token:blacklist:${jti}`,
-      "revoked",
-    );
+    await this.cacheService.setSession(`token:blacklist:${jti}`, "revoked");
 
     this.logger.log(`User logged out: ${userId}`);
 
