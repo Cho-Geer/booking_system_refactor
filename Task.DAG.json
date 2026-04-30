@@ -299,6 +299,11 @@
           "version": "4.7.0",
           "date": "2026-04-30",
           "description": "FIX-API-RESPONSE-WRAP completed. Fixed 4 POST auth methods (loginVerifyCode, loginPassword, registerComplete, refreshToken) to add map(response => response.data) to unwrap ResponseInterceptor envelope."
+        },
+        {
+          "version": "4.8.0",
+          "date": "2026-04-30",
+          "description": "T-ParseIntPipeFix TDD completed. Added optional-parse-int.pipe.spec.ts with 9 unit tests (all passed). Tests cover: undefined/empty→undefined, valid integers parsed, invalid strings throw BadRequestException. Guardian review now PASS."
         }
       ]
     },
@@ -968,19 +973,21 @@
         "priority": "P1",
         "target_files": [
           "booking-backend/src/common/pipes/optional-parse-int.pipe.ts",
+          "booking-backend/src/common/pipes/optional-parse-int.pipe.spec.ts",
           "booking-backend/src/modules/services/services.controller.ts",
           "booking-backend/src/modules/users/users.controller.ts",
           "booking-backend/src/modules/time-slots/time-slots.controller.ts",
           "booking-backend/src/modules/appointments/appointments.controller.ts",
           "booking-frontend/src/app/core/services/api.service.ts"
         ],
-        "definition_of_done": "OptionalParseIntPipe created and working, all 4 controllers updated, retry(2) removed from frontend service, lint and typecheck passing.",
+        "definition_of_done": "OptionalParseIntPipe created and working, all 4 controllers updated, retry(2) removed from frontend service, unit tests (9/9) passing, lint and typecheck passing.",
         "result": {
-          "suites_passed": "N/A - lint and build passed",
-          "tests_passed": "N/A - no new tests (implementation only)",
+          "suites_passed": "1 suite (optional-parse-int.pipe.spec.ts) - 9/9 tests passed",
+          "tests_passed": "9/9 - undefined/empty returns undefined, valid integers parsed, invalid strings throw BadRequestException",
           "tests_failed": 0,
           "fixes_applied": [
             "Created src/common/pipes/optional-parse-int.pipe.ts with OptionalParseIntPipe class",
+            "Created src/common/pipes/optional-parse-int.pipe.spec.ts with 9 unit tests (all passed)",
             "Replaced ParseIntPipe with OptionalParseIntPipe in services.controller.ts (findAll)",
             "Replaced ParseIntPipe with OptionalParseIntPipe in users.controller.ts (findAll)",
             "Replaced ParseIntPipe with OptionalParseIntPipe in time-slots.controller.ts (findAll)",
