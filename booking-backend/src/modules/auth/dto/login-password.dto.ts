@@ -1,7 +1,6 @@
-import { IsString, IsEnum, IsNotEmpty } from "class-validator";
+import { IsString, IsEnum, IsNotEmpty, MinLength, Matches } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
 import { ContactType } from "./register-send-code.dto";
-import { IsStrongPassword } from "../../../common/validators/password.validator";
 
 export class LoginPasswordDto {
   @ApiProperty({
@@ -21,13 +20,18 @@ export class LoginPasswordDto {
   contactType!: ContactType;
 
   @ApiProperty({
-    description: "密码（至少12个字符，包含大小写字母、数字、特殊字符）",
+    description:
+      "Password (min 8 chars, uppercase, lowercase, number, special char)",
     example: "SecurePass123!",
-    minLength: 12,
   })
   @IsString()
-  @IsStrongPassword({
-    message: "Password does not meet security requirements",
-  })
+  @MinLength(8, { message: "Password must be at least 8 characters long" })
+  @Matches(
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+    {
+      message:
+        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+    },
+  )
   password!: string;
 }
