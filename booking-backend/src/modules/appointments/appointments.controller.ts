@@ -51,11 +51,11 @@ export class AppointmentsController {
   @ApiResponse({ status: 200, description: "List of appointments" })
   async findAll(
     @Query("page", OptionalParseIntPipe) page: number = 1,
-    @Query("pageSize", OptionalParseIntPipe) pageSize: number = 10,
+    @Query("limit", OptionalParseIntPipe) limit: number = 20,
     @Query("status") status?: AppointmentStatus,
     @Query("userId") userId?: string,
   ) {
-    return this.appointmentsService.findAll(page, pageSize, status, userId);
+    return this.appointmentsService.findAll(page, limit, status, userId);
   }
 
   @Get("my")
@@ -65,10 +65,10 @@ export class AppointmentsController {
   async getMyAppointments(
     @Req() req,
     @Query("page", OptionalParseIntPipe) page: number = 1,
-    @Query("pageSize", OptionalParseIntPipe) pageSize: number = 10,
+    @Query("limit", OptionalParseIntPipe) limit: number = 20,
   ) {
     const userId = req?.user?.id;
-    return this.appointmentsService.findAll(page, pageSize, undefined, userId);
+    return this.appointmentsService.findAll(page, limit, undefined, userId);
   }
 
   @Get(":id")

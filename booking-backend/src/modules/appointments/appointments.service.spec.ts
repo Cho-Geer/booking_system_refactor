@@ -528,11 +528,15 @@ describe('AppointmentsService', () => {
       });
       expect(prisma.appointment.count).toHaveBeenCalledWith({ where: {} });
       expect(result).toEqual({
-        data: mockAppointments,
-        total: 2,
-        page: 1,
-        pageSize: 10,
-        totalPages: 1,
+        items: mockAppointments,
+        meta: {
+          total: 2,
+          page: 1,
+          limit: 10,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false,
+        }
       });
     });
 
@@ -593,8 +597,8 @@ describe('AppointmentsService', () => {
           take: 1,
         }),
       );
-      expect(result.page).toBe(2);
-      expect(result.pageSize).toBe(1);
+      expect(result.meta.page).toBe(2);
+      expect(result.meta.limit).toBe(1);
     });
 
     it('should return empty data when no appointments exist', async () => {
@@ -604,11 +608,15 @@ describe('AppointmentsService', () => {
       const result = await service.findAll();
 
       expect(result).toEqual({
-        data: [],
-        total: 0,
-        page: 1,
-        pageSize: 10,
-        totalPages: 0,
+        items: [],
+        meta: {
+          total: 0,
+          page: 1,
+          limit: 10,
+          totalPages: 0,
+          hasNext: false,
+          hasPrev: false,
+        }
       });
     });
 
@@ -618,8 +626,8 @@ describe('AppointmentsService', () => {
 
       const result = await service.findAll();
 
-      expect(result.data[0]).toHaveProperty('timeSlot');
-      expect(result.data[0]).toHaveProperty('service');
+      expect(result.items[0]).toHaveProperty('timeSlot');
+      expect(result.items[0]).toHaveProperty('service');
     });
 
     it('should order results by createdAt descending', async () => {
@@ -641,7 +649,7 @@ describe('AppointmentsService', () => {
 
       const result = await service.findAll(1, 10);
 
-      expect(result.totalPages).toBe(3);
+      expect(result.meta.totalPages).toBe(3);
     });
   });
 
@@ -1184,8 +1192,8 @@ if (isIntegrationMode()) {
         });
 
         const result = await appointmentsService.findAll();
-        expect(result).toHaveProperty('data');
-        expect(result.total).toBeGreaterThanOrEqual(1);
+        expect(result).toHaveProperty('items');
+        expect(result.meta.total).toBeGreaterThanOrEqual(1);
       });
     });
 

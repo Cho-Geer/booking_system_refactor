@@ -176,43 +176,55 @@ describe('AppointmentsController', () => {
 
     it('should call service.findAll with default pagination', async () => {
       mockAppointmentsService.findAll.mockResolvedValue({
-        data: mockAppointments,
-        total: 2,
-        page: 1,
-        pageSize: 10,
-        totalPages: 1,
+        items: mockAppointments,
+        meta: {
+          total: 2,
+          page: 1,
+          limit: 20,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false,
+        }
       });
 
       const result = await controller.findAll();
 
-      expect(service.findAll).toHaveBeenCalledWith(1, 10, undefined, undefined);
-      expect(result.data).toEqual(mockAppointments);
-      expect(result.total).toBe(2);
+      expect(service.findAll).toHaveBeenCalledWith(1, 20, undefined, undefined);
+      expect(result.items).toEqual(mockAppointments);
+      expect(result.meta.total).toBe(2);
     });
 
     it('should call service.findAll with custom pagination', async () => {
       mockAppointmentsService.findAll.mockResolvedValue({
-        data: [mockAppointments[0]],
-        total: 1,
-        page: 2,
-        pageSize: 5,
-        totalPages: 1,
+        items: [mockAppointments[0]],
+        meta: {
+          total: 1,
+          page: 2,
+          limit: 5,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: true,
+        }
       });
 
       const result = await controller.findAll(2, 5);
 
       expect(service.findAll).toHaveBeenCalledWith(2, 5, undefined, undefined);
-      expect(result.page).toBe(2);
-      expect(result.pageSize).toBe(5);
+      expect(result.meta.page).toBe(2);
+      expect(result.meta.limit).toBe(5);
     });
 
     it('should call service.findAll with status filter', async () => {
       mockAppointmentsService.findAll.mockResolvedValue({
-        data: mockAppointments,
-        total: 2,
-        page: 1,
-        pageSize: 10,
-        totalPages: 1,
+        items: mockAppointments,
+        meta: {
+          total: 2,
+          page: 1,
+          limit: 10,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false,
+        }
       });
 
       await controller.findAll(1, 10, AppointmentStatus.PENDING);
@@ -223,11 +235,15 @@ describe('AppointmentsController', () => {
     // BUG-001 Test 4: Admin findAll endpoint still supports userId query param for filtering
     it('[BUG-001] should allow userId filter via query param for findAll (admin endpoint)', async () => {
       mockAppointmentsService.findAll.mockResolvedValue({
-        data: mockAppointments,
-        total: 2,
-        page: 1,
-        pageSize: 10,
-        totalPages: 1,
+        items: mockAppointments,
+        meta: {
+          total: 2,
+          page: 1,
+          limit: 10,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false,
+        }
       });
 
       await controller.findAll(1, 10, undefined, 'filter-user-id');
@@ -237,11 +253,15 @@ describe('AppointmentsController', () => {
 
     it('should call service.findAll with all filters', async () => {
       mockAppointmentsService.findAll.mockResolvedValue({
-        data: [],
-        total: 0,
-        page: 1,
-        pageSize: 10,
-        totalPages: 0,
+        items: [],
+        meta: {
+          total: 0,
+          page: 1,
+          limit: 10,
+          totalPages: 0,
+          hasNext: false,
+          hasPrev: false,
+        }
       });
 
       await controller.findAll(1, 10, AppointmentStatus.CANCELLED, 'user-2');
@@ -258,11 +278,15 @@ describe('AppointmentsController', () => {
     // BUG-001 Test 2: GET /v1/appointments/my should use JWT userId, not query param
     it('[BUG-001] should ignore userId from query param and use userId from JWT token', async () => {
       mockAppointmentsService.findAll.mockResolvedValue({
-        data: mockAppointments,
-        total: 1,
-        page: 1,
-        pageSize: 10,
-        totalPages: 1,
+        items: mockAppointments,
+        meta: {
+          total: 1,
+          page: 1,
+          limit: 20,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false,
+        }
       });
 
       // Act: Call getMyAppointments with mockReq (JWT user)
@@ -271,32 +295,40 @@ describe('AppointmentsController', () => {
 
       // Assert: Verify service.findAll was called with JWT userId
       const actualCallArg = mockAppointmentsService.findAll.mock.calls[0];
-      expect(actualCallArg).toEqual([1, 10, undefined, 'jwt-user-id']);
-      expect(result.data).toEqual(mockAppointments);
+      expect(actualCallArg).toEqual([1, 20, undefined, 'jwt-user-id']);
+      expect(result.items).toEqual(mockAppointments);
     });
 
     it('should call service.findAll with userId filter', async () => {
       mockAppointmentsService.findAll.mockResolvedValue({
-        data: mockAppointments,
-        total: 1,
-        page: 1,
-        pageSize: 10,
-        totalPages: 1,
+        items: mockAppointments,
+        meta: {
+          total: 1,
+          page: 1,
+          limit: 20,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false,
+        }
       });
 
       const result = await controller.getMyAppointments(mockReq);
 
-      expect(service.findAll).toHaveBeenCalledWith(1, 10, undefined, 'jwt-user-id');
-      expect(result.data).toEqual(mockAppointments);
+      expect(service.findAll).toHaveBeenCalledWith(1, 20, undefined, 'jwt-user-id');
+      expect(result.items).toEqual(mockAppointments);
     });
 
     it('should call service.findAll with userId and custom pagination', async () => {
       mockAppointmentsService.findAll.mockResolvedValue({
-        data: mockAppointments,
-        total: 1,
-        page: 2,
-        pageSize: 5,
-        totalPages: 1,
+        items: mockAppointments,
+        meta: {
+          total: 1,
+          page: 2,
+          limit: 5,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: true,
+        }
       });
 
       await controller.getMyAppointments(mockReq, 2, 5);
@@ -306,17 +338,21 @@ describe('AppointmentsController', () => {
 
     it('should return empty list when user has no appointments', async () => {
       mockAppointmentsService.findAll.mockResolvedValue({
-        data: [],
-        total: 0,
-        page: 1,
-        pageSize: 10,
-        totalPages: 0,
+        items: [],
+        meta: {
+          total: 0,
+          page: 1,
+          limit: 20,
+          totalPages: 0,
+          hasNext: false,
+          hasPrev: false,
+        }
       });
 
       const result = await controller.getMyAppointments(mockReq);
 
-      expect(result.data).toEqual([]);
-      expect(result.total).toBe(0);
+      expect(result.items).toEqual([]);
+      expect(result.meta.total).toBe(0);
     });
   });
 

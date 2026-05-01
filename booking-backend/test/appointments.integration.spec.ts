@@ -197,17 +197,17 @@ describe('Appointments Module (Integration)', () => {
       const response = await request(app.getHttpServer())
         .get('/appointments')
         .set('Authorization', `Bearer ${adminToken}`)
-        .query({ page: 1, pageSize: 10 });
+        .query({ page: 1, limit: 10 });
 
       // May fail due to missing appointments or implementation
       expect([200, 500]).toContain(response.status);
 
       if (response.status === 200) {
-        expect(extractDataBody(response)).toHaveProperty('data');
-        expect(extractDataBody(response)).toHaveProperty('total');
-        expect(extractDataBody(response)).toHaveProperty('page');
-        expect(extractDataBody(response)).toHaveProperty('pageSize');
-        expect(Array.isArray(extractDataBody(response).data)).toBe(true);
+        expect(extractDataBody(response)).toHaveProperty('items');
+        expect(extractDataBody(response)).toHaveProperty('meta');
+        expect(extractDataBody(response).meta).toHaveProperty('page');
+        expect(extractDataBody(response).meta).toHaveProperty('limit');
+        expect(Array.isArray(extractDataBody(response).items)).toBe(true);
       }
     });
 
@@ -236,14 +236,14 @@ describe('Appointments Module (Integration)', () => {
       const response = await request(app.getHttpServer())
         .get('/appointments/my')
         .set('Authorization', `Bearer ${userToken}`)
-        .query({ userId, page: 1, pageSize: 10 });
+        .query({ userId, page: 1, limit: 10 });
 
       expect([200, 500]).toContain(response.status);
 
       if (response.status === 200) {
-        expect(extractDataBody(response)).toHaveProperty('data');
-        expect(extractDataBody(response)).toHaveProperty('total');
-        expect(Array.isArray(extractDataBody(response).data)).toBe(true);
+        expect(extractDataBody(response)).toHaveProperty('items');
+        expect(extractDataBody(response)).toHaveProperty('meta');
+        expect(Array.isArray(extractDataBody(response).items)).toBe(true);
       }
     });
   });

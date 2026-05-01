@@ -221,11 +221,11 @@ export class AppointmentsService {
 
   async findAll(
     page = 1,
-    pageSize = 10,
+    limit = 10,
     status?: AppointmentStatus,
     userId?: string,
   ) {
-    const skip = (page - 1) * pageSize;
+    const skip = (page - 1) * limit;
     const where: Prisma.AppointmentWhereInput = {};
 
     if (status) {
@@ -238,7 +238,7 @@ export class AppointmentsService {
     const [appointments, total] = await Promise.all([
       this.prisma.appointment.findMany({
         skip,
-        take: pageSize,
+        take: limit,
         where,
         include: {
           timeSlot: true,
@@ -249,12 +249,17 @@ export class AppointmentsService {
       this.prisma.appointment.count({ where }),
     ]);
 
+    const totalPages = Math.ceil(total / limit);
     return {
-      data: appointments,
-      total,
-      page,
-      pageSize,
-      totalPages: Math.ceil(total / pageSize),
+      items: appointments,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1,
+      }
     };
   }
 
