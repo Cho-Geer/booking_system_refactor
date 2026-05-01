@@ -45,9 +45,9 @@ export class TimeSlotsService {
     serviceId?: string,
     isActive?: boolean,
     page = 1,
-    pageSize = 10,
+    limit = 10,
   ) {
-    const skip = (page - 1) * pageSize;
+    const skip = (page - 1) * limit;
     const where: Prisma.TimeSlotWhereInput = {};
 
     if (serviceId) {
@@ -60,7 +60,7 @@ export class TimeSlotsService {
     const [timeSlots, total] = await Promise.all([
       this.prisma.timeSlot.findMany({
         skip,
-        take: pageSize,
+        take: limit,
         where,
         include: {
           service: true,
@@ -70,12 +70,17 @@ export class TimeSlotsService {
       this.prisma.timeSlot.count({ where }),
     ]);
 
+    const totalPages = Math.ceil(total / limit);
     return {
-      data: timeSlots,
-      total,
-      page,
-      pageSize,
-      totalPages: Math.ceil(total / pageSize),
+      items: timeSlots,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1,
+      },
     };
   }
 

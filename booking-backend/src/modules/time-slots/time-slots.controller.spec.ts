@@ -89,76 +89,96 @@ describe('TimeSlotsController', () => {
 
     it('should call service.findAll with default pagination', async () => {
       mockTimeSlotsService.findAll.mockResolvedValue({
-        data: mockTimeSlots,
-        total: 2,
-        page: 1,
-        pageSize: 10,
-        totalPages: 1,
+        items: mockTimeSlots,
+        meta: {
+          total: 2,
+          page: 1,
+          limit: 10,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false,
+        },
       });
 
       const result = await controller.findAll();
 
-      expect(service.findAll).toHaveBeenCalledWith(undefined, undefined, 1, 10);
-      expect(result.data).toEqual(mockTimeSlots);
-      expect(result.total).toBe(2);
+      expect(service.findAll).toHaveBeenCalledWith(undefined, undefined, 1, 20);
+      expect(result.items).toEqual(mockTimeSlots);
+      expect(result.meta.total).toBe(2);
     });
 
     it('should call service.findAll with serviceId filter', async () => {
       mockTimeSlotsService.findAll.mockResolvedValue({
-        data: mockTimeSlots,
-        total: 2,
-        page: 1,
-        pageSize: 10,
-        totalPages: 1,
+        items: mockTimeSlots,
+        meta: {
+          total: 2,
+          page: 1,
+          limit: 10,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false,
+        },
       });
 
       await controller.findAll('service-1');
 
-      expect(service.findAll).toHaveBeenCalledWith('service-1', undefined, 1, 10);
+      expect(service.findAll).toHaveBeenCalledWith('service-1', undefined, 1, 20);
     });
 
     it('should call service.findAll with isActive filter', async () => {
       mockTimeSlotsService.findAll.mockResolvedValue({
-        data: mockTimeSlots,
-        total: 2,
-        page: 1,
-        pageSize: 10,
-        totalPages: 1,
+        items: mockTimeSlots,
+        meta: {
+          total: 2,
+          page: 1,
+          limit: 10,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false,
+        },
       });
 
       await controller.findAll(undefined, true);
 
-      expect(service.findAll).toHaveBeenCalledWith(undefined, true, 1, 10);
+      expect(service.findAll).toHaveBeenCalledWith(undefined, true, 1, 20);
     });
 
     it('should call service.findAll with all filters and custom pagination', async () => {
       mockTimeSlotsService.findAll.mockResolvedValue({
-        data: [mockTimeSlots[0]],
-        total: 1,
-        page: 1,
-        pageSize: 5,
-        totalPages: 1,
+        items: [mockTimeSlots[0]],
+        meta: {
+          total: 1,
+          page: 1,
+          limit: 5,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false,
+        },
       });
 
       const result = await controller.findAll('service-1', true, 1, 5);
 
       expect(service.findAll).toHaveBeenCalledWith('service-1', true, 1, 5);
-      expect(result.pageSize).toBe(5);
+      expect(result.meta.limit).toBe(5);
     });
 
     it('should return empty data when no time slots exist', async () => {
       mockTimeSlotsService.findAll.mockResolvedValue({
-        data: [],
-        total: 0,
-        page: 1,
-        pageSize: 10,
-        totalPages: 0,
+        items: [],
+        meta: {
+          total: 0,
+          page: 1,
+          limit: 10,
+          totalPages: 0,
+          hasNext: false,
+          hasPrev: false,
+        },
       });
 
       const result = await controller.findAll();
 
-      expect(result.data).toEqual([]);
-      expect(result.total).toBe(0);
+      expect(result.items).toEqual([]);
+      expect(result.meta.total).toBe(0);
     });
   });
 

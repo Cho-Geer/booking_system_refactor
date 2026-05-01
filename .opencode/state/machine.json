@@ -7,9 +7,9 @@
     "lastUpdated": "2026-05-01T09:15:20.764Z"
   },
   "currentTask": {
-    "id": "BUG-009",
-    "title": "Verify/Create partial unique index migration",
-    "status": "Done",
+    "id": "TIMESLOTS-PAGINATION-FIX",
+    "title": "Fix TimeSlots module pagination format",
+    "status": "completed",
     "owner": "@Coder-BE"
   },
   "contracts": {

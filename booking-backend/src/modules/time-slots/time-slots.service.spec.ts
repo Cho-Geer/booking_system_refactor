@@ -192,11 +192,15 @@ describe('TimeSlotsService', () => {
       });
       expect(prisma.timeSlot.count).toHaveBeenCalledWith({ where: {} });
       expect(result).toEqual({
-        data: mockTimeSlots,
-        total: 2,
-        page: 1,
-        pageSize: 10,
-        totalPages: 1,
+        items: mockTimeSlots,
+        meta: {
+          total: 2,
+          page: 1,
+          limit: 10,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false,
+        },
       });
     });
 
@@ -239,7 +243,7 @@ describe('TimeSlotsService', () => {
           where: { isActive: false },
         }),
       );
-      expect(result.data).toEqual(unavailableSlots);
+      expect(result.items).toEqual(unavailableSlots);
     });
 
     it('should filter by both serviceId and isActive', async () => {
@@ -270,8 +274,8 @@ describe('TimeSlotsService', () => {
           take: 1,
         }),
       );
-      expect(result.page).toBe(2);
-      expect(result.pageSize).toBe(1);
+       expect(result.meta.page).toBe(2);
+       expect(result.meta.limit).toBe(1);
     });
 
     it('should return empty data when no time slots exist', async () => {
@@ -281,11 +285,15 @@ describe('TimeSlotsService', () => {
       const result = await service.findAll();
 
       expect(result).toEqual({
-        data: [],
-        total: 0,
-        page: 1,
-        pageSize: 10,
-        totalPages: 0,
+        items: [],
+        meta: {
+          total: 0,
+          page: 1,
+          limit: 10,
+          totalPages: 0,
+          hasNext: false,
+          hasPrev: false,
+        },
       });
     });
 
@@ -308,7 +316,7 @@ describe('TimeSlotsService', () => {
 
       const result = await service.findAll();
 
-      expect(result.data[0]).toHaveProperty('service');
+       expect(result.items[0]).toHaveProperty('service');
     });
 
     it('should calculate totalPages correctly', async () => {
@@ -317,7 +325,9 @@ describe('TimeSlotsService', () => {
 
       const result = await service.findAll(undefined, undefined, 1, 10);
 
-      expect(result.totalPages).toBe(3);
+       expect(result.meta.totalPages).toBe(3);
+       expect(result.meta.hasNext).toBe(true);
+       expect(result.meta.hasPrev).toBe(false);
     });
   });
 
@@ -638,7 +648,7 @@ if (isIntegrationMode()) {
         });
 
         const result = await timeSlotsService.findAll();
-        expect(result.data.length).toBeGreaterThanOrEqual(2);
+        expect(result.items.length).toBeGreaterThanOrEqual(2);
       });
     });
 

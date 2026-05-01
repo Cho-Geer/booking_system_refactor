@@ -47,9 +47,9 @@ export class TimeSlotsController {
     @Query("serviceId") serviceId?: string,
     @Query("isActive") isActive?: boolean,
     @Query("page", OptionalParseIntPipe) page: number = 1,
-    @Query("pageSize", OptionalParseIntPipe) pageSize: number = 10,
+    @Query("limit", OptionalParseIntPipe) limit: number = 20,
   ) {
-    return this.timeSlotsService.findAll(serviceId, isActive, page, pageSize);
+    return this.timeSlotsService.findAll(serviceId, isActive, page, limit);
   }
 
   @Get("available")
