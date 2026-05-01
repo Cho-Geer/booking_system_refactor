@@ -15,7 +15,8 @@ import { Router } from '@angular/router';
  * 1. Automatically attaches JWT access token to authenticated requests
  * 2. Handles 401 responses with automatic token refresh
  * 3. Retries failed requests after successful refresh
- * 4. Redirects to login on refresh failure
+ * 4. Fetches user profile after successful token refresh (fire-and-forget)
+ * 5. Redirects to login on refresh failure
  *
  * Security: Token is read from AuthStore (in-memory Signal), NOT from
  * localStorage/sessionStorage, preventing XSS token theft.
@@ -102,11 +103,15 @@ export const authInterceptor: HttpInterceptorFn = (
           authStore.loginSuccess(response.accessToken, response.refreshToken);
           refreshTokenSubject.next(response.accessToken);
           isRefreshing = false;
+          // Fire-and-forget: fetch user profile after successful token refresh.
+          // Using the store's method which catches errors internally.
+          authStore.fetchUserProfile();
+          // Immediately retry the original request with the new token
           return next(addToken(req, response.accessToken));
         }),
         catchError((err) => {
           isRefreshing = false;
-          authStore.logout();
+          authStore.clearAuthState();
           redirectToLogin();
           return throwError(() => err);
         }),

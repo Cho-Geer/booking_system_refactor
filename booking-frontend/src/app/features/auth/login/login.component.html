@@ -1,9 +1,9 @@
-<div class="login-container">
-  <div class="login-card">
+<div class="login-container min-h-screen w-full">
+  <div class="login-card w-full">
     <div class="tabs">
       <button
         type="button"
-        class="tab-button"
+        class="tab-button w-full"
         [class.active]="activeTab() === 'password'"
         (click)="switchTab('password')"
       >
@@ -11,7 +11,7 @@
        </button>
        <button
          type="button"
-         class="tab-button"
+         class="tab-button w-full"
          [class.active]="activeTab() === 'code'"
          (click)="switchTab('code')"
       >
@@ -33,7 +33,7 @@
           <div class="contact-type-selector">
             <button
               type="button"
-              class="type-btn"
+              class="type-btn min-touch-target"
               [class.active]="contactType() === ContactType.EMAIL"
               (click)="contactType.set(ContactType.EMAIL)"
             >
@@ -41,7 +41,7 @@
              </button>
              <button
                type="button"
-               class="type-btn"
+               class="type-btn min-touch-target"
                [class.active]="contactType() === ContactType.PHONE"
                (click)="contactType.set(ContactType.PHONE)"
             >
@@ -86,10 +86,23 @@
             </div>
           }
         </div>
-
+        <div class="terms-checkbox">
+          <label>
+            <input
+              type="checkbox"
+              [ngModel]="acceptTerms()"
+              [ngModelOptions]="{standalone: true}"
+              (ngModelChange)="acceptTerms.set($event)"
+            />
+            <span>我已阅读并同意</span>
+            <a routerLink="/legal/terms" target="_blank">服务条款</a>
+            <span>和</span>
+            <a routerLink="/legal/privacy" target="_blank">隐私政策</a>
+          </label>
+        </div>
         <button
           type="submit"
-          class="btn-primary"
+          class="btn-primary w-full min-touch-target"
           [disabled]="passwordForm.invalid || isLoading() || !acceptTerms()"
           aria-label="Submit password login"
         >
@@ -125,7 +138,7 @@
             <div class="contact-type-selector">
               <button
                 type="button"
-                class="type-btn"
+                class="type-btn min-touch-target"
                 [class.active]="contactType() === ContactType.EMAIL"
                 (click)="contactType.set(ContactType.EMAIL)"
               >
@@ -133,7 +146,7 @@
               </button>
               <button
                 type="button"
-                class="type-btn"
+                class="type-btn min-touch-target"
                 [class.active]="contactType() === ContactType.PHONE"
                 (click)="contactType.set(ContactType.PHONE)"
               >
@@ -176,7 +189,7 @@
               />
               <button
                 type="button"
-                class="btn-get-code"
+                class="btn-get-code min-touch-target"
                 [disabled]="countdown() > 0"
                 (click)="sendVerifyCode()"
               >
@@ -213,7 +226,7 @@
         @if (codeLoginStep() === 1) {
           <button
             type="submit"
-            class="btn-primary"
+            class="btn-primary w-full min-touch-target"
             [disabled]="codeLoginForm.get('contact')?.invalid || isLoading() || !acceptTerms()"
             aria-label="Send verification code"
           >
@@ -227,12 +240,12 @@
 
         @if (codeLoginStep() === 2) {
           <div class="step-actions">
-            <button type="button" class="btn-secondary" (click)="codeLoginStep.set(1)">
+            <button type="button" class="btn-secondary min-touch-target w-full sm:w-auto" (click)="codeLoginStep.set(1)">
               返回
             </button>
             <button
               type="submit"
-              class="btn-primary"
+              class="btn-primary min-touch-target w-full sm:w-auto"
               [disabled]="codeLoginForm.invalid || isLoading() || !acceptTerms()"
               aria-label="Verify code and login"
             >

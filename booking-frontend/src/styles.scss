@@ -1,11 +1,311 @@
 @import "tailwindcss";
 @plugin "tailwindcss-primeui";
 
-/* You can add global styles to this file, and also import other style files */
+@theme {
+  /* Glassmorphism colors */
+  --color-primary-start: #667eea;
+  --color-primary-end: #764ba2;
+  --color-primary-solid: #667eea;
+  --color-secondary: #764ba2;
+  --color-success: #00B42A;
+  --color-warning: #FF7D00;
+  --color-danger: #F53F3F;
+  --color-info: #1677FF;
 
-/* Global box-sizing reset */
+  /* Glass backgrounds */
+  --color-glass-light: rgba(255, 255, 255, 0.85);
+  --color-glass-medium: rgba(255, 255, 255, 0.75);
+  --color-glass-dark: rgba(255, 255, 255, 0.65);
+  --color-glass-overlay: rgba(0, 0, 0, 0.4);
+
+  /* Glass shadows */
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --shadow-glass-hover: 0 20px 60px rgba(102, 126, 234, 0.2);
+  --shadow-glass-lg: 0 20px 60px rgba(0, 0, 0, 0.15);
+
+  /* Glass radii */
+  --radius-glass: 16px;
+  --radius-glass-lg: 20px;
+
+  /* Animation keyframes */
+  --animate-glass-in: glassIn 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --animate-glass-out: glassOut 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --animate-shimmer: shimmer 1.5s infinite;
+  --animate-page-enter: pageEnter 400ms ease;
+  --animate-fade-in: fadeIn 300ms ease;
+
+  @keyframes glassIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  @keyframes glassOut {
+    from { opacity: 1; transform: scale(1); }
+    to { opacity: 0; transform: scale(0.95); }
+  }
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  @keyframes pageEnter {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  @keyframes successPop {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+  @keyframes toastSlideIn {
+    from { opacity: 0; transform: translateY(-100%); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes toastSlideOut {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-100%); }
+  }
+}
+
+/* Glassmorphism utility classes */
+.glass-level-1 {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* Mobile glass overrides — reduced backdrop for performance */
+@media (max-width: 640px) {
+  .glass-level-1 {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background: rgba(255, 255, 255, 0.7);
+  }
+  .glass-level-2 {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  .glass-level-3 {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+}
+
+.glass-level-2 {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+}
+
+.glass-level-3 {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+.glass-overlay {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.gradient-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-page-bg {
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+}
+
+/* Page enter animation — GPU accelerated */
+.page-enter {
+  animation: pageEnter 400ms cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, opacity;
+}
+
+/* Glass-in animation for dialogs/modals — GPU accelerated */
+.animate-glass-in {
+  will-change: transform, opacity;
+}
+
+/* Skeleton shimmer */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.5) 0%,
+    rgba(255, 255, 255, 0.7) 50%,
+    rgba(255, 255, 255, 0.5) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Global styles */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', 'Microsoft YaHei', 'Source Han Sans', sans-serif;
+  color: #1D2129;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+  min-height: 100vh;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+::selection {
+  background: rgba(102, 126, 234, 0.2);
+  color: #1D2129;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@supports not (backdrop-filter: blur(8px)) {
+  .glass-level-1, .glass-level-2, .glass-level-3 {
+    background: rgba(255, 255, 255, 0.95);
+  }
+}
+
+/* Touch-friendly minimum click target size (WCAG 2.2) */
+.min-touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Full-screen modal on mobile */
+@media (max-width: 640px) {
+  .modal-fullscreen-mobile {
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+  }
+
+  .modal-fullscreen-mobile .p-dialog-header,
+  .modal-fullscreen-mobile .p-dialog-content,
+  .modal-fullscreen-mobile .p-dialog-footer {
+    border-radius: 0 !important;
+  }
+}
+
+/* Bottom fixed action bar for mobile */
+.bottom-action-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+  padding: 12px 16px;
+}
+
+/* Horizontal scroll container for tables on mobile */
+.table-scroll-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-left: -16px;
+  margin-right: -16px;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.table-scroll-container::-webkit-scrollbar {
+  height: 4px;
+}
+
+.table-scroll-container::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 2px;
+}
+
+/* Pull-to-refresh indicator */
+.pull-to-refresh-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 60px;
+  overflow: hidden;
+  transition: height 0.3s ease;
+  color: var(--color-primary-start, #667eea);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.pull-to-refresh-indicator .spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(102, 126, 234, 0.2);
+  border-top-color: var(--color-primary-start, #667eea);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+/* Responsive card: single column on mobile, side-by-side on larger */
+.responsive-card-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 640px) {
+  .responsive-card-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+}
+
+/* Mobile full-width utility */
+@media (max-width: 640px) {
+  .mobile-full-width {
+    width: 100% !important;
+  }
 }

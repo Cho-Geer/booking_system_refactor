@@ -28,6 +28,7 @@
   cursor: pointer;
   position: relative;
   transition: color 0.2s ease;
+  min-height: 44px; /* WCAG touch target */
 
   &.active {
     color: var(--primary-color, #1976d2);
@@ -45,6 +46,22 @@
 
   &:hover {
     color: var(--primary-color, #1976d2);
+  }
+}
+
+/* Responsive tabs - allow wrapping on very small screens */
+@media (max-width: 480px) {
+  .tabs {
+    gap: 1rem;
+  }
+
+  .tab-button {
+    font-size: 0.9rem;
+    padding: 0.6rem 0;
+  }
+
+  .login-card {
+    padding: 1.25rem;
   }
 }
 

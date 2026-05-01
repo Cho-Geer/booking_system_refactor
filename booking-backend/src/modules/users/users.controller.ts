@@ -113,13 +113,9 @@ export class UsersController {
 
     const profile = await this.usersService.getProfile(user.id);
 
-    return {
-      statusCode: 200,
-      message: "获取成功",
-      data: profile,
-      timestamp: new Date().toISOString(),
-      requestId: this.cls.get("requestId") ?? `req-${crypto.randomUUID()}`,
-    };
+    // ResponseInterceptor globally wraps all returns with envelope;
+    // return raw profile to avoid double-wrapping
+    return profile;
   }
 
   @Get(":id")

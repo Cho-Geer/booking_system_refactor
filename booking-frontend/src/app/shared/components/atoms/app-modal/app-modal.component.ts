@@ -64,4 +64,11 @@ export class AppModalComponent {
 
   /** Emitted when the dialog visibility changes. */
   readonly visibleChange = output<boolean>();
+
+  /** Computed style class with glass animation added. */
+  get combinedStyleClass(): string {
+    const base = this.styleClass() || '';
+    const animClass = 'animate-glass-in';
+    return base ? `${base} ${animClass}` : animClass;
+  }
 }

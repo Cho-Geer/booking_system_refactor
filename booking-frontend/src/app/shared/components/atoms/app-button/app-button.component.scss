@@ -1,2 +1,11 @@
 /* AppButton - Atomic component wrapper for PrimeNG p-button */
 /* Styling is handled via Tailwind and PrimeNG theme configuration */
+
+/* Button click feedback - smooth scale on press */
+.app-button-click-feedback {
+  transition: transform 0.15s ease;
+}
+
+.app-button-click-feedback:active {
+  transform: scale(0.98);
+}

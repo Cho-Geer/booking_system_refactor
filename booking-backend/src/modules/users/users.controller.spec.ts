@@ -479,8 +479,9 @@ describe('UsersController', () => {
   });
 
   // ==================== FIX-P1-004: GET /profile endpoint ====================
+  // RED Phase: Controller should return raw profile (ResponseInterceptor wraps it later)
   describe('FIX-P1-004: GET /users/profile (RED)', () => {
-    it('should call service.getProfile with the authenticated user id', async () => {
+    it('should call service.getProfile and return the raw profile (no manual envelope)', async () => {
       const mockProfile = {
         id: 'user-1',
         email: 'user1@example.com',
@@ -507,11 +508,8 @@ describe('UsersController', () => {
       const result = await controller.getProfile(mockReq as unknown as Request);
 
       expect(service.getProfile).toHaveBeenCalledWith('user-1');
-      expect(result.data).toEqual(mockProfile);
-      expect(result.statusCode).toBe(200);
-      expect(result.message).toBe('获取成功');
-      expect(result).toHaveProperty('timestamp');
-      expect(result).toHaveProperty('requestId');
+      // Controller should return raw profile (no envelope); ResponseInterceptor wraps it
+      expect(result).toEqual(mockProfile);
     });
 
     it('should throw ForbiddenException when user is not authenticated', async () => {

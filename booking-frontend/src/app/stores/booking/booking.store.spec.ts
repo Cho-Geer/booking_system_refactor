@@ -1,13 +1,29 @@
 import { TestBed } from '@angular/core/testing';
 import { BookingStore, TimeSlot } from './booking.store';
+import { ApiService } from '../../core/services/api.service';
+import { Service } from '../../shared/dto/service.dto';
+import { BookingListItem, ReservationResponse } from '../../shared/dto/booking.dto';
+import { of, throwError } from 'rxjs';
 
 describe('BookingStore', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let store: any;
+  let apiServiceMock: jest.Mocked<ApiService>;
 
   beforeEach(() => {
+    apiServiceMock = {
+      getServices: jest.fn(),
+      getAvailableSlots: jest.fn(),
+      createAppointment: jest.fn(),
+      getMyAppointments: jest.fn(),
+      cancelBooking: jest.fn(),
+    } as unknown as jest.Mocked<ApiService>;
+
     TestBed.configureTestingModule({
-      providers: [BookingStore],
+      providers: [
+        BookingStore,
+        { provide: ApiService, useValue: apiServiceMock },
+      ],
     });
     store = TestBed.inject(BookingStore);
   });
@@ -34,9 +50,9 @@ describe('BookingStore', () => {
 
   it('should expose availableSlots computed signal', () => {
     const mockSlots: TimeSlot[] = [
-      { id: '1', date: '2026-04-20', time: '09:00', isActive: true },
-      { id: '2', date: '2026-04-20', time: '10:00', isActive: false },
-      { id: '3', date: '2026-04-20', time: '11:00', isActive: true },
+      { id: '1', startTime: '09:00', endTime: '10:00', capacity: 5, bookedCount: 0, available: true },
+      { id: '2', startTime: '10:00', endTime: '11:00', capacity: 5, bookedCount: 3, available: false },
+      { id: '3', startTime: '11:00', endTime: '12:00', capacity: 5, bookedCount: 0, available: true },
     ];
 
     expect(store.availableSlots()).toEqual([]);
@@ -50,9 +66,9 @@ describe('BookingStore', () => {
 
   it('should expose bookedSlots computed signal', () => {
     const mockSlots: TimeSlot[] = [
-      { id: '1', date: '2026-04-20', time: '09:00', isActive: true },
-      { id: '2', date: '2026-04-20', time: '10:00', isActive: false },
-      { id: '3', date: '2026-04-20', time: '11:00', isActive: true },
+      { id: '1', startTime: '09:00', endTime: '10:00', capacity: 5, bookedCount: 0, available: true },
+      { id: '2', startTime: '10:00', endTime: '11:00', capacity: 5, bookedCount: 3, available: false },
+      { id: '3', startTime: '11:00', endTime: '12:00', capacity: 5, bookedCount: 0, available: true },
     ];
 
     expect(store.bookedSlots()).toEqual([]);
@@ -65,8 +81,8 @@ describe('BookingStore', () => {
 
   it('should load available slots', () => {
     const mockSlots: TimeSlot[] = [
-      { id: '1', date: '2026-04-20', time: '09:00', isActive: true },
-      { id: '2', date: '2026-04-20', time: '10:00', isActive: true },
+      { id: '1', startTime: '09:00', endTime: '10:00', capacity: 5, bookedCount: 0, available: true },
+      { id: '2', startTime: '10:00', endTime: '11:00', capacity: 5, bookedCount: 0, available: true },
     ];
 
     store.loadSlots(mockSlots);
@@ -79,9 +95,11 @@ describe('BookingStore', () => {
   it('should select a slot', () => {
     const mockSlot: TimeSlot = {
       id: '1',
-      date: '2026-04-20',
-      time: '09:00',
-      isActive: true,
+      startTime: '09:00',
+      endTime: '10:00',
+      capacity: 5,
+      bookedCount: 0,
+      available: true,
     };
 
     expect(store.hasSelection()).toBe(false);
@@ -95,9 +113,11 @@ describe('BookingStore', () => {
   it('should clear selection when selecting null', () => {
     const mockSlot: TimeSlot = {
       id: '1',
-      date: '2026-04-20',
-      time: '09:00',
-      isActive: true,
+      startTime: '09:00',
+      endTime: '10:00',
+      capacity: 5,
+      bookedCount: 0,
+      available: true,
     };
 
     store.selectSlot(mockSlot);
@@ -111,24 +131,23 @@ describe('BookingStore', () => {
 
   it('should update slot availability on booking', () => {
     const mockSlots: TimeSlot[] = [
-      { id: '1', date: '2026-04-20', time: '09:00', isActive: true },
-      { id: '2', date: '2026-04-20', time: '10:00', isActive: true },
+      { id: '1', startTime: '09:00', endTime: '10:00', capacity: 5, bookedCount: 0, available: true },
+      { id: '2', startTime: '10:00', endTime: '11:00', capacity: 5, bookedCount: 0, available: true },
     ];
 
     store.loadSlots(mockSlots);
     store.bookSlot('1', 'user-123');
 
     const updatedSlots = store.slots();
-    expect(updatedSlots[0].isActive).toBe(false);
-    expect(updatedSlots[0].bookedBy).toBe('user-123');
-    expect(updatedSlots[1].isActive).toBe(true);
+    expect(updatedSlots[0].available).toBe(false);
+    expect(updatedSlots[1].available).toBe(true);
     expect(store.activeBookings()).toContain('1');
     expect(store.selectedSlot()).toBeNull();
   });
 
   it('should handle concurrent booking attempts', () => {
     const mockSlots: TimeSlot[] = [
-      { id: '1', date: '2026-04-20', time: '09:00', isActive: true },
+      { id: '1', startTime: '09:00', endTime: '10:00', capacity: 5, bookedCount: 0, available: true },
     ];
 
     store.loadSlots(mockSlots);
@@ -137,27 +156,25 @@ describe('BookingStore', () => {
     store.bookSlot('1', 'user-123');
     
     const slotsAfterFirst = store.slots();
-    expect(slotsAfterFirst[0].isActive).toBe(false);
-    expect(slotsAfterFirst[0].bookedBy).toBe('user-123');
+    expect(slotsAfterFirst[0].available).toBe(false);
     expect(store.activeBookings().length).toBe(1);
   });
 
   it('should cancel a booking and restore availability', () => {
     const mockSlots: TimeSlot[] = [
-      { id: '1', date: '2026-04-20', time: '09:00', isActive: true },
+      { id: '1', startTime: '09:00', endTime: '10:00', capacity: 5, bookedCount: 0, available: true },
     ];
 
     store.loadSlots(mockSlots);
     store.bookSlot('1', 'user-123');
     
-    expect(store.slots()[0].isActive).toBe(false);
+    expect(store.slots()[0].available).toBe(false);
     expect(store.activeBookings()).toContain('1');
 
     store.cancelBooking('1');
 
     const slotsAfterCancel = store.slots();
-    expect(slotsAfterCancel[0].isActive).toBe(true);
-    expect(slotsAfterCancel[0].bookedBy).toBeUndefined();
+    expect(slotsAfterCancel[0].available).toBe(true);
     expect(store.activeBookings()).not.toContain('1');
   });
 
@@ -189,16 +206,16 @@ describe('BookingStore', () => {
 
     it('[RED] should fail: should mark a slot as booked when confirmed', () => {
       const mockSlots: TimeSlot[] = [
-        { id: '1', date: '2026-04-20', time: '09:00', isActive: true },
-        { id: '2', date: '2026-04-20', time: '10:00', isActive: true },
+        { id: '1', startTime: '09:00', endTime: '10:00', capacity: 5, bookedCount: 0, available: true },
+        { id: '2', startTime: '10:00', endTime: '11:00', capacity: 5, bookedCount: 0, available: true },
       ];
 
       store.loadSlots(mockSlots);
       store.confirmSlotReservation('1');
 
       const updatedSlots = store.slots();
-      expect(updatedSlots[0].isActive).toBe(false);
-      expect(updatedSlots[1].isActive).toBe(true);
+      expect(updatedSlots[0].available).toBe(false);
+      expect(updatedSlots[1].available).toBe(true);
     });
   });
 
@@ -211,7 +228,7 @@ describe('BookingStore', () => {
     it('[RED] should fail: should restore slot and set error message', () => {
       // Simulate an optimistic slot change, then rollback
       const mockSlots: TimeSlot[] = [
-        { id: '1', date: '2026-04-20', time: '09:00', isActive: true },
+        { id: '1', startTime: '09:00', endTime: '10:00', capacity: 5, bookedCount: 0, available: true },
       ];
 
       store.loadSlots(mockSlots);
@@ -219,7 +236,7 @@ describe('BookingStore', () => {
 
       const updatedSlots = store.slots();
       // Slot should remain active (rolled back)
-      expect(updatedSlots[0].isActive).toBe(true);
+      expect(updatedSlots[0].available).toBe(true);
       expect(store.error()).toBe('Network error');
       expect(store.isLoading()).toBe(false);
     });
@@ -235,11 +252,10 @@ describe('BookingStore', () => {
   // These tests MUST FAIL with the current code because the store's computed signals
   // (availableSlots, bookedSlots) still reference store-specific fields (isActive) instead of DTO fields (available).
 
-  describe('[TYPE-UNIFICATION] Store should work with DTO-typed TimeSlot', () => {
-    it('[RED] should fail: store availableSlots should work with DTO-typed TimeSlot (using `available` instead of `isActive`)', () => {
-      // DTO TimeSlot uses `available` field, not `isActive`
-      // The store's `availableSlots` computed filters by `slot.isActive`
-      // which is undefined for DTO objects, making all slots appear unavailable
+  describe('[TYPE-UNIFICATION] Store works with DTO-typed TimeSlot', () => {
+    it('should work with DTO-typed TimeSlot using `available` field', () => {
+      // DTO TimeSlot uses `available` field.
+      // The store's `availableSlots` computed now correctly filters by `slot.available`.
       const dtoSlots = [
         { id: '1', startTime: '09:00', endTime: '10:00', capacity: 5, bookedCount: 0, available: true },
         { id: '2', startTime: '10:00', endTime: '11:00', capacity: 5, bookedCount: 3, available: false },
@@ -248,15 +264,11 @@ describe('BookingStore', () => {
       store.loadSlots(dtoSlots as any[]);
 
       const available = store.availableSlots();
-      // After unification, availableSlots should filter by `available` (DTO).
-      // Currently it filters by `isActive` → undefined for DTO → both filtered out → length 0
       expect(available.length).toBe(1);
       expect(available[0].id).toBe('1');
     });
 
-    it('[RED] should fail: store bookedSlots should work with DTO-typed TimeSlot (using `!available` instead of `!isActive`)', () => {
-      // The store's `bookedSlots` computed filters by `!slot.isActive`
-      // For DTO objects, `!undefined` is `true`, making ALL slots appear booked
+    it('should work with DTO-typed TimeSlot using `!available` for booked slots', () => {
       const dtoSlots = [
         { id: '1', startTime: '09:00', endTime: '10:00', capacity: 5, bookedCount: 0, available: true },
         { id: '2', startTime: '10:00', endTime: '11:00', capacity: 5, bookedCount: 3, available: false },
@@ -265,10 +277,178 @@ describe('BookingStore', () => {
       store.loadSlots(dtoSlots as any[]);
 
       const booked = store.bookedSlots();
-      // After unification, bookedSlots should filter by `!available` (DTO).
-      // Currently it filters by `!isActive` → !undefined → both included → length 2
       expect(booked.length).toBe(1);
       expect(booked[0].id).toBe('2');
+    });
+  });
+
+  // ==========================================
+  // RED PHASE: Wire BookingStore to real API calls
+  // ==========================================
+
+  describe('[RED] loadServices()', () => {
+    it('[RED] should fail: loadServices is not yet defined', () => {
+      expect(store.loadServices).toBeDefined();
+    });
+
+    it('[RED] should fail: should call apiService.getServices and store services', async () => {
+      const mockServices: Service[] = [
+        { id: '1', name: 'Haircut', description: 'Basic cut', duration: 30, durationMinutes: 30, price: 25, active: true },
+      ];
+      apiServiceMock.getServices.mockReturnValue(of(mockServices));
+
+      await store.loadServices();
+
+      expect(apiServiceMock.getServices).toHaveBeenCalled();
+      expect(store.services()).toEqual(mockServices);
+      expect(store.isLoading()).toBe(false);
+    });
+
+    it('[RED] should fail: should set error on API failure', async () => {
+      apiServiceMock.getServices.mockReturnValue(
+        throwError(() => new Error('Failed to load services'))
+      );
+
+      await store.loadServices();
+
+      expect(store.error()).toBe('Failed to load services');
+      expect(store.isLoading()).toBe(false);
+    });
+  });
+
+  describe('[RED] loadTimeSlots()', () => {
+    it('[RED] should fail: loadTimeSlots is not yet defined', () => {
+      expect(store.loadTimeSlots).toBeDefined();
+    });
+
+    it('[RED] should fail: should call apiService.getAvailableSlots with serviceId', async () => {
+      const mockSlots = [
+        { id: '1', startTime: '09:00', endTime: '10:00', capacity: 5, bookedCount: 0, available: true },
+        { id: '2', startTime: '10:00', endTime: '11:00', capacity: 5, bookedCount: 2, available: false },
+      ];
+      apiServiceMock.getAvailableSlots.mockReturnValue(of(mockSlots));
+
+      await store.loadTimeSlots('svc-1');
+
+      expect(apiServiceMock.getAvailableSlots).toHaveBeenCalledWith('svc-1');
+      expect(store.slots()).toEqual(mockSlots);
+      expect(store.isLoading()).toBe(false);
+    });
+
+    it('[RED] should fail: should handle API failure gracefully', async () => {
+      apiServiceMock.getAvailableSlots.mockReturnValue(
+        throwError(() => new Error('No slots available'))
+      );
+
+      await store.loadTimeSlots('svc-1');
+
+      expect(store.error()).toBe('No slots available');
+      expect(store.isLoading()).toBe(false);
+    });
+  });
+
+  describe('[RED] createAppointment()', () => {
+    it('[RED] should fail: createAppointment is not yet defined', () => {
+      expect(store.createAppointment).toBeDefined();
+    });
+
+    it('[RED] should fail: should call apiService.createAppointment with correct params', async () => {
+      const mockResponse: ReservationResponse = {
+        status: 'SUCCESS',
+        slot: { id: 'slot-1', startTime: '09:00', endTime: '10:00', capacity: 5, bookedCount: 0, available: false },
+      };
+      apiServiceMock.createAppointment.mockReturnValue(of(mockResponse));
+
+      const dto = { timeSlotId: 'slot-1', serviceId: 'svc-1', appointmentDate: '2026-05-01', preferredSequence: 1 };
+      const result = await store.createAppointment(dto);
+
+      expect(apiServiceMock.createAppointment).toHaveBeenCalledWith(dto);
+      expect(result.status).toBe('SUCCESS');
+    });
+
+    it('[RED] should fail: should handle API failure and return FAILED response', async () => {
+      apiServiceMock.createAppointment.mockReturnValue(
+        throwError(() => new Error('Booking failed'))
+      );
+
+      const result = await store.createAppointment({
+        timeSlotId: 'slot-1',
+        serviceId: 'svc-1',
+        appointmentDate: '2026-05-01',
+        preferredSequence: 1,
+      });
+
+      expect(result.status).toBe('FAILED');
+      expect(store.error()).toBe('Booking failed');
+    });
+  });
+
+  describe('[RED] fetchMyBookings()', () => {
+    it('[RED] should fail: fetchMyBookings is not yet defined', () => {
+      expect(store.fetchMyBookings).toBeDefined();
+    });
+
+    it('[RED] should fail: should call apiService.getMyAppointments and store bookings', async () => {
+      const mockBookings: BookingListItem[] = [
+        {
+          id: 'apt-1', timeSlotId: 'slot-1', appointmentDate: '2026-05-01T10:00:00Z',
+          status: 'CONFIRMED' as any, serviceName: 'Haircut',
+          timeSlotStart: '10:00', timeSlotEnd: '11:00',
+        },
+      ];
+      apiServiceMock.getMyAppointments.mockReturnValue(of(mockBookings));
+
+      await store.fetchMyBookings();
+
+      expect(apiServiceMock.getMyAppointments).toHaveBeenCalled();
+      expect(store.bookings()).toEqual(mockBookings);
+      expect(store.isLoading()).toBe(false);
+    });
+
+    it('[RED] should fail: should pass query params to API', async () => {
+      apiServiceMock.getMyAppointments.mockReturnValue(of([]));
+
+      await store.fetchMyBookings({ status: 'CONFIRMED' });
+
+      expect(apiServiceMock.getMyAppointments).toHaveBeenCalledWith(
+        { status: 'CONFIRMED' }
+      );
+    });
+  });
+
+  describe('[RED] cancelMyBooking()', () => {
+    it('[RED] should fail: cancelMyBooking is not yet defined', () => {
+      expect(store.cancelMyBooking).toBeDefined();
+    });
+
+    it('[RED] should fail: should call apiService.cancelBooking and update local state', async () => {
+      const mockBookings: BookingListItem[] = [
+        {
+          id: 'apt-1', timeSlotId: 'slot-1', appointmentDate: '2026-05-01T10:00:00Z',
+          status: 'CONFIRMED' as any, serviceName: 'Haircut',
+          timeSlotStart: '10:00', timeSlotEnd: '11:00',
+        },
+      ];
+      apiServiceMock.getMyAppointments.mockReturnValue(of(mockBookings));
+      await store.fetchMyBookings();
+
+      apiServiceMock.cancelBooking.mockReturnValue(of(undefined));
+
+      await store.cancelMyBooking('apt-1');
+
+      expect(apiServiceMock.cancelBooking).toHaveBeenCalledWith('apt-1');
+      // Booking should be removed from local list
+      expect(store.bookings().length).toBe(0);
+    });
+
+    it('[RED] should fail: should handle API failure during cancellation', async () => {
+      apiServiceMock.cancelBooking.mockReturnValue(
+        throwError(() => new Error('Cancel failed'))
+      );
+
+      await store.cancelMyBooking('apt-1');
+
+      expect(store.error()).toBe('Cancel failed');
     });
   });
 });

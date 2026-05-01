@@ -446,6 +446,112 @@ describe('ApiService', () => {
     });
   });
 
+  describe('getMyAppointments()', () => {
+    const mockAppointments = [
+      {
+        id: 'apt-1',
+        timeSlotId: 'slot-1',
+        appointmentDate: '2026-05-15T10:00:00Z',
+        status: 'CONFIRMED',
+        serviceName: 'Haircut',
+        timeSlotStart: '2026-05-15T10:00:00Z',
+        timeSlotEnd: '2026-05-15T11:00:00Z',
+      },
+      {
+        id: 'apt-2',
+        timeSlotId: 'slot-2',
+        appointmentDate: '2026-05-16T14:00:00Z',
+        status: 'PENDING',
+        serviceName: 'Coloring',
+        timeSlotStart: '2026-05-16T14:00:00Z',
+        timeSlotEnd: '2026-05-16T15:00:00Z',
+      },
+    ];
+
+    it('[RED] should fail: getMyAppointments should send GET to /api/appointments', () => {
+      const wrappedResponse: ApiResponse<typeof mockAppointments> = {
+        success: true,
+        code: 200,
+        message: 'OK',
+        data: mockAppointments,
+        timestamp: '2026-04-30T10:00:00.000Z',
+        requestId: 'req-test-uuid',
+      };
+
+      service.getMyAppointments().subscribe((appointments) => {
+        expect(Array.isArray(appointments)).toBe(true);
+        expect(appointments.length).toBe(2);
+        expect(appointments[0].serviceName).toBe('Haircut');
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/appointments`);
+      expect(req.request.method).toBe('GET');
+      req.flush(wrappedResponse);
+    });
+
+    it('[RED] should fail: getMyAppointments should handle error', () => {
+      service.getMyAppointments().subscribe({
+        next: () => fail('expected error'),
+        error: (error) => {
+          expect(error).toBeTruthy();
+        },
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/appointments`);
+      req.flush({ message: 'Unauthorized' }, { status: 401, statusText: 'Unauthorized' });
+    });
+
+    it('[RED] should fail: getMyAppointments should pass query params when provided', () => {
+      service.getMyAppointments({ status: 'CONFIRMED', startDate: '2026-05-01', endDate: '2026-05-31' }).subscribe();
+
+      const req = httpMock.expectOne((request) => {
+        return (
+          request.url === `${apiUrl}/appointments` &&
+          request.params.get('status') === 'CONFIRMED' &&
+          request.params.get('startDate') === '2026-05-01' &&
+          request.params.get('endDate') === '2026-05-31'
+        );
+      });
+      expect(req.request.method).toBe('GET');
+      req.flush({ success: true, code: 200, message: 'OK', data: [], timestamp: '', requestId: '' });
+    });
+  });
+
+  describe('updateProfile()', () => {
+    it('[RED] should fail: updateProfile should send PUT to /api/users/profile', () => {
+      const updateData = { name: 'New Name' };
+      const wrappedResponse: ApiResponse<{ user: { id: string; name: string; role: string } }> = {
+        success: true,
+        code: 200,
+        message: 'OK',
+        data: { user: { id: '1', name: 'New Name', role: 'CUSTOMER' } },
+        timestamp: '2026-04-30T10:00:00.000Z',
+        requestId: 'req-test-uuid',
+      };
+
+      service.updateProfile(updateData).subscribe((response) => {
+        expect(response.user.name).toBe('New Name');
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/users/profile`);
+      expect(req.request.method).toBe('PUT');
+      expect(req.request.body).toEqual(updateData);
+      req.flush(wrappedResponse);
+    });
+
+    it('[RED] should fail: updateProfile should handle error', () => {
+      service.updateProfile({ name: 'New Name' }).subscribe({
+        next: () => fail('expected error'),
+        error: (error) => {
+          expect(error).toBeTruthy();
+        },
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/users/profile`);
+      req.flush({ message: 'Update failed' }, { status: 400, statusText: 'Bad Request' });
+    });
+  });
+
   describe('error handling', () => {
     it('should return Error with message from HTTP error response', () => {
       service.getServices().subscribe({

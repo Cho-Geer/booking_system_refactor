@@ -88,4 +88,18 @@ describe('BookingSuccessComponent', () => {
     component.goHome();
     expect(router.navigate).toHaveBeenCalledWith(['/booking']);
   });
+
+  describe('success animation', () => {
+    it('[RED] should have successPop animation class on success-icon-circle', () => {
+      const circle = fixture.nativeElement.querySelector('.success-icon-circle');
+      expect(circle).toBeTruthy();
+      expect(circle.classList.contains('animate-success-pop')).toBe(true);
+    });
+
+    it('[RED] should have success-checkmark with fadeIn animation after delay', () => {
+      const checkmark = fixture.nativeElement.querySelector('.success-checkmark');
+      expect(checkmark).toBeTruthy();
+      expect(checkmark.classList.contains('animate-success-fade')).toBe(true);
+    });
+  });
 });

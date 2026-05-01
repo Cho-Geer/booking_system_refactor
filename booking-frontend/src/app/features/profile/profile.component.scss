@@ -1,0 +1,41 @@
+.profile-page {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.info-row {
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+}
+
+.glass-input {
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 12px;
+  padding: 10px 14px;
+  color: #1D2129;
+  font-size: 14px;
+  transition: all 200ms ease;
+  outline: none;
+
+  &::placeholder {
+    color: rgba(29, 33, 41, 0.4);
+  }
+
+  &:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+    background: rgba(255, 255, 255, 0.7);
+  }
+}
+
+:host {
+  display: block;
+  min-height: 100vh;
+}

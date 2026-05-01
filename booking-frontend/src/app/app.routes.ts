@@ -13,6 +13,21 @@ export const routes: Routes = [
       import('./features/booking/booking.routes').then((m) => m.BOOKING_ROUTES),
   },
   {
+    path: 'admin',
+    loadChildren: () =>
+      import('./features/admin/admin.routes').then((m) => m.ADMIN_ROUTES),
+  },
+  {
+    path: 'my-bookings',
+    loadChildren: () =>
+      import('./features/my-bookings/my-bookings.routes').then((m) => m.MY_BOOKINGS_ROUTES),
+  },
+  {
+    path: 'profile',
+    loadChildren: () =>
+      import('./features/profile/profile.routes').then((m) => m.PROFILE_ROUTES),
+  },
+  {
     path: 'legal',
     loadChildren: () =>
       import('./features/legal/legal.routes').then((m) => m.LEGAL_ROUTES),

@@ -4,13 +4,13 @@
   } @else if (error()) {
     <div class="error" role="alert" aria-live="assertive">
       <p>{{ error() }}</p>
-      <button (click)="retryLoad()" aria-label="Retry loading time slots">Retry</button>
+      <button (click)="retryLoad()" aria-label="Retry loading time slots" class="min-h-[44px]">Retry</button>
     </div>
   } @else {
     <div class="time-slots">
       @for (slot of availableSlots(); track slot.id) {
         <button
-          class="slot-button"
+          class="slot-button w-full"
           [class.selected]="isSelected(slot)"
           [class.unavailable]="!slot.available"
           [disabled]="!slot.available"

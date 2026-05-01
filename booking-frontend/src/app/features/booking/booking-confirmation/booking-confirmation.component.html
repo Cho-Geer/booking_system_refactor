@@ -3,12 +3,12 @@
     <div class="empty-state">
       <h2>No booking selected</h2>
       <p>Please select a time slot to proceed with booking.</p>
-      <button routerLink="/booking" class="btn-primary" aria-label="Go back to booking page">
+      <button routerLink="/booking" class="btn-primary min-h-[44px]" aria-label="Go back to booking page">
         Back to Booking
       </button>
     </div>
   } @else {
-    <div class="confirmation-card">
+    <div class="confirmation-card w-full">
       <h2>Booking Confirmation</h2>
 
       <div class="booking-details">
@@ -42,14 +42,14 @@
 
       <div class="actions">
         <button
-          class="btn-secondary"
+          class="btn-secondary min-h-[44px]"
           (click)="cancelBooking()"
           [disabled]="isProcessing()"
         >
           Cancel
         </button>
         <button
-          class="btn-primary"
+          class="btn-primary min-h-[44px]"
           (click)="confirmBooking()"
           [disabled]="isProcessing()"
         >

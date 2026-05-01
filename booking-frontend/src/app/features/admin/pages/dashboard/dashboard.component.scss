@@ -1,0 +1,22 @@
+:host {
+  display: block;
+}
+
+/* Admin dashboard card hover micro-interactions */
+.app-dashboard-card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.app-dashboard-card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+}
+
+/* Responsive card grid */
+@media (max-width: 640px) {
+  app-card {
+    ::ng-deep .p-card {
+      border-radius: 12px;
+    }
+  }
+}

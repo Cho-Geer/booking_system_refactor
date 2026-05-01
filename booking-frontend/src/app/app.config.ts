@@ -8,13 +8,14 @@ import Aura from '@primeng/themes/aura';
 import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { requestIdInterceptor } from './core/interceptors/request-id.interceptor';
+import { apiTransformInterceptor } from './core/interceptors/api-transform.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideHttpClient(
-      withInterceptors([authInterceptor, requestIdInterceptor])
+      withInterceptors([authInterceptor, apiTransformInterceptor, requestIdInterceptor])
     ),
     provideAnimationsAsync(),
     providePrimeNG({

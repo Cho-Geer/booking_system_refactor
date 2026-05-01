@@ -2,8 +2,8 @@
   <div class="max-w-md w-full text-center">
     <!-- Success Checkmark Icon -->
     <div class="success-icon-wrapper mx-auto mb-6">
-      <div class="success-icon-circle">
-        <span class="success-checkmark" aria-hidden="true">&#10003;</span>
+      <div class="success-icon-circle animate-success-pop">
+        <span class="success-checkmark animate-success-fade" aria-hidden="true">&#10003;</span>
       </div>
     </div>
 
@@ -39,18 +39,18 @@
       </p>
     }
 
-    <!-- Action Buttons -->
-    <div class="space-y-3">
+    <!-- Action Buttons - Full width on mobile -->
+    <div class="space-y-3 sm:space-y-3">
       <button
         type="button"
-        class="w-full px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+        class="w-full px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors min-h-[44px]"
         (click)="viewMyBookings()"
       >
         View My Bookings
       </button>
       <button
         type="button"
-        class="w-full px-6 py-3 bg-white text-gray-700 font-medium rounded-lg border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+        class="w-full px-6 py-3 bg-white text-gray-700 font-medium rounded-lg border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors min-h-[44px]"
         (click)="goHome()"
       >
         Back to Home

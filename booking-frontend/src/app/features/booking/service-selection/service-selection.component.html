@@ -1,6 +1,14 @@
 <div class="services">
   @if (isLoading()) {
-    <div class="loading" role="status" aria-live="polite">Loading services...</div>
+    <div class="services loading loading-skeleton" role="status" aria-live="polite">
+      @for (item of [1,2,3,4]; track item) {
+        <div class="service-card-skeleton">
+          <div class="skeleton skeleton-title"></div>
+          <div class="skeleton skeleton-desc"></div>
+          <div class="skeleton skeleton-meta"></div>
+        </div>
+      }
+    </div>
   } @else {
     @for (service of services(); track service.id) {
       <div

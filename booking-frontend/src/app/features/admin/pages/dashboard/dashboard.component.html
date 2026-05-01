@@ -1,0 +1,97 @@
+<div class="space-y-6">
+  <!-- Page Header -->
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+    <h1 class="text-xl sm:text-2xl font-bold text-gray-800">Admin Dashboard</h1>
+    <p class="text-sm text-gray-500">Welcome to the admin panel</p>
+  </div>
+
+  <!-- Loading State -->
+  @if (vm().isLoading) {
+    <div class="flex justify-center py-12">
+      <i class="pi pi-spin pi-spinner text-4xl text-primary-500"></i>
+    </div>
+  }
+
+  <!-- Stats Cards - single column on mobile, 2 on md, 4 on lg -->
+  @if (!vm().isLoading && vm().stats) {
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <app-card header="Total Bookings" styleClass="app-dashboard-card-hover">
+        <div class="text-center py-4">
+          <p class="text-3xl sm:text-4xl font-bold text-primary-600">{{ vm().stats!.totalBookings }}</p>
+          <p class="text-sm text-gray-500 mt-2">All time bookings</p>
+        </div>
+      </app-card>
+
+      <app-card header="Today's Bookings" styleClass="app-dashboard-card-hover">
+        <div class="text-center py-4">
+          <p class="text-3xl sm:text-4xl font-bold text-green-600">{{ vm().stats!.todayBookings }}</p>
+          <p class="text-sm text-gray-500 mt-2">Bookings today</p>
+        </div>
+      </app-card>
+
+      <app-card header="Active Users" styleClass="app-dashboard-card-hover">
+        <div class="text-center py-4">
+          <p class="text-3xl sm:text-4xl font-bold text-blue-600">{{ vm().stats!.activeUsers }}</p>
+          <p class="text-sm text-gray-500 mt-2">Registered users</p>
+        </div>
+      </app-card>
+
+      <app-card header="Total Revenue" styleClass="app-dashboard-card-hover">
+        <div class="text-center py-4">
+          <p class="text-3xl sm:text-4xl font-bold text-amber-600">{{ vm().stats!.totalRevenue | currency:'USD' }}</p>
+          <p class="text-sm text-gray-500 mt-2">Revenue generated</p>
+        </div>
+      </app-card>
+    </div>
+
+    <!-- Charts Section - single column on mobile, 2 on lg -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mt-6">
+      <!-- Booking Trend -->
+      <app-card header="Booking Trend (Last 7 Days)" styleClass="app-dashboard-card-hover">
+        <div class="py-4">
+          <div class="space-y-2">
+            @for (item of vm().stats!.bookingTrend; track item.date) {
+              <div class="flex items-center gap-3">
+                <span class="text-sm text-gray-600 w-20 sm:w-24">{{ item.date | date:'MMM d' }}</span>
+                <div class="flex-1 bg-gray-100 rounded-full h-4">
+                  <div
+                    class="bg-primary-500 h-4 rounded-full transition-all duration-500"
+                    [style.width.%]="maxCount() > 0 ? (item.count / maxCount() * 100) : 0"
+                  ></div>
+                </div>
+                <span class="text-sm font-medium text-gray-700 w-12 text-right">{{ item.count }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      </app-card>
+
+      <!-- Service Popularity -->
+      <app-card header="Service Popularity" styleClass="app-dashboard-card-hover">
+        <div class="py-4">
+          <div class="space-y-2">
+            @for (item of vm().stats!.servicePopularity; track item.serviceName) {
+              <div class="flex items-center gap-3">
+                <span class="text-sm text-gray-600 w-24 sm:w-32 truncate">{{ item.serviceName }}</span>
+                <div class="flex-1 bg-gray-100 rounded-full h-4">
+                  <div
+                    class="bg-secondary-500 h-4 rounded-full transition-all duration-500"
+                    [style.width.%]="maxServiceCount() > 0 ? (item.count / maxServiceCount() * 100) : 0"
+                  ></div>
+                </div>
+                <span class="text-sm font-medium text-gray-700 w-12 text-right">{{ item.count }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      </app-card>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (vm().error) {
+    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+      {{ vm().error }}
+    </div>
+  }
+</div>

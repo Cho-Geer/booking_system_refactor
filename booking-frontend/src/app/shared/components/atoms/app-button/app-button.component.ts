@@ -76,4 +76,11 @@ export class AppButtonComponent {
 
   /** Callback to execute when button is clicked. */
   readonly onClick = output<MouseEvent>();
+
+  /** Computed style class with click feedback animation. */
+  get combinedStyleClass(): string {
+    const base = this.styleClass() || '';
+    const feedbackClass = 'app-button-click-feedback';
+    return base ? `${base} ${feedbackClass}` : feedbackClass;
+  }
 }

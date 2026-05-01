@@ -7,7 +7,7 @@
   [resizable]="resizable() ?? false"
   [modal]="modal() ?? false"
   [position]="position()"
-  [styleClass]="styleClass()"
+  [styleClass]="combinedStyleClass"
   [appendTo]="appendTo() || 'body'"
   (visibleChange)="visibleChange.emit($event)"
 >

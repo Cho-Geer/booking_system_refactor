@@ -1,0 +1,19 @@
+:host {
+  display: block;
+}
+
+/* Ensure selects and datepickers are full-width on mobile */
+@media (max-width: 640px) {
+  ::ng-deep .p-select,
+  ::ng-deep .p-datepicker {
+    width: 100% !important;
+  }
+
+  ::ng-deep .p-dialog {
+    .p-dialog-header,
+    .p-dialog-content,
+    .p-dialog-footer {
+      border-radius: 0 !important;
+    }
+  }
+}

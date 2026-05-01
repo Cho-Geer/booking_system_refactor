@@ -1,5 +1,5 @@
-<div class="register-container">
-  <div class="register-card">
+<div class="register-container min-h-screen w-full">
+  <div class="register-card w-full">
     <h2>欢迎注册</h2>
 
     <div class="login-link">
@@ -33,7 +33,7 @@
           <div class="contact-type-selector">
             <button
               type="button"
-              class="type-btn"
+              class="type-btn min-touch-target"
               [class.active]="contactType() === ContactType.EMAIL"
               (click)="contactType.set(ContactType.EMAIL)"
             >
@@ -41,7 +41,7 @@
              </button>
              <button
                type="button"
-               class="type-btn"
+               class="type-btn min-touch-target"
                [class.active]="contactType() === ContactType.PHONE"
                (click)="contactType.set(ContactType.PHONE)"
             >
@@ -73,7 +73,7 @@
 
         <button
           type="submit"
-          class="btn-primary"
+          class="btn-primary w-full min-touch-target"
           [disabled]="step1Form.invalid || isLoading()"
         >
           @if (isLoading()) {
@@ -103,7 +103,7 @@
             />
             <button
               type="button"
-              class="btn-get-code"
+              class="btn-get-code min-touch-target"
               [disabled]="countdown() > 0"
               (click)="sendVerifyCode()"
             >
@@ -231,12 +231,12 @@
         </div>
 
         <div class="step-actions">
-          <button type="button" class="btn-secondary" (click)="goToStep1()">
+          <button type="button" class="btn-secondary min-touch-target w-full sm:w-auto" (click)="goToStep1()">
             返回
           </button>
           <button
             type="submit"
-            class="btn-primary"
+            class="btn-primary min-touch-target w-full sm:w-auto"
             [disabled]="step2Form.invalid || isLoading() || !acceptTerms()"
             aria-label="Complete registration"
           >

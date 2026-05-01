@@ -5,6 +5,13 @@
   padding: 1rem;
 }
 
+@media (max-width: 640px) {
+  .services {
+    grid-template-columns: 1fr;
+    padding: 0.75rem;
+  }
+}
+
 .service-card {
   border: 2px solid var(--border-color, #e0e0e0);
   border-radius: 8px;
@@ -12,6 +19,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   background: var(--background-color, #fff);
+  min-height: 44px; /* WCAG touch target */
 }
 
 .service-card:hover {
@@ -56,4 +64,46 @@
   text-align: center;
   padding: 2rem;
   color: var(--text-secondary, #666);
+}
+
+/* Skeleton shimmer loading states */
+.loading-skeleton {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+}
+
+@media (max-width: 640px) {
+  .loading-skeleton {
+    grid-template-columns: 1fr;
+    padding: 0.75rem;
+  }
+}
+
+.service-card-skeleton {
+  border: 2px solid rgba(224, 224, 224, 0.4);
+  border-radius: 8px;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.skeleton-title {
+  height: 24px;
+  width: 60%;
+  border-radius: 4px;
+  margin-bottom: 12px;
+}
+
+.skeleton-desc {
+  height: 16px;
+  width: 90%;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.skeleton-meta {
+  height: 20px;
+  width: 40%;
+  border-radius: 4px;
 }

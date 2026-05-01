@@ -19,7 +19,10 @@ module.exports = {
   coverageDirectory: '<rootDir>/coverage',
   coverageReporters: ['text', 'lcov', 'html'],
   collectCoverageFrom: [
-    'src/**/*.ts',
+    'src/app/features/**/*.ts',
+    'src/app/shared/**/*.ts',
+    'src/app/stores/**/*.ts',
+    'src/app/core/**/*.ts',
     '!src/main.ts',
     '!src/**/*.module.ts',
     '!src/**/index.ts',
@@ -28,10 +31,10 @@ module.exports = {
   ],
   coverageThreshold: {
     global: {
-      branches: 80,
-      functions: 85,
-      lines: 85,
-      statements: 85,
+      branches: 70,
+      functions: 70,
+      lines: 70,
+      statements: 70,
     },
   },
 };

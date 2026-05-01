@@ -1,0 +1,10 @@
+:host {
+  display: block;
+}
+
+@media (max-width: 640px) {
+  ::ng-deep .p-select,
+  ::ng-deep .p-inputtext {
+    width: 100% !important;
+  }
+}

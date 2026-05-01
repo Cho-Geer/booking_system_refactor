@@ -39,6 +39,7 @@ export class ServiceSelectionComponent implements OnInit {
 
   selectService(service: Service): void {
     this.selectedServiceId.set(service.id);
+    this.store.setSelectedServiceId(service.id);
     this.store.loadSlots([]);
     // Load slots for selected service - would call API here
     this.loadSlotsForService(service.id);

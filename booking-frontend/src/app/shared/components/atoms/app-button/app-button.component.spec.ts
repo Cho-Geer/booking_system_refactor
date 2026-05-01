@@ -92,4 +92,23 @@ describe('AppButtonComponent', () => {
     const buttonEl = fixture.debugElement.query(By.css('p-button'));
     expect(buttonEl).toBeTruthy();
   });
+
+  describe('button click feedback', () => {
+    it('[RED] should have app-button-click-feedback class in combined style', () => {
+      fixture.detectChanges();
+      // combinedStyleClass should include the feedback class
+      expect(component.combinedStyleClass).toContain('app-button-click-feedback');
+    });
+
+    it('[RED] should have active:scale(0.98) transform style', () => {
+      const buttonEl = fixture.debugElement.query(By.css('p-button'));
+      expect(buttonEl).toBeTruthy();
+      const nativeEl = buttonEl.nativeElement;
+      // Check transition property for transform
+      const style = getComputedStyle(nativeEl);
+      // Should have a transition on something
+      const hasTransition = style.transitionProperty !== 'none' || style.transitionDuration !== '0s';
+      expect(hasTransition).toBe(true);
+    });
+  });
 });

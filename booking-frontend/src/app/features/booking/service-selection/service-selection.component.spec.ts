@@ -37,6 +37,7 @@ describe('ServiceSelectionComponent', () => {
       cancelBooking: jest.fn(),
       setLoading: jest.fn(),
       setError: jest.fn(),
+      setSelectedServiceId: jest.fn(),
     };
 
     bookingServiceMock = {
@@ -240,7 +241,9 @@ describe('ServiceSelectionComponent', () => {
 
       const loading = fixture.nativeElement.querySelector('.loading');
       expect(loading).toBeTruthy();
-      expect(loading.textContent.trim()).toBe('Loading services...');
+      // Should have skeleton shimmer elements when loading
+      const skeletons = loading.querySelectorAll('.skeleton');
+      expect(skeletons.length).toBeGreaterThan(0);
     });
 
     it('should highlight selected service card', () => {
@@ -292,6 +295,32 @@ describe('ServiceSelectionComponent', () => {
 
       const cards = fixture.nativeElement.querySelectorAll('.service-card');
       expect(cards.length).toBe(0);
+    });
+  });
+
+  describe('skeleton shimmer loading', () => {
+    beforeEach(() => {
+      // Simulate non-loading API response, then override to loading
+      apiServiceMock.getServices.mockReturnValue(of(mockServices));
+      fixture.detectChanges(); // triggers ngOnInit, loads services, isLoading = false
+      // Now manually set loading and re-render
+      component.isLoading.set(true);
+      fixture.detectChanges();
+    });
+
+    it('[RED] should show skeleton shimmer loading when isLoading is true', () => {
+      const loadingEl = fixture.nativeElement.querySelector('.loading');
+      expect(loadingEl).toBeTruthy();
+      // Should have skeleton elements
+      const skeletons = loadingEl.querySelectorAll('.skeleton');
+      expect(skeletons.length).toBeGreaterThan(0);
+    });
+
+    it('[RED] should have skeleton placeholder elements for shimmer effect', () => {
+      const loadingEl = fixture.nativeElement.querySelector('.loading');
+      expect(loadingEl).toBeTruthy();
+      // The loading container should have loading-skeleton class
+      expect(loadingEl.classList.contains('loading-skeleton')).toBe(true);
     });
   });
 });

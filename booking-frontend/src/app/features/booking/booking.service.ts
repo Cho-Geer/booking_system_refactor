@@ -37,6 +37,15 @@ export class BookingService {
   async reserveSlot(slotId: string, maxSlots: number = DEFAULT_MAX_SLOTS): Promise<ReservationResponse> {
     const preferSeq = this.generatePreferSeq(maxSlots);
     const idempotencyKey = this.generateIdempotencyKey();
+    const serviceId = this.store.selectedServiceId();
+
+    if (!serviceId) {
+      return {
+        status: 'FAILED',
+        slot: { id: slotId, startTime: '', endTime: '', capacity: 0, bookedCount: 0, available: true },
+        message: 'No service selected',
+      };
+    }
 
     // Set loading state
     this.store.setLoading(true);
@@ -46,7 +55,9 @@ export class BookingService {
       const response = await lastValueFrom(
         this.apiService.createAppointment({
           timeSlotId: slotId,
+          serviceId,
           appointmentDate: new Date().toISOString(),
+          preferredSequence: preferSeq,
           notes: undefined,
         })
       );

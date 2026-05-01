@@ -1,5 +1,8 @@
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
 import { computed, inject } from '@angular/core';
+import { lastValueFrom } from 'rxjs';
+import { ApiService } from '../../core/services/api.service';
+import { RegisterSendCodeDto, RegisterCompleteDto, LoginPasswordDto } from '../../features/auth/dto/auth.dto';
 
 /**
  * User interface aligned with PII encryption contract (Scheme C v4).
@@ -9,7 +12,7 @@ import { computed, inject } from '@angular/core';
 export interface User {
   id: string;
   name: string;
-  role: string;
+  userType: string;
   email?: string;   // masked value from backend (e.g., "us***@example.com")
   phone?: string;   // masked value from backend (e.g., "138****5678")
   createdAt?: string;
@@ -40,7 +43,7 @@ export const AuthStore = signalStore(
     currentToken: computed(() => token()),
     currentRefreshToken: computed(() => refreshToken()),
   })),
-  withMethods((store) => ({
+  withMethods((store, apiService = inject(ApiService)) => ({
     /**
      * Login success - store tokens only (no user object in auth response)
      * User profile should be fetched separately via /users/profile
@@ -59,7 +62,10 @@ export const AuthStore = signalStore(
     setUserProfile(user: User) {
       patchState(store, { user });
     },
-    logout() {
+    /**
+     * Clear local auth state synchronously (without API call)
+     */
+    clearAuthState() {
       patchState(store, {
         user: null,
         token: null,
@@ -73,6 +79,134 @@ export const AuthStore = signalStore(
     },
     setError(error: string | null) {
       patchState(store, { error, isLoading: false });
+    },
+
+    // ==========================================
+    // Async API methods
+    // ==========================================
+
+    /**
+     * Register Step 1: Send verification code via API
+     */
+    async sendRegisterCode(dto: RegisterSendCodeDto) {
+      patchState(store, { isLoading: true, error: null });
+      try {
+        const response = await lastValueFrom(apiService.registerSendCode(dto));
+        patchState(store, { isLoading: false });
+        return response;
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Failed to send verification code';
+        patchState(store, { error: message, isLoading: false });
+        throw err;
+      }
+    },
+
+    /**
+     * Register Step 2: Complete registration via API
+     * Stores tokens and fetches user profile on success.
+     */
+    async completeRegistration(dto: RegisterCompleteDto) {
+      patchState(store, { isLoading: true, error: null });
+      try {
+        const authResponse = await lastValueFrom(apiService.registerComplete(dto));
+        patchState(store, {
+          token: authResponse.accessToken,
+          refreshToken: authResponse.refreshToken,
+          isLoading: false,
+          error: null,
+        });
+
+        // Fetch user profile after successful registration
+        await this.fetchUserProfile();
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Registration failed';
+        patchState(store, { error: message, isLoading: false });
+      }
+    },
+
+    /**
+     * Login with email/phone and password via API
+     * Stores tokens and fetches user profile on success.
+     */
+    async loginWithPassword(dto: LoginPasswordDto) {
+      patchState(store, { isLoading: true, error: null });
+      try {
+        const authResponse = await lastValueFrom(apiService.loginPassword(dto));
+        patchState(store, {
+          token: authResponse.accessToken,
+          refreshToken: authResponse.refreshToken,
+          isLoading: false,
+          error: null,
+        });
+
+        // Fetch user profile after successful login
+        await this.fetchUserProfile();
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Login failed';
+        patchState(store, { error: message, isLoading: false });
+      }
+    },
+
+    /**
+     * Refresh the access token using stored refresh token.
+     */
+    async refreshAccessToken() {
+      const currentRefreshToken = store.refreshToken();
+      if (!currentRefreshToken) {
+        patchState(store, { error: 'No refresh token available', isLoading: false });
+        return;
+      }
+
+      patchState(store, { isLoading: true, error: null });
+      try {
+        const authResponse = await lastValueFrom(apiService.refreshToken(currentRefreshToken));
+        patchState(store, {
+          token: authResponse.accessToken,
+          refreshToken: authResponse.refreshToken,
+          isLoading: false,
+          error: null,
+        });
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Token refresh failed';
+        patchState(store, { error: message, isLoading: false });
+      }
+    },
+
+    /**
+     * Async logout - calls API to blacklist token, then clears local state.
+     * Always clears local state regardless of API success/failure.
+     */
+    async logout() {
+      patchState(store, { isLoading: true });
+      try {
+        await lastValueFrom(apiService.logout());
+      } catch {
+        // Always clear local state regardless of API outcome
+      } finally {
+        this.clearAuthState();
+      }
+    },
+
+    /**
+     * Fetch current user profile from API.
+     */
+    async fetchUserProfile() {
+      patchState(store, { isLoading: true, error: null });
+      try {
+        const profile = await lastValueFrom(apiService.getUserProfile());
+        const user: User = {
+          id: profile.id,
+          name: profile.name,
+          userType: profile.userType,
+          email: profile.email,
+          phone: profile.phone,
+          createdAt: profile.createdAt,
+        };
+        patchState(store, { user, isLoading: false });
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Failed to fetch profile';
+        patchState(store, { error: message, isLoading: false });
+      }
     },
   }))
 );

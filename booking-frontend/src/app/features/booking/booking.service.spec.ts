@@ -19,6 +19,7 @@ describe('BookingService', () => {
 
     storeMock = {
       slots: jest.fn(() => []),
+      selectedServiceId: jest.fn(() => 'svc-1'),
       reserveSlot: jest.fn().mockReturnValue(mockReservationResponse),
       confirmSlotReservation: jest.fn(),
       failedReservation: jest.fn(),
@@ -31,7 +32,16 @@ describe('BookingService', () => {
     };
 
     apiServiceMock = {
-      createAppointment: jest.fn(),
+      createAppointment: jest.fn().mockReturnValue(of({
+        id: 'booking-1',
+        status: 'CONFIRMED' as const,
+        userId: 'user-1',
+        timeSlotId: 'slot-1',
+        serviceId: 'svc-1',
+        appointmentDate: new Date().toISOString(),
+        slotSequence: 1,
+        createdAt: new Date().toISOString(),
+      })),
     } as unknown as jest.Mocked<ApiService>;
 
     TestBed.configureTestingModule({

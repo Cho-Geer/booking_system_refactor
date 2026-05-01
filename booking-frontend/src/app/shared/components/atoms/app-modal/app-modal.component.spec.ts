@@ -97,4 +97,28 @@ describe('AppModalComponent', () => {
     const dialogEl = fixture.debugElement.query(By.css('p-dialog'));
     expect(dialogEl).toBeTruthy();
   });
+
+  describe('glass animation', () => {
+    it('[RED] should have animate-glass-in class when dialog is visible', () => {
+      fixture.componentRef.setInput('visible', true);
+      fixture.componentRef.setInput('styleClass', 'animate-glass-in');
+      fixture.detectChanges();
+
+      const dialogEl = fixture.debugElement.query(By.css('p-dialog'));
+      expect(dialogEl).toBeTruthy();
+      // The styleClass should contain glass-in animation class
+      const styleClass = component.styleClass();
+      expect(styleClass).toContain('animate-glass-in');
+    });
+
+    it('[RED] should have glass animation styleClass passed to p-dialog', () => {
+      fixture.componentRef.setInput('visible', true);
+      fixture.detectChanges();
+
+      const dialogEl = fixture.debugElement.query(By.css('p-dialog'));
+      expect(dialogEl).toBeTruthy();
+      // combinedStyleClass should contain animate-glass-in
+      expect(component.combinedStyleClass).toContain('animate-glass-in');
+    });
+  });
 });

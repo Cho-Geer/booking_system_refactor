@@ -59,6 +59,21 @@ describe('AppCardComponent', () => {
     expect(content).toBeTruthy();
     expect(content.nativeElement.textContent).toContain('Projected Content');
   });
+
+  describe('card hover micro-interaction', () => {
+    it('[RED] should have app-card-hover class in combinedStyleClass', () => {
+      fixture.detectChanges();
+      // combinedStyleClass should include app-card-hover
+      expect(component.combinedStyleClass).toContain('app-card-hover');
+    });
+
+    it('[RED] should have hover transition styles defined', () => {
+      fixture.detectChanges();
+      const combined = component.combinedStyleClass;
+      expect(combined).toContain('app-card-hover');
+      expect(combined.length).toBeGreaterThan(0);
+    });
+  });
 });
 
 @Component({

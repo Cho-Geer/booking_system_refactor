@@ -17,4 +17,11 @@ export class AppCardComponent {
 
   /** Class of the element. */
   readonly styleClass = input<string>();
+
+  /** Computed style class with hover effect added. */
+  get combinedStyleClass(): string {
+    const base = this.styleClass() || '';
+    const hoverClass = 'app-card-hover';
+    return base ? `${base} ${hoverClass}` : hoverClass;
+  }
 }

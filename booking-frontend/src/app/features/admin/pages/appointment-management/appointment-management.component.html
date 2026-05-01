@@ -1,0 +1,132 @@
+<div class="space-y-6">
+  <!-- Page Header -->
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+    <h1 class="text-xl sm:text-2xl font-bold text-gray-800">Appointment Management</h1>
+    @if (selectedAppointments().length > 0) {
+      <p-button
+        label="Batch Cancel ({{ selectedAppointments().length }})"
+        icon="pi pi-times"
+        severity="danger"
+        (onClick)="batchCancel()"
+      />
+    }
+  </div>
+
+  <!-- Error State -->
+  @if (vm().error) {
+    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+      {{ vm().error }}
+    </div>
+  }
+
+  <!-- Filters - wrap on mobile -->
+  <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 sm:items-center">
+    <p-select
+      [(ngModel)]="filterStatus"
+      [options]="statusOptions"
+      placeholder="All Statuses"
+      (onChange)="applyFilter()"
+      class="w-full sm:w-36"
+    />
+    <div class="flex flex-col sm:flex-row gap-2 sm:gap-2 sm:items-center">
+      <label class="text-sm text-gray-600">From:</label>
+      <p-datepicker [(ngModel)]="filterStartDate" dateFormat="yy-mm-dd" (onSelect)="applyFilter()" />
+    </div>
+    <div class="flex flex-col sm:flex-row gap-2 sm:gap-2 sm:items-center">
+      <label class="text-sm text-gray-600">To:</label>
+      <p-datepicker [(ngModel)]="filterEndDate" dateFormat="yy-mm-dd" (onSelect)="applyFilter()" />
+    </div>
+  </div>
+
+  <!-- Appointments Table - horizontal scroll on mobile -->
+  <div class="table-scroll-container">
+    <p-table
+      [value]="vm().appointments"
+      [loading]="vm().isLoading"
+      [paginator]="true"
+      [rows]="10"
+      [totalRecords]="vm().appointmentsTotal"
+      [rowsPerPageOptions]="[10, 25, 50]"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} appointments"
+      [(selection)]="selectedAppointments"
+      [rowHover]="true"
+      dataKey="id"
+      [tableStyle]="{ 'min-width': '700px' }"
+    >
+      <ng-template #header>
+        <tr>
+          <th style="width: 3rem">
+            <p-tableHeaderCheckbox />
+          </th>
+          <th pSortableColumn="appointmentNumber">Number <p-sortIcon field="appointmentNumber" /></th>
+          <th pSortableColumn="userName">Customer <p-sortIcon field="userName" /></th>
+          <th pSortableColumn="serviceName">Service <p-sortIcon field="serviceName" /></th>
+          <th pSortableColumn="appointmentDate">Date <p-sortIcon field="appointmentDate" /></th>
+          <th pSortableColumn="status">Status <p-sortIcon field="status" /></th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-appointment>
+        <tr>
+          <td><p-tableCheckbox [value]="appointment" /></td>
+          <td>{{ appointment.appointmentNumber }}</td>
+          <td>{{ appointment.userName }}</td>
+          <td>{{ appointment.serviceName }}</td>
+          <td>{{ appointment.appointmentDate | date:'medium' }}</td>
+          <td><p-tag [value]="appointment.status" [severity]="getStatusSeverity(appointment.status)" /></td>
+          <td>
+            <p-button icon="pi pi-refresh" [rounded]="true" [outlined]="true" size="small"
+              (onClick)="openStatusDialog(appointment)"
+              pTooltip="Update Status"
+            />
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="7" class="text-center py-8 text-gray-500">No appointments found.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <!-- Status Update Dialog - full-screen on mobile -->
+  <p-dialog
+    [(visible)]="statusDialogVisible"
+    header="Update Appointment Status"
+    [modal]="true"
+    [style]="{ width: '400px' }"
+    [class]="'modal-fullscreen-mobile'"
+    (onHide)="statusDialogVisible.set(false)"
+  >
+    <ng-template #content>
+      @if (selectedAppointment()) {
+        <div class="flex flex-col gap-4 p-4">
+          <div>
+            <p class="text-sm text-gray-500">Appointment: <strong>{{ selectedAppointment()?.appointmentNumber }}</strong></p>
+            <p class="text-sm text-gray-500">Customer: <strong>{{ selectedAppointment()?.userName }}</strong></p>
+          </div>
+          <div>
+            <label class="block font-medium mb-1">New Status</label>
+            <p-select
+              [(ngModel)]="newStatus"
+              [options]="statusOptions"
+              class="w-full"
+            />
+          </div>
+          <div>
+            <label class="block font-medium mb-1">Reason (optional)</label>
+            <input pInputText [(ngModel)]="statusUpdateReason" class="w-full" placeholder="Reason for status change..." />
+          </div>
+        </div>
+      }
+    </ng-template>
+    <ng-template #footer>
+      <div class="flex flex-col-reverse sm:flex-row gap-2 sm:gap-2">
+        <p-button label="Cancel" [outlined]="true" (onClick)="statusDialogVisible.set(false)" class="w-full sm:w-auto" />
+        <p-button label="Update" (onClick)="updateStatus()" class="w-full sm:w-auto" />
+      </div>
+    </ng-template>
+  </p-dialog>
+</div>

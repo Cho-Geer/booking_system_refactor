@@ -13,11 +13,24 @@
   max-width: 480px;
 }
 
+@media (max-width: 640px) {
+  .register-card {
+    padding: 1.25rem;
+    border-radius: 12px;
+  }
+}
+
 h2 {
   margin: 0 0 0.5rem;
   color: var(--text-primary, #333);
   font-size: 1.75rem;
   font-weight: 600;
+}
+
+@media (max-width: 480px) {
+  h2 {
+    font-size: 1.5rem;
+  }
 }
 
 .login-link {

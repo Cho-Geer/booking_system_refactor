@@ -1,0 +1,8 @@
+:host {
+  display: block;
+}
+
+/* Page enter animation using CSS variable from styles.scss */
+.animate-page-enter {
+  animation: var(--animate-page-enter, pageEnter 400ms ease);
+}

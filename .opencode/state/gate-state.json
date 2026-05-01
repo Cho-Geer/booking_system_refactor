@@ -618,6 +618,350 @@
         "execution_summary": "Re-review T-ParseIntPipeFix (commit ac14893): All 28 checks passed. Test execution evidence verified (9/9 unit tests passing, exit_code=0, real output_summary), code quality compliant with backend-coding-standard, no security vulnerabilities, 4 controllers migrated, frontend retry(2) removed, all 5 artifacts complete. Verdict: PASS.",
         "completed_at": "2026-04-30T01:52:02.062Z"
       }
+    },
+    "cg_ses_1777540732805": {
+      "session_id": "cg_ses_1777540732805",
+      "created_at": "2026-04-30T09:18:52.806Z",
+      "task_description": "Fix contract.yaml based on Design Document Verification Report: add Admin CRUD APIs, fix appointment create fields, add field mapping specs",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fixed contract.yaml v1.3.0: Added Admin CRUD endpoints, fixed appointment creation fields, added field mapping specifications",
+      "confirmed_at": "2026-04-30T09:19:43.981Z",
+      "consumed_at": "2026-04-30T09:19:55.636Z",
+      "audit": {
+        "execution_summary": "Fixed contract.yaml v1.3.0: Added Admin CRUD endpoints (/v1/admin/*), fixed appointment creation fields (service_id, preferred_sequence, customer_info), added API field mapping specifications (snake_case→camelCase), documented notes→remarks mapping, updated all status enums to include EXPIRED",
+        "completed_at": "2026-04-30T09:19:55.636Z"
+      }
+    },
+    "cg_ses_1777544567266": {
+      "session_id": "cg_ses_1777544567266",
+      "created_at": "2026-04-30T10:22:47.266Z",
+      "task_description": "Execute Phase 1 (Design System + Foundation) of the UI implementation plan, then dispatch multi-agent sub-agents for parallel Phase 2 development (Customer + Admin pages)",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Start Phase 1 (Design System + Foundation) execution: Tailwind config, global styles, 15+ atomic components, 5 layouts, 4 core services, 5 interceptors, 5 stores. After foundation, dispatch multi-agent for parallel Phase 2.",
+      "confirmed_at": "2026-04-30T10:24:50.634Z",
+      "consumed_at": "2026-04-30T11:05:27.595Z",
+      "audit": {
+        "execution_summary": "Completed Phase 1 (Design System + Foundation): Created 3 layout components (app-header, app-sidebar, app-layout). Verified existing 13 atomic components, 5 stores, 6 services, 4 interceptors, and glassmorphism styles.scss are already complete. Dispatched multi-agent for Phase 2: @Coder-FE Customer created MyBookings+Profile pages (29 tests passing). @Coder-FE Admin created Dashboard+UserMgmt+ServiceMgmt+AppointmentMgmt pages (54 tests passing, 22 new files). @Guardian review: 4 blocking issues found (coverage, pre-existing failures, template size, exit_code).",
+        "completed_at": "2026-04-30T11:05:27.595Z"
+      }
+    },
+    "cg_ses_1777545012555": {
+      "session_id": "cg_ses_1777545012555",
+      "created_at": "2026-04-30T10:30:12.555Z",
+      "task_description": "Implement Customer frontend pages: my-bookings and profile for the Booking System. Auth (login/register) is already fully implemented. Need to: (1) Add getMyAppointments and updateProfile methods to ApiService, (2) Create MyBookings feature page with status filter tabs and booking cards, (3) Create Profile feature page with user info display and edit mode, (4) Add EXPIRED status to BookingStatus enum, (5) Update app.routes.ts with new lazy-loaded routes. Follow TDD (RED/GREEN/REFACTOR), use Angular v21+ standalone, Tailwind CSS v4, NgRx Signals, and glassmorphism design system per customer-ui-spec.md.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Build MyBookings and Profile pages via TDD: RED (write failing tests) → GREEN (implement) → REFACTOR. Create 2 feature modules with routes, update ApiService + DTOs, add app routes.",
+      "confirmed_at": "2026-04-30T10:32:54.906Z",
+      "consumed_at": "2026-04-30T10:40:33.000Z",
+      "audit": {
+        "execution_summary": "Implemented MyBookings and Profile frontend pages via TDD (RED→GREEN). Created 10 new files, modified 4 existing. Added 29 new tests all passing. MyBookings: status filter tabs, booking cards with cancel flow, empty/loading/error states. Profile: avatar, info cards, edit mode, password dialog. Updated ApiService with getMyAppointments() and updateProfile(). Added EXPIRED to BookingStatus. Updated app.routes.ts with lazy-loaded routes protected by authGuard.",
+        "completed_at": "2026-04-30T10:40:33.000Z"
+      }
+    },
+    "cg_ses_1777545145622": {
+      "session_id": "cg_ses_1777545145622",
+      "created_at": "2026-04-30T10:32:25.622Z",
+      "task_description": "Implement Admin dashboard pages for Booking System: dashboard stats/charts, user management (table + CRUD), service management (table + CRUD + image upload), appointment management (table + filters + batch operations). Angular v21+, PrimeNG, NgRx Signals, Tailwind CSS v4. Based on contract.yaml v1.3.0 Admin APIs. TDD (RED/GREEN/REFACTOR). Frontend at booking_system_refactor/booking-frontend/.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Implement Admin dashboard pages with 4 pages (dashboard, users, services, appointments) using TDD, Angular v21+, PrimeNG, NgRx Signals",
+      "confirmed_at": "2026-04-30T10:41:10.866Z",
+      "consumed_at": "2026-04-30T10:53:27.827Z",
+      "audit": {
+        "execution_summary": "Implemented 4 Admin dashboard pages (dashboard, user management, service management, appointment management) with TDD. Created 22 files including DTOs, service, SignalStore, lazy routes, and 4 full page components with PrimeNG UI. All 54 admin tests pass. See .task_temp/T003/ for HANDOVER.md and test_report.json.",
+        "completed_at": "2026-04-30T10:53:27.827Z"
+      }
+    },
+    "cg_ses_1777546701209": {
+      "session_id": "cg_ses_1777546701209",
+      "created_at": "2026-04-30T10:58:21.209Z",
+      "task_description": "Guardian quality gate review: Review Coder-FE work on Customer pages (auth, my-bookings, profile) and Admin pages (dashboard, user-management, service-management, appointment-management) for compliance with design docs, coding standards, and quality standards. Verify test execution evidence.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Guardian quality gate review: 6-dimension audit of Coder-FE Customer & Admin pages — DoD evidence verification, static code analysis, security audit, architecture compliance, coding standards, design alignment. Scope: auth/login, auth/register, my-bookings, profile, admin/dashboard, admin/user-management, admin/service-management, admin/appointment-management plus shared services/stores/DTOs.",
+      "confirmed_at": "2026-04-30T10:59:14.888Z",
+      "consumed_at": "2026-04-30T11:02:24.056Z",
+      "audit": {
+        "execution_summary": "Guardian quality gate review completed: 6-dimension audit of Coder-FE Customer & Admin pages. Result: FAIL — 4 blocking issues (missing test_report.json, no coverage reports, 2 template size violations exceeding 200-line limit), 6 warnings (temp files, dead code, any types in specs, misleading test naming, hardcoded API URL, missing route guards). All admin DTOs verified alignment with contract.yaml v1.3.0. Security audit passed (no token in localStorage, proper signal-based storage). Architecture compliance passed.",
+        "completed_at": "2026-04-30T11:02:24.056Z"
+      }
+    },
+    "cg_ses_1777548713991": {
+      "session_id": "cg_ses_1777548713991",
+      "created_at": "2026-04-30T11:31:53.991Z",
+      "task_description": "Execute Phase 4 (API Integration) and Phase 5 (Responsive/Mobile) in parallel: fix API mappings, implement camelCase interceptor, wire stores to APIs, add responsive/mobile adaptations",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Phase 4+5 parallel execution: (1) Fix createAppointment API mapping, (2) Build snake_case↔camelCase interceptor, (3) Dispatch @Coder-FE to wire stores-to-APIs, (4) Dispatch @Coder-FE for responsive/mobile phase, (5) @Guardian review",
+      "confirmed_at": "2026-04-30T11:31:59.620Z",
+      "consumed_at": "2026-04-30T12:10:44.556Z",
+      "audit": {
+        "execution_summary": "Completed Phase 4 (API Integration) + Phase 5 (Responsive/Mobile) parallel execution: Fixed createAppointment API mapping (added serviceId, preferredSequence, customerInfo), built and registered api-transform.interceptor for snake_case↔camelCase conversion, wired all 3 Stores to real API calls (111 tests passing via @Coder-FE), implemented responsive/mobile adaptations across all pages (40 tests passing via @Coder-FE). Guard review: 2 blockers fixed (interceptor registration + test reports).",
+        "completed_at": "2026-04-30T12:10:44.556Z"
+      }
+    },
+    "cg_ses_1777548847586": {
+      "session_id": "cg_ses_1777548847586",
+      "created_at": "2026-04-30T11:34:07.586Z",
+      "task_description": "Add responsive design and mobile adaptations to all pages in the Booking System frontend (Angular v21+ / PrimeNG / Tailwind CSS v4). Tasks: hamburger menu, single-column glass cards on mobile, full-screen modals, full-width buttons, bottom fixed action bar for booking flow, reduce backdrop-filter from 10px to 8px on mobile, touch-friendly 44x44px click targets, horizontal table scrolling, pull-to-refresh on my-bookings.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Responsive design & mobile adaptations for all Booking System frontend pages using Tailwind responsive prefixes. TDD RED→GREEN→REFACTOR across 8 page groups.",
+      "confirmed_at": "2026-04-30T11:46:18.234Z",
+      "consumed_at": "2026-04-30T12:01:14.169Z",
+      "audit": {
+        "execution_summary": "Completed responsive design and mobile adaptations for Booking System frontend. TDD RED→GREEN cycle: wrote 7 responsive test spec files (40 tests), implemented all GREEN changes across 24 modified files covering auth pages, booking flow, my-bookings, profile, admin pages, and global styles. Key adaptations: backdrop-filter 8px mobile, hamburger menu, full-screen modals, full-width buttons, bottom fixed action bar, pull-to-refresh, horizontal table scroll, 44px touch targets, single-column glass cards.",
+        "completed_at": "2026-04-30T12:01:14.169Z"
+      }
+    },
+    "cg_ses_1777548856044": {
+      "session_id": "cg_ses_1777548856044",
+      "created_at": "2026-04-30T11:34:16.044Z",
+      "task_description": "Wire all frontend SignalStores (AuthStore, BookingStore, AdminStore) to real API calls using inject() pattern, following TDD (RED first). Angular v21+ with NgRx Signals.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Wire all 3 SignalStores (Auth, Booking, Admin) to real API calls via TDD RED→GREEN→REFACTOR",
+      "confirmed_at": "2026-04-30T11:34:42.348Z",
+      "consumed_at": "2026-04-30T11:45:39.919Z",
+      "audit": {
+        "execution_summary": "Wired all 3 SignalStores (AuthStore, BookingStore, AdminStore) to real API calls using SignalStore inject() pattern. AuthStore: 6 new async methods (loginWithPassword, sendRegisterCode, completeRegistration, refreshAccessToken, logout, fetchUserProfile). BookingStore: 5 new async methods + type unification (DTO available field). AdminStore: 12 new async CRUD methods. TDD: 65 RED tests → all 65 pass GREEN phase. Zero regressions. 111 total store tests pass, 409 broader frontend tests pass (excluding 63 pre-existing failures).",
+        "completed_at": "2026-04-30T11:45:39.919Z"
+      }
+    },
+    "cg_ses_1777550582073": {
+      "session_id": "cg_ses_1777550582073",
+      "created_at": "2026-04-30T12:03:02.074Z",
+      "task_description": "Guardian: Review all Phase 4 (API Integration) and Phase 5 (Responsive/Mobile) work in the Booking System frontend. Check api-transform.interceptor.ts (snake_case↔camelCase), API mapping, Stores wired to real API calls, responsive/mobile adaptations. Validate against contract.yaml v1.3.0, frontend-coding-standard.md, and testing-coding-standard.md.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Guardian quality gate review: Phase 4 API Integration (interceptor, stores, services) + Phase 5 Responsive/Mobile. 6 dimensions: api-transform interceptor, API service mapping, store integration (111 tests), responsive adaptations (40 tests), code quality standards, test execution evidence (DoD). Output: REVIEW_REPORT.md with PASS/FAIL per dimension and violation list.",
+      "confirmed_at": "2026-04-30T12:03:42.871Z",
+      "consumed_at": "2026-04-30T12:09:51.724Z",
+      "audit": {
+        "execution_summary": "Guardian quality gate completed. 6 dimensions reviewed: api-transform interceptor (FAIL - missing registration and tests), API service mapping (CONDITIONAL PASS - DTO outdated), store integration (PASS - 111/111 tests), responsive (PASS - 40/40 tests), code quality (CONDITIONAL PASS), DoD evidence (FAIL - no test_report.json, coverage below thresholds). Overall: FAIL. Full report at booking_system_refactor/REVIEW_REPORT.md.",
+        "completed_at": "2026-04-30T12:09:51.724Z"
+      }
+    },
+    "cg_ses_1777551147879": {
+      "session_id": "cg_ses_1777551147879",
+      "created_at": "2026-04-30T12:12:27.879Z",
+      "task_description": "Execute Phase 6 (Animation Optimization) and Phase 7 (E2E Testing + Performance + Accessibility) using multi-agent dispatch",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Phase 6+7 parallel: @Coder-FE #1 apply animations/micro-interactions to all components, @Coder-FE #2 complete E2E tests + performance + accessibility, @Guardian final sign-off. 16 CSS keyframes already defined in styles.scss, 10 E2E tests exist. Need to wire animations to components and finalize E2E suite.",
+      "confirmed_at": "2026-04-30T12:12:45.272Z",
+      "consumed_at": "2026-04-30T13:08:29.696Z",
+      "audit": {
+        "execution_summary": "Phase 6+7 complete. Animations: 103 tests passing across 10 animation tasks (page transitions, modal, toast, card hover, button click, input glow, skeleton shimmer, toggle, success pop, admin cards). Phase 7: 25 new E2E tests (my-bookings, profile), lazy loading routes verified, will-change GPU acceleration added, accessibility fixes (ARIA, keyboard, focus).",
+        "completed_at": "2026-04-30T13:08:29.696Z"
+      }
+    },
+    "cg_ses_1777551221708": {
+      "session_id": "cg_ses_1777551221708",
+      "created_at": "2026-04-30T12:13:41.708Z",
+      "task_description": "Apply animations and micro-interactions to all Booking System frontend components including page transitions, glass modal animations, toast notifications, success animations, card hover effects, button feedback, input focus glow, skeleton shimmer loading states, toggle switch transitions, and prefers-reduced-motion support using CSS transitions in Angular frontend components",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Apply 10 CSS animation & micro-interaction tasks across ~20 Angular frontend components using TDD (RED→GREEN→REFACTOR)",
+      "confirmed_at": "2026-04-30T12:15:12.665Z",
+      "consumed_at": "2026-04-30T13:08:02.462Z",
+      "audit": {
+        "execution_summary": "Completed T-ANIM-001: Applied 10 CSS animation & micro-interaction tasks across 20+ Angular frontend components using TDD. All 103 animation-specific tests pass. Generated HANDOVER.md, test_report.json, TASK_LOG.md in .task_temp/T-ANIM-001/",
+        "completed_at": "2026-04-30T13:08:02.462Z"
+      }
+    },
+    "cg_ses_1777551236833": {
+      "session_id": "cg_ses_1777551236833",
+      "created_at": "2026-04-30T12:13:56.833Z",
+      "task_description": "Phase 7: Complete E2E testing, performance, and accessibility for Booking System. 1) Review/complete Playwright E2E tests (auth, booking-flow, services, admin) 2) Add missing E2E tests (my-bookings, profile) 3) Ensure lazy loading in Angular routes 4) Add GPU acceleration CSS 5) Audit accessibility (keyboard, ARIA, contrast). Use TDD. DO NOT run Playwright tests. Project: booking_system_refactor.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Phase 7: E2E tests (my-bookings, profile) + lazy loading + GPU acceleration + accessibility audit. TDD RED→GREEN→REFACTOR.",
+      "confirmed_at": "2026-04-30T12:15:13.433Z",
+      "consumed_at": "2026-04-30T12:21:49.328Z",
+      "audit": {
+        "execution_summary": "Phase 7 completed: 1) Added missing my-bookings/profile lazy-loaded routes to app.routes.ts. 2) Created e2e/my-bookings.spec.ts (12 tests) and e2e/profile.spec.ts (13 tests) for cancellation/view details/edit profile flows. 3) Added will-change:transform GPU acceleration to page-enter/animate-glass-in/booking-card. 4) Enhanced accessibility with ARIA roles (tab,dialog), keyboard handlers (Escape/Enter/Space), aria-labels on buttons. 5) Verified 37 unit tests passing, TypeScript compilation clean. Generated HANDOVER.md, test_report.json.",
+        "completed_at": "2026-04-30T12:21:49.328Z"
+      }
+    },
+    "cg_ses_1777554590962": {
+      "session_id": "cg_ses_1777554590962",
+      "created_at": "2026-04-30T13:09:50.962Z",
+      "task_description": "Final project-wide quality gate review for the Booking System. All 7 phases complete: Phase 1 (Foundation - 13 atoms, 5 stores, 6 services, 4 interceptors, 3 layouts, glassmorphism styles), Phase 2-3 (Customer pages + Admin pages via multi-agent), Phase 4 (API integration - 111 store tests), Phase 5 (Responsive/mobile - 40 tests), Phase 6 (Animations - 103 tests), Phase 7 (E2E/performance/accessibility - 25 tests). TOTAL: ~280+ new tests. Review: (1) DoD test evidence across all phases, (2) API contract alignment with contract.yaml v1.3.0, (3) Design spec alignment with all design docs, (4) Code quality and coding standards, (5) Animation performance and accessibility compliance. Generate FINAL_REVIEW_REPORT.md with overall PASS/FAIL verdict.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Final project-wide quality gate review for Booking System: (1) DoD test evidence audit across 27 test_reports, (2) API contract alignment with contract.yaml v1.3.0, (3) Design spec alignment with atomic design + glassmorphism, (4) Code quality & coding standards compliance, (5) Animation performance & accessibility compliance. Generate FINAL_REVIEW_REPORT.md with PASS/FAIL verdict.",
+      "confirmed_at": "2026-04-30T13:10:30.774Z",
+      "consumed_at": "2026-04-30T13:17:48.887Z",
+      "audit": {
+        "execution_summary": "Guardian final project-wide quality gate review completed. Reviewed 27 test_reports, contract.yaml v1.3.0 alignment, code quality across backend (8 controllers, 14 modules) and frontend (14 atoms, 2 molecules, 3 layouts, 3 stores). Verdict: ⚠️ CONDITIONAL PASS — 2 critical warnings: (1) residual any type in auth.service.ts:577, (2) admin endpoint URL path mismatch with contract. 280+ new tests pass across 7 phases. FINAL_REVIEW_REPORT.md generated.",
+        "completed_at": "2026-04-30T13:17:48.887Z"
+      }
+    },
+    "cg_ses_1777556147224": {
+      "session_id": "cg_ses_1777556147224",
+      "created_at": "2026-04-30T13:35:47.224Z",
+      "task_description": "Fix 4 frontend build errors: unused imports in my-bookings and app-header, interceptor clone type error, missing createAppointment DTO fields",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix 4 build errors: W1 remove AppSpinnerComponent import, W2 remove AvatarGroup import, E1 fix interceptor HttpResponse.clone() type check, E2 add serviceId+preferredSequence to createAppointment call. Verify with npm run build.",
+      "confirmed_at": "2026-04-30T13:35:53.253Z",
+      "consumed_at": "2026-04-30T13:41:41.493Z",
+      "audit": {
+        "execution_summary": "Fixed all 4 build errors via dispatched Coder-FE agent: W1 removed AppSpinnerComponent unused import, W2 removed AvatarGroup unused import, E1 fixed interceptor HttpResponse.clone() type guard, E2 added serviceId+preferredSequence to createAppointment. Build now passes with 0 errors, 0 TypeScript warnings. Only pre-existing bundle size budget warning remains (unrelated).",
+        "completed_at": "2026-04-30T13:41:41.493Z"
+      }
+    },
+    "cg_ses_1777556294029": {
+      "session_id": "cg_ses_1777556294029",
+      "created_at": "2026-04-30T13:38:14.029Z",
+      "task_description": "Fix 4 frontend TypeScript build errors in Booking System: (W1) Remove unused AppSpinnerComponent import, (W2) Remove unused AvatarGroup import, (E1) Fix HttpEvent.clone type error in api-transform.interceptor.ts using HttpResponse, (E2) Add serviceId and preferredSequence to createAppointment call in booking.service.ts",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix 4 frontend build errors: remove unused imports (AppSpinnerComponent, AvatarGroup), fix HttpEvent.clone type error with HttpResponse, add serviceId/preferredSequence to createAppointment call",
+      "confirmed_at": "2026-04-30T13:38:35.044Z",
+      "consumed_at": "2026-04-30T13:40:40.252Z",
+      "audit": {
+        "execution_summary": "Fixed 4 TypeScript build errors: W1 removed unused AppSpinnerComponent import, W2 removed unused AvatarGroup import, E1 fixed HttpEvent.clone type error using HttpResponse instanceof check, E2 added serviceId and preferredSequence params to createAppointment call. Build passes with 0 errors 0 warnings. Modified 6 files total.",
+        "completed_at": "2026-04-30T13:40:40.252Z"
+      }
+    },
+    "cg_ses_1777557617654": {
+      "session_id": "cg_ses_1777557617654",
+      "created_at": "2026-04-30T14:00:17.654Z",
+      "task_description": "Formulate test classes fix plan following compliance rules: document the process for ensuring test classes are updated when business code changes, based on the Booking System build fix experience",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Create a compliance-enforced plan document for test class updates when business code changes, based on real build fix experience. Includes before/after data, fix rules, and reusable TDD checklist.",
+      "confirmed_at": "2026-04-30T14:00:24.776Z",
+      "consumed_at": "2026-04-30T14:01:07.357Z",
+      "audit": {
+        "execution_summary": "Created docs/design/test-update-compliance-plan.md documenting the test class fix process following compliance rules. Document includes: problem background with real build fix data, 6-step P0 compliance flow for test updates, mock omission checklist, reusable CI gate checklist, actual fix records for booking.service.spec.ts and service-selection.component.spec.ts, pre-existing failure appendix.",
+        "completed_at": "2026-04-30T14:01:07.357Z"
+      }
+    },
+    "cg_ses_1777558491144": {
+      "session_id": "cg_ses_1777558491144",
+      "created_at": "2026-04-30T14:14:51.144Z",
+      "task_description": "Fix contract.yaml internal naming inconsistency, then fix api-transform interceptor request-side conversion that breaks auth endpoints",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Step 1: Fix contract.yaml naming convention to document PII auth endpoints use camelCase wire format while old endpoints use snake_case. Step 2: Fix api-transform interceptor to skip request-side snake_case conversion for auth endpoint URLs (/auth/). Then VERIFY by clicking 发送验证码.",
+      "confirmed_at": "2026-04-30T14:15:15.781Z",
+      "consumed_at": "2026-04-30T14:20:05.723Z",
+      "audit": {
+        "execution_summary": "Step 1: Fixed contract.yaml naming convention - added per-segment wire format docs (/auth/* uses camelCase, default uses snake_case). Step 2: Fixed api-transform.interceptor.ts - added isAuthUrl check to skip request-side snake_case conversion for /auth/ endpoints. Created api-transform.interceptor.spec.ts with 12 TDD tests verifying auth skip, non-auth conversion, response conversion, and edge cases. All 12 tests pass.",
+        "completed_at": "2026-04-30T14:20:05.723Z"
+      }
+    },
+    "cg_ses_1777558614312": {
+      "session_id": "cg_ses_1777558614312",
+      "created_at": "2026-04-30T14:16:54.312Z",
+      "task_description": "Write RED tests first for api-transform.interceptor.ts - verify auth endpoint fix for snake_case conversion skip on /auth/ URLs. Task: 1) Write failing RED tests for interceptor behavior (non-auth body converted, auth body NOT converted, response always camelCased), 2) Confirm GREEN passes since fix is already applied, 3) Run tests and report results.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Write tests for api-transform.interceptor.ts: 6 test cases covering auth URL skip logic, non-auth snake_case conversion, response camelCase conversion. RED tests first, GREEN pass since fix applied. Generate TASK_LOG.md, test_report.json, HANDOVER.md.",
+      "confirmed_at": "2026-04-30T14:17:35.574Z",
+      "consumed_at": "2026-04-30T14:19:18.731Z",
+      "audit": {
+        "execution_summary": "Created api-transform.interceptor.spec.ts with 12 tests: 7 request body transformation tests (non-auth→snake_case, auth→preserve camelCase, PII skip, FormData passthrough, nested objects) and 5 response body transformation tests (snake_case→camelCase, nested, arrays, auth endpoint response, null). All 12 tests passed. Files: TASK_LOG.md, test_report.json, HANDOVER.md generated.",
+        "completed_at": "2026-04-30T14:19:18.731Z"
+      }
+    },
+    "cg_ses_1777561799797": {
+      "session_id": "cg_ses_1777561799797",
+      "created_at": "2026-04-30T15:09:59.797Z",
+      "task_description": "Update booking system requirements documents to reflect CUSTOMER-only access for /booking and /my-bookings, and create role.guard.ts",
+      "gate_status": "armed",
+      "last_check_failed_items": [],
+      "plan_summary": "Update 5 requirement documents to align role separation: contract.yaml auth, security arch RBAC, customer/admin UI specs. Create role.guard.ts and apply to booking/my-bookings routes.",
+      "confirmed_at": "2026-04-30T15:10:06.322Z",
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1777607240310": {
+      "session_id": "cg_ses_1777607240310",
+      "created_at": "2026-05-01T03:47:20.310Z",
+      "task_description": "Create RouteResolver service to centralize role-based route management, replace scattered getPostLoginRoute logic in login/register components and guest guard, with TDD",
+      "gate_status": "armed",
+      "last_check_failed_items": [],
+      "plan_summary": "Create core/services/route-resolver.service.ts with static getPostLoginRoute(role), write 7 TDD tests (RED→GREEN→REFACTOR), then replace scattered getPostLoginRoute in login.component.ts, register.component.ts, and guest.guard.ts with centralized RouteResolver calls.",
+      "confirmed_at": "2026-05-01T03:47:27.869Z",
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1777607416579": {
+      "session_id": "cg_ses_1777607416579",
+      "created_at": "2026-05-01T03:50:16.579Z",
+      "task_description": "Centralize route management with RouteResolver service, add profile fetch after token refresh in authInterceptor, and replace scattered getPostLoginRoute in login/register/guestGuard",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Phase A: Create RouteResolver service + 7 unit tests. Phase B: Add fetchUserProfile() after token refresh in auth.interceptor.ts + 3 tests. Phase C: Replace scattered getPostLoginRoute in login.component.ts, register.component.ts, guest.guard.ts with RouteResolver call. TDD: RED tests first, then GREEN implementation, then REFACTOR.",
+      "confirmed_at": "2026-05-01T03:50:21.911Z",
+      "consumed_at": "2026-05-01T04:20:09.281Z",
+      "audit": {
+        "execution_summary": "Executed 3-phase route management centralization via dispatched Coder-FE: Phase A — RouteResolver service created (ROLE_HOME map, getPostLoginRoute) + 7 tests. Phase B — fetchUserProfile() added after token refresh in auth.interceptor + 2 tests. Phase C — login.component.ts, register.component.ts, guest.guard.ts all now use RouteResolver instead of inline logic. All 12 new tests pass. Build passes.",
+        "completed_at": "2026-05-01T04:20:09.281Z"
+      }
+    },
+    "cg_ses_1777607544557": {
+      "session_id": "cg_ses_1777607544557",
+      "created_at": "2026-05-01T03:52:24.557Z",
+      "task_description": "Coder-FE: Execute 3-phase plan to centralize route management in Booking System frontend. Phase A: Create RouteResolver service with static method getPostLoginRoute(role). Phase B: Add fetchUserProfile after token refresh in auth interceptor. Phase C: Replace scattered getDefaultRoute calls in login, register, and guest guard with RouteResolver.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Route management centralization: Create RouteResolver service (Phase A RED tests 1st), add fetchUserProfile after token refresh in auth interceptor (Phase B RED tests 1st), replace getDefaultRoute with RouteResolver in login/register/guest guard (Phase C). Full TDD cycle.",
+      "confirmed_at": "2026-05-01T03:52:39.240Z",
+      "consumed_at": "2026-05-01T04:19:32.776Z",
+      "audit": {
+        "execution_summary": "Phase A: Created RouteResolver service (7 tests). Phase B: Added fire-and-forget fetchUserProfile after token refresh in auth interceptor (5 tests). Phase C: Replaced getDefaultRoute with RouteResolver in login/register/guest-guard. All 12 tests pass, build succeeds.",
+        "completed_at": "2026-05-01T04:19:32.776Z"
+      }
+    },
+    "cg_ses_1777615224368": {
+      "session_id": "cg_ses_1777615224368",
+      "created_at": "2026-05-01T06:00:24.369Z",
+      "task_description": "Fix double-wrapped response in users.controller.ts + fix frontend field name mismatches (role/userType, created_at/createdAt) across 5 frontend files. Execute with TDD.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix double-wrapped response: Backend - users.controller.ts remove manual envelope, let ResponseInterceptor handle single wrap. Frontend - fix role→userType, created_at→createdAt in api.service.ts, auth.store.ts, login.component.ts, register.component.ts. TDD RED→GREEN for both phases.",
+      "confirmed_at": "2026-05-01T06:00:35.877Z",
+      "consumed_at": "2026-05-01T06:12:46.333Z",
+      "audit": {
+        "execution_summary": "Backend: users.controller.ts getProfile() now returns raw profile instead of manual envelope. ResponseInterceptor handles single wrapping. 25/25 controller tests pass. Frontend: role→userType, created_at→createdAt fixed across 13 files (api.service.ts, auth.store.ts, login.component.ts, register.component.ts, profile.component.ts, guest.guard.ts, role.guard.ts, routing.config.ts, and 4 spec files). 57 related tests pass. Build passes.",
+        "completed_at": "2026-05-01T06:12:46.333Z"
+      }
+    },
+    "cg_ses_1777615296894": {
+      "session_id": "cg_ses_1777615296894",
+      "created_at": "2026-05-01T06:01:36.894Z",
+      "task_description": "Fix frontend field name mismatches between backend API (GET /v1/users/profile returns { userType, createdAt }) and frontend code (reads profile.role and profile.created_at). Modify 5 source files + 4 test files using TDD approach (RED first, then GREEN). Verify with npm run build.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix role->userType, created_at->createdAt across 5 frontend files using TDD (RED->GREEN). Build verification.",
+      "confirmed_at": "2026-05-01T06:02:54.412Z",
+      "consumed_at": "2026-05-01T06:11:50.026Z",
+      "audit": {
+        "execution_summary": "TDD cycle completed: RED (wrote failing tests for userType/createdAt) → GREEN (fixed role→userType, created_at→createdAt across 10 source files + 5 test files). Build passes. Key test suites pass (57 tests). Pre-existing test failures unrelated to changes.",
+        "completed_at": "2026-05-01T06:11:50.026Z"
+      }
+    },
+    "cg_ses_1777615307734": {
+      "session_id": "cg_ses_1777615307734",
+      "created_at": "2026-05-01T06:01:47.734Z",
+      "task_description": "Fix double-wrapped API response in users.controller.ts:getProfile(). The ResponseInterceptor already wraps all controller returns with an envelope, but getProfile() additionally returns a manual envelope causing double-wrapping. TDD approach: write RED test first (expecting single-wrap), then fix the controller to return raw profile object, run GREEN test. Verify contract.yaml authorization rules. Run backend tests to confirm no regressions.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix double-wrapped API response in users.controller.ts getProfile(): TDD RED (update test for raw return) → GREEN (fix controller) → verify tests pass → generate HANDOVER.md and test_report.json",
+      "confirmed_at": "2026-05-01T06:02:56.308Z",
+      "consumed_at": "2026-05-01T06:05:22.579Z",
+      "audit": {
+        "execution_summary": "Fixed double-wrapped API response in users.controller.ts:getProfile(). TDD executed: RED phase updated test to expect raw profile (confirmed test failed with double-wrap), GREEN phase removed manual envelope return (all 25 users.controller tests pass, full suite shows no regressions from our change). Contract.yaml authorization verified (read-only). Generated TASK_LOG.md, HANDOVER.md, test_report.json.",
+        "completed_at": "2026-05-01T06:05:22.579Z"
+      }
     }
   }
 }

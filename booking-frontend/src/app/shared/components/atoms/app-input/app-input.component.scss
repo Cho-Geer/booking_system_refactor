@@ -1,2 +1,19 @@
 /* AppInput - Atomic component wrapper for PrimeNG p-inputtext */
-/* Styling is handled via Tailwind and PrimeNG theme configuration */
+
+/* Glass input variant with focus glow effect */
+.glass-input {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 12px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  outline: none;
+}
+
+.glass-input:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2), 0 4px 12px rgba(102, 126, 234, 0.1);
+}
+
+.glass-input:hover:not(:focus) {
+  border-color: rgba(102, 126, 234, 0.3);
+}

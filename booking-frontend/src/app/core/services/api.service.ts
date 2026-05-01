@@ -14,7 +14,7 @@ import {
   LoginSendCodeResponse,
   LogoutResponse,
 } from '../../features/auth/dto/auth.dto';
-import { Service, TimeSlot, ReservationResponse } from '../../shared/dto';
+import { Service, TimeSlot, ReservationResponse, BookingListItem } from '../../shared/dto';
 
 /**
  * Standard API response envelope as produced by the backend ResponseInterceptor.
@@ -145,12 +145,37 @@ export class ApiService {
    */
   createAppointment(dto: {
     timeSlotId: string;
+    serviceId: string;
     appointmentDate: string;
+    preferredSequence: number;
+    customerInfo?: Record<string, unknown>;
     notes?: string;
   }): Observable<ReservationResponse> {
     return this.http
       .post<ReservationResponse>(`${this.apiUrl}/appointments`, dto)
       .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Get user's appointments list
+   * GET /v1/appointments
+   */
+  getMyAppointments(query?: {
+    startDate?: string;
+    endDate?: string;
+    status?: string;
+  }): Observable<BookingListItem[]> {
+    let params = new HttpParams();
+    if (query?.startDate) params = params.set('startDate', query.startDate);
+    if (query?.endDate) params = params.set('endDate', query.endDate);
+    if (query?.status) params = params.set('status', query.status);
+
+    return this.http
+      .get<ApiResponse<BookingListItem[]>>(`${this.apiUrl}/appointments`, { params })
+      .pipe(
+        map(response => response.data),
+        catchError(this.handleError)
+      );
   }
 
   getAvailableSlots(serviceId: string): Observable<TimeSlot[]> {
@@ -197,8 +222,8 @@ export class ApiService {
     name: string;
     email?: string; // masked value like "us***@example.com"
     phone?: string; // masked value like "138****5678"
-    role: string;
-    created_at: string;
+    userType: string;
+    createdAt: string;
   }> {
     return this.http
       .get<ApiResponse<{
@@ -206,9 +231,22 @@ export class ApiService {
         name: string;
         email?: string;
         phone?: string;
-        role: string;
-        created_at: string;
+        userType: string;
+        createdAt: string;
       }>>(`${this.apiUrl}/users/profile`)
+      .pipe(
+        map(response => response.data),
+        catchError(this.handleError)
+      );
+  }
+
+  /**
+   * Update user profile
+   * PUT /v1/users/profile
+   */
+  updateProfile(dto: { name?: string }): Observable<{ user: { id: string; name: string; email?: string; phone?: string; userType: string; createdAt?: string } }> {
+    return this.http
+      .put<ApiResponse<{ user: { id: string; name: string; email?: string; phone?: string; userType: string; createdAt?: string } }>>(`${this.apiUrl}/users/profile`, dto)
       .pipe(
         map(response => response.data),
         catchError(this.handleError)

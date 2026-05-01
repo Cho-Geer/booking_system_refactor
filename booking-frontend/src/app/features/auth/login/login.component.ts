@@ -8,6 +8,7 @@ import { Router, RouterModule } from '@angular/router';
 import { AuthStore } from '../../../stores/auth/auth.store';
 import { ApiService } from '../../../core/services/api.service';
 import { SocketService } from '../../../core/services/socket.service';
+import { RouteResolver } from '../../../core/services/route-resolver.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -102,20 +103,20 @@ export class LoginComponent implements OnDestroy {
             this.authStore.setUserProfile({
               id: profile.id,
               name: profile.name,
-              role: profile.role,
+              userType: profile.userType,
               email: profile.email,
               phone: profile.phone,
-              createdAt: profile.created_at,
+              createdAt: profile.createdAt,
             });
 
-            // Connect socket and redirect
+            // Connect socket and redirect by role
             this.socketService.connect();
-            this.router.navigate(['/booking']);
+            this.router.navigate([RouteResolver.getPostLoginRoute(profile.userType)]);
           },
           error: () => {
-            // Even if profile fetch fails, user is logged in
+            // Even if profile fetch fails, redirect to default (auth guard handles fallback)
             this.socketService.connect();
-            this.router.navigate(['/booking']);
+            this.router.navigate(['/']);
           },
         });
       },
@@ -187,20 +188,20 @@ export class LoginComponent implements OnDestroy {
             this.authStore.setUserProfile({
               id: profile.id,
               name: profile.name,
-              role: profile.role,
+              userType: profile.userType,
               email: profile.email,
               phone: profile.phone,
-              createdAt: profile.created_at,
+              createdAt: profile.createdAt,
             });
 
-            // Connect socket and redirect
+            // Connect socket and redirect by role
             this.socketService.connect();
-            this.router.navigate(['/booking']);
+            this.router.navigate([RouteResolver.getPostLoginRoute(profile.userType)]);
           },
           error: () => {
-            // Even if profile fetch fails, user is logged in
+            // Even if profile fetch fails, redirect to default (auth guard handles fallback)
             this.socketService.connect();
-            this.router.navigate(['/booking']);
+            this.router.navigate(['/']);
           },
         });
       },

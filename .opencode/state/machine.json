@@ -4,7 +4,7 @@
     "version": "2.1.0",
     "project": "appointment-booking-system",
     "description": "强制校验契约哈希 + 任务生命周期证据链。涉及角色：@Architect(定义), @Coder-BE(实现), @Coder-FE(适配), @Guardian(审查), @Orchestrator(调度)。",
-    "lastUpdated": "2026-04-29T05:23:48.918Z"
+    "lastUpdated": "2026-05-01T09:15:20.764Z"
   },
   "currentTask": {
     "id": "BUG-009",
@@ -15,8 +15,8 @@
   "contracts": {
     "backend-api": {
       "file": "contract.yaml",
-      "hash": "sha256-860d6c67f55df3ffa8109e8ceab5072a5f9dd2d0de0373df267f856ec54e7356",
-      "lastValidated": "2026-04-29T05:23:48.918Z",
+      "hash": "sha256-0502aaa61e0ed1e5140da45beef46cd52ec9e701a66d9aab08339437fd5b8bd1",
+      "lastValidated": "2026-05-01T09:15:20.764Z",
       "owner": "@Architect"
     },
     "prisma-schema": {
@@ -27,8 +27,8 @@
     },
     "frontend-dto": {
       "file": "booking-frontend/src/app/shared/dto/",
-      "hash": "sha256-f05041e0d2634acb513ccd7e0a47ce876ccb7bf3e60a175e006224b58411ee94",
-      "lastValidated": "2026-04-20T20:43:58.083Z",
+      "hash": "sha256-64117d14d17fa033e9b4fb187659bce6e313b5a548ef20e6698fc752563f925f",
+      "lastValidated": "2026-05-01T09:15:20.764Z",
       "owner": "@Coder-FE",
       "description": "前端类型定义，须与 backend-api 一致"
     },
@@ -419,6 +419,20 @@
       "action": "HASH_UPDATE",
       "target": "prisma-schema",
       "details": "Hash updated from sha256-94d9022d97ac6... to sha256-b21af8c449996..."
+    },
+    {
+      "timestamp": "2026-05-01T09:15:20.764Z",
+      "agent": "@Orchestrator",
+      "action": "HASH_UPDATE",
+      "target": "backend-api",
+      "details": "Hash updated from sha256-860d6c67f55df... to sha256-0502aaa61e0ed..."
+    },
+    {
+      "timestamp": "2026-05-01T09:15:20.764Z",
+      "agent": "@Orchestrator",
+      "action": "HASH_UPDATE",
+      "target": "frontend-dto",
+      "details": "Hash updated from sha256-f05041e0d2634... to sha256-64117d14d17fa..."
     }
   ]
 }

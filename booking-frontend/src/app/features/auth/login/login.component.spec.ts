@@ -22,7 +22,7 @@ describe('LoginComponent', () => {
     id: '1',
     email: 'test@example.com',
     name: 'Test User',
-    role: 'user',
+    userType: 'user',
   };
 
   const mockLoginResponse = {

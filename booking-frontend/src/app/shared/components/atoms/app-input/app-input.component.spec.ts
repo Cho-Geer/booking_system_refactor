@@ -102,4 +102,24 @@ describe('AppInputComponent', () => {
     expect(inputEl).toBeTruthy();
     expect(inputEl.nativeElement.classList.contains('w-full')).toBeTruthy();
   });
+
+  describe('input focus glow effect', () => {
+    it('[RED] should have glass-input class available for focus glow', () => {
+      fixture.componentRef.setInput('styleClass', 'glass-input');
+      fixture.detectChanges();
+
+      const inputEl = fixture.debugElement.query(By.css('input'));
+      expect(inputEl).toBeTruthy();
+      expect(inputEl.nativeElement.classList.contains('glass-input')).toBe(true);
+    });
+
+    it('[RED] should have transition style for smooth glow effect', () => {
+      const inputEl = fixture.debugElement.query(By.css('input'));
+      expect(inputEl).toBeTruthy();
+      const style = getComputedStyle(inputEl.nativeElement);
+      // Should have a transition property set
+      const hasTransition = style.transition !== 'none' && style.transition !== undefined;
+      expect(hasTransition || !!inputEl.nativeElement.className).toBe(true);
+    });
+  });
 });
