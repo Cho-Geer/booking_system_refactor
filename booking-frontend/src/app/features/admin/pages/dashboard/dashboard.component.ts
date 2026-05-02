@@ -96,6 +96,16 @@ export class DashboardComponent implements OnInit {
     },
   ]);
 
+  readonly hasBookingTrendData = computed(() => {
+    const trend = this.vm().stats?.bookingTrend;
+    return trend && trend.length > 0;
+  });
+
+  readonly hasServicePopularityData = computed(() => {
+    const pop = this.vm().stats?.servicePopularity;
+    return pop && pop.length > 0;
+  });
+
   readonly bookingTrendChartData = computed<ChartData>(() => {
     const trend = this.vm().stats?.bookingTrend ?? [];
     return {

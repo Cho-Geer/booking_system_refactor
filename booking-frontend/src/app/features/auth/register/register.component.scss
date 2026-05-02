@@ -1,71 +1,14 @@
 @use '../auth-form';
 
-.register-container {
-  @extend %auth-container;
-  background: var(--background-gradient, #f0f2f5);
-}
-
-.register-card {
-  @extend %auth-card;
-  background: var(--card-background, #ffffff);
-  border-radius: 16px;
-  padding: 2.5rem;
-  max-width: 480px;
-}
-
-@media (max-width: 640px) {
-  .register-card {
-    padding: 1.25rem;
-    border-radius: 12px;
-  }
+.register-page {
+  // Container styles from auth-form
 }
 
 h2 {
-  margin: 0 0 0.5rem;
-  color: var(--text-primary, #333);
-  font-size: 1.75rem;
-  font-weight: 600;
-}
-
-@media (max-width: 480px) {
-  h2 {
-    font-size: 1.5rem;
-  }
-}
-
-.login-link {
-  color: var(--text-secondary, #666);
-  font-size: 0.9rem;
-  margin-bottom: 1.5rem;
-
-  a {
-    color: var(--primary-color, #667eea);
-    text-decoration: none;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-}
-
-.password-requirements-placeholder {
-  margin-top: 0.75rem;
-  padding: 0.5rem 0;
-  min-height: 1.5rem;
-
-  .placeholder-text {
-    color: var(--text-secondary, #999);
-    font-size: 0.8rem;
-    font-style: italic;
-  }
+  margin: 0;
 }
 
 .password-requirements {
-  margin-top: 0.75rem;
-  padding: 0;
-  background-color: transparent;
-  border: none;
-
   ul {
     list-style: none;
     padding: 0;
@@ -95,10 +38,6 @@ h2 {
         border-radius: 3px;
         position: relative;
         transition: all 0.15s ease;
-        vertical-align: middle;
-        display: inline-grid;
-        align-content: center;
-        box-sizing: border-box;
         background-color: #d9d9d9;
 
         &:checked {
@@ -115,5 +54,45 @@ h2 {
         font-weight: 500;
       }
     }
+  }
+}
+
+[data-theme="dark"] .register-page {
+  .step-indicator {
+    .step-label {
+      color: #A0A8B0;
+    }
+    .step-number {
+      background: #272E3B;
+      border-color: #4E5969;
+      color: #A0A8B0;
+
+      &.active {
+        background: #667eea;
+        color: #ffffff;
+      }
+    }
+    .step-connector {
+      background: #4E5969;
+
+      &.completed {
+        background: #667eea;
+      }
+    }
+  }
+
+  .type-btn {
+    background: #272E3B;
+    border-color: #4E5969;
+    color: #A0A8B0;
+
+    &.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #ffffff;
+    }
+  }
+
+  label {
+    color: #A0A8B0;
   }
 }

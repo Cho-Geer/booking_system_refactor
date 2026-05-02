@@ -1,5 +1,35 @@
 :host {
   display: block;
+  width: 100%;
+}
+
+/* Stats cards container */
+.stats-grid {
+  width: 100%;
+}
+
+/* Chart containers */
+.chart-container {
+  min-height: 300px;
+}
+
+/* Table styling */
+.recent-bookings-table {
+  th {
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  td {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--color-border-light);
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
 }
 
 /* Admin dashboard card hover micro-interactions */

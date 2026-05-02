@@ -1,14 +1,7 @@
 @use '../auth-form';
 
-.login-container {
-  @extend %auth-container;
-  background-color: var(--background-light, #f5f5f5);
-}
-
-.login-card {
-  @extend %auth-card;
-  background: var(--background-color, #fff);
-  border: 1px solid var(--border-color, #e0e0e0);
+.login-page {
+  // Container styles come from auth-form and tailwind
 }
 
 .tabs {
@@ -28,10 +21,10 @@
   cursor: pointer;
   position: relative;
   transition: color 0.2s ease;
-  min-height: 44px; /* WCAG touch target */
+  min-height: 44px;
 
   &.active {
-    color: var(--primary-color, #1976d2);
+    color: var(--color-primary, #667eea);
 
     &::after {
       content: '';
@@ -40,16 +33,15 @@
       left: 0;
       right: 0;
       height: 2px;
-      background-color: var(--primary-color, #1976d2);
+      background-color: var(--color-primary, #667eea);
     }
   }
 
   &:hover {
-    color: var(--primary-color, #1976d2);
+    color: var(--color-primary, #667eea);
   }
 }
 
-/* Responsive tabs - allow wrapping on very small screens */
 @media (max-width: 480px) {
   .tabs {
     gap: 1rem;
@@ -59,31 +51,6 @@
     font-size: 0.9rem;
     padding: 0.6rem 0;
   }
-
-  .login-card {
-    padding: 1.25rem;
-  }
-}
-
-.email-description {
-  color: var(--text-secondary, #666);
-  font-size: 0.85rem;
-  margin-bottom: 1rem;
-}
-
-.cant-get-code {
-  text-align: left;
-  margin-top: 0.25rem;
-
-  a {
-    color: var(--primary-color, #1976d2);
-    font-size: 0.85rem;
-    text-decoration: none;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
 }
 
 .footer-links {
@@ -92,11 +59,43 @@
 }
 
 .register-link {
-  color: var(--primary-color, #1976d2);
+  color: var(--color-primary, #667eea);
   text-decoration: none;
   font-size: 0.9rem;
 
   &:hover {
     text-decoration: underline;
+  }
+}
+
+[data-theme="dark"] .login-page {
+  .tab-button {
+    color: #A0A8B0;
+    border-bottom-color: #4E5969;
+
+    &.active {
+      color: #F2F3F5;
+      border-bottom-color: #667eea;
+    }
+  }
+
+  .type-btn {
+    background: #272E3B;
+    border-color: #4E5969;
+    color: #A0A8B0;
+
+    &.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #ffffff;
+      border-color: transparent;
+    }
+  }
+
+  label {
+    color: #A0A8B0;
+  }
+
+  .terms-text {
+    color: #A0A8B0;
   }
 }

@@ -1,14 +1,16 @@
-<div class="register-container min-h-screen w-full">
-  <div class="register-card w-full">
-    <h2>欢迎注册</h2>
-
-    <div class="login-link">
-      已有账号? <a routerLink="/auth/login">登录</a>
-    </div>
+<div class="register-page min-h-screen w-full gradient-page-bg flex items-center justify-center px-4 py-8">
+  <div class="max-w-[480px] w-full">
+    <app-card variant="glass" styleClass="w-full">
+      <div class="p-6 lg:p-8">
+    <h2 class="text-2xl font-bold mb-1 gradient-text">欢迎注册</h2>
+    <p class="text-sm text-gray-500 mb-4">
+      已有账号?
+      <a routerLink="/auth/login" class="text-primary-start hover:underline">登录</a>
+    </p>
 
     @if (error()) {
-      <div class="error-message global-error">
-        <p>{{ error() }}</p>
+      <div class="glass-level-1 p-4 mb-4 border-l-4 border-red-500">
+        <p class="text-sm text-red-600">{{ error() }}</p>
       </div>
     }
 
@@ -37,26 +39,27 @@
               [class.active]="contactType() === ContactType.EMAIL"
               (click)="contactType.set(ContactType.EMAIL)"
             >
-               邮箱
-             </button>
-             <button
-               type="button"
-               class="type-btn min-touch-target"
-               [class.active]="contactType() === ContactType.PHONE"
-               (click)="contactType.set(ContactType.PHONE)"
+              邮箱
+            </button>
+            <button
+              type="button"
+              class="type-btn min-touch-target"
+              [class.active]="contactType() === ContactType.PHONE"
+              (click)="contactType.set(ContactType.PHONE)"
             >
-               手机号
-             </button>
-           </div>
-         </div>
+              手机号
+            </button>
+          </div>
+        </div>
 
-         <div class="form-group">
-           <label for="contact">{{ contactType() === ContactType.EMAIL ? '邮箱' : '手机号' }}</label>
-           <input
-             id="contact"
-             [type]="contactType() === ContactType.EMAIL ? 'email' : 'tel'"
-             formControlName="contact"
-             [placeholder]="contactType() === ContactType.EMAIL ? 'Enter your email' : 'Enter your phone number'"
+        <div class="form-group">
+          <label for="contact">{{ contactType() === ContactType.EMAIL ? '邮箱' : '手机号' }}</label>
+          <input
+            id="contact"
+            class="glass-input"
+            [type]="contactType() === ContactType.EMAIL ? 'email' : 'tel'"
+            formControlName="contact"
+            [placeholder]="contactType() === ContactType.EMAIL ? 'Enter your email' : 'Enter your phone number'"
             [class.error]="isStep1FieldInvalid('contact')"
           />
           @if (isStep1FieldInvalid('contact')) {
@@ -64,24 +67,18 @@
               @if (step1Form.get('contact')?.errors?.['required']) {
                 <span>{{ contactType() === ContactType.EMAIL ? 'Email is required' : 'Phone number is required' }}</span>
               }
-              @if (step1Form.get('contact')?.errors?.['email']) {
-                <span>Please enter a valid email address</span>
-              }
             </div>
           }
         </div>
 
-        <button
+        <app-button
           type="submit"
-          class="btn-primary w-full min-touch-target"
+          label="发送验证码"
+          variant="primary"
+          class="w-full"
           [disabled]="step1Form.invalid || isLoading()"
-        >
-          @if (isLoading()) {
-            <span>发送中...</span>
-          } @else {
-            <span>发送验证码</span>
-          }
-        </button>
+          [loading]="isLoading()"
+        />
       </form>
     }
 
@@ -93,6 +90,7 @@
           <div class="verify-input-wrapper">
             <input
               id="code"
+              class="glass-input"
               type="text"
               inputmode="numeric"
               pattern="\d{6}"
@@ -125,6 +123,7 @@
           <label for="name">姓名</label>
           <input
             id="name"
+            class="glass-input"
             type="text"
             formControlName="name"
             placeholder="Enter your name"
@@ -146,6 +145,7 @@
           <label for="password">密码</label>
           <input
             id="password"
+            class="glass-input"
             type="password"
             formControlName="password"
             placeholder="Set login password"
@@ -164,6 +164,7 @@
           <label for="confirmPassword">确认密码</label>
           <input
             id="confirmPassword"
+            class="glass-input"
             type="password"
             formControlName="confirmPassword"
             placeholder="Confirm your password"
@@ -181,36 +182,31 @@
           }
         </div>
 
-        @defer {
-          <div class="password-requirements">
-            <ul>
-              <li [class.valid]="passwordRequirements.hasMinLength">
-                <input type="checkbox" [attr.checked]="passwordRequirements.hasMinLength ? '' : null" disabled />
-                <span>至少 8 个字符</span>
-              </li>
-              <li [class.valid]="passwordRequirements.hasUpperCase">
-                <input type="checkbox" [attr.checked]="passwordRequirements.hasUpperCase ? '' : null" disabled />
-                <span>至少一个大写字母 (A-Z)</span>
-              </li>
-              <li [class.valid]="passwordRequirements.hasLowerCase">
-                <input type="checkbox" [attr.checked]="passwordRequirements.hasLowerCase ? '' : null" disabled />
-                <span>至少一个小写字母 (a-z)</span>
-              </li>
-              <li [class.valid]="passwordRequirements.hasNumber">
-                <input type="checkbox" [attr.checked]="passwordRequirements.hasNumber ? '' : null" disabled />
-                <span>至少一个数字 (0-9)</span>
-              </li>
-              <li [class.valid]="passwordRequirements.hasSpecialChar">
-                <input type="checkbox" [attr.checked]="passwordRequirements.hasSpecialChar ? '' : null" disabled />
-                <span>至少一个特殊字符 (@$!%?&)</span>
-              </li>
-            </ul>
-          </div>
-        } @placeholder {
-          <div class="password-requirements-placeholder">
-            <span class="placeholder-text">Password requirements will appear as you type...</span>
-          </div>
-        }
+        <!-- Password Requirements Checklist -->
+        <div class="password-requirements mb-4">
+          <ul>
+            <li [class.valid]="passwordRequirements.hasMinLength">
+              <input type="checkbox" [attr.checked]="passwordRequirements.hasMinLength ? '' : null" disabled />
+              <span>至少 8 个字符</span>
+            </li>
+            <li [class.valid]="passwordRequirements.hasUpperCase">
+              <input type="checkbox" [attr.checked]="passwordRequirements.hasUpperCase ? '' : null" disabled />
+              <span>至少一个大写字母 (A-Z)</span>
+            </li>
+            <li [class.valid]="passwordRequirements.hasLowerCase">
+              <input type="checkbox" [attr.checked]="passwordRequirements.hasLowerCase ? '' : null" disabled />
+              <span>至少一个小写字母 (a-z)</span>
+            </li>
+            <li [class.valid]="passwordRequirements.hasNumber">
+              <input type="checkbox" [attr.checked]="passwordRequirements.hasNumber ? '' : null" disabled />
+              <span>至少一个数字 (0-9)</span>
+            </li>
+            <li [class.valid]="passwordRequirements.hasSpecialChar">
+              <input type="checkbox" [attr.checked]="passwordRequirements.hasSpecialChar ? '' : null" disabled />
+              <span>至少一个特殊字符 (@$!%?&)</span>
+            </li>
+          </ul>
+        </div>
 
         <div class="terms-checkbox">
           <label>
@@ -231,23 +227,24 @@
         </div>
 
         <div class="step-actions">
-          <button type="button" class="btn-secondary min-touch-target w-full sm:w-auto" (click)="goToStep1()">
-            返回
-          </button>
-          <button
+          <app-button
+            label="返回"
+            variant="secondary"
+            class="w-full sm:w-auto"
+            (onClick)="goToStep1()"
+          />
+          <app-button
             type="submit"
-            class="btn-primary min-touch-target w-full sm:w-auto"
+            label="完成注册"
+            variant="primary"
+            class="w-full sm:w-auto"
             [disabled]="step2Form.invalid || isLoading() || !acceptTerms()"
-            aria-label="Complete registration"
-          >
-            @if (isLoading()) {
-              <span>注册中...</span>
-            } @else {
-              <span>完成注册</span>
-            }
-          </button>
+            [loading]="isLoading()"
+          />
         </div>
       </form>
     }
+      </div>
+  </app-card>
   </div>
 </div>

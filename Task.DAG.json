@@ -31,6 +31,14 @@
       "status": "completed",
       "dependencies": ["LAYOUT-REDESIGN"],
       "assignee": "@Coder-FE"
+    },
+    {
+      "id": "ADMIN-DASHBOARD-FIX",
+      "name": "Fix Admin Dashboard Layout and Charts",
+      "description": "Fix stats cards grid layout, add chart empty states, improve table styling, and adjust admin content width.",
+      "status": "completed",
+      "dependencies": ["ADMIN-DASHBOARD-REDESIGN"],
+      "assignee": "@Coder-FE"
     }
   ]
 }

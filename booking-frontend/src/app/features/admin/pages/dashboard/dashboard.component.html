@@ -25,7 +25,7 @@
 
   @if (!vm().isLoading && vm().stats) {
     <!-- Stats Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 w-full stats-grid">
       <!-- Total Bookings -->
       <app-card variant="elevated" styleClass="app-dashboard-card-hover">
         <div class="flex items-center gap-4 p-2">
@@ -98,20 +98,34 @@
     <!-- Charts Section -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
       <app-card header="Booking Trend (Last 7 Days)" variant="elevated">
-        <app-chart
-          type="line"
-          [data]="bookingTrendChartData()"
-          [options]="bookingTrendChartOptions"
-          height="300px"
-        ></app-chart>
+        @if (hasBookingTrendData()) {
+          <app-chart
+            type="line"
+            [data]="bookingTrendChartData()"
+            [options]="bookingTrendChartOptions"
+            height="300px"
+          ></app-chart>
+        } @else {
+          <div class="flex flex-col items-center justify-center py-12 text-text-secondary chart-container">
+            <i class="pi pi-chart-line text-4xl mb-4 opacity-50"></i>
+            <p>No booking data available</p>
+          </div>
+        }
       </app-card>
 
       <app-card header="Service Popularity" variant="elevated">
-        <app-chart
-          type="doughnut"
-          [data]="servicePopularityChartData()"
-          height="300px"
-        ></app-chart>
+        @if (hasServicePopularityData()) {
+          <app-chart
+            type="doughnut"
+            [data]="servicePopularityChartData()"
+            height="300px"
+          ></app-chart>
+        } @else {
+          <div class="flex flex-col items-center justify-center py-12 text-text-secondary chart-container">
+            <i class="pi pi-chart-pie text-4xl mb-4 opacity-50"></i>
+            <p>No service data available</p>
+          </div>
+        }
       </app-card>
     </div>
 

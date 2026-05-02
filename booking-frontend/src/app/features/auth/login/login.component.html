@@ -1,5 +1,8 @@
-<div class="login-container min-h-screen w-full">
-  <div class="login-card w-full">
+<div class="login-page min-h-screen w-full gradient-page-bg flex items-center justify-center px-4 py-8">
+  <div class="max-w-[450px] w-full">
+    <app-card variant="glass" styleClass="w-full">
+      <div class="p-6 lg:p-8">
+    <!-- Tabs -->
     <div class="tabs">
       <button
         type="button"
@@ -7,21 +10,22 @@
         [class.active]="activeTab() === 'password'"
         (click)="switchTab('password')"
       >
-         密码登录
-       </button>
-       <button
-         type="button"
-         class="tab-button w-full"
-         [class.active]="activeTab() === 'code'"
-         (click)="switchTab('code')"
+        密码登录
+      </button>
+      <button
+        type="button"
+        class="tab-button w-full"
+        [class.active]="activeTab() === 'code'"
+        (click)="switchTab('code')"
       >
         验证码登录
       </button>
     </div>
 
+    <!-- Error -->
     @if (error()) {
-      <div class="error-message global-error">
-        <p>{{ error() }}</p>
+      <div class="glass-level-1 p-4 mb-4 border-l-4 border-red-500">
+        <p class="text-sm text-red-600">{{ error() }}</p>
       </div>
     }
 
@@ -35,33 +39,42 @@
               type="button"
               class="type-btn min-touch-target"
               [class.active]="contactType() === ContactType.EMAIL"
-              (click)="contactType.set(ContactType.EMAIL)"
+              (click)="setContactType(ContactType.EMAIL)"
             >
-               邮箱
-             </button>
-             <button
-               type="button"
-               class="type-btn min-touch-target"
-               [class.active]="contactType() === ContactType.PHONE"
-               (click)="contactType.set(ContactType.PHONE)"
+              邮箱
+            </button>
+            <button
+              type="button"
+              class="type-btn min-touch-target"
+              [class.active]="contactType() === ContactType.PHONE"
+              (click)="setContactType(ContactType.PHONE)"
             >
-               手机号
-             </button>
-           </div>
-         </div>
+              手机号
+            </button>
+          </div>
+        </div>
 
-         <div class="form-group">
-           <label for="password-contact">{{ contactType() === ContactType.EMAIL ? '邮箱' : '手机号' }}</label>
-           <input
-             id="password-contact"
-             [type]="contactType() === ContactType.EMAIL ? 'email' : 'tel'"
-             formControlName="contact"
-             [placeholder]="contactType() === ContactType.EMAIL ? 'Enter your email' : 'Enter your phone number'"
+        <div class="form-group">
+          <label for="password-contact">{{ contactType() === ContactType.EMAIL ? '邮箱' : '手机号' }}</label>
+          <input
+            id="password-contact"
+            class="glass-input"
+            [type]="contactType() === ContactType.EMAIL ? 'email' : 'tel'"
+            formControlName="contact"
+            [placeholder]="contactType() === ContactType.EMAIL ? 'Enter your email' : 'Enter your phone number'"
             [class.error]="isPasswordFieldInvalid('contact')"
           />
           @if (isPasswordFieldInvalid('contact')) {
             <div class="error-message">
-              <span>联系方式不能为空</span>
+              @if (passwordForm.get('contact')?.errors?.['required']) {
+                <span>联系方式不能为空</span>
+              }
+              @if (passwordForm.get('contact')?.errors?.['emailFormat']) {
+                <span>请输入有效的邮箱地址</span>
+              }
+              @if (passwordForm.get('contact')?.errors?.['phoneFormat']) {
+                <span>请输入有效的手机号</span>
+              }
             </div>
           }
         </div>
@@ -70,6 +83,7 @@
           <label for="password">密码</label>
           <input
             id="password"
+            class="glass-input"
             type="password"
             formControlName="password"
             placeholder="Enter your password"
@@ -80,12 +94,25 @@
               @if (passwordForm.get('password')?.errors?.['required']) {
                 <span>密码不能为空</span>
               }
-              @if (passwordForm.get('password')?.errors?.['minlength']) {
-                <span>密码至少8个字符</span>
+              @if (getPasswordStrengthError('isValidLength')) {
+                <span>密码至少需要8个字符</span>
+              }
+              @if (getPasswordStrengthError('hasUpperCase')) {
+                <span>需要至少一个大写字母</span>
+              }
+              @if (getPasswordStrengthError('hasLowerCase')) {
+                <span>需要至少一个小写字母</span>
+              }
+              @if (getPasswordStrengthError('hasNumber')) {
+                <span>需要至少一个数字</span>
+              }
+              @if (getPasswordStrengthError('hasSpecialChar')) {
+                <span>需要至少一个特殊字符 (@$!%*?&)</span>
               }
             </div>
           }
         </div>
+
         <div class="terms-checkbox">
           <label>
             <input
@@ -100,24 +127,21 @@
             <a routerLink="/legal/privacy" target="_blank">隐私政策</a>
           </label>
         </div>
-        <button
+
+        <app-button
           type="submit"
-          class="btn-primary w-full min-touch-target"
+          label="登录"
+          variant="primary"
+          class="w-full"
           [disabled]="passwordForm.invalid || isLoading() || !acceptTerms()"
-          aria-label="Submit password login"
-        >
-          @if (isLoading()) {
-            <span aria-hidden="true">登录中...</span>
-          } @else {
-            登录
-          }
-        </button>
+          [loading]="isLoading()"
+        />
       </form>
     }
 
     <!-- Code Login Form -->
     @if (activeTab() === 'code') {
-      <!-- Step Indicator for Code Login -->
+      <!-- Step Indicator -->
       <div class="step-indicator">
         <div class="step" [class.active]="codeLoginStep() === 1" [class.completed]="codeLoginStep() > 1">
           <span class="step-number">1</span>
@@ -130,6 +154,12 @@
         </div>
       </div>
 
+      @if (showAntiEnumMessage()) {
+        <div class="glass-level-1 p-3 mb-4 border-l-4 border-green-500">
+          <span class="text-sm text-green-700">如果该账号存在，验证码已发送至您的{{ contactType() === ContactType.EMAIL ? '邮箱' : '手机号' }}</span>
+        </div>
+      }
+
       <form [formGroup]="codeLoginForm" (ngSubmit)="onSubmit()">
         <!-- Step 1: Contact info -->
         @if (codeLoginStep() === 1) {
@@ -140,7 +170,7 @@
                 type="button"
                 class="type-btn min-touch-target"
                 [class.active]="contactType() === ContactType.EMAIL"
-                (click)="contactType.set(ContactType.EMAIL)"
+                (click)="setContactType(ContactType.EMAIL)"
               >
                 邮箱
               </button>
@@ -148,7 +178,7 @@
                 type="button"
                 class="type-btn min-touch-target"
                 [class.active]="contactType() === ContactType.PHONE"
-                (click)="contactType.set(ContactType.PHONE)"
+                (click)="setContactType(ContactType.PHONE)"
               >
                 手机号
               </button>
@@ -159,6 +189,7 @@
             <label for="code-contact">{{ contactType() === ContactType.EMAIL ? '邮箱' : '手机号' }}</label>
             <input
               id="code-contact"
+              class="glass-input"
               [type]="contactType() === ContactType.EMAIL ? 'email' : 'tel'"
               formControlName="contact"
               [placeholder]="contactType() === ContactType.EMAIL ? 'Enter your email' : 'Enter your phone number'"
@@ -166,7 +197,15 @@
             />
             @if (isCodeFieldInvalid('contact')) {
               <div class="error-message">
-                <span>联系方式不能为空</span>
+                @if (codeLoginForm.get('contact')?.errors?.['required']) {
+                  <span>联系方式不能为空</span>
+                }
+                @if (codeLoginForm.get('contact')?.errors?.['emailFormat']) {
+                  <span>请输入有效的邮箱地址</span>
+                }
+                @if (codeLoginForm.get('contact')?.errors?.['phoneFormat']) {
+                  <span>请输入有效的手机号</span>
+                }
               </div>
             }
           </div>
@@ -179,6 +218,7 @@
             <div class="verify-input-wrapper">
               <input
                 id="verify-code"
+                class="glass-input"
                 type="text"
                 inputmode="numeric"
                 pattern="\d{6}"
@@ -224,46 +264,42 @@
         </div>
 
         @if (codeLoginStep() === 1) {
-          <button
+          <app-button
             type="submit"
-            class="btn-primary w-full min-touch-target"
+            label="发送验证码"
+            variant="primary"
+            class="w-full"
             [disabled]="codeLoginForm.get('contact')?.invalid || isLoading() || !acceptTerms()"
-            aria-label="Send verification code"
-          >
-            @if (isLoading()) {
-              <span aria-hidden="true">发送中...</span>
-            } @else {
-              发送验证码
-            }
-          </button>
+            [loading]="isLoading()"
+          />
         }
 
         @if (codeLoginStep() === 2) {
           <div class="step-actions">
-            <button type="button" class="btn-secondary min-touch-target w-full sm:w-auto" (click)="codeLoginStep.set(1)">
-              返回
-            </button>
-            <button
+            <app-button
+              label="返回"
+              variant="secondary"
+              class="w-full sm:w-auto"
+              (onClick)="codeLoginStep.set(1)"
+            />
+            <app-button
               type="submit"
-              class="btn-primary min-touch-target w-full sm:w-auto"
+              label="登录"
+              variant="primary"
+              class="w-full sm:w-auto"
               [disabled]="codeLoginForm.invalid || isLoading() || !acceptTerms()"
-              aria-label="Verify code and login"
-            >
-          @if (isLoading()) {
-                <span aria-hidden="true">登录中...</span>
-              } @else {
-                登录
-              }
-            </button>
+              [loading]="isLoading()"
+            />
           </div>
         }
       </form>
     }
 
-    @defer {
-      <div class="footer-links">
-        <a routerLink="/auth/register" class="register-link">注册新账号</a>
+    <!-- Register Link -->
+    <div class="footer-links">
+      <a routerLink="/auth/register" class="register-link">注册新账号</a>
+    </div>
       </div>
-    }
+  </app-card>
   </div>
 </div>
