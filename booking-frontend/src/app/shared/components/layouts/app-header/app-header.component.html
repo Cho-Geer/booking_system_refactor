@@ -1,5 +1,6 @@
-<header class="fixed top-0 left-0 right-0 h-16 z-50 transition-all duration-300" [ngClass]="{'bg-white/85 backdrop-blur-xl border-b border-white/30': true}">
+<header class="fixed top-0 left-0 right-0 h-16 z-50 transition-all duration-300 bg-white border-b border-gray-200" [class.shadow-md]="scrollY() > 10">
   <div class="flex items-center justify-between h-full px-4 lg:px-6 max-w-7xl mx-auto">
+    <!-- Left: Hamburger + Logo -->
     <div class="flex items-center gap-6">
       <button (click)="toggleSidebar()" class="lg:hidden w-10 h-10 flex items-center justify-center rounded-xl hover:bg-black/5 transition-colors" aria-label="Toggle menu">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -9,22 +10,42 @@
       <a routerLink="/" class="text-xl font-bold bg-gradient-to-r from-primary-start to-primary-end bg-clip-text text-transparent">
         Booking
       </a>
-      <nav class="hidden lg:flex items-center gap-1">
-        @for (link of navLinks(); track link.route) {
-          <a [routerLink]="link.route"
-             routerLinkActive="text-primary-start bg-primary-start/10"
-             class="px-3 py-2 rounded-xl text-sm font-medium text-text-secondary hover:text-primary-start hover:bg-primary-start/5 transition-all duration-200">
-            {{ link.label }}
-          </a>
-        }
-      </nav>
     </div>
+
+    <!-- Center: Navigation links -->
+    <nav class="hidden lg:flex items-center gap-1">
+      @for (link of navLinks(); track link.route) {
+        <a [routerLink]="link.route"
+           routerLinkActive="text-primary-start bg-primary-start/10"
+           class="px-3 py-2 rounded-xl text-sm font-medium text-text-secondary hover:text-primary-start hover:bg-primary-start/5 transition-all duration-200">
+          {{ link.label }}
+        </a>
+      }
+    </nav>
+
+    <!-- Right: Notification + User -->
     <div class="flex items-center gap-3">
+      <!-- Notification Bell -->
+      <button class="relative w-10 h-10 flex items-center justify-center rounded-xl hover:bg-black/5 transition-colors" aria-label="Notifications">
+        <i class="pi pi-bell text-text-secondary text-lg"></i>
+        @if (notificationCount() && notificationCount()! > 0) {
+          <span data-testid="notification-badge" class="absolute top-1.5 right-1.5 min-w-[18px] h-[18px] flex items-center justify-center px-1 rounded-full text-[10px] font-bold bg-danger text-white">
+            {{ notificationCount() }}
+          </span>
+        }
+      </button>
+
       @if (userName()) {
-        <div class="relative">
+        <div class="relative flex items-center gap-2">
+          <!-- Admin Badge -->
+          @if (isAdmin()) {
+            <span data-testid="admin-badge" class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-primary-start/10 text-primary-start border border-primary-start/20">
+              Admin
+            </span>
+          }
           <button (click)="menu.toggle($event)" class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-black/5 transition-colors">
             <p-avatar [label]="userName()!.charAt(0).toUpperCase()" styleClass="bg-gradient-to-r from-primary-start to-primary-end text-white text-sm" shape="circle" size="normal" />
-            <span class="hidden sm:block text-sm font-medium text-text-primary">{{ userName() }}</span>
+            <span class="user-name hidden sm:block text-sm font-medium text-text-primary">{{ userName() }}</span>
           </button>
           <p-menu #menu [model]="menuItems()" [popup]="true" />
         </div>

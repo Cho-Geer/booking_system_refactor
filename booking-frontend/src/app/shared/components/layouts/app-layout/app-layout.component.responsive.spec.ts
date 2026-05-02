@@ -125,7 +125,8 @@ describe('AppLayoutComponent - Responsive Design', () => {
     it('[Red] should render main element with responsive padding classes', () => {
       const mainEl = fixture.nativeElement.querySelector('main');
       expect(mainEl).toBeTruthy();
-      expect(mainEl.classList.contains('pt-16')).toBeTruthy();
+      expect(mainEl.classList.contains('pt-4')).toBeTruthy();
+      expect(mainEl.classList.contains('lg:pl-60')).toBeTruthy();
     });
 
     it('[Red] should have transition-all class for smooth layout animations', () => {

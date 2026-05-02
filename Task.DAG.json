@@ -20,7 +20,7 @@
       "id": "LAYOUT-REDESIGN",
       "name": "Redesign Layout Components",
       "description": "Redesign AppHeader, AppSidebar, and AppLayout for admin vs user modes with solid backgrounds, PrimeIcons, scroll shadows, and responsive behavior.",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": [],
       "assignee": "@Coder-FE"
     }
