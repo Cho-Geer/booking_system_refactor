@@ -23,6 +23,14 @@
       "status": "completed",
       "dependencies": [],
       "assignee": "@Coder-FE"
+    },
+    {
+      "id": "ADMIN-DASHBOARD-REDESIGN",
+      "name": "Redesign Admin Dashboard",
+      "description": "Redesign admin dashboard with real charts, stats cards, recent bookings, quick actions, and page header using enhanced atomic components.",
+      "status": "in_progress",
+      "dependencies": ["LAYOUT-REDESIGN"],
+      "assignee": "@Coder-FE"
     }
   ]
 }
