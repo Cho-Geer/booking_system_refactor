@@ -28,7 +28,7 @@
       "id": "ADMIN-DASHBOARD-REDESIGN",
       "name": "Redesign Admin Dashboard",
       "description": "Redesign admin dashboard with real charts, stats cards, recent bookings, quick actions, and page header using enhanced atomic components.",
-      "status": "in_progress",
+      "status": "completed",
       "dependencies": ["LAYOUT-REDESIGN"],
       "assignee": "@Coder-FE"
     }

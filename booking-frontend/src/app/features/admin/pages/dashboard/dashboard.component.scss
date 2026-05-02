@@ -3,13 +3,14 @@
 }
 
 /* Admin dashboard card hover micro-interactions */
-.app-dashboard-card-hover {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
 .app-dashboard-card-hover:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 20px 60px rgba(102, 126, 234, 0.2);
+}
+
+/* Table row hover highlight */
+table tbody tr:hover {
+  background-color: var(--color-bg-secondary, #F2F3F5);
 }
 
 /* Responsive card grid */
