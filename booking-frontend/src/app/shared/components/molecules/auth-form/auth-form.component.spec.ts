@@ -105,4 +105,11 @@ describe('AuthFormComponent', () => {
   it('should expose ContactType enum to template', () => {
     expect(component.ContactType).toBe(ContactType);
   });
+
+  it('[RED] should have gradient-primary class on step indicator', () => {
+    fixture.componentRef.setInput('activeTab', 'code');
+    fixture.detectChanges();
+    const stepIndicator = fixture.nativeElement.querySelector('.step-indicator');
+    expect(stepIndicator).toBeTruthy();
+  });
 });

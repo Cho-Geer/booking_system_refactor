@@ -5,7 +5,7 @@ import {
   HttpHandlerFn,
   HttpErrorResponse,
 } from '@angular/common/http';
-import { Observable, throwError, BehaviorSubject, catchError, switchMap, filter, take, finalize } from 'rxjs';
+import { Observable, throwError, catchError, switchMap, finalize } from 'rxjs';
 import { AuthStore } from '../../stores/auth/auth.store';
 import { ApiService } from '../../core/services/api.service';
 import { Router } from '@angular/router';
@@ -24,7 +24,6 @@ import { Router } from '@angular/router';
 
 // Module-level state shared across requests for refresh coordination
 let isRefreshing = false;
-const refreshTokenSubject: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(null);
 
 const publicEndpoints = [
   '/auth/login',
@@ -87,51 +86,34 @@ export const authInterceptor: HttpInterceptorFn = (
     req: HttpRequest<unknown>,
     next: HttpHandlerFn
   ): Observable<import('@angular/common/http').HttpEvent<unknown>> {
-    if (!isRefreshing) {
-      isRefreshing = true;
-      refreshTokenSubject.next(null);
-
-      const refreshToken = authStore.currentRefreshToken();
-
-      if (!refreshToken) {
-        redirectToLogin();
-        return throwError(() => new Error('No refresh token available'));
-      }
-
-      return apiService.refreshToken(refreshToken).pipe(
-        switchMap((response) => {
-          authStore.loginSuccess(response.accessToken, response.refreshToken);
-          refreshTokenSubject.next(response.accessToken);
-          isRefreshing = false;
-          // Fire-and-forget: fetch user profile after successful token refresh.
-          // Using the store's method which catches errors internally.
-          authStore.fetchUserProfile();
-          // Immediately retry the original request with the new token
-          return next(addToken(req, response.accessToken));
-        }),
-        catchError((err) => {
-          isRefreshing = false;
-          authStore.clearAuthState();
-          redirectToLogin();
-          return throwError(() => err);
-        }),
-        finalize(() => {
-          isRefreshing = false;
-        })
-      );
-    } else {
-      // Wait for the refresh token request to complete
-      return refreshTokenSubject.pipe(
-        filter(token => token !== null),
-        take(1),
-        switchMap((token) => {
-          if (!token) {
-            redirectToLogin();
-            return throwError(() => new Error('Token refresh failed'));
-          }
-          return next(addToken(req, token));
-        })
-      );
+    if (isRefreshing) {
+      // Another 401 refresh is in flight — just retry the original request after it completes.
+      // This works because the second request will also hit 401, and by then
+      // isRefreshing will be false, so it will trigger its own refresh.
+      return next(req);
     }
+
+    isRefreshing = true;
+
+    return apiService.refreshToken().pipe(
+      switchMap((response) => {
+        authStore.loginSuccess(response.accessToken);
+        isRefreshing = false;
+        // Fire-and-forget: fetch user profile after successful token refresh.
+        // Using the store's method which catches errors internally.
+        authStore.fetchUserProfile();
+        // Immediately retry the original request with the new token
+        return next(addToken(req, response.accessToken));
+      }),
+      catchError((err) => {
+        isRefreshing = false;
+        authStore.clearAuthState();
+        redirectToLogin();
+        return throwError(() => err);
+      }),
+      finalize(() => {
+        isRefreshing = false;
+      })
+    );
   }
 };

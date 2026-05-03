@@ -21,6 +21,7 @@ import { NotificationsModule } from "./modules/notifications/notifications.modul
 import { StatsModule } from "./modules/stats/stats.module";
 import { HealthModule } from "./modules/health/health.module";
 import { RateLimiterModule } from "./modules/rate-limiter/rate-limiter.module";
+import { AdminModule } from "./modules/admin/admin.module";
 import { RetentionModule } from "./modules/retention/retention.module";
 import { VerificationModule } from "./modules/verification/verification.module";
 import { EncryptionModule } from "./modules/encryption/encryption.module";
@@ -73,6 +74,7 @@ import { EncryptionModule } from "./modules/encryption/encryption.module";
     }),
 
     // Feature modules
+    AdminModule,
     AuthModule,
     UsersModule,
     ServicesModule,

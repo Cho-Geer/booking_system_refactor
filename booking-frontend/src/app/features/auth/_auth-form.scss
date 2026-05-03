@@ -12,7 +12,6 @@
 
 // Card
 %auth-card {
-  border-radius: 12px;
   padding: 2rem;
   max-width: 450px;
   width: 100%;
@@ -40,14 +39,14 @@ input, select {
   width: 100%;
   padding: 0.75rem;
   border: 2px solid var(--border-color, #e0e0e0);
-  border-radius: 8px;
+  border-radius: 12px;
   font-size: 1rem;
   transition: border-color 0.2s ease;
   min-height: 44px; /* WCAG touch target */
 
   &:focus {
     outline: none;
-    border-color: var(--primary-color, #1976d2);
+    border-color: var(--color-primary, #667eea);
   }
 
   &.error {
@@ -69,7 +68,7 @@ input, select {
   padding: 0.75rem 1rem;
   background: none;
   border: none;
-  color: var(--primary-color, #1976d2);
+  color: var(--color-primary, #667eea);
   font-size: 0.9rem;
   cursor: pointer;
   white-space: nowrap;
@@ -95,7 +94,7 @@ input, select {
 .global-error {
   background-color: var(--error-light, #ffebee);
   padding: 0.75rem;
-  border-radius: 8px;
+  border-radius: 12px;
   margin-bottom: 1rem;
 }
 
@@ -103,20 +102,22 @@ input, select {
 .btn-primary {
   width: 100%;
   padding: 0.75rem;
-  background-color: var(--primary-color, #1976d2);
+  background: linear-gradient(135deg, var(--color-primary, #667eea), #764ba2);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: opacity 0.2s ease, box-shadow 0.2s ease;
   min-height: 44px; /* WCAG touch target */
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 
   &:hover:not(:disabled) {
-    background-color: var(--primary-dark, #1565c0);
+    opacity: 0.9;
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
   }
 
   &:disabled {
@@ -143,7 +144,7 @@ input, select {
     }
 
     a {
-      color: var(--primary-color, #1976d2);
+      color: var(--color-primary, #667eea);
       text-decoration: none;
 
       &:hover {
@@ -190,7 +191,7 @@ input, select {
 
   &.active {
     .step-number {
-      background: var(--primary-color, #1976d2);
+      background: var(--color-primary, #667eea);
       color: white;
     }
     .step-label {
@@ -232,7 +233,7 @@ input, select {
   flex: 1;
   padding: 0.5rem 1rem;
   border: 2px solid var(--border-color, #e0e0e0);
-  border-radius: 8px;
+  border-radius: 12px;
   background: transparent;
   color: var(--text-secondary, #666);
   font-size: 0.875rem;
@@ -240,12 +241,12 @@ input, select {
   transition: all 0.2s ease;
 
   &:hover {
-    border-color: var(--primary-color, #1976d2);
+    border-color: var(--color-primary, #667eea);
   }
 
   &.active {
-    border-color: var(--primary-color, #1976d2);
-    background: var(--primary-color, #1976d2);
+    border-color: var(--color-primary, #667eea);
+    background: linear-gradient(135deg, var(--color-primary, #667eea), #764ba2);
     color: white;
   }
 }
@@ -266,7 +267,7 @@ input, select {
     background: transparent;
     color: var(--text-secondary, #666);
     border: 2px solid var(--border-color, #e0e0e0);
-    border-radius: 8px;
+    border-radius: 12px;
     font-size: 1rem;
     font-weight: 500;
     cursor: pointer;
@@ -277,8 +278,9 @@ input, select {
     justify-content: center;
 
     &:hover {
-      border-color: var(--primary-color, #1976d2);
-      color: var(--primary-color, #1976d2);
+      border-color: var(--color-primary, #667eea);
+      color: var(--color-primary, #667eea);
+      background: rgba(102, 126, 234, 0.05);
     }
   }
 

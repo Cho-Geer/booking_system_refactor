@@ -5,6 +5,9 @@ import { ApiService } from '../../core/services/api.service';
 import { AuthStore } from '../../stores/auth/auth.store';
 import { AppBadgeComponent, BadgeStatus } from '../../shared/components/atoms/app-badge/app-badge.component';
 import { AppEmptyStateComponent } from '../../shared/components/atoms/app-empty-state/app-empty-state.component';
+import { AppCardComponent } from '../../shared/components/atoms/app-card/app-card.component';
+import { AppButtonComponent } from '../../shared/components/atoms/app-button/app-button.component';
+import { AppModalComponent } from '../../shared/components/atoms/app-modal/app-modal.component';
 
 export type PullToRefreshState = 'idle' | 'pulling' | 'refreshing';
 
@@ -28,6 +31,9 @@ type FilterValue = 'all' | string;
     RouterModule,
     AppBadgeComponent,
     AppEmptyStateComponent,
+    AppCardComponent,
+    AppButtonComponent,
+    AppModalComponent,
   ],
   templateUrl: './my-bookings.component.html',
   styleUrl: './my-bookings.component.scss',
@@ -93,7 +99,6 @@ export class MyBookingsComponent implements OnInit {
     this.pullToRefreshState.set('refreshing');
     this.pullProgress.set(0);
     this.loadAppointments();
-    // Reset after loading is complete (handled in loadAppointments callback)
   }
 
   // Cancel dialog state
@@ -184,7 +189,6 @@ export class MyBookingsComponent implements OnInit {
     this.isCancelling.set(true);
     this.api.cancelBooking(id).subscribe({
       next: () => {
-        // Remove from list
         this.appointments.update((list) => list.filter((a) => a.id !== id));
         this.showCancelDialog.set(false);
         this.cancellingId.set(null);
@@ -229,7 +233,6 @@ export class MyBookingsComponent implements OnInit {
   }
 
   formatPrice(_serviceName: string): string {
-    // Price data not in list endpoint — show as placeholder
     return '';
   }
 }

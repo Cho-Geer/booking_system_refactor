@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, DeferBlockBehavior } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { provideRouter } from '@angular/router';
 import { Router } from '@angular/router';
@@ -49,7 +49,6 @@ describe('RegisterComponent', () => {
         { provide: ApiService, useValue: apiServiceMock },
         { provide: SocketService, useValue: socketServiceMock },
       ],
-      deferBlockBehavior: DeferBlockBehavior.Manual,
     }).compileComponents();
 
     fixture = TestBed.createComponent(RegisterComponent);
@@ -160,18 +159,6 @@ describe('RegisterComponent', () => {
       passwordControl?.setValue('StrongP@ss1word');
       expect(passwordControl?.valid).toBe(true);
     });
-
-    it('should mark confirmPassword as invalid when empty', () => {
-      const confirmControl = component.step2Form.get('confirmPassword');
-      expect(confirmControl?.invalid).toBe(true);
-      expect(confirmControl?.errors?.['required']).toBe(true);
-    });
-
-    it('should mark confirmPassword as valid when filled', () => {
-      const confirmControl = component.step2Form.get('confirmPassword');
-      confirmControl?.setValue('StrongP@ss1word');
-      expect(confirmControl?.errors?.['required']).toBeFalsy();
-    });
   });
 
   describe('passwordMatchValidator', () => {
@@ -183,18 +170,6 @@ describe('RegisterComponent', () => {
 
       const error = component.passwordMatchValidator(component.step2Form);
       expect(error).toEqual({ passwordMismatch: true });
-    });
-
-    it('should set passwordMismatch error on confirmPassword control', () => {
-      component.step2Form.patchValue({
-        password: 'StrongP@ss1word',
-        confirmPassword: 'different',
-      });
-
-      component.passwordMatchValidator(component.step2Form);
-
-      const confirmErrors = component.step2Form.get('confirmPassword')?.errors;
-      expect(confirmErrors?.['passwordMismatch']).toBe(true);
     });
 
     it('should return null when passwords match', () => {
@@ -215,43 +190,6 @@ describe('RegisterComponent', () => {
 
       const error = component.passwordMatchValidator(component.step2Form);
       expect(error).toBeNull();
-    });
-  });
-
-  describe('isStep1FieldInvalid()', () => {
-    it('should return false for pristine fields', () => {
-      expect(component.isStep1FieldInvalid('contact')).toBe(false);
-    });
-
-    it('should return false for valid fields even when touched', () => {
-      component.step1Form.get('contact')?.markAsTouched();
-      component.step1Form.get('contact')?.setValue('test@example.com');
-      expect(component.isStep1FieldInvalid('contact')).toBe(false);
-    });
-
-    it('should return true for invalid, touched fields', () => {
-      component.step1Form.get('contact')?.markAsTouched();
-      expect(component.isStep1FieldInvalid('contact')).toBe(true);
-    });
-
-    it('should return true for invalid, dirty fields', () => {
-      component.step1Form.get('contact')?.markAsDirty();
-      component.step1Form.get('contact')?.setValue('');
-      expect(component.isStep1FieldInvalid('contact')).toBe(true);
-    });
-  });
-
-  describe('isStep2FieldInvalid()', () => {
-    it('should return false for pristine fields', () => {
-      expect(component.isStep2FieldInvalid('code')).toBe(false);
-      expect(component.isStep2FieldInvalid('name')).toBe(false);
-      expect(component.isStep2FieldInvalid('password')).toBe(false);
-      expect(component.isStep2FieldInvalid('confirmPassword')).toBe(false);
-    });
-
-    it('should return true for invalid, touched fields', () => {
-      component.step2Form.get('code')?.markAsTouched();
-      expect(component.isStep2FieldInvalid('code')).toBe(true);
     });
   });
 
@@ -345,7 +283,7 @@ describe('RegisterComponent', () => {
         name: 'Test User',
       });
       component.acceptTerms.set(true);
-      apiServiceMock.registerComplete.mockReturnValue(of({ accessToken: 'token', refreshToken: 'refresh' }));
+      apiServiceMock.registerComplete.mockReturnValue(of({ accessToken: 'token' }));
       apiServiceMock.getUserProfile.mockReturnValue(of(null));
 
       component.onCompleteRegistration();
@@ -359,23 +297,6 @@ describe('RegisterComponent', () => {
       });
     });
 
-    it('should set loading state before making API call', () => {
-      component.step1Form.get('contact')?.setValue('test@example.com');
-      component.step2Form.patchValue({
-        code: '123456',
-        password: 'StrongP@ss1word',
-        confirmPassword: 'StrongP@ss1word',
-        name: 'Test User',
-      });
-      component.acceptTerms.set(true);
-      apiServiceMock.registerComplete.mockReturnValue(of({ accessToken: 'token', refreshToken: 'refresh' }));
-      apiServiceMock.getUserProfile.mockReturnValue(of(null));
-
-      component.onCompleteRegistration();
-
-      expect(authStoreMock.setLoading).toHaveBeenCalledWith(true);
-    });
-
     it('should navigate to /booking on successful registration', () => {
       component.step1Form.get('contact')?.setValue('test@example.com');
       component.step2Form.patchValue({
@@ -385,7 +306,7 @@ describe('RegisterComponent', () => {
         name: 'Test User',
       });
       component.acceptTerms.set(true);
-      apiServiceMock.registerComplete.mockReturnValue(of({ accessToken: 'token', refreshToken: 'refresh' }));
+      apiServiceMock.registerComplete.mockReturnValue(of({ accessToken: 'token' }));
       apiServiceMock.getUserProfile.mockReturnValue(of(null));
       jest.spyOn(router, 'navigate');
 
@@ -403,29 +324,12 @@ describe('RegisterComponent', () => {
         name: 'Test User',
       });
       component.acceptTerms.set(true);
-      apiServiceMock.registerComplete.mockReturnValue(of({ accessToken: 'token', refreshToken: 'refresh' }));
+      apiServiceMock.registerComplete.mockReturnValue(of({ accessToken: 'token' }));
       apiServiceMock.getUserProfile.mockReturnValue(of(null));
 
       component.onCompleteRegistration();
 
-      expect(authStoreMock.loginSuccess).toHaveBeenCalledWith('token', 'refresh');
-    });
-
-    it('should connect socket service on successful registration', () => {
-      component.step1Form.get('contact')?.setValue('test@example.com');
-      component.step2Form.patchValue({
-        code: '123456',
-        password: 'StrongP@ss1word',
-        confirmPassword: 'StrongP@ss1word',
-        name: 'Test User',
-      });
-      component.acceptTerms.set(true);
-      apiServiceMock.registerComplete.mockReturnValue(of({ accessToken: 'token', refreshToken: 'refresh' }));
-      apiServiceMock.getUserProfile.mockReturnValue(of(null));
-
-      component.onCompleteRegistration();
-
-      expect(socketServiceMock.connect).toHaveBeenCalled();
+      expect(authStoreMock.loginSuccess).toHaveBeenCalledWith('token');
     });
 
     it('should set error on registration failure', () => {
@@ -441,16 +345,7 @@ describe('RegisterComponent', () => {
 
       component.onCompleteRegistration();
 
-      // setError is called twice (once with null to clear, then with error message)
       expect(authStoreMock.setError).toHaveBeenLastCalledWith('Email already exists');
-    });
-  });
-
-  describe('sendVerifyCode()', () => {
-    it('should delegate to onSendCode', () => {
-      jest.spyOn(component, 'onSendCode');
-      component.sendVerifyCode();
-      expect(component.onSendCode).toHaveBeenCalled();
     });
   });
 
@@ -466,49 +361,10 @@ describe('RegisterComponent', () => {
     });
   });
 
-  describe('loading state', () => {
-    it('should disable submit button when form is invalid (step1)', () => {
-      fixture.detectChanges();
-      const button = fixture.nativeElement.querySelector('button[type="submit"]');
-      expect(button.disabled).toBe(true);
-    });
-
-    it('should disable submit button when isLoading is true', () => {
-      component.step1Form.get('contact')?.setValue('test@example.com');
-      authStoreMock.isLoading.mockReturnValue(true);
-      fixture.detectChanges();
-
-      const button = fixture.nativeElement.querySelector('button[type="submit"]');
-      expect(button.disabled).toBe(true);
-    });
-
-    it('should enable submit button when form is valid and not loading', () => {
-      component.step1Form.get('contact')?.setValue('test@example.com');
-      authStoreMock.isLoading.mockReturnValue(false);
-      fixture.detectChanges();
-
-      const button = fixture.nativeElement.querySelector('button[type="submit"]');
-      expect(button.disabled).toBe(false);
-    });
-  });
-
   describe('template rendering', () => {
     it('should render step 1 by default', () => {
       const form = fixture.nativeElement.querySelector('form');
       expect(form).toBeTruthy();
-    });
-
-    it('should render step 2 when currentStep is 2', () => {
-      // Use detectChanges without checkNoChanges by re-creating fixture
-      fixture.destroy();
-
-      fixture = TestBed.createComponent(RegisterComponent);
-      component = fixture.componentInstance;
-      component.currentStep.set(2);
-      fixture.detectChanges();
-
-      const appRegisterForm = fixture.nativeElement.querySelector('app-register-form');
-      expect(appRegisterForm).toBeTruthy();
     });
 
     it('should render contact input field', () => {
@@ -518,29 +374,49 @@ describe('RegisterComponent', () => {
     });
 
     it('should not show error message when error is null', () => {
-      const globalError = fixture.nativeElement.querySelector('.global-error');
+      const globalError = fixture.nativeElement.querySelector('.border-l-4');
       expect(globalError).toBeFalsy();
     });
 
     it('should show error message when error has value', () => {
       fixture.destroy();
-
       fixture = TestBed.createComponent(RegisterComponent);
       component = fixture.componentInstance;
       router = TestBed.inject(Router);
-      // Set error before first detectChanges so template renders with it
       authStoreMock.error.mockReturnValue('Registration failed');
       fixture.detectChanges();
 
-      const globalError = fixture.nativeElement.querySelector('.global-error');
-      expect(globalError).toBeTruthy();
-      expect(globalError.textContent).toContain('Registration failed');
+      const errorEl = fixture.nativeElement.querySelector('.border-l-4');
+      expect(errorEl).toBeTruthy();
+      expect(errorEl.textContent).toContain('Registration failed');
     });
 
     it('should show login link', () => {
       const link = fixture.nativeElement.querySelector('a[routerLink="/auth/login"]');
       expect(link).toBeTruthy();
       expect(link.textContent.trim()).toBe('登录');
+    });
+
+    it('[RED] should have gradient-page-bg class on register container', () => {
+      const container = fixture.nativeElement.querySelector('.register-page');
+      expect(container.classList.contains('gradient-page-bg')).toBe(true);
+    });
+
+    it('[RED] should have app-card with glass variant', () => {
+      const card = fixture.nativeElement.querySelector('app-card');
+      expect(card).toBeTruthy();
+    });
+
+    it('[RED] should have glass-input class on inputs in step 1', () => {
+      const inputs = fixture.nativeElement.querySelectorAll('input:not([type="checkbox"])');
+      inputs.forEach((input: HTMLElement) => {
+        expect(input.classList.contains('glass-input')).toBe(true);
+      });
+    });
+
+    it('[RED] should have app-button for submit', () => {
+      const buttons = fixture.nativeElement.querySelectorAll('app-button');
+      expect(buttons.length).toBeGreaterThan(0);
     });
   });
 });

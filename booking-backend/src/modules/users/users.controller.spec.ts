@@ -109,49 +109,61 @@ describe('UsersController', () => {
 
     it('should call service.findAll with default pagination', async () => {
       mockUsersService.findAll.mockResolvedValue({
-        data: mockUsers,
-        total: 2,
-        page: 1,
-        pageSize: 10,
-        totalPages: 1,
+        items: mockUsers,
+        meta: {
+          total: 2,
+          page: 1,
+          limit: 20,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false,
+        },
       });
 
       const result = await controller.findAll();
 
-      expect(service.findAll).toHaveBeenCalledWith(1, 10);
-      expect(result.data).toEqual(mockUsers);
-      expect(result.total).toBe(2);
+      expect(service.findAll).toHaveBeenCalledWith(1, 20);
+      expect(result.items).toEqual(mockUsers);
+      expect(result.meta.total).toBe(2);
     });
 
     it('should call service.findAll with custom pagination', async () => {
       mockUsersService.findAll.mockResolvedValue({
-        data: [mockUsers[0]],
-        total: 2,
-        page: 2,
-        pageSize: 1,
-        totalPages: 2,
+        items: [mockUsers[0]],
+        meta: {
+          total: 2,
+          page: 2,
+          limit: 1,
+          totalPages: 2,
+          hasNext: false,
+          hasPrev: true,
+        },
       });
 
       const result = await controller.findAll(2, 1);
 
       expect(service.findAll).toHaveBeenCalledWith(2, 1);
-      expect(result.page).toBe(2);
-      expect(result.pageSize).toBe(1);
+      expect(result.meta.page).toBe(2);
+      expect(result.meta.limit).toBe(1);
     });
 
     it('should return empty data when no users exist', async () => {
       mockUsersService.findAll.mockResolvedValue({
-        data: [],
-        total: 0,
-        page: 1,
-        pageSize: 10,
-        totalPages: 0,
+        items: [],
+        meta: {
+          total: 0,
+          page: 1,
+          limit: 20,
+          totalPages: 0,
+          hasNext: false,
+          hasPrev: false,
+        },
       });
 
       const result = await controller.findAll();
 
-      expect(result.data).toEqual([]);
-      expect(result.total).toBe(0);
+      expect(result.items).toEqual([]);
+      expect(result.meta.total).toBe(0);
     });
   });
 

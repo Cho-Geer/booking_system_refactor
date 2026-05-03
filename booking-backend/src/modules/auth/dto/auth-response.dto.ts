@@ -8,14 +8,13 @@ export class AuthResponseDto {
   @ApiProperty({ description: "JWT Access Token" })
   accessToken!: string;
 
-  @ApiProperty({ description: "JWT Refresh Token" })
-  refreshToken!: string;
-
   @ApiProperty({ description: "Access Token 过期时间（秒）", example: 900 })
   expiresIn!: number;
 
   @ApiProperty({ description: "Token 类型", example: "Bearer" })
   tokenType!: string;
+
+  // refreshToken 通过 HttpOnly cookie 传输，不在 JSON 响应体中暴露
 }
 
 /**

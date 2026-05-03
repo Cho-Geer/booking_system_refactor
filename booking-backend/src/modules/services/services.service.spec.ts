@@ -138,11 +138,15 @@ describe('ServicesService', () => {
       });
       expect(prisma.service.count).toHaveBeenCalledWith({ where: {} });
       expect(result).toEqual({
-        data: mockServices,
-        total: 2,
-        page: 1,
-        pageSize: 10,
-        totalPages: 1,
+        items: mockServices,
+        meta: {
+          total: 2,
+          page: 1,
+          limit: 10,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false,
+        },
       });
     });
 
@@ -161,8 +165,8 @@ describe('ServicesService', () => {
         },
         orderBy: { createdAt: 'desc' },
       });
-      expect(result.page).toBe(2);
-      expect(result.pageSize).toBe(1);
+      expect(result.meta.page).toBe(2);
+      expect(result.meta.limit).toBe(1);
     });
 
     it('should filter by active status when isActive is true', async () => {
@@ -201,7 +205,7 @@ describe('ServicesService', () => {
         },
         orderBy: { createdAt: 'desc' },
       });
-      expect(result.data).toEqual(inactiveServices);
+      expect(result.items).toEqual(inactiveServices);
     });
 
     it('should not filter by isActive when undefined', async () => {
@@ -224,11 +228,15 @@ describe('ServicesService', () => {
       const result = await service.findAll();
 
       expect(result).toEqual({
-        data: [],
-        total: 0,
-        page: 1,
-        pageSize: 10,
-        totalPages: 0,
+        items: [],
+        meta: {
+          total: 0,
+          page: 1,
+          limit: 10,
+          totalPages: 0,
+          hasNext: false,
+          hasPrev: false,
+        },
       });
     });
 
@@ -238,7 +246,7 @@ describe('ServicesService', () => {
 
       const result = await service.findAll(1, 10);
 
-      expect(result.totalPages).toBe(3);
+      expect(result.meta.totalPages).toBe(3);
     });
 
     it('should include category in returned services', async () => {
@@ -247,8 +255,8 @@ describe('ServicesService', () => {
 
       const result = await service.findAll();
 
-      expect(result.data[0]).toHaveProperty('category');
-      expect(result.data[0].category).toEqual(mockCategory);
+      expect(result.items[0]).toHaveProperty('category');
+      expect(result.items[0].category).toEqual(mockCategory);
     });
   });
 

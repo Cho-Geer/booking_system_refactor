@@ -47,6 +47,70 @@
       "status": "completed",
       "dependencies": ["LAYOUT-REDESIGN"],
       "assignee": "@Coder-FE"
+    },
+    {
+      "id": "ADMIN-BACKEND-MODULE",
+      "name": "Backend Admin Module",
+      "description": "Create admin module with controllers, services, DTOs, and mappers for appointments, services, users, reports, and stats.",
+      "status": "completed",
+      "dependencies": [],
+      "assignee": "@Coder-BE"
+    },
+    {
+      "id": "AUTH-USERS-SERVICES-UPDATE",
+      "name": "Update Auth, Users, Services modules",
+      "description": "Update controllers, services, and DTOs for auth, users, and services modules with specs and pagination fixes.",
+      "status": "completed",
+      "dependencies": [],
+      "assignee": "@Coder-BE"
+    },
+    {
+      "id": "FRONTEND-ADMIN-PAGES",
+      "name": "Frontend Admin Pages Redesign",
+      "description": "Redesign appointment-management, service-management, and user-management admin pages with PrimeNG components.",
+      "status": "completed",
+      "dependencies": ["ADMIN-BACKEND-MODULE"],
+      "assignee": "@Coder-FE"
+    },
+    {
+      "id": "BOOKING-FLOW-IMPROVEMENTS",
+      "name": "Improve Booking Flow Components",
+      "description": "Update booking confirmation, booking success, service selection, and time slot picker components with responsive specs and dark mode support.",
+      "status": "completed",
+      "dependencies": [],
+      "assignee": "@Coder-FE"
+    },
+    {
+      "id": "SHARED-COMPONENTS-UPDATE",
+      "name": "Update Shared Atomic Components",
+      "description": "Update app-badge, app-button, app-card, app-header, app-sidebar, auth-form, register-form with styles, specs, and new features.",
+      "status": "completed",
+      "dependencies": [],
+      "assignee": "@Coder-FE"
+    },
+    {
+      "id": "AUTH-PAGES-DARK-MODE",
+      "name": "Auth Pages Dark Mode and Improvements",
+      "description": "Add dark mode styles, padding wrappers, and responsive specs to login and register pages.",
+      "status": "completed",
+      "dependencies": [],
+      "assignee": "@Coder-FE"
+    },
+    {
+      "id": "THEME-SERVICE-TOGGLE",
+      "name": "Theme Service and Theme Toggle Component",
+      "description": "Create theme service, theme-toggle component, chart component, and update app.config with theme support.",
+      "status": "completed",
+      "dependencies": [],
+      "assignee": "@Coder-FE"
+    },
+    {
+      "id": "INTERCEPTORS-ROUTES-UPDATE",
+      "name": "Update Auth Interceptor, Routes, and API Service",
+      "description": "Update auth interceptor with specs, app routes with role-based routing, and API service with new endpoints.",
+      "status": "completed",
+      "dependencies": [],
+      "assignee": "@Coder-FE"
     }
   ]
 }

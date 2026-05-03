@@ -11,7 +11,7 @@ module.exports = {
   roots: ['<rootDir>/src'],
   moduleFileExtensions: ['ts', 'js', 'html', 'json'],
   transformIgnorePatterns: [
-    'node_modules/(?!@angular|@ngrx|@angular/cdk|primeng|@primeng|@primeuix|uuid)'
+    'node_modules/(?!@angular|@ngrx|@angular/cdk|primeng|@primeng|@primeuix|uuid|@testing-library)'
   ],
   moduleNameMapper: {
     '^src/(.*)$': '<rootDir>/src/$1',

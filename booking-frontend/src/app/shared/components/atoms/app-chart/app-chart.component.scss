@@ -1,0 +1,10 @@
+/* AppChart - Atomic Chart.js wrapper component */
+
+.app-chart-container {
+  position: relative;
+  width: 100%;
+}
+
+.app-chart-container ::ng-deep canvas {
+  max-width: 100%;
+}

@@ -1,7 +1,18 @@
+@if (showAccentBar) {
+  <div class="app-card-accent h-[3px] bg-gradient-to-r from-primary-start to-primary-end rounded-t-lg"></div>
+}
 <p-card
-  [header]="header()"
+  [header]="headerIcon() ? undefined : header()"
   [subheader]="subheader()"
   [styleClass]="combinedStyleClass"
 >
+  @if (headerIcon()) {
+    <div class="flex items-center gap-2 mb-3">
+      <i class="app-card-header-icon pi {{ headerIcon() }} text-primary-start"></i>
+      @if (header()) {
+        <span class="text-h3 font-semibold">{{ header() }}</span>
+      }
+    </div>
+  }
   <ng-content />
 </p-card>

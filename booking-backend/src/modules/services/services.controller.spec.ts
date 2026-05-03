@@ -89,27 +89,35 @@ describe('ServicesController', () => {
 
     it('should call service.findAll with default pagination', async () => {
       mockServicesService.findAll.mockResolvedValue({
-        data: mockServices,
-        total: 2,
-        page: 1,
-        pageSize: 10,
-        totalPages: 1,
+        items: mockServices,
+        meta: {
+          total: 2,
+          page: 1,
+          limit: 10,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false,
+        },
       });
 
       const result = await controller.findAll();
 
-      expect(service.findAll).toHaveBeenCalledWith(1, 10, undefined);
-      expect(result.data).toEqual(mockServices);
-      expect(result.total).toBe(2);
+      expect(service.findAll).toHaveBeenCalledWith(1, 20, undefined);
+      expect(result.items).toEqual(mockServices);
+      expect(result.meta.total).toBe(2);
     });
 
     it('should call service.findAll with isActive filter', async () => {
       mockServicesService.findAll.mockResolvedValue({
-        data: mockServices,
-        total: 2,
-        page: 1,
-        pageSize: 10,
-        totalPages: 1,
+        items: mockServices,
+        meta: {
+          total: 2,
+          page: 1,
+          limit: 10,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false,
+        },
       });
 
       await controller.findAll(1, 10, true);
@@ -119,48 +127,60 @@ describe('ServicesController', () => {
 
     it('should call service.findAll with isActive=false filter', async () => {
       mockServicesService.findAll.mockResolvedValue({
-        data: [],
-        total: 0,
-        page: 1,
-        pageSize: 10,
-        totalPages: 0,
+        items: [],
+        meta: {
+          total: 0,
+          page: 1,
+          limit: 10,
+          totalPages: 0,
+          hasNext: false,
+          hasPrev: false,
+        },
       });
 
       const result = await controller.findAll(1, 10, false);
 
       expect(service.findAll).toHaveBeenCalledWith(1, 10, false);
-      expect(result.data).toEqual([]);
+      expect(result.items).toEqual([]);
     });
 
     it('should call service.findAll with custom pagination', async () => {
       mockServicesService.findAll.mockResolvedValue({
-        data: [mockServices[0]],
-        total: 2,
-        page: 1,
-        pageSize: 1,
-        totalPages: 2,
+        items: [mockServices[0]],
+        meta: {
+          total: 2,
+          page: 1,
+          limit: 1,
+          totalPages: 2,
+          hasNext: true,
+          hasPrev: false,
+        },
       });
 
       const result = await controller.findAll(1, 1);
 
       expect(service.findAll).toHaveBeenCalledWith(1, 1, undefined);
-      expect(result.pageSize).toBe(1);
-      expect(result.totalPages).toBe(2);
+      expect(result.meta.limit).toBe(1);
+      expect(result.meta.totalPages).toBe(2);
     });
 
     it('should return empty data when no services exist', async () => {
       mockServicesService.findAll.mockResolvedValue({
-        data: [],
-        total: 0,
-        page: 1,
-        pageSize: 10,
-        totalPages: 0,
+        items: [],
+        meta: {
+          total: 0,
+          page: 1,
+          limit: 10,
+          totalPages: 0,
+          hasNext: false,
+          hasPrev: false,
+        },
       });
 
       const result = await controller.findAll();
 
-      expect(result.data).toEqual([]);
-      expect(result.total).toBe(0);
+      expect(result.items).toEqual([]);
+      expect(result.meta.total).toBe(0);
     });
   });
 

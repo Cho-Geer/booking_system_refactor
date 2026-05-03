@@ -4,11 +4,23 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthStore, User } from '../../stores/auth/auth.store';
 import { ApiService } from '../../core/services/api.service';
+import { AppCardComponent } from '../../shared/components/atoms/app-card/app-card.component';
+import { AppButtonComponent } from '../../shared/components/atoms/app-button/app-button.component';
+import { AppModalComponent } from '../../shared/components/atoms/app-modal/app-modal.component';
+import { AppBadgeComponent } from '../../shared/components/atoms/app-badge/app-badge.component';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    FormsModule,
+    AppCardComponent,
+    AppButtonComponent,
+    AppModalComponent,
+    AppBadgeComponent,
+  ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',
 })

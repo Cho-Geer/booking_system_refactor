@@ -962,6 +962,581 @@
         "execution_summary": "Fixed double-wrapped API response in users.controller.ts:getProfile(). TDD executed: RED phase updated test to expect raw profile (confirmed test failed with double-wrap), GREEN phase removed manual envelope return (all 25 users.controller tests pass, full suite shows no regressions from our change). Contract.yaml authorization verified (read-only). Generated TASK_LOG.md, HANDOVER.md, test_report.json.",
         "completed_at": "2026-05-01T06:05:22.579Z"
       }
+    },
+    "cg_ses_1777633328340": {
+      "session_id": "cg_ses_1777633328340",
+      "created_at": "2026-05-01T11:02:08.340Z",
+      "task_description": "Fix double-nested data transmission issue (Plan B): align pagination format to 接口设计规范文档 - change data→items, pageSize→limit, add meta wrapper with hasNext/hasPrev across 4 backend modules + frontend ApiService",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix double-nested data transmission (Plan B): align pagination format to 接口设计规范文档 across 4 backend modules (Services, Appointments, Users, TimeSlots) + frontend ApiService. Change data→items, pageSize→limit, add meta wrapper with hasNext/hasPrev. 22 files total: 9 backend source, 8 backend tests, 2 frontend source, 3 frontend tests. TDD RED→GREEN→REFACTOR per agent.",
+      "confirmed_at": "2026-05-01T11:05:22.024Z",
+      "consumed_at": "2026-05-01T11:51:53.883Z",
+      "audit": {
+        "execution_summary": "Plan B executed: Aligned pagination format to 接口设计规范文档 across 4 backend modules + frontend. Changes: data→items, pageSize→limit, added meta wrapper with hasNext/hasPrev. 5 parallel agents completed (4 @Coder-BE + 1 @Coder-FE). Backend: 258/258 paginated-module tests pass. Frontend: api.service.ts now unwraps response.data.items correctly. Pre-existing failures unchanged (42 auth controller tests, 55 frontend setup tests). TimeSlots module committed (3d1f168), Appointments committed (7d620a3).",
+        "completed_at": "2026-05-01T11:51:53.883Z"
+      }
+    },
+    "cg_ses_1777633677861": {
+      "session_id": "cg_ses_1777633677861",
+      "created_at": "2026-05-01T11:07:57.861Z",
+      "task_description": "Fix Services module pagination format to align with 接口设计规范文档. The service currently returns { data: items[], total, page, pageSize, totalPages } but the 接口设计规范文档 specifies { items: [...], meta: { total, page, limit, totalPages, hasNext, hasPrev } }. Follow TDD RED→GREEN→REFACTOR process: RED phase update spec files to expect new format and confirm tests fail; GREEN phase update service and controller implementations; REFACTOR phase run all module tests and generate test report.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix Services module pagination format RED→GREEN→REFACTOR: update specs first (RED), then implement service/controller changes (GREEN), then refactor/verify",
+      "confirmed_at": "2026-05-01T11:45:14.927Z",
+      "consumed_at": "2026-05-01T11:48:27.349Z",
+      "audit": {
+        "execution_summary": "Fixed Services module pagination format (RED→GREEN→REFACTOR). RED: updated both spec files to expect { items, meta: { total, page, limit, totalPages, hasNext, hasPrev } } format and confirmed test failure. GREEN: updated ServicesService.findAll() return format and ServicesController query param pageSize→limit (default 10→20). REFACTOR: all 35 tests pass across 2 suites. Created TASK_LOG.md, HANDOVER.md, and test_report.json in .task_temp/SERVICES-PAGINATION-FIX/.",
+        "completed_at": "2026-05-01T11:48:27.349Z"
+      }
+    },
+    "cg_ses_1777633691487": {
+      "session_id": "cg_ses_1777633691487",
+      "created_at": "2026-05-01T11:08:11.487Z",
+      "task_description": "Fix Appointments module pagination format to align with 接口设计规范文档: resolve double-nesting bug where service returns { data: items[], total, page, pageSize, totalPages } instead of required { items: [...], meta: { total, page, limit, totalPages, hasNext, hasPrev } }, update service, controller, and tests per TDD process (RED → GREEN → REFACTOR)",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix Appointments pagination format: update service/controller specs to expect {items+meta} and limit param (RED), update service/controller implementation (GREEN), run full module tests (REFACTOR). Commit with [Green] tag.",
+      "confirmed_at": "2026-05-01T11:49:01.122Z",
+      "consumed_at": "2026-05-01T11:49:04.951Z",
+      "audit": {
+        "execution_summary": "Fixed Appointments module pagination format to align with 接口设计规范文档. Updated service findAll() to return { items, meta: { total, page, limit, totalPages, hasNext, hasPrev } }, changed controller query params from pageSize to limit with default 20, updated all test specs (unit + integration) to match new format. All 93 tests pass across 4 suites.",
+        "completed_at": "2026-05-01T11:49:04.951Z"
+      }
+    },
+    "cg_ses_1777633734795": {
+      "session_id": "cg_ses_1777633734795",
+      "created_at": "2026-05-01T11:08:54.795Z",
+      "task_description": "Fix frontend ApiService pagination double-nesting bug: update to use response.data.items per new backend format { data: { items: [...], meta: {...} } }, follow TDD RED→GREEN→REFACTOR process for FRONTEND-PAGINATION-FIX task",
+      "gate_status": "armed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix FRONTEND-PAGINATION-FIX: Update ApiService to use response.data.items per new backend paginated format { data: { items: [...], meta: {...} } }, follow TDD RED→GREEN→REFACTOR process. Modify api.service.ts and api.service.spec.ts, add PaginatedMeta/PaginatedResponse interfaces, run unit and component tests, create required task artifacts (TASK_LOG.md, HANDOVER.md, test_report.json)",
+      "confirmed_at": "2026-05-01T11:09:43.885Z",
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1777633741304": {
+      "session_id": "cg_ses_1777633741304",
+      "created_at": "2026-05-01T11:09:01.304Z",
+      "task_description": "Fix Users module pagination format to align with 接口设计规范文档, specifically fixing double-nesting bug where service returns { data: items[], total, page, pageSize, totalPages } but spec requires { items: [...], meta: { total, page, limit, totalPages, hasNext, hasPrev } }, following TDD RED→GREEN→REFACTOR process with task ID USERS-PAGINATION-FIX",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix Users module pagination format: RED (update tests to expect new format, confirm failure) → GREEN (update service/controller, confirm pass) → REFACTOR (full tests run, task artifacts)",
+      "confirmed_at": "2026-05-01T11:45:14.225Z",
+      "consumed_at": "2026-05-01T11:49:10.515Z",
+      "audit": {
+        "execution_summary": "Fixed Users module pagination format following TDD (RED→GREEN→REFACTOR). RED: Updated users.service.spec.ts & users.controller.spec.ts to expect { items, meta: { total, page, limit, totalPages, hasNext, hasPrev } } format — tests failed as expected with TS type errors. GREEN: Updated users.service.ts findAll() to return new format with hasNext/hasPrev, updated users.controller.ts to use @Query('limit') with default 20 — all 53 tests pass. REFACTOR: Created TASK_LOG.md, HANDOVER.md, and test_report.json in .task_temp/USERS-PAGINATION-FIX/. Files changed: users.service.ts, users.controller.ts, users.service.spec.ts, users.controller.spec.ts.",
+        "completed_at": "2026-05-01T11:49:10.515Z"
+      }
+    },
+    "cg_ses_1777635927701": {
+      "session_id": "cg_ses_1777635927701",
+      "created_at": "2026-05-01T11:45:27.701Z",
+      "task_description": "Fix frontend API service pagination to handle new backend paginated response format. Follow TDD: RED (update tests, confirm fail) → GREEN (fix api.service.ts, confirm pass) → REFACTOR (run component tests, generate report). Task ID: FRONTEND-PAGINATION-FIX",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "TDD: Fix frontend API service pagination - RED (update tests) → GREEN (fix api.service.ts) → REFACTOR (component tests)",
+      "confirmed_at": "2026-05-01T11:45:38.288Z",
+      "consumed_at": "2026-05-01T11:48:27.063Z",
+      "audit": {
+        "execution_summary": "TDD: RED (confirmed test mocks use paginated format, 4 pre-existing failures) → GREEN (fixed getMyAppointments() to extract response.data.items, confirmed 22/26 tests pass with 0 new failures) → REFACTOR (service-selection 31/31 pass, my-bookings 13/13 pass). Created TASK_LOG.md, HANDOVER.md, test_report.json. No commit.",
+        "completed_at": "2026-05-01T11:48:27.063Z"
+      }
+    },
+    "cg_ses_1777645795596": {
+      "session_id": "cg_ses_1777645795596",
+      "created_at": "2026-05-01T14:29:55.596Z",
+      "task_description": "Frontend ApiResponse interface alignment + contract.yaml envelope documentation update",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix ApiResponse frontend interface (success+code→statusCode) aligning with backend + update contract.yaml response envelope documentation (add global section, add requestId to auth endpoints). TDD via Coder-FE for frontend code.",
+      "confirmed_at": "2026-05-01T14:30:06.431Z",
+      "consumed_at": "2026-05-01T14:36:23.104Z",
+      "audit": {
+        "execution_summary": "ApiResponse alignment: Frontend ApiResponse<T> interface changed success→removed, code→statusCode. Updated 16 mock objects in spec file. contract.yaml v1.4.0: Added global response_envelope section documenting uniform envelope, paginated format (items+meta), and error format. Added requestId to all 7 auth endpoint responses. Fixed pre-existing YAML indentation issues (appointment_date, status, service_name, time_slot_end).",
+        "completed_at": "2026-05-01T14:36:23.104Z"
+      }
+    },
+    "cg_ses_1777645825624": {
+      "session_id": "cg_ses_1777645825624",
+      "created_at": "2026-05-01T14:30:25.624Z",
+      "task_description": "Fix frontend ApiResponse<T> interface to match backend StandardResponse format - TDD process",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix ApiResponse<T> interface to match backend StandardResponse format via TDD RED→GREEN→REFACTOR",
+      "confirmed_at": "2026-05-01T14:33:04.313Z",
+      "consumed_at": "2026-05-01T14:33:08.764Z",
+      "audit": {
+        "execution_summary": "APIRESPONSE-ALIGN-FIX: Updated ApiResponse<T> interface (removed success, code→statusCode) and aligned all 7 spec mock objects. TDD: RED (spec updated to expect new format) → GREEN (interface updated) → REFACTOR (verified no TS errors, created reports). Pre-existing 55 NG0400 failures unrelated.",
+        "completed_at": "2026-05-01T14:33:08.764Z"
+      }
+    },
+    "cg_ses_1777649816984": {
+      "session_id": "cg_ses_1777649816984",
+      "created_at": "2026-05-01T15:36:56.984Z",
+      "task_description": "Implement HttpOnly Cookie refresh token (Plan C): backend sets httpOnly cookie for refreshToken, frontend uses withCredentials + restoreSession on app bootstrap",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Implement HttpOnly Cookie refresh token (Plan C): backend sets httpOnly cookie for refreshToken on login/register, reads from cookie on refresh, clears on logout. Frontend uses withCredentials, restores session on app bootstrap via APP_INITIALIZER. Removes refreshToken from AuthResponseDto and frontend state.",
+      "confirmed_at": "2026-05-01T15:37:04.326Z",
+      "consumed_at": "2026-05-01T15:53:49.107Z",
+      "audit": {
+        "execution_summary": "Plan C implemented: HttpOnly cookie-based refresh token. Backend auth.controller.ts updated: all login/register/refresh endpoints set refreshToken as httpOnly cookie, refresh reads from cookie, logout clears cookie. Auth service return type widened to include refreshToken for cookie setting. Frontend: removed refreshToken from AuthState/initialAuthState/store/computed/interceptor. api.service.ts: all auth endpoints use withCredentials:true, refreshToken() takes no params. app.config.ts: APP_INITIALIZER calls authStore.restoreSession() on bootstrap. login/register components: loginSuccess single arg. Across 14 files. Backend tests: 72/73 pass (1 pre-existing). Frontend auth tests: 42/42 pass. TypeScript: 0 errors source code.",
+        "completed_at": "2026-05-01T15:53:49.107Z"
+      }
+    },
+    "cg_ses_1777649909787": {
+      "session_id": "cg_ses_1777649909787",
+      "created_at": "2026-05-01T15:38:29.788Z",
+      "task_description": "Implement HttpOnly cookie-based refresh token on the backend (Plan C) - modify auth.controller.ts to extract refresh token from HttpOnly cookie instead of request body, update auth service to remove refreshToken from response DTO, update all auth test specs accordingly. Follow strict TDD: RED → GREEN → REFACTOR.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Implement HttpOnly cookie-based refresh token on auth backend: RED phase updates test specs to expect cookie-based auth (mock req.cookies, res.cookie, res.clearCookie); GREEN phase updates auth.controller.ts to extract refreshToken from HttpOnly cookie and set it as cookie, strip from response body; service layer kept mostly unchanged. Full TDD cycle with test_report.json output.",
+      "confirmed_at": "2026-05-01T15:38:46.992Z",
+      "consumed_at": "2026-05-01T15:48:10.884Z",
+      "audit": {
+        "execution_summary": "Implemented HttpOnly cookie-based refresh token on backend (Plan C) following strict TDD: RED phase updated auth.controller.spec.ts with cookie mock expectations (res.cookie, res.clearCookie, req.cookies) and removed refreshToken from response body expectations; GREEN phase updated auth.controller.ts to extract refreshToken from HttpOnly cookie (inbound), set as cookie (outbound), strip from JSON response, and updated auth.service.ts return types to expose refreshToken to controller. All 84 auth unit tests pass; only 1 pre-existing DTO validation test fails unrelated to this change. Full test_report.json and HANDOVER.md created.",
+        "completed_at": "2026-05-01T15:48:10.884Z"
+      }
+    },
+    "cg_ses_1777649929253": {
+      "session_id": "cg_ses_1777649929253",
+      "created_at": "2026-05-01T15:38:49.253Z",
+      "task_description": "Implement frontend support for HttpOnly cookie-based refresh token (Plan C) - Update auth service, store, interceptor, and app config to use cookie-based refresh tokens instead of client-side refreshToken storage",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "RED: Update api.service.spec, auth.store.spec, auth.interceptor.spec for cookie-based refresh. GREEN: Update api.service, auth.store, auth.interceptor, app.config, login/register components. REFACTOR: Verify and report.",
+      "confirmed_at": "2026-05-01T15:39:45.866Z",
+      "consumed_at": "2026-05-01T15:50:26.260Z",
+      "audit": {
+        "execution_summary": "RED: Updated 3 spec files for cookie-based refresh token (removed refreshToken assertions, added withCredentials tests, added restoreSession tests). GREEN: Updated api.service.ts (withCredentials, refreshToken() no params), auth.store.ts (removed refreshToken state, loginSuccess single arg, added restoreSession), auth.interceptor.ts (removed refreshTokenSubject), app.config.ts (APP_INITIALIZER), login/register components (loginSuccess single arg). All core tests pass with zero TS errors.",
+        "completed_at": "2026-05-01T15:50:26.260Z"
+      }
+    },
+    "cg_ses_1777698189087": {
+      "session_id": "cg_ses_1777698189087",
+      "created_at": "2026-05-02T05:03:09.088Z",
+      "task_description": "Create AdminModule with 5 controllers, 5 services, 3 mappers, DTOs, register in AppModule. Build admin stats/users/services/appointments/reports endpoints matching contract.yaml. Dispatch 5 parallel Coder-BE agents for TDD implementation.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Create AdminModule with loose coupling: dedicated services, pure mappers, contract DTOs. 5 parallel Coder-BE agents implement stats/users/services/appointments/reports controllers + services + tests (TDD). Pre-work: module structure, DTOs, mappers, AppModule registration.",
+      "confirmed_at": "2026-05-02T05:03:14.559Z",
+      "consumed_at": "2026-05-02T05:19:43.918Z",
+      "audit": {
+        "execution_summary": "AdminModule created with 5 controllers, 5 services, 3 mappers, 6 DTOs across 31 source files. 5 Coder-BE agents implemented in parallel: AdminStats (12 tests), AdminUsers (21 tests), AdminServices (32 tests), AdminAppointments (31 tests), AdminReports (8 tests). All 104 admin-specific tests pass. Pre-registered in AppModule. Contracts: all 13 contract.yaml admin endpoints now implemented. Field mapping: userType↔role, isActive↔active, durationMinutes↔duration. Pagination: meta wrapper format consistent with system.",
+        "completed_at": "2026-05-02T05:19:43.918Z"
+      }
+    },
+    "cg_ses_1777698314781": {
+      "session_id": "cg_ses_1777698314781",
+      "created_at": "2026-05-02T05:05:14.781Z",
+      "task_description": "Implement AdminUsersController + AdminUsersService with TDD (RED → GREEN → REFACTOR). Build admin users CRUD endpoints with search/role/status filters and field mapping (userType↔role) in the booking-backend NestJS project.",
+      "gate_status": "checked",
+      "last_check_failed_items": [],
+      "plan_summary": null,
+      "confirmed_at": null,
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1777698333608": {
+      "session_id": "cg_ses_1777698333608",
+      "created_at": "2026-05-02T05:05:33.608Z",
+      "task_description": "Implement AdminAppointmentsController + AdminAppointmentsService with TDD (RED→GREEN→REFACTOR). Create admin appointment list with date/service/user filters, status transitions, batch cancel endpoints.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "TDD implementation of AdminAppointmentsController + AdminAppointmentsService. RED: write failing tests (31 tests). GREEN: implement service (findAll/updateStatus/batchCancel) and controller with guards. 31 tests all pass. Generate HANDOVER.md, test_report.json.",
+      "confirmed_at": "2026-05-02T05:10:57.298Z",
+      "consumed_at": "2026-05-02T05:11:01.557Z",
+      "audit": {
+        "execution_summary": "TDD: Created AdminAppointmentsService (findAll with date/service/user filters + pagination, updateStatus with state machine validation, batchCancel non-transactional) and AdminAppointmentsController (GET /, PUT /:id/status, POST /batch-cancel with JwtAuthGuard+RolesGuard ADMIN/SUPER_ADMIN). 31/31 tests pass. Generated TASK_LOG.md, HANDOVER.md, test_report.json.",
+        "completed_at": "2026-05-02T05:11:01.557Z"
+      }
+    },
+    "cg_ses_1777698382849": {
+      "session_id": "cg_ses_1777698382849",
+      "created_at": "2026-05-02T05:06:22.849Z",
+      "task_description": "Implement AdminReportsController + AdminReportsService (TDD) for admin reports summary endpoint. Create tests first (RED), then implement service/controller (GREEN), then refactor. Files: admin-reports.service.ts, admin-reports.controller.ts, admin-reports.service.spec.ts, admin-reports.controller.spec.ts",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "TDD AdminReportsController+Service for admin reports summary: create tests(RED), implement service+controller(GREEN), refactor. 4 files, mock PrismaService, @Roles ADMIN+SUPER_ADMIN.",
+      "confirmed_at": "2026-05-02T05:06:32.001Z",
+      "consumed_at": "2026-05-02T05:11:38.398Z",
+      "audit": {
+        "execution_summary": "TDD AdminReportsController + AdminReportsService completed. RED Phase: wrote 2 test files (service spec with 5 tests, controller spec with 3 tests), confirmed FAIL with module-not-found errors. GREEN Phase: implemented admin-reports.service.ts (getSummary with 5 raw SQL queries for totalBookings, totalRevenue, cancellationRate, topServices, dailyStats) and admin-reports.controller.ts (GET /admin/reports/summary, @Roles ADMIN/SUPER_ADMIN). All 8 tests PASS. REFACTOR Phase: delivered test_report.json and HANDOVER.md.",
+        "completed_at": "2026-05-02T05:11:38.398Z"
+      }
+    },
+    "cg_ses_1777698391644": {
+      "session_id": "cg_ses_1777698391644",
+      "created_at": "2026-05-02T05:06:31.644Z",
+      "task_description": "Implement AdminServicesController + AdminServicesService (TDD). Build admin services CRUD endpoints with search/active filters, field mapping (isActive↔active, durationMinutes↔duration).",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "RED→GREEN→REFACTOR: 4 files for AdminServicesController + AdminServicesService (TDD). Service spec/impl (search+active filters, field mapping), Controller spec/impl (CRUD routes, roles, status codes).",
+      "confirmed_at": "2026-05-02T05:11:55.878Z",
+      "consumed_at": "2026-05-02T05:16:22.287Z",
+      "audit": {
+        "execution_summary": "RED→GREEN→REFACTOR: Created 4 files for AdminServicesController + AdminServicesService (TDD). Service: Prisma-based findAll with search/active filters + delegates to ServicesService with mapper. Controller: CRUD routes with role-based auth (ADMIN/SUPER_ADMIN), 201 POST, 204 DELETE. 32/32 new tests pass, no regressions.",
+        "completed_at": "2026-05-02T05:16:22.287Z"
+      }
+    },
+    "cg_ses_1777701114532": {
+      "session_id": "cg_ses_1777701114532",
+      "created_at": "2026-05-02T05:51:54.532Z",
+      "task_description": "Fix anti-enumeration UX gap in verification code login flow: frontend should check maskedContact response field before advancing to verify-code step for non-existent users",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix anti-enumeration UX gap: check maskedContact in LoginSendCodeResponse before advancing to verify-code step. 3 files: auth.dto.ts, api.service.ts, login.component.ts. TDD via Coder-FE.",
+      "confirmed_at": "2026-05-02T05:52:00.815Z",
+      "consumed_at": "2026-05-02T05:56:49.760Z",
+      "audit": {
+        "execution_summary": "Anti-enumeration UX fix: LoginSendCodeResponse now includes optional maskedContact. login.component.ts onSendCode() checks response?.maskedContact before advancing to verify-code step. Non-existent users stay on step 1 instead of reaching dead-end step 2. 3 frontend files changed, 11 new/modified tests pass.",
+        "completed_at": "2026-05-02T05:56:49.760Z"
+      }
+    },
+    "cg_ses_1777701143827": {
+      "session_id": "cg_ses_1777701143827",
+      "created_at": "2026-05-02T05:52:23.827Z",
+      "task_description": "Fix anti-enumeration UX gap in verification code login flow. Frontend should not advance to step 2 when backend returns 200 without maskedContact (non-existent user). Update auth.dto.ts, login.component.ts, and corresponding spec files. Follow TDD: RED → GREEN → REFACTOR.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix anti-enumeration UX in verification code login flow using TDD: RED (write failing tests) → GREEN (implement maskedContact check) → REFACTOR (verify and create artifacts)",
+      "confirmed_at": "2026-05-02T05:56:34.318Z",
+      "consumed_at": "2026-05-02T05:56:39.081Z",
+      "audit": {
+        "execution_summary": "Fixed anti-enumeration UX gap in verification code login flow. Changes: (1) Added `maskedContact?: string` to LoginSendCodeResponse DTO; (2) Updated onSendCode() to check response.maskedContact before advancing to step 2; (3) Added/updated test specs in api.service.spec.ts and login.component.spec.ts. TDD confirmed: RED test failed (expected 1, got 2), GREEN tests all pass. Pre-existing zone.js failures (13) unrelated.",
+        "completed_at": "2026-05-02T05:56:39.081Z"
+      }
+    },
+    "cg_ses_1777714082720": {
+      "session_id": "cg_ses_1777714082720",
+      "created_at": "2026-05-02T09:28:02.721Z",
+      "task_description": "Centralize glassmorphism design system in styles.scss, eliminate #1976d2, rollout glass styling to all customer pages, fix atoms, layout, admin accents, and P0 bugs. 5 parallel Coder-FE streams with TDD.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Centralize glassmorphism design in styles.scss foundation, then 5 parallel Coder-FE streams: (1) Auth pages + color migration, (2) Atoms fixes, (3) Layout fixes, (4) Admin accents, (5) P0 bug fixes. TDD per stream.",
+      "confirmed_at": "2026-05-02T09:28:09.756Z",
+      "consumed_at": "2026-05-02T10:12:40.782Z",
+      "audit": {
+        "execution_summary": "Design centralization complete. Phase 0: styles.scss foundation updated with glass-input, btn-primary-glass, btn-secondary-glass, gradient-card-selected, admin-page-bg utility classes + fixed blur(10px) and pageEnter(10px). 5 parallel streams completed: Stream1 (Auth + #1976d2 elimination): 135 tests pass, zero #1976d2 remaining. Stream2 (Booking glass): 122 tests pass, all 4 booking pages glassmorphism applied. Stream3 (Atoms+layout): AppCard/AppBadge glass variants, sidebar blur 24→15px + solid mode, header scroll behavior. Stream4 (Admin): gradient top-bar accent on dashboard cards, fixed hover shadow. Stream5 (P0 bugs): register-form 12→8 chars fixed, booking confirmation wired to real BookingStore. TypeScript: 0 errors.",
+        "completed_at": "2026-05-02T10:12:40.782Z"
+      }
+    },
+    "cg_ses_1777714207695": {
+      "session_id": "cg_ses_1777714207695",
+      "created_at": "2026-05-02T09:30:07.695Z",
+      "task_description": "Fix auth page glassmorphism styling - replace #1976d2 with #667eea, apply glass-input/btn-primary-glass/glass-level-3 classes across 8 auth form SCSS/HTML files. TDD: RED (write failing tests) → GREEN (apply styling changes) → REFACTOR (verify all tests pass).",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix auth page glassmorphism: replace #1976d2 with #667eea, apply glass-input/btn-primary-glass/glass-level-3, fix register-form 12→8 chars. TDD RED→GREEN→REFACTOR across 8 files.",
+      "confirmed_at": "2026-05-02T10:04:19.281Z",
+      "consumed_at": "2026-05-02T10:11:59.429Z",
+      "audit": {
+        "execution_summary": "TDD RED→GREEN→REFACTOR complete. 8 auth page files modified: eliminated #1976d2, replaced with #667eea. Applied glass-input, btn-primary-glass, btn-secondary-glass, glass-level-3, gradient-page-bg classes to login/register templates. Input border-radius 8→12px, buttons use gradient + box-shadow. Removed hardcoded border-radius from %auth-card. 12 new [RED] tests all pass (0 failures from our changes). 12 pre-existing failures remain untouched. Test report and handover generated at .task_temp/DESIGN-STREAM1/.",
+        "completed_at": "2026-05-02T10:11:59.429Z"
+      }
+    },
+    "cg_ses_1777714223430": {
+      "session_id": "cg_ses_1777714223430",
+      "created_at": "2026-05-02T09:30:23.430Z",
+      "task_description": "Fix atoms (AppCard, AppBadge) + layout (sidebar, header) in booking-frontend Angular app. TDD: RED → GREEN → REFACTOR. Modify 7 component files: app-card (scss, ts), app-badge (ts), app-sidebar (html, scss), app-header (ts, scss) under shared/components/ and layouts/.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix atoms (AppCard, AppBadge) + layout (sidebar, header) in booking-frontend. TDD: RED → GREEN → REFACTOR. 7 files changed, 2 new spec files, 28/31 tests passing (3 pre-existing failures).",
+      "confirmed_at": "2026-05-02T09:42:33.662Z",
+      "consumed_at": "2026-05-02T09:42:38.791Z",
+      "audit": {
+        "execution_summary": "Completed DESIGN-STREAM3 (Fix atoms + layout). RED: wrote failing tests for glass inputs, scrollY, solid mode. GREEN: implemented 7 file changes - AppCard glass/hover/shadow, AppBadge glass styling, AppSidebar shadow-glass/blur/solid, AppHeader scrollY/HostListener/transparent. REFACTOR: verified 28/31 tests pass (3 pre-existing badge failures due to NG0100 + toBeTrue). Output: TASK_LOG.md, HANDOVER.md, test_report.json.",
+        "completed_at": "2026-05-02T09:42:38.791Z"
+      }
+    },
+    "cg_ses_1777714226309": {
+      "session_id": "cg_ses_1777714226309",
+      "created_at": "2026-05-02T09:30:26.309Z",
+      "task_description": "Fix admin dashboard glass accents + admin page background in booking-frontend. Add gradient top-bar accent to stats cards, update hover shadow, and remove duplicate hover code. TDD.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix admin dashboard: add gradient accent bar to stats cards, update hover shadow to purple-tinted, remove duplicate hover CSS. TDD.",
+      "confirmed_at": "2026-05-02T09:31:38.002Z",
+      "consumed_at": "2026-05-02T09:34:35.947Z",
+      "audit": {
+        "execution_summary": "Stream 4: Fixed admin dashboard glass accents. Added 4px gradient top-bar accent (from-primary-start to to-primary-end) inside 4 stats cards with TDD tests verifying presence on stats cards and absence on chart cards. Updated hover box-shadow to purple-tinted glass shadow (rgba(102,126,234,0.2)) and removed duplicate hover transition base class (now inherited from app-card). All 11 tests pass (7 + 4 new).",
+        "completed_at": "2026-05-02T09:34:35.947Z"
+      }
+    },
+    "cg_ses_1777714227275": {
+      "session_id": "cg_ses_1777714227275",
+      "created_at": "2026-05-02T09:30:27.276Z",
+      "task_description": "Fix P0 functional bugs: 12-char password text in register form + booking confirmation placeholders need to be replaced with real BookingStore data",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix P0 bugs: change password text from 12 to 8 chars, replace booking confirmation placeholder signals with BookingStore computed signals",
+      "confirmed_at": "2026-05-02T09:31:45.686Z",
+      "consumed_at": "2026-05-02T09:41:23.980Z",
+      "audit": {
+        "execution_summary": "Fixed 2 P0 bugs: (1) register-form password hint text changed from \"至少 12 个字符\" to \"至少 8 个字符\" in template HTML; (2) booking-confirmation placeholder signals (selectedServiceName/serviceDuration/servicePrice) replaced with computed() signals deriving data from BookingStore.selectedServiceId and BookingStore.services. Updated spec files with proper mocks (services/selectedServiceId) and test expectations. All 25 register-form tests pass. Booking-confirmation: 35/40 pass (5 pre-existing failures from another stream's CSS class name changes). Responsive spec: 4/5 pass (1 pre-existing failure).",
+        "completed_at": "2026-05-02T09:41:23.980Z"
+      }
+    },
+    "cg_ses_1777714313050": {
+      "session_id": "cg_ses_1777714313050",
+      "created_at": "2026-05-02T09:31:53.050Z",
+      "task_description": "Fix booking flow glassmorphism (service selection, time slots, booking confirmation, booking success). Apply glass-level-1, glass-level-2, btn-primary-glass, btn-secondary-glass, gradient-card-selected, gradient-page-bg classes. Replace #1976d2 with #667eea. TDD: RED → GREEN → REFACTOR.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix booking flow glassmorphism: 4 components with glass-level-1/2, btn-primary-glass/btn-secondary-glass, gradient-card-selected, gradient-page-bg. Replace #1976d2 with #667eea. TDD RED→GREEN→REFACTOR.",
+      "confirmed_at": "2026-05-02T10:12:11.532Z",
+      "consumed_at": "2026-05-02T10:12:16.371Z",
+      "audit": {
+        "execution_summary": "TDD RED→GREEN→REFACTOR completed. Updated 4 booking flow components with glassmorphism styling: service-selection (glass cards with gradient-card-selected), time-slot-picker (glass buttons with gradient-primary selection), booking-confirmation (glass-level-2 card, btn-primary-glass/btn-secondary-glass), booking-success (gradient-page-bg, glass-level-2, btn-primary-glass). Replaced #1976d2→#667eea in 3 SCSS files. All 151 booking tests pass, zero regressions.",
+        "completed_at": "2026-05-02T10:12:16.371Z"
+      }
+    },
+    "cg_ses_1777720522322": {
+      "session_id": "cg_ses_1777720522322",
+      "created_at": "2026-05-02T11:15:22.322Z",
+      "task_description": "Fix cookie path mismatch and route structure. Backend: change cookie path from /v1/auth/refresh to / for browser-proxy compatibility. Frontend: wrap authenticated routes under AppLayoutComponent with store-wired header/sidebar.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Backend: fix cookie path /v1/auth/refresh → / so browser sends cookie through proxy. Frontend: wrap authenticated routes under AppLayoutComponent, wire layout to AuthStore for dynamic nav/sidebar/logout. 2 parallel TDD agents.",
+      "confirmed_at": "2026-05-02T11:15:27.949Z",
+      "consumed_at": "2026-05-02T11:21:41.466Z",
+      "audit": {
+        "execution_summary": "Cookie path fixed: auth.controller.ts REFRESH_COOKIE_OPTIONS.path changed from /v1/auth/refresh to /. clearRefreshCookie uses same path. Spec updated. Route restructure: app.routes.ts wraps authenticated routes under AppLayoutComponent (booking/my-bookings/profile/admin as children). Auth/legal/404 routes outside layout. AppLayoutComponent wired to AuthStore — navLinks/sidebarItems adapt to admin vs customer, onLogout() calls store + navigates. 0 TypeScript errors.",
+        "completed_at": "2026-05-02T11:21:41.466Z"
+      }
+    },
+    "cg_ses_1777720545536": {
+      "session_id": "cg_ses_1777720545536",
+      "created_at": "2026-05-02T11:15:45.536Z",
+      "task_description": "Fix HttpOnly cookie path in auth.controller.ts - Change cookie path from /v1/auth/refresh to / so Angular proxy at /api/auth/refresh can attach the cookie. Follow TDD RED→GREEN→REFACTOR.",
+      "gate_status": "checked",
+      "last_check_failed_items": [],
+      "plan_summary": null,
+      "confirmed_at": null,
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1777720560583": {
+      "session_id": "cg_ses_1777720560583",
+      "created_at": "2026-05-02T11:16:00.583Z",
+      "task_description": "Restructure app routes to wrap authenticated pages under AppLayoutComponent, and wire the layout to AuthStore. Follow TDD approach with RED, GREEN, REFACTOR phases.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "RED phase: Update routes spec + layout spec to expect new nested layout structure and AuthStore integration. Tests will fail against old code.",
+      "confirmed_at": "2026-05-02T11:18:17.569Z",
+      "consumed_at": "2026-05-02T11:21:18.955Z",
+      "audit": {
+        "execution_summary": "RED phase: Updated app.routes.spec.ts and app-layout.component.responsive.spec.ts with new nested route structure and AuthStore integration expectations. 18 failures confirmed. GREEN phase: Restructured app.routes.ts with AppLayoutComponent wrapping authenticated child routes. Rewired app-layout.component.ts to inject AuthStore and compute navLinks/sidebarItems dynamically from user role. Template unchanged. All 35 tests pass across both suites.",
+        "completed_at": "2026-05-02T11:21:18.955Z"
+      }
+    },
+    "cg_ses_1777723213059": {
+      "session_id": "cg_ses_1777723213059",
+      "created_at": "2026-05-02T12:00:13.060Z",
+      "task_description": "Full Frontend UI Design System Overhaul - Admin Dashboard redesign with comprehensive design system, dark mode, responsive layout, Chart.js integration, and consistency across all frontend pages",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Full Frontend UI Design System Overhaul: Implement comprehensive design system with glassmorphism for user pages and solid clean design for admin pages. Redesign admin dashboard with real Chart.js charts, stats cards with icons, responsive layout, dark mode support. Enhance all atomic components (Card, Button, Badge, Chart), redesign layout components (Header, Sidebar), polish all admin pages (User/Service/Appointment Management) and user-facing pages (Booking, Profile, Auth). Follow TDD with RED/GREEN/REFACTOR phases. Use flat admin navigation, Chart.js, fully responsive, dark mode, purple gradient theme.",
+      "confirmed_at": "2026-05-02T12:00:24.583Z",
+      "consumed_at": "2026-05-02T14:16:11.419Z",
+      "audit": {
+        "execution_summary": "Full Frontend UI Design System Overhaul completed across 7 phases: Phase 1 - Layout components redesigned (Header/Sidebar/AppLayout with solid backgrounds, active states, PrimeIcons, admin/user mode detection). Phase 2 - Atomic components enhanced (AppCard 4 variants, AppButton 4 variants, AppBadge 7 status colors, new AppChart Chart.js wrapper). Phase 3 - Admin Dashboard redesigned (stats cards with icons+trends, Chart.js line+doughnut charts, recent bookings table, quick actions). Phase 4 - Admin management pages redesigned (User/Service/Appointment with stats summaries, filters, data tables, modals). Phase 5 - User-facing pages polished (Service selection, Time slots, Booking flow, My Bookings, Profile, Auth). Phase 6 - Dark mode implemented (ThemeService with localStorage persistence, ThemeToggle component, dark CSS variables). Phase 7 - QA verified: TypeScript 0 errors, admin 118/118 passing, layout 53/53 passing, atomic components 71/71 passing, total 876/896 passing (20 pre-exis",
+        "completed_at": "2026-05-02T14:16:11.419Z"
+      }
+    },
+    "cg_ses_1777723398654": {
+      "session_id": "cg_ses_1777723398654",
+      "created_at": "2026-05-02T12:03:18.654Z",
+      "task_description": "Implement Phase 1: Redesign Layout Components (Header, Sidebar, AppLayout) for the Booking System Angular app.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Phase 1: Redesign Layout Components (Header, Sidebar, AppLayout) for Booking System Angular app. Plan: 1) Create TASK_LOG.md. 2) RED Phase: Update existing test files (app-header, app-sidebar, app-layout responsive) to assert new design requirements (solid backgrounds, scroll shadow, PrimeIcons, admin route detection, etc.) — tests will fail against current code. Commit with [Red] layout-redesign. 3) GREEN Phase: Implement redesigned components (HTML/TS/SCSS) to satisfy the new tests. Commit with [Green] layout-redesign. 4) Run typecheck and lint. 5) Generate test_report.json and HANDOVER.md.",
+      "confirmed_at": "2026-05-02T12:05:00.070Z",
+      "consumed_at": "2026-05-02T12:28:42.161Z",
+      "audit": {
+        "execution_summary": "Implemented Phase 1 layout redesign for Booking System Angular app. RED phase: Updated tests for AppHeader, AppSidebar, and AppLayout to assert new design requirements (solid backgrounds, scroll shadows, PrimeIcons, admin route detection, sections, z-index, breadcrumb). Tests failed as expected. GREEN phase: Implemented redesigned components - AppHeader (solid white bg, border, shadow on scroll, notification bell, admin badge), AppSidebar (solid bg, sections, PrimeIcons, active accent, bottom profile, mobile drawer), AppLayout (admin route detection, conditional backgrounds, breadcrumb placeholder, z-index hierarchy). All 53 layout tests pass. Typecheck passed. Commits: [Red] layout-redesign and [Green] layout-redesign.",
+        "completed_at": "2026-05-02T12:28:42.161Z"
+      }
+    },
+    "cg_ses_1777725101031": {
+      "session_id": "cg_ses_1777725101031",
+      "created_at": "2026-05-02T12:31:41.031Z",
+      "task_description": "Phase 2: Enhance Atomic Components (AppCard, AppButton, AppBadge variants + new AppChart) for Booking System Angular app with TDD approach",
+      "gate_status": "checked",
+      "last_check_failed_items": [],
+      "plan_summary": null,
+      "confirmed_at": null,
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1777727635458": {
+      "session_id": "cg_ses_1777727635458",
+      "created_at": "2026-05-02T13:13:55.458Z",
+      "task_description": "Phase 4: Redesign Admin Management Pages for Booking System Angular app - User Management, Service Management, and Appointment Management pages",
+      "gate_status": "checked",
+      "last_check_failed_items": [],
+      "plan_summary": null,
+      "confirmed_at": null,
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1777729204747": {
+      "session_id": "cg_ses_1777729204747",
+      "created_at": "2026-05-02T13:40:04.747Z",
+      "task_description": "Phase 4: Redesign Admin Management Pages - User Management, Service Management, Appointment Management pages in Angular booking-frontend",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Phase 4 Redesign: Redesign 3 admin management pages (User, Service, Appointment) with stats cards, enhanced filters, grid/list toggles, atomic components, refactored to AdminStore async methods. TDD: RED (update specs) → GREEN (implement).",
+      "confirmed_at": "2026-05-02T13:41:20.285Z",
+      "consumed_at": "2026-05-02T13:48:45.100Z",
+      "audit": {
+        "execution_summary": "Phase 4 Admin Management Pages Redesign completed with TDD. RED phase: Updated 3 spec files with 12 new test cases (stats cards, filter clearing, view toggles, form validation, calendar events). All 12 tests confirmed failing initially. GREEN phase: Implemented full redesign of User Management (stats cards, enhanced filter bar, avatar+name, AppBadge roles, form validation), Service Management (stats cards, grid/list view toggle, service cards, enhanced filters, form validation), and Appointment Management (stats cards, calendar/list view toggle, monthly calendar with status-colored dots, batch operations, date range filters). All 118 admin tests pass, TypeScript typecheck has 0 errors.",
+        "completed_at": "2026-05-02T13:48:45.100Z"
+      }
+    },
+    "cg_ses_1777729218847": {
+      "session_id": "cg_ses_1777729218847",
+      "created_at": "2026-05-02T13:40:18.847Z",
+      "task_description": "Implement Phase 6: Dark Mode Support for Angular booking-frontend app. Tasks include: adding dark mode CSS variables, creating ThemeService with signal-based state and localStorage persistence, creating ThemeToggleComponent, integrating into AppHeader, updating PrimeNG theme, adding smooth transitions, and handling responsive chart colors. Follow TDD (RED → GREEN).",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Implement Phase 6: Dark Mode Support - Add [data-theme=\"dark\"] CSS variables to styles.scss, create ThemeService (signal-based with auto-detect/localStorage), create ThemeToggleComponent (sun/moon icons), integrate into AppHeader, update PrimeNG config, and create test files. TDD: RED (write failing tests) → GREEN (implement). Create TASK_LOG.md, HANDOVER.md, test_report.json outputs.",
+      "confirmed_at": "2026-05-02T13:41:39.102Z",
+      "consumed_at": "2026-05-02T13:47:09.603Z",
+      "audit": {
+        "execution_summary": "Phase 6 Dark Mode Support implementation completed with TDD (RED→GREEN). Created: ThemeService (signal-based, localStorage persistence, system preference detection, toggle/enable/disable), ThemeToggleComponent (sun/moon icons, aria-label tooltip), dark mode CSS variables in styles.scss ([data-theme=\"dark\"] selectors for backgrounds/text/borders/glass/scrollbar/input/button/header), updated PrimeNG config to use [data-theme=\"dark\"] selector, integrated theme toggle into AppHeader. Added global window.matchMedia mock in setup-jest.ts. All 54 affected tests pass, typecheck has 0 errors.",
+        "completed_at": "2026-05-02T13:47:09.603Z"
+      }
+    },
+    "cg_ses_1777729763479": {
+      "session_id": "cg_ses_1777729763479",
+      "created_at": "2026-05-02T13:49:23.479Z",
+      "task_description": "Implement Phase 5: Polish User-facing Pages for Booking System Angular app. Includes Service Selection, Time Slot Picker, Booking Confirmation, Booking Success, My Bookings, Profile, and Auth pages.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Polish 7 user-facing booking pages: Service Selection, Time Slot Picker, Booking Confirmation, Booking Success, My Bookings, Profile, Auth pages with AppCard glass variant, search, filters, skeleton, empty states, calendar, availability indicators, and AppButton integration following TDD RED→GREEN",
+      "confirmed_at": "2026-05-02T13:52:50.578Z",
+      "consumed_at": "2026-05-02T14:14:09.289Z",
+      "audit": {
+        "execution_summary": "Phase 5: Polished 7 user-facing pages - Service Selection (search, filters, skeleton, AppCard glass), Time Slot Picker (DatePicker calendar, availability colors, pulse dot, responsive grid), Booking Confirmation (AppCard, terms checkbox, AppButton), Booking Success (AppButton), My Bookings (AppCard, AppModal), Profile (AppCard sections, AppModal for password), Auth pages (AppCard glass wrapper, AppButton). 222/226 tests pass, 0 type errors.",
+        "completed_at": "2026-05-02T14:14:09.289Z"
+      }
+    },
+    "cg_ses_1777731681234": {
+      "session_id": "cg_ses_1777731681234",
+      "created_at": "2026-05-02T14:21:21.235Z",
+      "task_description": "Fix build errors in the Booking System Angular frontend - including Angular template type casting, iconOnly property binding, missing component imports, and unused import warnings.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix Angular frontend build errors: as-casting, iconOnly, spinner/tag imports, unused imports",
+      "confirmed_at": "2026-05-02T14:26:19.414Z",
+      "consumed_at": "2026-05-02T14:26:24.839Z",
+      "audit": {
+        "execution_summary": "Fixed 5 categories of Angular frontend build errors: (1) Replaced $event as Type template casting with wrapper methods in appointment/service/user management components; (2) Fixed iconOnly=\"true\" -> [iconOnly]=\"true\"; (3) Added AppSpinnerComponent to imports in appointment-management and user-management; (4) Added Tag (primeng/tag) import to user-management; (5) Removed unused AppButtonComponent import from time-slot-picker. Result: npm run build 0 errors, tsc --noEmit 0 errors, 118 admin tests passing.",
+        "completed_at": "2026-05-02T14:26:24.839Z"
+      }
+    },
+    "cg_ses_1777738320971": {
+      "session_id": "cg_ses_1777738320971",
+      "created_at": "2026-05-02T16:12:00.972Z",
+      "task_description": "Fix global layout structure of Booking System Angular app - AppLayout, AppHeader, AppSidebar components",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fixed global layout structure of Booking System Angular app: 1) AppLayout - added w-full to main content area, 2) AppHeader - added shadow-sm always + shadow-md on scroll, gap-4 spacing, 3) AppSidebar - added shadow-lg, proper mobile drawer translate classes, mt-auto for profile. Wrote 36 tests (RED phase), implemented fixes (GREEN phase), all 61 tests pass, TypeScript 0 errors.",
+      "confirmed_at": "2026-05-02T16:28:31.681Z",
+      "consumed_at": "2026-05-02T16:28:40.966Z",
+      "audit": {
+        "execution_summary": "Fixed global layout structure of Booking System Angular app. Modified 3 components: AppLayout (added w-full to main), AppHeader (added shadow-sm + gap-4), AppSidebar (added shadow-lg, fixed mobile drawer translate classes, mt-auto for profile). Created comprehensive test suites for all 3 components with 61 total tests passing. TypeScript compilation has 0 errors. Delivered TASK_LOG.md, HANDOVER.md, and test_report.json.",
+        "completed_at": "2026-05-02T16:28:40.966Z"
+      }
+    },
+    "cg_ses_1777738345909": {
+      "session_id": "cg_ses_1777738345909",
+      "created_at": "2026-05-02T16:12:25.909Z",
+      "task_description": "Redesign Login and Register pages for Booking System Angular app with glass card styling, dark mode fixes, and TDD approach",
+      "gate_status": "checked",
+      "last_check_failed_items": [],
+      "plan_summary": null,
+      "confirmed_at": null,
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1777738360537": {
+      "session_id": "cg_ses_1777738360537",
+      "created_at": "2026-05-02T16:12:40.537Z",
+      "task_description": "Fix Admin Dashboard layout: stats grid, charts, bookings table, content width in Angular/PrimeNG/Tailwind app",
+      "gate_status": "checked",
+      "last_check_failed_items": [],
+      "plan_summary": null,
+      "confirmed_at": null,
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1777738395437": {
+      "session_id": "cg_ses_1777738395437",
+      "created_at": "2026-05-02T16:13:15.437Z",
+      "task_description": "Fix CSS variables and dark mode contrast issues across the Booking System Angular app. Modify src/styles.scss and app-card.component.scss.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix CSS variables and dark mode contrast issues in Angular app. Plan: 1) Remove redundant :root block from styles.scss since @theme already exports CSS custom properties. 2) Update dark mode section in styles.scss with better text contrast colors, add input-specific CSS variables, add global input/textarea/label/checkbox/dropdown dark mode overrides. 3) Update app-card.component.scss to add box-shadow to elevated variant and ensure dark mode uses correct background. 4) Run build and Jest tests for admin features. 5) Produce TASK_LOG.md, HANDOVER.md, and test_report.json.",
+      "confirmed_at": "2026-05-02T16:13:32.555Z",
+      "consumed_at": "2026-05-02T16:16:07.998Z",
+      "audit": {
+        "execution_summary": "Fixed CSS variables and dark mode contrast issues in Angular app. Modified src/styles.scss (removed redundant :root, updated dark mode text contrast, added input-specific variables and global dark mode overrides for inputs/labels/checkboxes/dropdowns) and src/app/shared/components/atoms/app-card/app-card.component.scss (added box-shadow to elevated variant, fixed dark mode background). Build passed with 0 errors. Jest admin tests passed: 6 suites, 118 tests. Outputs: TASK_LOG.md, HANDOVER.md, test_report.json created in .task_temp/css-fix/.",
+        "completed_at": "2026-05-02T16:16:07.998Z"
+      }
+    },
+    "cg_ses_1777739510355": {
+      "session_id": "cg_ses_1777739510355",
+      "created_at": "2026-05-02T16:31:50.355Z",
+      "task_description": "Fix auth page dark mode issues: login/register forms, labels, tab buttons visibility in dark mode. Modify login.component.html, login.component.scss, register.component.html, register.component.scss. Run typecheck and jest tests. Commit as [Green] auth-dark-mode-fix.",
+      "gate_status": "checked",
+      "last_check_failed_items": [],
+      "plan_summary": null,
+      "confirmed_at": null,
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1777739536627": {
+      "session_id": "cg_ses_1777739536627",
+      "created_at": "2026-05-02T16:32:16.628Z",
+      "task_description": "Implement admin dashboard fixes: stats grid layout, chart empty states, table styling, and admin content width",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "User explicitly instructed to proceed immediately with admin dashboard fixes: stats grid layout, chart empty states, table styling, and admin content width adjustments.",
+      "confirmed_at": "2026-05-02T16:32:22.394Z",
+      "consumed_at": "2026-05-02T16:36:33.565Z",
+      "audit": {
+        "execution_summary": "Implemented admin dashboard fixes: 1) Added hasBookingTrendData and hasServicePopularityData computed signals to dashboard.component.ts, 2) Fixed stats grid with w-full and added empty states for charts in dashboard.component.html, 3) Added proper host/card/chart/table styling in dashboard.component.scss, 4) Fixed admin content width to max-w-6xl in app-layout.component.html. All TypeScript checks passed (0 errors) and all 118 admin tests passed (6 suites). Committed as [Green] admin-dashboard-fix.",
+        "completed_at": "2026-05-02T16:36:33.565Z"
+      }
+    },
+    "cg_ses_1777739826874": {
+      "session_id": "cg_ses_1777739826874",
+      "created_at": "2026-05-02T16:37:06.874Z",
+      "task_description": "Fix auth pages dark mode styling - tab buttons, input labels, step indicators for dark theme visibility",
+      "gate_status": "armed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix auth pages dark mode styling: login/register tab buttons, contact type buttons, labels, step indicators. Add proper padding inside glass cards. Ensure all elements visible in dark mode with proper contrast.",
+      "confirmed_at": "2026-05-02T16:37:26.683Z",
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1777739887996": {
+      "session_id": "cg_ses_1777739887996",
+      "created_at": "2026-05-02T16:38:07.996Z",
+      "task_description": "Implement auth page dark mode fixes for login and register components",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Implement auth page dark mode fixes by adding padding wrappers inside glass cards and adding [data-theme=\"dark\"] CSS overrides for login and register components.",
+      "confirmed_at": "2026-05-02T16:40:25.257Z",
+      "consumed_at": "2026-05-02T16:40:32.059Z",
+      "audit": {
+        "execution_summary": "Implemented auth page dark mode fixes: added p-6 lg:p-8 padding wrappers inside glass cards for login/register components, and added [data-theme=\"dark\"] CSS overrides for tab buttons, type buttons, step indicators, labels, and terms text. TypeScript typecheck passed with 0 errors. Tests show 6 pre-existing failures unrelated to UI changes. Committed as [Green] auth-dark-mode-fix.",
+        "completed_at": "2026-05-02T16:40:32.059Z"
+      }
     }
   }
 }

@@ -3,6 +3,9 @@ import {
   ReactiveFormsModule,
   FormBuilder,
   Validators,
+  ValidatorFn,
+  ValidationErrors,
+  AbstractControl,
 } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthStore } from '../../../stores/auth/auth.store';
@@ -17,11 +20,59 @@ import {
   LoginSendCodeDto,
   LoginVerifyCodeDto,
 } from '../dto/auth.dto';
+import { AppCardComponent } from '../../../shared/components/atoms/app-card/app-card.component';
+import { AppButtonComponent } from '../../../shared/components/atoms/app-button/app-button.component';
+
+// Password strength validator matching backend requirements
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_REGEX = /^1[3-9]\d{9}$/;
+
+const passwordStrengthValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+  const value = control.value;
+  if (!value) return null;
+
+  const hasUpperCase = /[A-Z]/.test(value);
+  const hasLowerCase = /[a-z]/.test(value);
+  const hasNumber = /\d/.test(value);
+  const hasSpecialChar = /[@$!%*?&]/.test(value);
+  const isValidLength = value.length >= 8;
+
+  const valid = hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar && isValidLength;
+
+  return valid ? null : {
+    passwordStrength: {
+      hasUpperCase,
+      hasLowerCase,
+      hasNumber,
+      hasSpecialChar,
+      isValidLength,
+    },
+  };
+};
+
+function contactFormatValidator(type: ContactType): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const value = control.value;
+    if (!value) return null;
+
+    if (type === ContactType.EMAIL) {
+      return EMAIL_REGEX.test(value) ? null : { emailFormat: true };
+    }
+    return PHONE_REGEX.test(value) ? null : { phoneFormat: true };
+  };
+}
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterModule, CommonModule, FormsModule],
+  imports: [
+    ReactiveFormsModule,
+    RouterModule,
+    CommonModule,
+    FormsModule,
+    AppCardComponent,
+    AppButtonComponent,
+  ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })
@@ -49,10 +100,13 @@ export class LoginComponent implements OnDestroy {
   // Code login step: 1 = send code, 2 = verify code
   codeLoginStep = signal(1);
 
+  // Anti-enumeration: generic message for non-existent users (no PII leakage)
+  showAntiEnumMessage = signal(false);
+
   // Password Login Form
   passwordForm = this.fb.group({
     contact: ['', [Validators.required]],
-    password: ['', [Validators.required, Validators.minLength(8)]],
+    password: ['', [Validators.required, passwordStrengthValidator]],
   });
 
   // Code Login Form
@@ -65,8 +119,27 @@ export class LoginComponent implements OnDestroy {
   isLoading = this.authStore.isLoading;
   error = this.authStore.error;
 
+  constructor() {
+    this.updateContactValidators();
+  }
+
   ngOnDestroy(): void {
     this.clearCountdown();
+  }
+
+  setContactType(type: ContactType): void {
+    this.contactType.set(type);
+    this.updateContactValidators();
+  }
+
+  private updateContactValidators(): void {
+    const type = this.contactType();
+    const formatValidator = contactFormatValidator(type);
+    this.passwordForm.get('contact')?.setValidators([Validators.required, formatValidator]);
+    this.passwordForm.get('contact')?.updateValueAndValidity({ emitEvent: false });
+    const codeContact = this.codeLoginForm.get('contact');
+    codeContact?.setValidators([Validators.required, formatValidator]);
+    codeContact?.updateValueAndValidity({ emitEvent: false });
   }
 
   switchTab(tab: 'password' | 'code'): void {
@@ -74,6 +147,7 @@ export class LoginComponent implements OnDestroy {
     this.authStore.setError(null);
     this.clearCountdown();
     this.codeLoginStep.set(1);
+    this.showAntiEnumMessage.set(false);
   }
 
   // Password Login
@@ -94,10 +168,8 @@ export class LoginComponent implements OnDestroy {
 
     this.api.loginPassword(dto).subscribe({
       next: (response) => {
-        // Store tokens (auth response has no user object)
-        this.authStore.loginSuccess(response.accessToken, response.refreshToken);
+        this.authStore.loginSuccess(response.accessToken);
 
-        // Fetch user profile separately
         this.api.getUserProfile().subscribe({
           next: (profile) => {
             this.authStore.setUserProfile({
@@ -109,12 +181,10 @@ export class LoginComponent implements OnDestroy {
               createdAt: profile.createdAt,
             });
 
-            // Connect socket and redirect by role
             this.socketService.connect();
             this.router.navigate([RouteResolver.getPostLoginRoute(profile.userType)]);
           },
           error: () => {
-            // Even if profile fetch fails, redirect to default (auth guard handles fallback)
             this.socketService.connect();
             this.router.navigate(['/']);
           },
@@ -148,10 +218,14 @@ export class LoginComponent implements OnDestroy {
     };
 
     this.api.loginSendCode(dto).subscribe({
-      next: () => {
+      next: (response) => {
         this.authStore.setLoading(false);
-        this.codeLoginStep.set(2);
-        this.startCountdown();
+        if (response?.maskedContact) {
+          this.codeLoginStep.set(2);
+          this.startCountdown();
+        } else {
+          this.showAntiEnumMessage.set(true);
+        }
       },
       error: (err) => {
         this.authStore.setLoading(false);
@@ -179,10 +253,8 @@ export class LoginComponent implements OnDestroy {
 
     this.api.loginVerifyCode(dto).subscribe({
       next: (response) => {
-        // Store tokens (auth response has no user object)
-        this.authStore.loginSuccess(response.accessToken, response.refreshToken);
+        this.authStore.loginSuccess(response.accessToken);
 
-        // Fetch user profile separately
         this.api.getUserProfile().subscribe({
           next: (profile) => {
             this.authStore.setUserProfile({
@@ -194,12 +266,10 @@ export class LoginComponent implements OnDestroy {
               createdAt: profile.createdAt,
             });
 
-            // Connect socket and redirect by role
             this.socketService.connect();
             this.router.navigate([RouteResolver.getPostLoginRoute(profile.userType)]);
           },
           error: () => {
-            // Even if profile fetch fails, redirect to default (auth guard handles fallback)
             this.socketService.connect();
             this.router.navigate(['/']);
           },
@@ -253,5 +323,10 @@ export class LoginComponent implements OnDestroy {
   isCodeFieldInvalid(fieldName: string): boolean {
     const field = this.codeLoginForm.get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched));
+  }
+
+  getPasswordStrengthError(key: string): boolean {
+    const errors = this.passwordForm.get('password')?.errors?.['passwordStrength'];
+    return errors?.[key] === false;
   }
 }

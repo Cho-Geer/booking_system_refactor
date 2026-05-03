@@ -32,12 +32,17 @@ export class ServicesService {
       this.prisma.service.count({ where }),
     ]);
 
+    const totalPages = Math.ceil(total / pageSize);
     return {
-      data: services,
-      total,
-      page,
-      pageSize,
-      totalPages: Math.ceil(total / pageSize),
+      items: services,
+      meta: {
+        total,
+        page,
+        limit: pageSize,
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1,
+      },
     };
   }
 

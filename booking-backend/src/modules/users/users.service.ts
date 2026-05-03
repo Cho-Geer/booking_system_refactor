@@ -63,12 +63,17 @@ export class UsersService {
       this.prisma.user.count(),
     ]);
 
+    const totalPages = Math.ceil(total / pageSize);
     return {
-      data: users,
-      total,
-      page,
-      pageSize,
-      totalPages: Math.ceil(total / pageSize),
+      items: users,
+      meta: {
+        total,
+        page,
+        limit: pageSize,
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1,
+      },
     };
   }
 

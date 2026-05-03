@@ -1,0 +1,11 @@
+<button type="button"
+        (click)="toggleTheme()"
+        [attr.aria-label]="tooltip"
+        class="relative min-touch-target w-10 h-10 flex items-center justify-center rounded-xl hover:bg-black/5 dark-hover-bg transition-colors duration-200">
+  <!-- Sun icon (shown in dark mode - click to switch to light) -->
+  <i class="pi pi-sun text-lg"
+     [ngClass]="{'hidden': !isDarkMode(), 'text-yellow-400': isDarkMode()}"></i>
+  <!-- Moon icon (shown in light mode - click to switch to dark) -->
+  <i class="pi pi-moon text-lg"
+     [ngClass]="{'hidden': isDarkMode(), 'text-text-secondary': !isDarkMode()}"></i>
+</button>

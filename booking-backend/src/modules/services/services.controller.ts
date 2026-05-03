@@ -44,10 +44,10 @@ export class ServicesController {
   @ApiResponse({ status: 200, description: "List of services" })
   async findAll(
     @Query("page", OptionalParseIntPipe) page: number = 1,
-    @Query("pageSize", OptionalParseIntPipe) pageSize: number = 10,
+    @Query("limit", OptionalParseIntPipe) limit: number = 20,
     @Query("isActive") isActive?: boolean,
   ) {
-    return this.servicesService.findAll(page, pageSize, isActive);
+    return this.servicesService.findAll(page, limit, isActive);
   }
 
   @Get(":id")

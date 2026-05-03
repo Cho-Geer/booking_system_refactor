@@ -81,7 +81,15 @@ describe('ServiceSelectionComponent', () => {
       expect(component.isLoading()).toBe(false);
     });
 
-    it('should call loadServices in constructor', () => {
+    it('should initialize searchQuery as empty', () => {
+      expect(component.searchQuery()).toBe('');
+    });
+
+    it('should initialize activeCategory as null', () => {
+      expect(component.activeCategory()).toBeNull();
+    });
+
+    it('should call loadServices in ngOnInit', () => {
       apiServiceMock.getServices.mockReturnValue(of(mockServices));
       fixture.detectChanges();
 
@@ -165,13 +173,11 @@ describe('ServiceSelectionComponent', () => {
       expect(component.selectedServiceId()).toBe('svc-2');
     });
 
-    it('should call loadSlotsForService with the service id', () => {
-      const service = mockServices[1];
-      jest.spyOn(component as any, 'loadSlotsForService');
-
+    it('should call store.setSelectedServiceId with service id', () => {
+      const service = mockServices[0];
       component.selectService(service);
 
-      expect((component as any).loadSlotsForService).toHaveBeenCalledWith('svc-2');
+      expect(storeMock.setSelectedServiceId).toHaveBeenCalledWith('svc-1');
     });
   });
 
@@ -197,62 +203,125 @@ describe('ServiceSelectionComponent', () => {
     });
   });
 
+  describe('search and filter', () => {
+    beforeEach(() => {
+      component.services.set(mockServices);
+    });
+
+    it('should filter services by search query', () => {
+      component.onSearchInput('color');
+      expect(component.filteredServices().length).toBe(1); // Coloring
+    });
+
+    it('should return all services with empty search', () => {
+      component.onSearchInput('');
+      expect(component.filteredServices().length).toBe(3);
+    });
+
+    it('should return empty when search matches nothing', () => {
+      component.onSearchInput('zzzzzz');
+      expect(component.filteredServices().length).toBe(0);
+    });
+
+    it('should set category filter', () => {
+      component.setCategoryFilter('Haircut');
+      expect(component.activeCategory()).toBe('Haircut');
+    });
+
+    it('should clear category filter with null', () => {
+      component.setCategoryFilter('Haircut');
+      component.setCategoryFilter(null);
+      expect(component.activeCategory()).toBeNull();
+    });
+  });
+
+  describe('categories computed', () => {
+    it('should derive categories from service names', () => {
+      component.services.set(mockServices);
+      const cats = component.categories();
+      expect(cats.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('should return empty categories when no services', () => {
+      component.services.set([]);
+      expect(component.categories().length).toBe(0);
+    });
+  });
+
   describe('template rendering', () => {
     beforeEach(() => {
       apiServiceMock.getServices.mockReturnValue(of(mockServices));
       fixture.detectChanges();
     });
 
-    it('should render service cards for each service', () => {
-      const cards = fixture.nativeElement.querySelectorAll('.service-card');
+    it('should render service card wrappers for each service', () => {
+      const cards = fixture.nativeElement.querySelectorAll('.service-card-wrapper');
       expect(cards.length).toBe(3);
     });
 
     it('should render service name in each card', () => {
-      const cards = fixture.nativeElement.querySelectorAll('.service-card');
-      expect(cards[0].querySelector('h3')?.textContent.trim()).toBe('Haircut');
-      expect(cards[1].querySelector('h3')?.textContent.trim()).toBe('Coloring');
-      expect(cards[2].querySelector('h3')?.textContent.trim()).toBe('Styling');
+      const cards = fixture.nativeElement.querySelectorAll('.service-card-wrapper');
+      const texts = cards[0].textContent || '';
+      expect(texts).toContain('Haircut');
     });
 
-    it('should render service description in each card', () => {
-      const cards = fixture.nativeElement.querySelectorAll('.service-card');
-      expect(cards[0].querySelector('p')?.textContent.trim()).toBe('Standard haircut');
+    it('should render service description', () => {
+      const cards = fixture.nativeElement.querySelectorAll('.service-card-wrapper');
+      expect(cards[0].textContent).toContain('Standard haircut');
     });
 
     it('should render service duration', () => {
-      const cards = fixture.nativeElement.querySelectorAll('.service-card');
-      expect(cards[0].querySelector('.duration')?.textContent.trim()).toBe('30 min');
+      const cards = fixture.nativeElement.querySelectorAll('.service-card-wrapper');
+      expect(cards[0].textContent).toContain('30');
+      expect(cards[0].textContent).toContain('分钟');
     });
 
     it('should render service price', () => {
-      const cards = fixture.nativeElement.querySelectorAll('.service-card');
-      expect(cards[0].querySelector('.price')?.textContent.trim()).toContain('$25');
+      const cards = fixture.nativeElement.querySelectorAll('.service-card-wrapper');
+      expect(cards[0].textContent).toContain('$25');
     });
 
     it('should not show loading state when not loading', () => {
-      const loading = fixture.nativeElement.querySelector('.loading');
-      expect(loading).toBeFalsy();
+      const skeleton = fixture.nativeElement.querySelector('[role="status"]');
+      expect(skeleton).toBeFalsy();
     });
 
-    it('should show loading state when isLoading is true', () => {
+    it('should show loading skeleton when isLoading is true', () => {
       component.isLoading.set(true);
       fixture.detectChanges();
 
-      const loading = fixture.nativeElement.querySelector('.loading');
-      expect(loading).toBeTruthy();
-      // Should have skeleton shimmer elements when loading
-      const skeletons = loading.querySelectorAll('.skeleton');
-      expect(skeletons.length).toBeGreaterThan(0);
+      const skeleton = fixture.nativeElement.querySelector('[role="status"]');
+      expect(skeleton).toBeTruthy();
+      const skeletonItems = skeleton.querySelectorAll('.skeleton');
+      expect(skeletonItems.length).toBeGreaterThan(0);
     });
 
-    it('should highlight selected service card', () => {
+    it('should highlight selected service card with selected class', () => {
+      component.selectService(mockServices[0]);
+      fixture.detectChanges();
+
+      const wrappers = fixture.nativeElement.querySelectorAll('.service-card-wrapper');
+      expect(wrappers[0].classList.contains('selected')).toBe(true);
+      expect(wrappers[1].classList.contains('selected')).toBe(false);
+    });
+
+    it('should have app-card with gradient-card-selected when selected', () => {
       component.selectService(mockServices[0]);
       fixture.detectChanges();
 
       const cards = fixture.nativeElement.querySelectorAll('.service-card');
-      expect(cards[0].classList.contains('selected')).toBe(true);
-      expect(cards[1].classList.contains('selected')).toBe(false);
+      expect(cards[0].classList.contains('gradient-card-selected')).toBe(true);
+    });
+
+    it('[RED] should have services-page class on container', () => {
+      const container = fixture.nativeElement.querySelector('.services-page');
+      expect(container).toBeTruthy();
+    });
+
+    it('[RED] should have gradient-text class on header', () => {
+      const header = fixture.nativeElement.querySelector('.gradient-text');
+      expect(header).toBeTruthy();
+      expect(header.textContent).toContain('选择服务');
     });
   });
 
@@ -262,28 +331,28 @@ describe('ServiceSelectionComponent', () => {
       fixture.detectChanges();
     });
 
-    it('should select service on card click', () => {
-      const cards = fixture.nativeElement.querySelectorAll('.service-card');
-      cards[0].click();
+    it('should select service on card wrapper click', () => {
+      const wrappers = fixture.nativeElement.querySelectorAll('.service-card-wrapper');
+      wrappers[0].click();
 
       expect(component.selectedServiceId()).toBe('svc-1');
     });
 
-    it('should select service on Enter key press', () => {
-      const cards = fixture.nativeElement.querySelectorAll('.service-card');
+    it('should select service on Enter key press on wrapper', () => {
+      const wrappers = fixture.nativeElement.querySelectorAll('.service-card-wrapper');
       const event = new KeyboardEvent('keydown', { key: 'Enter' });
-      cards[1].dispatchEvent(event);
+      wrappers[1].dispatchEvent(event);
 
       expect(component.selectedServiceId()).toBe('svc-2');
     });
 
-    it('should change selection when clicking different cards', () => {
-      const cards = fixture.nativeElement.querySelectorAll('.service-card');
+    it('should change selection when clicking different wrappers', () => {
+      const wrappers = fixture.nativeElement.querySelectorAll('.service-card-wrapper');
 
-      cards[0].click();
+      wrappers[0].click();
       expect(component.selectedServiceId()).toBe('svc-1');
 
-      cards[2].click();
+      wrappers[2].click();
       expect(component.selectedServiceId()).toBe('svc-3');
     });
   });
@@ -293,34 +362,29 @@ describe('ServiceSelectionComponent', () => {
       apiServiceMock.getServices.mockReturnValue(of([]));
       fixture.detectChanges();
 
-      const cards = fixture.nativeElement.querySelectorAll('.service-card');
-      expect(cards.length).toBe(0);
+      const wrappers = fixture.nativeElement.querySelectorAll('.service-card-wrapper');
+      expect(wrappers.length).toBe(0);
     });
   });
 
   describe('skeleton shimmer loading', () => {
     beforeEach(() => {
-      // Simulate non-loading API response, then override to loading
       apiServiceMock.getServices.mockReturnValue(of(mockServices));
-      fixture.detectChanges(); // triggers ngOnInit, loads services, isLoading = false
-      // Now manually set loading and re-render
+      fixture.detectChanges();
       component.isLoading.set(true);
       fixture.detectChanges();
     });
 
     it('[RED] should show skeleton shimmer loading when isLoading is true', () => {
-      const loadingEl = fixture.nativeElement.querySelector('.loading');
-      expect(loadingEl).toBeTruthy();
-      // Should have skeleton elements
-      const skeletons = loadingEl.querySelectorAll('.skeleton');
+      const skeleton = fixture.nativeElement.querySelector('[role="status"]');
+      expect(skeleton).toBeTruthy();
+      const skeletons = skeleton.querySelectorAll('.skeleton');
       expect(skeletons.length).toBeGreaterThan(0);
     });
 
     it('[RED] should have skeleton placeholder elements for shimmer effect', () => {
-      const loadingEl = fixture.nativeElement.querySelector('.loading');
-      expect(loadingEl).toBeTruthy();
-      // The loading container should have loading-skeleton class
-      expect(loadingEl.classList.contains('loading-skeleton')).toBe(true);
+      const skeleton = fixture.nativeElement.querySelector('[role="status"]');
+      expect(skeleton).toBeTruthy();
     });
   });
 });

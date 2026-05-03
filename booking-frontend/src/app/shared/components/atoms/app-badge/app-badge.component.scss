@@ -1,0 +1,121 @@
+/* AppBadge - Atomic status badge component */
+
+:host {
+  display: inline-flex;
+}
+
+.app-badge {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 500;
+  border: 1px solid transparent;
+  line-height: 1;
+}
+
+/* Size variants */
+.app-badge--sm {
+  height: 16px;
+  padding: 0 6px;
+  font-size: 0.625rem;
+}
+
+.app-badge--md {
+  height: 20px;
+  padding: 0 8px;
+  font-size: 0.75rem;
+}
+
+.app-badge--lg {
+  height: 24px;
+  padding: 0 12px;
+  font-size: 0.875rem;
+}
+
+/* Shape variants */
+.app-badge--rounded {
+  border-radius: 4px;
+}
+
+.app-badge--pill {
+  border-radius: 9999px;
+}
+
+/* Status colors - light mode solid */
+.app-badge--pending {
+  background: rgba(255, 125, 0, 0.1);
+  color: #FF7D00;
+  border-color: rgba(255, 125, 0, 0.2);
+}
+
+.app-badge--confirmed {
+  background: rgba(0, 180, 42, 0.1);
+  color: #00B42A;
+  border-color: rgba(0, 180, 42, 0.2);
+}
+
+.app-badge--completed {
+  background: rgba(22, 119, 255, 0.1);
+  color: #1677FF;
+  border-color: rgba(22, 119, 255, 0.2);
+}
+
+.app-badge--cancelled {
+  background: rgba(245, 63, 63, 0.1);
+  color: #F53F3F;
+  border-color: rgba(245, 63, 63, 0.2);
+}
+
+.app-badge--expired {
+  background: rgba(134, 144, 156, 0.1);
+  color: #86909C;
+  border-color: rgba(134, 144, 156, 0.2);
+}
+
+.app-badge--processing {
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+  border-color: rgba(102, 126, 234, 0.2);
+}
+
+.app-badge--error {
+  background: rgba(245, 63, 63, 0.15);
+  color: #F53F3F;
+  border-color: rgba(245, 63, 63, 0.3);
+}
+
+/* Glass mode */
+.app-badge--glass {
+  background: transparent;
+  backdrop-filter: blur(4px);
+}
+
+.app-badge--glass.app-badge--pending {
+  background: rgba(255, 125, 0, 0.08);
+  border-color: rgba(255, 125, 0, 0.25);
+}
+
+.app-badge--glass.app-badge--confirmed {
+  background: rgba(0, 180, 42, 0.08);
+  border-color: rgba(0, 180, 42, 0.25);
+}
+
+.app-badge--glass.app-badge--completed {
+  background: rgba(22, 119, 255, 0.08);
+  border-color: rgba(22, 119, 255, 0.25);
+}
+
+.app-badge--glass.app-badge--cancelled,
+.app-badge--glass.app-badge--error {
+  background: rgba(245, 63, 63, 0.08);
+  border-color: rgba(245, 63, 63, 0.25);
+}
+
+.app-badge--glass.app-badge--expired {
+  background: rgba(134, 144, 156, 0.08);
+  border-color: rgba(134, 144, 156, 0.25);
+}
+
+.app-badge--glass.app-badge--processing {
+  background: rgba(102, 126, 234, 0.08);
+  border-color: rgba(102, 126, 234, 0.25);
+}

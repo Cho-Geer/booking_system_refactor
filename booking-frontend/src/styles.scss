@@ -2,7 +2,17 @@
 @plugin "tailwindcss-primeui";
 
 @theme {
+  /* Background colors */
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #F2F3F5;
+  --color-bg-tertiary: #e4e8ec;
+
+  /* Border colors */
+  --color-border: #E5E6EB;
+  --color-border-light: #F2F3F5;
+
   /* Glassmorphism colors */
+  --color-primary: #667eea;
   --color-primary-start: #667eea;
   --color-primary-end: #764ba2;
   --color-primary-solid: #667eea;
@@ -11,6 +21,14 @@
   --color-warning: #FF7D00;
   --color-danger: #F53F3F;
   --color-info: #1677FF;
+
+  /* Text colors */
+  --color-text-primary: #1D2129;
+  --color-text-secondary: #86909C;
+  --color-text-disabled: #C9CDD4;
+
+  /* Admin palette */
+  --color-admin-bg: #F2F3F5;
 
   /* Glass backgrounds */
   --color-glass-light: rgba(255, 255, 255, 0.85);
@@ -47,7 +65,7 @@
     100% { background-position: -200% 0; }
   }
   @keyframes pageEnter {
-    from { opacity: 0; transform: translateY(20px); }
+    from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
   }
   @keyframes fadeIn {
@@ -72,11 +90,209 @@
   }
 }
 
-/* Glassmorphism utility classes */
+/* ============================================
+   Dark Mode Variables
+   Applied when <html data-theme="dark">
+   ============================================ */
+[data-theme="dark"] {
+  --color-bg-primary: #1D2129;
+  --color-bg-secondary: #272E3B;
+  --color-bg-tertiary: #333D4D;
+  --color-text-primary: #F2F3F5;
+  --color-text-secondary: #A0A8B0;
+  --color-text-disabled: #6B7280;
+  --color-border: #4E5969;
+  --color-border-light: #333D4D;
+
+  /* Input field backgrounds - lighter than page */
+  --color-input-bg: #333D4D;
+  --color-input-border: #5A6478;
+  --color-input-text: #F2F3F5;
+  --color-input-placeholder: #6B7280;
+
+  /* Glassmorphism (Dark) */
+  --color-glass-light: rgba(39, 46, 59, 0.85);
+  --color-glass-medium: rgba(39, 46, 59, 0.75);
+  --color-glass-dark: rgba(39, 46, 59, 0.65);
+  --color-glass-overlay: rgba(0, 0, 0, 0.6);
+  --color-glass-border: rgba(255, 255, 255, 0.1);
+
+  /* Shadows (reduced intensity) */
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --shadow-glass-hover: 0 20px 60px rgba(102, 126, 234, 0.15);
+  --shadow-glass-lg: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+/* Dark mode form elements */
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] .p-inputtext,
+[data-theme="dark"] .p-inputnumber-input {
+  background-color: #333D4D !important;
+  border-color: #5A6478 !important;
+  color: #F2F3F5 !important;
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+  color: #6B7280 !important;
+}
+
+[data-theme="dark"] input:focus,
+[data-theme="dark"] textarea:focus,
+[data-theme="dark"] .p-inputtext:focus {
+  border-color: #667eea !important;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2) !important;
+}
+
+/* Dark mode labels */
+[data-theme="dark"] label,
+[data-theme="dark"] .form-label,
+[data-theme="dark"] .field-label {
+  color: #A0A8B0 !important;
+}
+
+/* Dark mode checkboxes */
+[data-theme="dark"] .p-checkbox .p-checkbox-box {
+  background-color: #333D4D;
+  border-color: #5A6478;
+}
+
+/* Dark mode dropdowns */
+[data-theme="dark"] .p-dropdown {
+  background-color: #333D4D;
+  border-color: #5A6478;
+}
+
+[data-theme="dark"] .p-dropdown .p-dropdown-label {
+  color: #F2F3F5;
+}
+
+/* Smooth theme transition on html element */
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ============================================
+   Dark Mode Overrides for Utility Classes
+   ============================================ */
+
+/* Gradient page background — dark variant */
+[data-theme="dark"] .gradient-page-bg {
+  background: linear-gradient(135deg, #1D2129 0%, #272E3B 100%);
+}
+
+/* Admin page background — dark variant */
+[data-theme="dark"] .admin-page-bg {
+  background: #1D2129;
+}
+
+/* Glass level utilities — dark variant */
+[data-theme="dark"] .glass-level-1 {
+  background: rgba(39, 46, 59, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .glass-level-2 {
+  background: rgba(39, 46, 59, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="dark"] .glass-level-3 {
+  background: rgba(39, 46, 59, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="dark"] .glass-overlay {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+/* Glass input — dark variant */
+[data-theme="dark"] .glass-input {
+  background: rgba(39, 46, 59, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #F2F3F5;
+}
+
+[data-theme="dark"] .glass-input::placeholder {
+  color: #4E5969;
+}
+
+[data-theme="dark"] .glass-input:focus {
+  background: rgba(39, 46, 59, 0.65);
+  border-color: var(--color-primary, #667eea);
+}
+
+/* Secondary glass button — dark variant */
+[data-theme="dark"] .btn-secondary-glass {
+  background: rgba(39, 46, 59, 0.65);
+  color: #F2F3F5;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .btn-secondary-glass:hover {
+  background: rgba(39, 46, 59, 0.85);
+}
+
+/* Bottom action bar — dark variant */
+[data-theme="dark"] .bottom-action-bar {
+  background: rgba(29, 33, 41, 0.95);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Scrollbar — dark variant */
+[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Body colors — dark variant */
+[data-theme="dark"] body {
+  color: #F2F3F5;
+  background: linear-gradient(135deg, #1D2129 0%, #272E3B 100%);
+}
+
+/* Selection — dark variant */
+[data-theme="dark"] ::selection {
+  background: rgba(102, 126, 234, 0.3);
+  color: #F2F3F5;
+}
+
+/* Skeleton — dark variant */
+[data-theme="dark"] .skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(39, 46, 59, 0.5) 0%,
+    rgba(39, 46, 59, 0.7) 50%,
+    rgba(39, 46, 59, 0.5) 100%
+  );
+}
+
+/* Dark hover utility */
+[data-theme="dark"] .dark-hover-bg:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Header — dark variant */
+[data-theme="dark"] header {
+  background: #272E3B !important;
+  border-color: #333D4D !important;
+}
+
+/* ============================================
+   Glassmorphism utility classes
+   ============================================ */
 .glass-level-1 {
   background: rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 16px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
@@ -137,6 +353,135 @@
 .gradient-page-bg {
   background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
 }
+
+.admin-page-bg {
+  background: #F2F3F5;
+}
+
+/* Glass input — translucent background with focus glow */
+.glass-input {
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: var(--color-text-primary, #1D2129);
+  font-size: 0.9375rem;
+  transition: all 0.2s ease;
+  outline: none;
+  width: 100%;
+}
+
+.glass-input::placeholder {
+  color: #C9CDD4;
+}
+
+.glass-input:focus {
+  border-color: var(--color-primary, #667eea);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+  background: rgba(255, 255, 255, 0.65);
+}
+
+.glass-input.error {
+  border-color: var(--color-danger, #F53F3F);
+  box-shadow: 0 0 0 3px rgba(245, 63, 63, 0.15);
+}
+
+/* Glass buttons */
+.btn-primary-glass {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+}
+
+.btn-primary-glass:hover {
+  box-shadow: 0 12px 40px rgba(102, 126, 234, 0.3);
+  transform: scale(1.02);
+}
+
+.btn-primary-glass:active {
+  transform: scale(0.98);
+}
+
+.btn-primary-glass:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-secondary-glass {
+  background: rgba(255, 255, 255, 0.65);
+  color: var(--color-text-primary, #1D2129);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  outline: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+}
+
+.btn-secondary-glass:hover {
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.btn-secondary-glass:active {
+  transform: scale(0.98);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-primary, #667eea);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 44px;
+}
+
+.btn-ghost:hover {
+  background: rgba(102, 126, 234, 0.08);
+}
+
+/* Gradient border for selected cards */
+.gradient-card-selected {
+  position: relative;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.gradient-card-selected::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 2px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+/* Admin page background */
 
 /* Page enter animation — GPU accelerated */
 .page-enter {

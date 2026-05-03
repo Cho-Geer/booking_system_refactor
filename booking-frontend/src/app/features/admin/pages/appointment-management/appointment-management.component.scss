@@ -2,6 +2,11 @@
   display: block;
 }
 
+/* Table row hover overrides */
+::ng-deep .p-datatable .p-datatable-tbody > tr:hover {
+  background-color: var(--color-bg-secondary, #F2F3F5) !important;
+}
+
 /* Ensure selects and datepickers are full-width on mobile */
 @media (max-width: 640px) {
   ::ng-deep .p-select,

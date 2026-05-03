@@ -12,8 +12,11 @@ describe('BookingSuccessComponent', () => {
 
   const mockSlot = {
     id: 'slot-1',
-    date: '2026-04-20',
-    time: '10:00',
+    startTime: '2026-04-20T10:00:00',
+    endTime: '2026-04-20T11:00:00',
+    capacity: 1,
+    bookedCount: 1,
+    available: false,
     isActive: false,
     bookedBy: 'user-1',
   };
@@ -58,9 +61,9 @@ describe('BookingSuccessComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should render "Booking Confirmed!" heading', () => {
+  it('should render "预约成功!" heading', () => {
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.textContent).toContain('Booking Confirmed!');
+    expect(compiled.textContent).toContain('预约成功!');
   });
 
   it('should display success icon', () => {
@@ -69,9 +72,39 @@ describe('BookingSuccessComponent', () => {
     expect(checkmark).toBeTruthy();
   });
 
+  it('[RED] should have gradient-page-bg on container', () => {
+    const compiled = fixture.nativeElement as HTMLElement;
+    const wrapper = compiled.firstElementChild as HTMLElement;
+    expect(wrapper.classList.contains('gradient-page-bg')).toBe(true);
+  });
+
+  it('[RED] should have app-card with glass variant', () => {
+    const compiled = fixture.nativeElement as HTMLElement;
+    const card = compiled.querySelector('app-card');
+    expect(card).toBeTruthy();
+  });
+
+  it('[RED] should have app-button elements for action buttons', () => {
+    const compiled = fixture.nativeElement as HTMLElement;
+    const buttons = compiled.querySelectorAll('app-button');
+    expect(buttons.length).toBeGreaterThan(0);
+  });
+
+  it('[RED] should have gradient success checkmark circle', () => {
+    const compiled = fixture.nativeElement as HTMLElement;
+    const circle = compiled.querySelector('.success-icon-circle');
+    expect(circle).toBeTruthy();
+    expect(circle.classList.contains('animate-success-pop')).toBe(true);
+  });
+
   it('should display booking time when slot is available', () => {
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.textContent).toContain('10:00');
+  });
+
+  it('should display booking reference number', () => {
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.textContent).toContain('BK-');
   });
 
   it('should display confirmation email message', () => {
@@ -79,9 +112,9 @@ describe('BookingSuccessComponent', () => {
     expect(compiled.textContent).toContain('test@example.com');
   });
 
-  it('should navigate to "/booking" when viewMyBookings is called', () => {
+  it('should navigate to "/my-bookings" when viewMyBookings is called', () => {
     component.viewMyBookings();
-    expect(router.navigate).toHaveBeenCalledWith(['/booking']);
+    expect(router.navigate).toHaveBeenCalledWith(['/my-bookings']);
   });
 
   it('should navigate to "/booking" when goHome is called', () => {

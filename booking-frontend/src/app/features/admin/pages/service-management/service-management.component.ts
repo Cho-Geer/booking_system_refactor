@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import { TableModule } from 'primeng/table';
 import { Dialog } from 'primeng/dialog';
@@ -9,7 +9,6 @@ import { Textarea } from 'primeng/textarea';
 import { SelectModule } from 'primeng/select';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { FormsModule } from '@angular/forms';
-import { Tag } from 'primeng/tag';
 import { AdminStore } from '../../stores/admin.store';
 import { AdminService } from '../../services/admin.service';
 import {
@@ -17,13 +16,23 @@ import {
   CreateAdminServiceRequest,
   UpdateAdminServiceRequest,
 } from '../../dto/admin.dto';
+import { AppCardComponent } from '../../../../shared/components/atoms/app-card/app-card.component';
+import { AppButtonComponent } from '../../../../shared/components/atoms/app-button/app-button.component';
+import { AppBadgeComponent, BadgeStatus } from '../../../../shared/components/atoms/app-badge/app-badge.component';
+import { AppInputComponent } from '../../../../shared/components/atoms/app-input/app-input.component';
+import { AppDropdownComponent } from '../../../../shared/components/atoms/app-dropdown/app-dropdown.component';
+import { AppSpinnerComponent } from '../../../../shared/components/atoms/app-spinner/app-spinner.component';
+
+export type ViewMode = 'grid' | 'list';
 
 @Component({
   selector: 'app-service-management',
   standalone: true,
   imports: [
     TableModule, Dialog, ButtonModule, InputTextModule, InputNumberModule,
-    Textarea, SelectModule, ToggleSwitch, FormsModule, Tag, CurrencyPipe,
+    Textarea, SelectModule, ToggleSwitch, FormsModule, CurrencyPipe,
+    AppCardComponent, AppButtonComponent, AppBadgeComponent,
+    AppInputComponent, AppDropdownComponent, AppSpinnerComponent,
   ],
   templateUrl: './service-management.component.html',
   styleUrl: './service-management.component.scss',
@@ -33,6 +42,9 @@ export class ServiceManagementComponent implements OnInit {
   private readonly adminService = inject(AdminService);
 
   readonly vm = this.store.vm;
+
+  // View mode
+  readonly viewMode = signal<ViewMode>('list');
 
   // Dialog state
   readonly serviceDialogVisible = signal(false);
@@ -44,7 +56,8 @@ export class ServiceManagementComponent implements OnInit {
 
   // Search/filter
   readonly searchQuery = signal('');
-  readonly activeFilter = signal<boolean | undefined>(undefined);
+  readonly categoryFilter = signal('');
+  readonly statusFilter = signal<string>('');
 
   // Form model
   formName = '';
@@ -53,6 +66,31 @@ export class ServiceManagementComponent implements OnInit {
   formPrice: number | null = null;
   formActive = true;
   formImageUrl = '';
+
+  // Form validation
+  formErrors: { name?: string; duration?: string } = {};
+
+  // Stats computed from services list
+  readonly totalServices = computed(() => this.vm().services.length);
+  readonly activeServicesCount = computed(() => this.vm().services.filter(s => s.active).length);
+  readonly averagePrice = computed(() => {
+    const services = this.vm().services;
+    if (services.length === 0) return 0;
+    const total = services.reduce((sum, s) => sum + s.price, 0);
+    return Math.round(total / services.length * 100) / 100;
+  });
+
+  readonly filterStatusOptions = [
+    { label: 'All', value: '' },
+    { label: 'Active', value: 'active' },
+    { label: 'Inactive', value: 'inactive' },
+  ];
+
+  readonly categoryOptions = [
+    { label: 'All Categories', value: '' },
+    { label: 'Category A', value: 'Category A' },
+    { label: 'Category B', value: 'Category B' },
+  ];
 
   ngOnInit(): void {
     this.loadServices();
@@ -64,7 +102,9 @@ export class ServiceManagementComponent implements OnInit {
       page: 1,
       limit: 10,
       search: this.searchQuery() || undefined,
-      active: this.activeFilter(),
+      active: this.statusFilter() === 'active' ? true :
+              this.statusFilter() === 'inactive' ? false :
+              undefined,
     }).subscribe({
       next: (response) => {
         this.store.setServices(response.items, response.total, response.page);
@@ -74,11 +114,16 @@ export class ServiceManagementComponent implements OnInit {
     });
   }
 
+  toggleView(mode: ViewMode): void {
+    this.viewMode.set(mode);
+  }
+
   openNew(): void {
     this.resetForm();
     this.isEdit.set(false);
     this.selectedService.set(null);
     this.submitted.set(false);
+    this.formErrors = {};
     this.serviceDialogVisible.set(true);
   }
 
@@ -92,6 +137,7 @@ export class ServiceManagementComponent implements OnInit {
     this.formActive = svc.active;
     this.formImageUrl = svc.imageUrl ?? '';
     this.submitted.set(false);
+    this.formErrors = {};
     this.serviceDialogVisible.set(true);
   }
 
@@ -108,6 +154,19 @@ export class ServiceManagementComponent implements OnInit {
 
   saveService(): void {
     this.submitted.set(true);
+    this.formErrors = {};
+
+    // Validation
+    if (!this.formName.trim()) {
+      this.formErrors.name = 'Service name is required';
+    }
+    if (this.formDuration === null || this.formDuration <= 0) {
+      this.formErrors.duration = 'Duration is required and must be positive';
+    }
+
+    if (Object.keys(this.formErrors).length > 0) {
+      return;
+    }
 
     if (this.isEdit() && this.selectedService()) {
       const updates: UpdateAdminServiceRequest = {
@@ -161,8 +220,25 @@ export class ServiceManagementComponent implements OnInit {
     this.loadServices();
   }
 
-  getActiveSeverity(active: boolean): 'success' | 'danger' {
-    return active ? 'success' : 'danger';
+  clearFilters(): void {
+    this.searchQuery.set('');
+    this.categoryFilter.set('');
+    this.statusFilter.set('');
+    this.loadServices();
+  }
+
+  onCategoryFilterChange(value: unknown): void {
+    this.categoryFilter.set(value as string);
+    this.applyFilter();
+  }
+
+  onStatusFilterChange(value: unknown): void {
+    this.statusFilter.set(value as string);
+    this.applyFilter();
+  }
+
+  getActiveSeverity(active: boolean): BadgeStatus {
+    return active ? 'confirmed' : 'expired';
   }
 
   private resetForm(): void {
@@ -172,5 +248,6 @@ export class ServiceManagementComponent implements OnInit {
     this.formPrice = null;
     this.formActive = true;
     this.formImageUrl = '';
+    this.formErrors = {};
   }
 }

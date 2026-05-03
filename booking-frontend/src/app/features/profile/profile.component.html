@@ -7,7 +7,7 @@
 
   @if (user(); as u) {
     <!-- Avatar Card -->
-    <div class="glass-level-2 rounded-2xl p-6 sm:p-8 mb-6 text-center">
+    <app-card variant="glass" class="mb-6 text-center">
       <div class="relative inline-flex">
         <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-primary-start to-primary-end flex items-center justify-center text-white text-xl sm:text-2xl font-bold ring-4 ring-white shadow-lg">
           {{ avatarInitials() }}
@@ -20,23 +20,21 @@
         </button>
       </div>
       <h2 class="text-xl font-bold text-gray-900 mt-4" data-testid="user-name">{{ u.name }}</h2>
-      <span class="inline-block mt-2 px-3 py-1 rounded-full text-xs font-medium bg-primary-start/10 text-primary-start border border-primary-start/20">
-        {{ u.userType === 'CUSTOMER' ? '普通用户' : u.userType === 'ADMIN' ? '管理员' : '超级管理员' }}
-      </span>
-    </div>
+      <app-badge [status]="u.userType === 'CUSTOMER' ? 'completed' : 'confirmed'" size="md" shape="pill" class="mt-2 inline-block">
+      </app-badge>
+    </app-card>
 
     <!-- Profile Info Card -->
-    <div class="glass-level-1 rounded-2xl p-4 sm:p-6 mb-6">
-      <div class="flex items-center justify-between mb-6">
-        <h3 class="text-base font-bold text-gray-900">基本信息</h3>
-        <button
-          class="px-4 py-2 rounded-lg text-sm font-medium text-primary-start border border-primary-start/30 hover:bg-primary-start/5 transition-all min-h-[44px]"
-          (click)="toggleEdit()"
+    <app-card variant="glass" header="基本信息" headerIcon="pi pi-user" class="mb-6">
+      <div class="flex items-center justify-between mb-4">
+        <div></div>
+        <app-button
+          [label]="isEditing() ? '取消' : '编辑资料'"
+          variant="ghost"
+          size="sm"
+          (onClick)="toggleEdit()"
           data-testid="edit-button"
-          [attr.aria-label]="isEditing() ? '取消编辑' : '编辑资料'"
-        >
-          @if (isEditing()) { 取消 } @else { 编辑资料 }
-        </button>
+        />
       </div>
 
       <div class="space-y-5">
@@ -63,24 +61,24 @@
           }
         </div>
 
-        <!-- Email field (read-only, masked) -->
+        <!-- Email field (read-only) -->
         <div class="info-row">
           <label class="block text-sm text-gray-500 mb-1">邮箱</label>
           <div class="flex items-center gap-2">
             <p class="text-base text-gray-900" data-testid="user-email">{{ u.email || '未设置' }}</p>
             @if (u.email) {
-              <span class="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full">已验证</span>
+              <app-badge status="confirmed" size="sm" customLabel="已验证" />
             }
           </div>
         </div>
 
-        <!-- Phone field (read-only, masked) -->
+        <!-- Phone field (read-only) -->
         <div class="info-row">
           <label class="block text-sm text-gray-500 mb-1">手机号</label>
           <div class="flex items-center gap-2">
             <p class="text-base text-gray-900" data-testid="user-phone">{{ u.phone || '未设置' }}</p>
             @if (u.phone) {
-              <span class="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full">已验证</span>
+              <app-badge status="confirmed" size="sm" customLabel="已验证" />
             }
           </div>
         </div>
@@ -90,97 +88,82 @@
           <label class="block text-sm text-gray-500 mb-1">角色</label>
           <p class="text-base text-gray-900">{{ u.userType === 'CUSTOMER' ? '普通用户' : u.userType }}</p>
         </div>
+
+        <!-- Member Since -->
+        @if (u.createdAt) {
+          <div class="info-row">
+            <label class="block text-sm text-gray-500 mb-1">注册时间</label>
+            <p class="text-base text-gray-900">{{ formatDate(u.createdAt) }}</p>
+          </div>
+        }
       </div>
 
-      <!-- Save/Cancel buttons (edit mode) - full-width on mobile -->
+      <!-- Save/Cancel buttons (edit mode) -->
       @if (isEditing()) {
         <div class="flex flex-col-reverse sm:flex-row gap-3 mt-6 pt-4 border-t border-white/30">
-          <button
-            class="w-full sm:flex-1 px-5 py-2.5 rounded-xl text-sm font-medium border border-gray-200 text-gray-700 hover:bg-gray-50 transition-all min-h-[44px]"
-            (click)="cancelEdit()"
+          <app-button
+            label="取消"
+            variant="secondary"
+            class="w-full sm:flex-1"
+            (onClick)="cancelEdit()"
             data-testid="cancel-button"
-          >
-            取消
-          </button>
-          <button
-            class="w-full sm:flex-1 px-5 py-2.5 rounded-xl gradient-primary text-white text-sm font-medium hover:opacity-90 transition-all shadow-glass active:scale-[0.98] disabled:opacity-50 min-h-[44px]"
+          />
+          <app-button
+            label="保存"
+            variant="primary"
+            class="w-full sm:flex-1"
             [disabled]="!editName().trim() || isSaving()"
-            (click)="saveProfile()"
+            [loading]="isSaving()"
+            (onClick)="saveProfile()"
             data-testid="save-button"
-          >
-            @if (isSaving()) {
-              <span>保存中...</span>
-            } @else {
-              <span>保存</span>
-            }
-          </button>
+          />
         </div>
       }
-    </div>
+    </app-card>
 
     <!-- Account Security Card -->
-    <div class="glass-level-1 rounded-2xl p-4 sm:p-6 mb-6">
-      <h3 class="text-base font-bold text-gray-900 mb-6">账户安全</h3>
-      <div class="space-y-4">
-        <div class="flex items-center justify-between py-3">
-          <div>
-            <p class="text-sm font-medium text-gray-900">登录密码</p>
-            <p class="text-xs text-gray-500">建议定期更换密码以保障账户安全</p>
-          </div>
-          <button
-            class="px-4 py-2 rounded-lg text-sm font-medium text-primary-start border border-primary-start/30 hover:bg-primary-start/5 transition-all min-h-[44px]"
-            (click)="showPasswordDialog()"
-            data-testid="change-password-button"
-          >
-            修改
-          </button>
+    <app-card variant="glass" header="账户安全" headerIcon="pi pi-shield" class="mb-6">
+      <div class="flex items-center justify-between py-3">
+        <div>
+          <p class="text-sm font-medium text-gray-900">登录密码</p>
+          <p class="text-xs text-gray-500">建议定期更换密码以保障账户安全</p>
         </div>
+        <app-button
+          label="修改"
+          variant="ghost"
+          size="sm"
+          (onClick)="showPasswordDialog()"
+          data-testid="change-password-button"
+        />
       </div>
-    </div>
-
-    <!-- Join date -->
-    <p class="text-center text-xs text-gray-400">
-      @if (u.createdAt) {
-        注册时间：{{ formatDate(u.createdAt) }}
-      }
-    </p>
+    </app-card>
   }
 
   <!-- Loading State -->
   @if (!user()) {
-    <div class="glass-level-1 rounded-2xl p-8 sm:p-12 text-center">
+    <app-card variant="glass" styleClass="text-center py-12">
       <div class="w-16 h-16 rounded-full bg-white/50 skeleton mx-auto mb-4"></div>
       <div class="h-5 w-32 bg-white/50 rounded skeleton mx-auto mb-3"></div>
       <div class="h-4 w-48 bg-white/50 rounded skeleton mx-auto"></div>
-    </div>
+    </app-card>
   }
 </div>
 
-<!-- Password Change Dialog - full-screen on mobile -->
-@if (passwordDialogVisible()) {
-  <div
-    class="glass-overlay fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4"
-    role="dialog"
-    aria-modal="true"
-    aria-label="修改密码"
-    (click)="closePasswordDialog()"
-    (keydown)="onPasswordDialogKeydown($event)"
-  >
-    <div
-      class="glass-level-3 rounded-none sm:rounded-2xl p-6 sm:p-8 max-w-md w-full h-full sm:h-auto animate-glass-in sm:mx-auto"
-      (click)="$event.stopPropagation()"
-    >
-      <h3 class="text-lg font-bold text-gray-900 mb-2">修改密码</h3>
-      <p class="text-sm text-gray-500 mb-6">密码功能开发中，敬请期待</p>
-      <div class="flex justify-end">
-        <button
-          class="w-full sm:w-auto px-5 py-2.5 rounded-xl text-sm font-medium border border-gray-200 text-gray-700 hover:bg-gray-50 transition-all min-h-[44px]"
-          (click)="closePasswordDialog()"
-          aria-label="关闭密码修改对话框"
-        >
-          关闭
-        </button>
-      </div>
-    </div>
+<!-- Password Change Dialog using AppModal -->
+<app-modal
+  [visible]="passwordDialogVisible()"
+  header="修改密码"
+  [closable]="true"
+  [dismissableMask]="true"
+  (visibleChange)="closePasswordDialog()"
+>
+  <p class="text-sm text-gray-500 mb-6">密码功能开发中，敬请期待</p>
+  <div class="flex justify-end">
+    <app-button
+      label="关闭"
+      variant="secondary"
+      class="w-full sm:w-auto"
+      (onClick)="closePasswordDialog()"
+    />
   </div>
-}
+</app-modal>

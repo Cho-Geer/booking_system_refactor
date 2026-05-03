@@ -1,9 +1,10 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, computed } from '@angular/core';
 import { Button } from 'primeng/button';
 import { ButtonSeverity } from 'primeng/types/button';
 
 export type ButtonIconPosition = 'left' | 'right' | 'top' | 'bottom';
-export type ButtonSize = 'small' | 'large';
+export type AppButtonSize = 'sm' | 'md' | 'lg';
+export type AppButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 
 @Component({
   selector: 'app-button',
@@ -39,7 +40,15 @@ export class AppButtonComponent {
   readonly type = input<string>('button');
 
   /** Defines the size of the button. */
-  readonly size = input<ButtonSize>();
+  readonly size = input<AppButtonSize>('md');
+
+  /** Defines the visual variant of the button. */
+  readonly variant = input<AppButtonVariant>('primary');
+
+  /** Whether to display in icon-only mode. */
+  readonly iconOnly = input<boolean, boolean | undefined>(undefined, {
+    transform: (v: boolean | undefined) => v ?? false,
+  });
 
   /** Add a shadow to indicate elevation. */
   readonly raised = input<boolean, boolean | undefined>(undefined, {
@@ -77,10 +86,40 @@ export class AppButtonComponent {
   /** Callback to execute when button is clicked. */
   readonly onClick = output<MouseEvent>();
 
-  /** Computed style class with click feedback animation. */
+  /** Resolved icon: shows spinner when loading. */
+  readonly resolvedIcon = computed(() => {
+    if (this.loading()) {
+      return 'pi pi-spinner pi-spin';
+    }
+    return this.icon();
+  });
+
+  /** Resolved disabled state: also disabled when loading. */
+  readonly isDisabled = computed(() => {
+    return this.disabled() || this.loading();
+  });
+
+  /** Mapped PrimeNG size from our size enum. */
+  readonly primeSize = computed(() => {
+    const s = this.size();
+    if (s === 'sm') return 'small';
+    if (s === 'lg') return 'large';
+    return undefined;
+  });
+
+  /** Computed style class with click feedback and variant/size classes. */
   get combinedStyleClass(): string {
     const base = this.styleClass() || '';
-    const feedbackClass = 'app-button-click-feedback';
-    return base ? `${base} ${feedbackClass}` : feedbackClass;
+    const classes = [
+      'app-button-click-feedback',
+      `app-button--${this.variant()}`,
+      `app-button--${this.size()}`,
+    ];
+
+    if (this.iconOnly()) {
+      classes.push('app-button--icon-only');
+    }
+
+    return base ? `${base} ${classes.join(' ')}` : classes.join(' ');
   }
 }

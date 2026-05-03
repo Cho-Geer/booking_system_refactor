@@ -3,6 +3,8 @@ import { ValidationPipe } from "@nestjs/common";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
 import { AppModule } from "./app.module";
 import helmet from "helmet";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const cookieParser = require("cookie-parser");
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -11,6 +13,7 @@ async function bootstrap() {
 
   // Security
   app.use(helmet());
+  app.use(cookieParser());
 
   // FIX-P2-004: 严格 CORS 配置
   const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:4200")

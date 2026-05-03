@@ -1,152 +1,289 @@
 <div class="space-y-6">
   <!-- Page Header -->
-  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-    <h1 class="text-xl sm:text-2xl font-bold text-gray-800">Service Management</h1>
-    <p-button label="New Service" icon="pi pi-plus" (onClick)="openNew()" />
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+    <div>
+      <h1 class="text-2xl sm:text-display font-bold text-text-primary">Service Management</h1>
+      <p class="text-sm text-text-secondary mt-1">Manage your business services and pricing</p>
+    </div>
+    <app-button label="New Service" variant="primary" icon="pi pi-plus" (onClick)="openNew()"></app-button>
   </div>
 
-  <!-- Error State -->
-  @if (vm().error) {
-    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-      {{ vm().error }}
+  <!-- Loading State -->
+  @if (vm().isLoading && vm().services.length === 0) {
+    <div class="flex justify-center py-12">
+      <app-spinner></app-spinner>
     </div>
   }
 
-  <!-- Filters - stack on mobile -->
-  <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 sm:items-center">
-    <span class="p-input-icon-left w-full sm:w-auto">
-      <i class="pi pi-search"></i>
-      <input pInputText [(ngModel)]="searchQuery" placeholder="Search services..." (input)="applyFilter()" class="p-2 border rounded w-full sm:w-auto" />
-    </span>
-    <p-select
-      [(ngModel)]="activeFilter"
-      [options]="[{ label: 'All', value: undefined }, { label: 'Active', value: true }, { label: 'Inactive', value: false }]"
-      optionLabel="label"
-      optionValue="value"
-      placeholder="Status"
-      (onChange)="applyFilter()"
-      class="w-full sm:w-32"
-    />
-  </div>
+  @if (!vm().isLoading) {
+    <!-- Stats Summary -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+      <app-card variant="elevated">
+        <div class="flex items-center gap-4 p-2">
+          <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+            <i class="pi pi-wrench text-blue-600 text-xl"></i>
+          </div>
+          <div>
+            <p class="text-3xl font-bold text-text-primary">{{ vm().servicesTotal }}</p>
+            <p class="text-sm text-text-secondary">Total Services</p>
+          </div>
+        </div>
+      </app-card>
 
-  <!-- Services Table - horizontal scroll on mobile -->
-  <div class="table-scroll-container">
-    <p-table
-      [value]="vm().services"
-      [loading]="vm().isLoading"
-      [paginator]="true"
-      [rows]="10"
-      [totalRecords]="vm().servicesTotal"
-      [rowsPerPageOptions]="[10, 25, 50]"
-      [showCurrentPageReport]="true"
-      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} services"
-      [tableStyle]="{ 'min-width': '600px' }"
-    >
-      <ng-template #header>
-        <tr>
-          <th pSortableColumn="name">Name <p-sortIcon field="name" /></th>
-          <th pSortableColumn="duration">Duration <p-sortIcon field="duration" /></th>
-          <th pSortableColumn="price">Price <p-sortIcon field="price" /></th>
-          <th pSortableColumn="active">Active <p-sortIcon field="active" /></th>
-          <th>Actions</th>
-        </tr>
-      </ng-template>
-      <ng-template #body let-svc>
-        <tr>
-          <td>
-            <div class="flex items-center gap-3">
-              @if (svc.imageUrl) {
-                <img [src]="svc.imageUrl" [alt]="svc.name" class="w-10 h-10 rounded object-cover flex-shrink-0" />
+      <app-card variant="elevated">
+        <div class="flex items-center gap-4 p-2">
+          <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+            <i class="pi pi-check-circle text-green-600 text-xl"></i>
+          </div>
+          <div>
+            <p class="text-3xl font-bold text-text-primary">{{ activeServicesCount() }}</p>
+            <p class="text-sm text-text-secondary">Active Services</p>
+          </div>
+        </div>
+      </app-card>
+
+      <app-card variant="elevated">
+        <div class="flex items-center gap-4 p-2">
+          <div class="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
+            <i class="pi pi-dollar text-amber-600 text-xl"></i>
+          </div>
+          <div>
+            <p class="text-3xl font-bold text-text-primary">{{ averagePrice() | currency:'USD' }}</p>
+            <p class="text-sm text-text-secondary">Avg Price</p>
+          </div>
+        </div>
+      </app-card>
+    </div>
+
+    <!-- Error State -->
+    @if (vm().error) {
+      <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+        {{ vm().error }}
+      </div>
+    }
+
+    <!-- Filter Bar + View Toggle -->
+    <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 sm:items-center sm:justify-between bg-white p-4 rounded-xl shadow-sm border border-border">
+      <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 sm:items-center sm:flex-wrap">
+        <app-input
+          [value]="searchQuery()"
+          placeholder="Search services..."
+          (valueChange)="searchQuery.set($event); applyFilter()"
+          styleClass="w-full sm:w-56"
+        ></app-input>
+        <app-dropdown
+          [options]="categoryOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="All Categories"
+          styleClass="w-full sm:w-40"
+          (valueChange)="onCategoryFilterChange($event)"
+        ></app-dropdown>
+        <app-dropdown
+          [options]="filterStatusOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Status"
+          styleClass="w-full sm:w-32"
+          (valueChange)="onStatusFilterChange($event)"
+        ></app-dropdown>
+        <app-button
+          label="Clear"
+          variant="ghost"
+          icon="pi pi-filter-slash"
+          size="sm"
+          (onClick)="clearFilters()"
+        ></app-button>
+      </div>
+      <!-- View Toggle -->
+      <div class="flex gap-1 bg-bg-secondary rounded-lg p-1">
+        <app-button
+          icon="pi pi-list"
+          variant="ghost"
+          size="sm"
+          [iconOnly]="true"
+          [styleClass]="viewMode() === 'list' ? 'bg-white shadow-sm rounded' : ''"
+          (onClick)="toggleView('list')"
+        ></app-button>
+        <app-button
+          icon="pi pi-th-large"
+          variant="ghost"
+          size="sm"
+          [iconOnly]="true"
+          [styleClass]="viewMode() === 'grid' ? 'bg-white shadow-sm rounded' : ''"
+          (onClick)="toggleView('grid')"
+        ></app-button>
+      </div>
+    </div>
+
+    <!-- Grid View -->
+    @if (viewMode() === 'grid') {
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        @for (svc of vm().services; track svc.id) {
+          <app-card variant="elevated">
+            <div class="p-2">
+              <div class="flex items-start justify-between mb-3">
+                <div class="w-12 h-12 rounded-lg bg-primary-start/10 flex items-center justify-center flex-shrink-0">
+                  <i class="pi pi-wrench text-primary-start text-xl"></i>
+                </div>
+                <app-badge [status]="getActiveSeverity(svc.active)" [customLabel]="svc.active ? 'Active' : 'Inactive'" size="sm"></app-badge>
+              </div>
+              <h3 class="font-semibold text-text-primary text-lg mb-1">{{ svc.name }}</h3>
+              @if (svc.description) {
+                <p class="text-sm text-text-secondary mb-3 line-clamp-2">{{ svc.description }}</p>
               }
-              <div class="min-w-0">
-                <span class="font-medium truncate block">{{ svc.name }}</span>
-                @if (svc.description) {
-                  <p class="text-sm text-gray-500 truncate">{{ svc.description }}</p>
-                }
+              <div class="flex items-center justify-between text-sm">
+                <span class="text-text-secondary">{{ svc.duration }} min</span>
+                <span class="font-bold text-primary-start">{{ svc.price | currency:'USD' }}</span>
+              </div>
+              <div class="flex gap-2 mt-4 pt-3 border-t border-border-light">
+                <app-button icon="pi pi-pencil" variant="ghost" size="sm" (onClick)="editService(svc)">Edit</app-button>
+                <app-button icon="pi pi-trash" variant="danger" size="sm" (onClick)="confirmDeleteService(svc)">Delete</app-button>
               </div>
             </div>
-          </td>
-          <td>{{ svc.duration }} min</td>
-          <td>{{ svc.price | currency:'USD' }}</td>
-          <td><p-tag [value]="svc.active ? 'Active' : 'Inactive'" [severity]="getActiveSeverity(svc.active)" /></td>
-          <td>
-            <div class="flex gap-2">
-              <p-button icon="pi pi-pencil" [rounded]="true" [outlined]="true" size="small" (onClick)="editService(svc)" />
-              <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" size="small" (onClick)="confirmDeleteService(svc)" />
-            </div>
-          </td>
-        </tr>
-      </ng-template>
-      <ng-template #emptymessage>
-        <tr>
-          <td colspan="5" class="text-center py-8 text-gray-500">No services found.</td>
-        </tr>
-      </ng-template>
-    </p-table>
-  </div>
+          </app-card>
+        }
+        @empty {
+          <div class="col-span-full text-center py-8 text-text-secondary">No services found.</div>
+        }
+      </div>
+    }
 
-  <!-- Service Dialog - full-screen on mobile -->
+    <!-- List View -->
+    @if (viewMode() === 'list') {
+      <div class="bg-white rounded-xl shadow-sm border border-border overflow-hidden">
+        <p-table
+          [value]="vm().services"
+          [loading]="vm().isLoading"
+          [paginator]="true"
+          [rows]="10"
+          [totalRecords]="vm().servicesTotal"
+          [rowsPerPageOptions]="[10, 25, 50]"
+          [showCurrentPageReport]="true"
+          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} services"
+          [tableStyle]="{ 'min-width': '650px' }"
+          stripedRows="true"
+          [rowHover]="true"
+        >
+          <ng-template #header>
+            <tr>
+              <th pSortableColumn="name">Name <p-sortIcon field="name" /></th>
+              <th pSortableColumn="duration">Duration <p-sortIcon field="duration" /></th>
+              <th pSortableColumn="price">Price <p-sortIcon field="price" /></th>
+              <th pSortableColumn="active">Status <p-sortIcon field="active" /></th>
+              <th>Actions</th>
+            </tr>
+          </ng-template>
+          <ng-template #body let-svc>
+            <tr>
+              <td>
+                <div class="flex items-center gap-3">
+                  @if (svc.imageUrl) {
+                    <img [src]="svc.imageUrl" [alt]="svc.name" class="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
+                  } @else {
+                    <div class="w-10 h-10 rounded-lg bg-primary-start/10 flex items-center justify-center flex-shrink-0">
+                      <i class="pi pi-wrench text-primary-start"></i>
+                    </div>
+                  }
+                  <div class="min-w-0">
+                    <span class="font-medium text-text-primary truncate block">{{ svc.name }}</span>
+                    @if (svc.description) {
+                      <p class="text-sm text-text-secondary truncate">{{ svc.description }}</p>
+                    }
+                  </div>
+                </div>
+              </td>
+              <td class="text-text-secondary">{{ svc.duration }} min</td>
+              <td class="font-medium text-text-primary">{{ svc.price | currency:'USD' }}</td>
+              <td><app-badge [status]="getActiveSeverity(svc.active)" [customLabel]="svc.active ? 'Active' : 'Inactive'" size="sm"></app-badge></td>
+              <td>
+                <div class="flex gap-2">
+                  <app-button icon="pi pi-pencil" variant="ghost" size="sm" [iconOnly]="true" (onClick)="editService(svc)"></app-button>
+                  <app-button icon="pi pi-trash" variant="danger" size="sm" [iconOnly]="true" (onClick)="confirmDeleteService(svc)"></app-button>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template #emptymessage>
+            <tr>
+              <td colspan="5" class="text-center py-8 text-text-secondary">No services found.</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    }
+  }
+
+  <!-- Service Dialog -->
   <p-dialog
     [(visible)]="serviceDialogVisible"
     [header]="isEdit() ? 'Edit Service' : 'New Service'"
     [modal]="true"
     [style]="{ width: '500px' }"
-    [class]="'modal-fullscreen-mobile'"
+    styleClass="rounded-xl"
     (onHide)="closeDialog()"
   >
     <ng-template #content>
       <div class="flex flex-col gap-4 p-4">
+        <!-- Name -->
         <div>
-          <label class="block font-medium mb-1">Name *</label>
-          <input pInputText [(ngModel)]="formName" class="w-full" required />
+          <label class="block font-medium mb-1 text-text-primary">Name *</label>
+          <input pInputText [(ngModel)]="formName" class="w-full" [class.ng-invalid]="submitted() && formErrors.name" />
+          @if (submitted() && formErrors.name) {
+            <small class="text-danger">{{ formErrors.name }}</small>
+          }
         </div>
+        <!-- Description -->
         <div>
-          <label class="block font-medium mb-1">Description</label>
+          <label class="block font-medium mb-1 text-text-primary">Description</label>
           <textarea pTextarea [(ngModel)]="formDescription" class="w-full" rows="3"></textarea>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="block font-medium mb-1">Duration (min) *</label>
-            <p-inputNumber [(ngModel)]="formDuration" class="w-full" [min]="1" [max]="480" />
+            <label class="block font-medium mb-1 text-text-primary">Duration (min) *</label>
+            <p-inputNumber [(ngModel)]="formDuration" class="w-full" [min]="1" [max]="480" [class.ng-invalid]="submitted() && formErrors.duration" />
+            @if (submitted() && formErrors.duration) {
+              <small class="text-danger">{{ formErrors.duration }}</small>
+            }
           </div>
           <div>
-            <label class="block font-medium mb-1">Price ($)</label>
+            <label class="block font-medium mb-1 text-text-primary">Price ($)</label>
             <p-inputNumber [(ngModel)]="formPrice" class="w-full" [min]="0" [max]="99999" mode="currency" currency="USD" />
           </div>
         </div>
         <div>
-          <label class="block font-medium mb-1">Image URL</label>
+          <label class="block font-medium mb-1 text-text-primary">Image URL</label>
           <input pInputText [(ngModel)]="formImageUrl" class="w-full" placeholder="https://..." />
         </div>
         <div class="flex items-center gap-3">
-          <label class="font-medium">Active</label>
+          <label class="font-medium text-text-primary">Active</label>
           <p-toggleSwitch [(ngModel)]="formActive" />
         </div>
       </div>
     </ng-template>
     <ng-template #footer>
       <div class="flex flex-col-reverse sm:flex-row gap-2 sm:gap-2">
-        <p-button label="Cancel" [outlined]="true" (onClick)="closeDialog()" class="w-full sm:w-auto" />
-        <p-button label="Save" (onClick)="saveService()" class="w-full sm:w-auto" />
+        <app-button label="Cancel" variant="secondary" (onClick)="closeDialog()"></app-button>
+        <app-button label="Save" variant="primary" (onClick)="saveService()"></app-button>
       </div>
     </ng-template>
   </p-dialog>
 
-  <!-- Delete Confirmation Dialog - full-screen on mobile -->
+  <!-- Delete Confirmation Dialog -->
   <p-dialog
     [(visible)]="deleteDialogVisible"
     header="Confirm Delete"
     [modal]="true"
     [style]="{ width: '400px' }"
-    [class]="'modal-fullscreen-mobile'"
+    styleClass="rounded-xl"
   >
     <ng-template #content>
-      <p class="p-4">Are you sure you want to delete service <strong>{{ serviceToDelete()?.name }}</strong>? This action cannot be undone.</p>
+      <p class="p-4 text-text-primary">Are you sure you want to delete service <strong>{{ serviceToDelete()?.name }}</strong>? This action cannot be undone.</p>
     </ng-template>
     <ng-template #footer>
       <div class="flex flex-col-reverse sm:flex-row gap-2 sm:gap-2">
-        <p-button label="Cancel" [outlined]="true" (onClick)="deleteDialogVisible.set(false)" class="w-full sm:w-auto" />
-        <p-button label="Delete" severity="danger" (onClick)="deleteService()" class="w-full sm:w-auto" />
+        <app-button label="Cancel" variant="secondary" (onClick)="deleteDialogVisible.set(false)"></app-button>
+        <app-button label="Delete" variant="danger" (onClick)="deleteService()"></app-button>
       </div>
     </ng-template>
   </p-dialog>

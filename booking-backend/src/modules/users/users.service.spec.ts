@@ -161,11 +161,15 @@ describe('UsersService', () => {
       });
       expect(prisma.user.count).toHaveBeenCalled();
       expect(result).toEqual({
-        data: mockUsers,
-        total: 2,
-        page: 1,
-        pageSize: 10,
-        totalPages: 1,
+        items: mockUsers,
+        meta: {
+          total: 2,
+          page: 1,
+          limit: 10,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false,
+        },
       });
     });
 
@@ -182,11 +186,15 @@ describe('UsersService', () => {
         orderBy: { createdAt: 'desc' },
       });
       expect(result).toEqual({
-        data: [mockUsers[0]],
-        total: 2,
-        page: 2,
-        pageSize: 1,
-        totalPages: 2,
+        items: [mockUsers[0]],
+        meta: {
+          total: 2,
+          page: 2,
+          limit: 1,
+          totalPages: 2,
+          hasNext: false,
+          hasPrev: true,
+        },
       });
     });
 
@@ -196,7 +204,7 @@ describe('UsersService', () => {
 
       const result = await service.findAll(1, 10);
 
-      expect(result.totalPages).toBe(3);
+      expect(result.meta.totalPages).toBe(3);
     });
 
     it('should return empty data when no users exist', async () => {
@@ -206,11 +214,15 @@ describe('UsersService', () => {
       const result = await service.findAll();
 
       expect(result).toEqual({
-        data: [],
-        total: 0,
-        page: 1,
-        pageSize: 10,
-        totalPages: 0,
+        items: [],
+        meta: {
+          total: 0,
+          page: 1,
+          limit: 10,
+          totalPages: 0,
+          hasNext: false,
+          hasPrev: false,
+        },
       });
     });
   });

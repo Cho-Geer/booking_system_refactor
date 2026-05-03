@@ -1,7 +1,9 @@
-import { Component, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 export type BadgeStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'expired' | 'processing' | 'error';
+export type BadgeSize = 'sm' | 'md' | 'lg';
+export type BadgeShape = 'rounded' | 'pill';
 
 export const BADGE_LABELS: Record<BadgeStatus, string> = {
   pending: '待确认',
@@ -17,43 +19,43 @@ export const BADGE_LABELS: Record<BadgeStatus, string> = {
   selector: 'app-badge',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border"
-          [ngClass]="statusClass">
-      {{ label }}
-    </span>
-  `,
-  styles: [`
-    :host { display: inline-flex; }
-  `]
+  templateUrl: './app-badge.component.html',
+  styleUrl: './app-badge.component.scss',
 })
 export class AppBadgeComponent {
-  @Input() status: BadgeStatus = 'pending';
-  @Input() customLabel?: string;
+  /** Status of the badge determining its color. */
+  readonly status = input<BadgeStatus>('pending');
 
+  /** Custom label text. If not provided, uses status default label. */
+  readonly customLabel = input<string>();
+
+  /** Glass mode - applies translucent styling. */
+  readonly glass = input<boolean>(false);
+
+  /** Size of the badge. */
+  readonly size = input<BadgeSize>('md');
+
+  /** Shape of the badge. */
+  readonly shape = input<BadgeShape>('rounded');
+
+  /** Resolved label text. */
   get label(): string {
-    return this.customLabel ?? BADGE_LABELS[this.status];
+    return this.customLabel() ?? BADGE_LABELS[this.status()];
   }
 
+  /** Combined CSS classes for the badge. */
   get statusClass(): string {
-    const base = 'border ';
-    switch (this.status) {
-      case 'pending':
-        return base + 'bg-gray-100 text-gray-600 border-gray-300';
-      case 'confirmed':
-        return base + 'bg-blue-50 text-blue-600 border-blue-200';
-      case 'completed':
-        return base + 'bg-green-50 text-green-600 border-green-200';
-      case 'cancelled':
-        return base + 'bg-red-50 text-red-600 border-red-200';
-      case 'expired':
-        return base + 'bg-orange-50 text-orange-600 border-orange-200';
-      case 'processing':
-        return base + 'bg-purple-50 text-purple-600 border-purple-200';
-      case 'error':
-        return base + 'bg-red-100 text-red-700 border-red-300';
-      default:
-        return base + 'bg-gray-100 text-gray-600 border-gray-300';
+    const classes: string[] = [
+      'app-badge',
+      `app-badge--${this.status()}`,
+      `app-badge--${this.size()}`,
+      `app-badge--${this.shape()}`,
+    ];
+
+    if (this.glass()) {
+      classes.push('app-badge--glass');
     }
+
+    return classes.join(' ');
   }
 }

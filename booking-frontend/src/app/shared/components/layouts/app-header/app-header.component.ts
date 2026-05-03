@@ -3,6 +3,8 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { Menu } from 'primeng/menu';
 import { Avatar } from 'primeng/avatar';
+import { ThemeToggleComponent } from '../../molecules/theme-toggle/theme-toggle.component';
+import { AppButtonComponent } from '../../atoms/app-button/app-button.component';
 
 export interface NavLink {
   label: string;
@@ -13,7 +15,7 @@ export interface NavLink {
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, Menu, Avatar],
+  imports: [RouterLink, RouterLinkActive, Menu, Avatar, ThemeToggleComponent, AppButtonComponent],
   templateUrl: './app-header.component.html',
   styleUrl: './app-header.component.scss',
   host: { class: 'z-50' },
@@ -29,6 +31,7 @@ export class AppHeaderComponent {
 
   readonly menuToggle = output<void>();
   readonly logout = output<void>();
+  readonly actionClick = output<string>();
 
   sidebarOpen = false;
 
@@ -47,5 +50,9 @@ export class AppHeaderComponent {
 
   onLogout(): void {
     this.logout.emit();
+  }
+
+  onActionClick(action: string): void {
+    this.actionClick.emit(action);
   }
 }

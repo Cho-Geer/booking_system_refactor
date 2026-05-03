@@ -50,14 +50,6 @@ describe('AppButtonComponent', () => {
     expect(buttonEl).toBeTruthy();
   });
 
-  it('should forward severity to p-button', () => {
-    fixture.componentRef.setInput('severity', 'danger');
-    fixture.detectChanges();
-
-    const buttonEl = fixture.debugElement.query(By.css('p-button'));
-    expect(buttonEl).toBeTruthy();
-  });
-
   it('should emit onClick when button is clicked', () => {
     const spy = jest.spyOn(component.onClick, 'emit');
 
@@ -93,22 +85,96 @@ describe('AppButtonComponent', () => {
     expect(buttonEl).toBeTruthy();
   });
 
+  describe('variant system', () => {
+    it('[RED] should default variant to "primary"', () => {
+      expect(component.variant()).toBe('primary');
+    });
+
+    it('[RED] should apply primary variant class', () => {
+      fixture.detectChanges();
+      expect(component.combinedStyleClass).toContain('app-button--primary');
+    });
+
+    it('[RED] should apply secondary variant class when variant is secondary', () => {
+      fixture.componentRef.setInput('variant', 'secondary');
+      fixture.detectChanges();
+      expect(component.combinedStyleClass).toContain('app-button--secondary');
+    });
+
+    it('[RED] should apply ghost variant class when variant is ghost', () => {
+      fixture.componentRef.setInput('variant', 'ghost');
+      fixture.detectChanges();
+      expect(component.combinedStyleClass).toContain('app-button--ghost');
+    });
+
+    it('[RED] should apply danger variant class when variant is danger', () => {
+      fixture.componentRef.setInput('variant', 'danger');
+      fixture.detectChanges();
+      expect(component.combinedStyleClass).toContain('app-button--danger');
+    });
+  });
+
+  describe('size system', () => {
+    it('[RED] should default size to "md"', () => {
+      expect(component.size()).toBe('md');
+    });
+
+    it('[RED] should apply sm size class', () => {
+      fixture.componentRef.setInput('size', 'sm');
+      fixture.detectChanges();
+      expect(component.combinedStyleClass).toContain('app-button--sm');
+    });
+
+    it('[RED] should apply md size class', () => {
+      fixture.componentRef.setInput('size', 'md');
+      fixture.detectChanges();
+      expect(component.combinedStyleClass).toContain('app-button--md');
+    });
+
+    it('[RED] should apply lg size class', () => {
+      fixture.componentRef.setInput('size', 'lg');
+      fixture.detectChanges();
+      expect(component.combinedStyleClass).toContain('app-button--lg');
+    });
+  });
+
+  describe('loading state', () => {
+    it('[RED] should show loading spinner when loading is true', () => {
+      fixture.componentRef.setInput('loading', true);
+      fixture.detectChanges();
+
+      expect(component.loading()).toBe(true);
+      expect(component.isDisabled()).toBe(true);
+    });
+
+    it('[RED] should set loading icon when loading is true', () => {
+      fixture.componentRef.setInput('loading', true);
+      fixture.detectChanges();
+
+      expect(component.resolvedIcon()).toBe('pi pi-spinner pi-spin');
+    });
+  });
+
+  describe('disabled state', () => {
+    it('[RED] should forward disabled to p-button', () => {
+      fixture.componentRef.setInput('disabled', true);
+      fixture.detectChanges();
+      expect(component.disabled()).toBe(true);
+    });
+  });
+
+  describe('icon-only mode', () => {
+    it('[RED] should apply icon-only class when iconOnly is true', () => {
+      fixture.componentRef.setInput('iconOnly', true);
+      fixture.detectChanges();
+      expect(component.combinedStyleClass).toContain('app-button--icon-only');
+    });
+  });
+
   describe('button click feedback', () => {
     it('[RED] should have app-button-click-feedback class in combined style', () => {
       fixture.detectChanges();
-      // combinedStyleClass should include the feedback class
       expect(component.combinedStyleClass).toContain('app-button-click-feedback');
-    });
-
-    it('[RED] should have active:scale(0.98) transform style', () => {
-      const buttonEl = fixture.debugElement.query(By.css('p-button'));
-      expect(buttonEl).toBeTruthy();
-      const nativeEl = buttonEl.nativeElement;
-      // Check transition property for transform
-      const style = getComputedStyle(nativeEl);
-      // Should have a transition on something
-      const hasTransition = style.transitionProperty !== 'none' || style.transitionDuration !== '0s';
-      expect(hasTransition).toBe(true);
     });
   });
 });

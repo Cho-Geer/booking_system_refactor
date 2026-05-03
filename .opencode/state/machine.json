@@ -4,7 +4,7 @@
     "version": "2.1.0",
     "project": "appointment-booking-system",
     "description": "强制校验契约哈希 + 任务生命周期证据链。涉及角色：@Architect(定义), @Coder-BE(实现), @Coder-FE(适配), @Guardian(审查), @Orchestrator(调度)。",
-    "lastUpdated": "2026-05-01T09:15:20.764Z"
+    "lastUpdated": "2026-05-03T02:50:38.328Z"
   },
   "currentTask": {
     "id": "TIMESLOTS-PAGINATION-FIX",
@@ -15,8 +15,8 @@
   "contracts": {
     "backend-api": {
       "file": "contract.yaml",
-      "hash": "sha256-0502aaa61e0ed1e5140da45beef46cd52ec9e701a66d9aab08339437fd5b8bd1",
-      "lastValidated": "2026-05-01T09:15:20.764Z",
+      "hash": "sha256-7e37df5a7d689b98c64156777a6d9bf6dce2f7b941b097e13776220908f3a622",
+      "lastValidated": "2026-05-03T02:50:38.328Z",
       "owner": "@Architect"
     },
     "prisma-schema": {
@@ -433,6 +433,13 @@
       "action": "HASH_UPDATE",
       "target": "frontend-dto",
       "details": "Hash updated from sha256-f05041e0d2634... to sha256-64117d14d17fa..."
+    },
+    {
+      "timestamp": "2026-05-03T02:50:38.328Z",
+      "agent": "@Orchestrator",
+      "action": "HASH_UPDATE",
+      "target": "backend-api",
+      "details": "Hash updated from sha256-0502aaa61e0ed... to sha256-7e37df5a7d689..."
     }
   ]
 }

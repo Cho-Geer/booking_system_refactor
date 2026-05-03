@@ -2,6 +2,19 @@
   display: block;
 }
 
+/* Table row hover overrides */
+::ng-deep .p-datatable .p-datatable-tbody > tr:hover {
+  background-color: var(--color-bg-secondary, #F2F3F5) !important;
+}
+
+/* Limit description lines in grid view */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 @media (max-width: 640px) {
   ::ng-deep .p-select,
   ::ng-deep .p-inputtext {

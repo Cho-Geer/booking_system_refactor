@@ -21,7 +21,6 @@ export interface User {
 export interface AuthState {
   user: User | null;
   token: string | null;
-  refreshToken: string | null;
   isLoading: boolean;
   error: string | null;
 }
@@ -29,7 +28,6 @@ export interface AuthState {
 export const initialAuthState: AuthState = {
   user: null,
   token: null,
-  refreshToken: null,
   isLoading: false,
   error: null,
 };
@@ -37,21 +35,20 @@ export const initialAuthState: AuthState = {
 export const AuthStore = signalStore(
   { providedIn: 'root' },
   withState<AuthState>(initialAuthState),
-  withComputed(({ user, token, refreshToken }) => ({
+  withComputed(({ user, token }) => ({
     isAuthenticated: computed(() => user() !== null && token() !== null),
     currentUser: computed(() => user()),
     currentToken: computed(() => token()),
-    currentRefreshToken: computed(() => refreshToken()),
   })),
   withMethods((store, apiService = inject(ApiService)) => ({
     /**
-     * Login success - store tokens only (no user object in auth response)
+     * Login success - store token only (no user object in auth response)
+     * refreshToken is handled via HttpOnly cookie — not stored in frontend state
      * User profile should be fetched separately via /users/profile
      */
-    loginSuccess(token: string, refreshToken?: string) {
+    loginSuccess(token: string) {
       patchState(store, {
         token,
-        refreshToken: refreshToken ?? null,
         isLoading: false,
         error: null,
       });
@@ -69,7 +66,6 @@ export const AuthStore = signalStore(
       patchState(store, {
         user: null,
         token: null,
-        refreshToken: null,
         isLoading: false,
         error: null,
       });
@@ -111,7 +107,6 @@ export const AuthStore = signalStore(
         const authResponse = await lastValueFrom(apiService.registerComplete(dto));
         patchState(store, {
           token: authResponse.accessToken,
-          refreshToken: authResponse.refreshToken,
           isLoading: false,
           error: null,
         });
@@ -134,7 +129,6 @@ export const AuthStore = signalStore(
         const authResponse = await lastValueFrom(apiService.loginPassword(dto));
         patchState(store, {
           token: authResponse.accessToken,
-          refreshToken: authResponse.refreshToken,
           isLoading: false,
           error: null,
         });
@@ -148,21 +142,14 @@ export const AuthStore = signalStore(
     },
 
     /**
-     * Refresh the access token using stored refresh token.
+     * Refresh the access token using HttpOnly cookie (no client-side refresh token needed).
      */
     async refreshAccessToken() {
-      const currentRefreshToken = store.refreshToken();
-      if (!currentRefreshToken) {
-        patchState(store, { error: 'No refresh token available', isLoading: false });
-        return;
-      }
-
       patchState(store, { isLoading: true, error: null });
       try {
-        const authResponse = await lastValueFrom(apiService.refreshToken(currentRefreshToken));
+        const authResponse = await lastValueFrom(apiService.refreshToken());
         patchState(store, {
           token: authResponse.accessToken,
-          refreshToken: authResponse.refreshToken,
           isLoading: false,
           error: null,
         });
@@ -206,6 +193,23 @@ export const AuthStore = signalStore(
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Failed to fetch profile';
         patchState(store, { error: message, isLoading: false });
+      }
+    },
+
+    /**
+     * Restore session on app bootstrap.
+     * Calls refreshToken() to get a new access token from the HttpOnly cookie,
+     * then fetches the user profile. Returns false silently if no cookie is available.
+     */
+    async restoreSession(): Promise<boolean> {
+      try {
+        const response = await lastValueFrom(apiService.refreshToken());
+        patchState(store, { token: response.accessToken });
+        await this.fetchUserProfile();
+        return true;
+      } catch {
+        // No valid cookie or refresh token — stay in guest state silently
+        return false;
       }
     },
   }))

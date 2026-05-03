@@ -45,17 +45,17 @@ describe('ServiceSelectionComponent - Responsive Design', () => {
   });
 
   describe('touch-friendly cards', () => {
-    it('[RED] should render service cards', () => {
+    it('[RED] should render service card wrappers', () => {
       fixture.detectChanges();
-      const cards = fixture.nativeElement.querySelectorAll('.service-card');
-      expect(cards.length).toBeGreaterThan(0);
+      const wrappers = fixture.nativeElement.querySelectorAll('.service-card-wrapper');
+      expect(wrappers.length).toBeGreaterThan(0);
     });
 
-    it('[RED] should have service cards as clickable with cursor pointer', () => {
+    it('[RED] should have service wrappers as clickable with cursor pointer', () => {
       fixture.detectChanges();
-      const cards = fixture.nativeElement.querySelectorAll('.service-card');
-      cards.forEach((card: HTMLElement) => {
-        expect(card.classList.contains('service-card')).toBeTruthy();
+      const wrappers = fixture.nativeElement.querySelectorAll('.service-card-wrapper');
+      wrappers.forEach((wrapper: HTMLElement) => {
+        expect(wrapper.getAttribute('role')).toBe('button');
       });
     });
   });
@@ -63,9 +63,8 @@ describe('ServiceSelectionComponent - Responsive Design', () => {
   describe('responsive card layout', () => {
     it('[RED] should have responsive services grid', () => {
       fixture.detectChanges();
-      const servicesContainer = fixture.nativeElement.querySelector('.services');
+      const servicesContainer = fixture.nativeElement.querySelector('.services-grid');
       expect(servicesContainer).toBeTruthy();
-      // CSS uses grid that goes single column on mobile via @media query
     });
   });
 });

@@ -1,12 +1,61 @@
 /* AppCard - Atomic component wrapper for PrimeNG p-card */
-/* Styling is handled via Tailwind and PrimeNG theme configuration */
 
 /* Card hover micro-interaction */
 .app-card-hover {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.app-card-hover:hover {
+/* Default variant */
+.app-card--default {
+  background: var(--color-bg-primary, #ffffff);
+  border-radius: 1rem;
+}
+
+/* Glass variant */
+.app-card--glass {
+  background: var(--color-glass-light, rgba(255, 255, 255, 0.85));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--color-glass-border, rgba(255, 255, 255, 0.3));
+  border-radius: 1rem;
+}
+
+/* Elevated variant */
+.app-card--elevated {
+  background: var(--color-bg-primary, #ffffff);
+  border-radius: 1rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.app-card--elevated.hover-lift:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--shadow-glass-hover, 0 20px 60px rgba(102, 126, 234, 0.2));
+}
+
+/* Outlined variant */
+.app-card--outlined {
+  background: var(--color-bg-primary, #ffffff);
+  border-color: var(--color-border, #E5E6EB);
+  border-radius: 1rem;
+  box-shadow: none !important;
+}
+
+/* Dark mode adaptations */
+[data-theme="dark"] .app-card--default {
+  background: var(--color-bg-secondary, #272E3B);
+}
+
+[data-theme="dark"] .app-card--elevated {
+  background: #272E3B;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .app-card--glass {
+  background: var(--color-glass-light, rgba(39, 46, 59, 0.85));
+  border-color: var(--color-glass-border, rgba(255, 255, 255, 0.1));
+}
+
+[data-theme="dark"] .app-card--outlined {
+  background: var(--color-bg-secondary, #272E3B);
+  border-color: var(--color-border, #4E5969);
 }

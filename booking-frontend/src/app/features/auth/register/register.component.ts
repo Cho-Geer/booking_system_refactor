@@ -19,6 +19,8 @@ import {
   RegisterSendCodeDto,
   RegisterCompleteDto,
 } from '../dto/auth.dto';
+import { AppCardComponent } from '../../../shared/components/atoms/app-card/app-card.component';
+import { AppButtonComponent } from '../../../shared/components/atoms/app-button/app-button.component';
 
 // Password strength validator matching backend requirements
 const passwordStrengthValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
@@ -47,7 +49,14 @@ const passwordStrengthValidator: ValidatorFn = (control: AbstractControl): Valid
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterModule, CommonModule, FormsModule],
+  imports: [
+    ReactiveFormsModule,
+    RouterModule,
+    CommonModule,
+    FormsModule,
+    AppCardComponent,
+    AppButtonComponent,
+  ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',
 })
@@ -137,8 +146,8 @@ export class RegisterComponent implements OnDestroy {
     const contact = this.step1Form.get('contact')?.value;
     if (!contact) return;
 
-    const { code, password, name, confirmPassword } = this.step2Form.value;
-    if (!code || !password || !name || !confirmPassword) return;
+    const { code, password, name } = this.step2Form.value;
+    if (!code || !password || !name) return;
 
     this.authStore.setLoading(true);
     this.authStore.setError(null);
@@ -153,10 +162,8 @@ export class RegisterComponent implements OnDestroy {
 
     this.api.registerComplete(dto).subscribe({
       next: (response) => {
-        // Store tokens (auth response has no user object)
-        this.authStore.loginSuccess(response.accessToken, response.refreshToken);
-        
-        // Fetch user profile separately
+        this.authStore.loginSuccess(response.accessToken);
+
         this.api.getUserProfile().subscribe({
           next: (profile) => {
             this.authStore.setUserProfile({
@@ -167,13 +174,11 @@ export class RegisterComponent implements OnDestroy {
               phone: profile.phone,
               createdAt: profile.createdAt,
             });
-            
-            // Connect socket and redirect by role
+
             this.socketService.connect();
             this.router.navigate([RouteResolver.getPostLoginRoute(profile.userType)]);
           },
           error: () => {
-            // Even if profile fetch fails, user is logged in
             this.socketService.connect();
             this.router.navigate(['/booking']);
           },

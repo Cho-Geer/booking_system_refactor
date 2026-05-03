@@ -82,7 +82,6 @@ async function main() {
         description: 'One-on-one business strategy consultation',
         durationMinutes: 60,
         price: 500.00,
-        capacity: 1,
       },
       {
         categoryId: consultingCategory.id,
@@ -90,7 +89,6 @@ async function main() {
         description: 'Expert review of your system architecture',
         durationMinutes: 90,
         price: 800.00,
-        capacity: 3,
       },
     ];
 

@@ -21,12 +21,27 @@ import { Service, TimeSlot, ReservationResponse, BookingListItem } from '../../s
  * All backend responses (both GET and POST/DELETE) are wrapped in this format.
  */
 export interface ApiResponse<T> {
-  success: boolean;
-  code: number;
+  statusCode: number;
   message: string;
   data: T;
   timestamp: string;
   requestId: string;
+}
+
+/** Metadata for paginated API responses */
+export interface PaginatedMeta {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+}
+
+/** Paginated response data wrapper for endpoints returning lists */
+export interface PaginatedResponse<T> {
+  items: T[];
+  meta: PaginatedMeta;
 }
 
 // Re-export DTOs for backward compatibility
@@ -58,8 +73,8 @@ export class ApiService {
    */
   registerSendCode(dto: RegisterSendCodeDto): Observable<RegisterSendCodeResponse> {
     return this.http
-      .post<RegisterSendCodeResponse>(`${this.apiUrl}/auth/register/send-code`, dto)
-      .pipe(catchError(this.handleError));
+      .post<ApiResponse<RegisterSendCodeResponse>>(`${this.apiUrl}/auth/register/send-code`, dto, { withCredentials: true })
+      .pipe(map(response => response.data), catchError(this.handleError));
   }
 
   /**
@@ -68,7 +83,7 @@ export class ApiService {
    */
   registerComplete(dto: RegisterCompleteDto): Observable<AuthResponseDto> {
     return this.http
-      .post<ApiResponse<AuthResponseDto>>(`${this.apiUrl}/auth/register/complete`, dto)
+      .post<ApiResponse<AuthResponseDto>>(`${this.apiUrl}/auth/register/complete`, dto, { withCredentials: true })
       .pipe(map(response => response.data), catchError(this.handleError));
   }
 
@@ -78,8 +93,8 @@ export class ApiService {
    */
   loginSendCode(dto: LoginSendCodeDto): Observable<LoginSendCodeResponse> {
     return this.http
-      .post<LoginSendCodeResponse>(`${this.apiUrl}/auth/login/send-code`, dto)
-      .pipe(catchError(this.handleError));
+      .post<ApiResponse<LoginSendCodeResponse>>(`${this.apiUrl}/auth/login/send-code`, dto, { withCredentials: true })
+      .pipe(map(response => response.data), catchError(this.handleError));
   }
 
   /**
@@ -88,7 +103,7 @@ export class ApiService {
    */
   loginVerifyCode(dto: LoginVerifyCodeDto): Observable<AuthResponseDto> {
     return this.http
-      .post<ApiResponse<AuthResponseDto>>(`${this.apiUrl}/auth/login/verify-code`, dto)
+      .post<ApiResponse<AuthResponseDto>>(`${this.apiUrl}/auth/login/verify-code`, dto, { withCredentials: true })
       .pipe(map(response => response.data), catchError(this.handleError));
   }
 
@@ -98,17 +113,18 @@ export class ApiService {
    */
   loginPassword(dto: LoginPasswordDto): Observable<AuthResponseDto> {
     return this.http
-      .post<ApiResponse<AuthResponseDto>>(`${this.apiUrl}/auth/login/password`, dto)
+      .post<ApiResponse<AuthResponseDto>>(`${this.apiUrl}/auth/login/password`, dto, { withCredentials: true })
       .pipe(map(response => response.data), catchError(this.handleError));
   }
 
   /**
    * Refresh access token
    * POST /v1/auth/refresh
+   * refreshToken is transmitted via HttpOnly cookie, not in request body
    */
-  refreshToken(refreshToken: string): Observable<AuthResponseDto> {
+  refreshToken(): Observable<AuthResponseDto> {
     return this.http
-      .post<ApiResponse<AuthResponseDto>>(`${this.apiUrl}/auth/refresh`, { refreshToken })
+      .post<ApiResponse<AuthResponseDto>>(`${this.apiUrl}/auth/refresh`, {}, { withCredentials: true })
       .pipe(map(response => response.data), catchError(this.handleError));
   }
 
@@ -128,9 +144,9 @@ export class ApiService {
 
   getServices(): Observable<Service[]> {
     return this.http
-      .get<ApiResponse<Service[]>>(`${this.apiUrl}/services`)
+      .get<ApiResponse<PaginatedResponse<Service>>>(`${this.apiUrl}/services`)
       .pipe(
-        map(response => response.data),
+        map(response => response.data.items),
         catchError(this.handleError)
       );
   }
@@ -171,9 +187,9 @@ export class ApiService {
     if (query?.status) params = params.set('status', query.status);
 
     return this.http
-      .get<ApiResponse<BookingListItem[]>>(`${this.apiUrl}/appointments`, { params })
+      .get<ApiResponse<PaginatedResponse<BookingListItem>>>(`${this.apiUrl}/appointments`, { params })
       .pipe(
-        map(response => response.data),
+        map(response => response.data.items),
         catchError(this.handleError)
       );
   }

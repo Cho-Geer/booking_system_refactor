@@ -60,18 +60,103 @@ describe('AppCardComponent', () => {
     expect(content.nativeElement.textContent).toContain('Projected Content');
   });
 
-  describe('card hover micro-interaction', () => {
-    it('[RED] should have app-card-hover class in combinedStyleClass', () => {
-      fixture.detectChanges();
-      // combinedStyleClass should include app-card-hover
-      expect(component.combinedStyleClass).toContain('app-card-hover');
+  describe('variant system', () => {
+    it('[RED] should default variant to "default"', () => {
+      expect(component.variant()).toBe('default');
     });
 
-    it('[RED] should have hover transition styles defined', () => {
+    it('[RED] should apply default variant classes', () => {
       fixture.detectChanges();
       const combined = component.combinedStyleClass;
       expect(combined).toContain('app-card-hover');
-      expect(combined.length).toBeGreaterThan(0);
+      expect(combined).toContain('app-card--default');
+    });
+
+    it('[RED] should apply glass variant classes when variant is glass', () => {
+      fixture.componentRef.setInput('variant', 'glass');
+      fixture.detectChanges();
+
+      const combined = component.combinedStyleClass;
+      expect(combined).toContain('app-card--glass');
+      expect(combined).toContain('glass-level-1');
+      expect(combined).toContain('shadow-glass');
+    });
+
+    it('[RED] should apply elevated variant classes', () => {
+      fixture.componentRef.setInput('variant', 'elevated');
+      fixture.detectChanges();
+
+      const combined = component.combinedStyleClass;
+      expect(combined).toContain('app-card--elevated');
+      expect(combined).toContain('shadow-xl');
+    });
+
+    it('[RED] should apply outlined variant classes', () => {
+      fixture.componentRef.setInput('variant', 'outlined');
+      fixture.detectChanges();
+
+      const combined = component.combinedStyleClass;
+      expect(combined).toContain('app-card--outlined');
+      expect(combined).toContain('border');
+    });
+
+    it('[RED] should still support legacy glass input mapped to glass variant', () => {
+      fixture.componentRef.setInput('glass', true);
+      fixture.detectChanges();
+
+      const combined = component.combinedStyleClass;
+      expect(combined).toContain('app-card--glass');
+    });
+  });
+
+  describe('header icon', () => {
+    it('[RED] should render header icon when headerIcon is provided', () => {
+      fixture.componentRef.setInput('header', 'Title');
+      fixture.componentRef.setInput('headerIcon', 'pi pi-user');
+      fixture.detectChanges();
+
+      const iconEl = fixture.debugElement.query(By.css('.app-card-header-icon'));
+      expect(iconEl).toBeTruthy();
+    });
+
+    it('[RED] should not render header icon when headerIcon is not provided', () => {
+      fixture.componentRef.setInput('header', 'Title');
+      fixture.detectChanges();
+
+      const iconEl = fixture.debugElement.query(By.css('.app-card-header-icon'));
+      expect(iconEl).toBeFalsy();
+    });
+  });
+
+  describe('accent bar', () => {
+    it('[RED] should render accent bar when accentBar is true', () => {
+      fixture.componentRef.setInput('accentBar', true);
+      fixture.detectChanges();
+
+      const accentBar = fixture.debugElement.query(By.css('.app-card-accent'));
+      expect(accentBar).toBeTruthy();
+    });
+
+    it('[RED] should not render accent bar by default', () => {
+      fixture.detectChanges();
+
+      const accentBar = fixture.debugElement.query(By.css('.app-card-accent'));
+      expect(accentBar).toBeFalsy();
+    });
+  });
+
+  describe('card hover micro-interaction', () => {
+    it('[RED] should have app-card-hover class in combinedStyleClass', () => {
+      fixture.detectChanges();
+      expect(component.combinedStyleClass).toContain('app-card-hover');
+    });
+  });
+
+  describe('elevated hover lift effect', () => {
+    it('[RED] should have hover-lift class for elevated variant', () => {
+      fixture.componentRef.setInput('variant', 'elevated');
+      fixture.detectChanges();
+      expect(component.combinedStyleClass).toContain('hover-lift');
     });
   });
 });

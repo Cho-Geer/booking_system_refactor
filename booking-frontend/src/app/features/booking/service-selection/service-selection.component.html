@@ -1,30 +1,129 @@
-<div class="services">
+<div class="services-page page-enter">
+  <!-- Header -->
+  <div class="mb-6 sm:mb-8">
+    <h1 class="text-2xl font-bold gradient-text">选择服务</h1>
+    <p class="text-sm text-gray-500 mt-1">浏览并选择您需要的服务项目</p>
+  </div>
+
+  <!-- Search Input -->
+  <div class="mb-5">
+    <app-input
+      [value]="searchQuery()"
+      placeholder="搜索服务名称..."
+      [fluid]="true"
+      (valueChange)="onSearchInput($event)"
+      ariaLabel="搜索服务"
+    />
+  </div>
+
+  <!-- Category Filter Chips -->
+  @if (categories().length > 0) {
+    <div class="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-thin -mx-4 px-4 sm:mx-0 sm:px-0">
+      <button
+        class="filter-chip whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 min-h-[44px]"
+        [class.active]="activeCategory() === null"
+        [class.inactive]="activeCategory() !== null"
+        (click)="setCategoryFilter(null)"
+        role="tab"
+        [attr.aria-selected]="activeCategory() === null"
+      >
+        全部
+      </button>
+      @for (cat of categories(); track cat.id) {
+        <button
+          class="filter-chip whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 min-h-[44px]"
+          [class.active]="activeCategory() === cat.id"
+          [class.inactive]="activeCategory() !== cat.id"
+          (click)="setCategoryFilter(cat.id)"
+          role="tab"
+          [attr.aria-selected]="activeCategory() === cat.id"
+        >
+          {{ cat.name }}
+        </button>
+      }
+    </div>
+  }
+
+  <!-- Skeleton Loading State -->
   @if (isLoading()) {
-    <div class="services loading loading-skeleton" role="status" aria-live="polite">
-      @for (item of [1,2,3,4]; track item) {
-        <div class="service-card-skeleton">
-          <div class="skeleton skeleton-title"></div>
-          <div class="skeleton skeleton-desc"></div>
-          <div class="skeleton skeleton-meta"></div>
+    <div class="services-grid" role="status" aria-live="polite">
+      @for (item of [1,2,3,4,5,6]; track item) {
+        <app-card variant="glass">
+          <div class="space-y-3">
+            <div class="w-12 h-12 rounded-xl bg-white/40 skeleton"></div>
+            <div class="h-5 w-3/4 bg-white/40 rounded skeleton"></div>
+            <div class="h-4 w-full bg-white/40 rounded skeleton"></div>
+            <div class="h-4 w-2/3 bg-white/40 rounded skeleton"></div>
+            <div class="flex justify-between pt-2">
+              <div class="h-4 w-16 bg-white/40 rounded skeleton"></div>
+              <div class="h-4 w-20 bg-white/40 rounded skeleton"></div>
+            </div>
+          </div>
+        </app-card>
+      }
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!isLoading() && filteredServices().length === 0 && services().length > 0) {
+    <app-empty-state
+      icon="🔍"
+      title="未找到服务"
+      description="没有匹配您搜索条件的服务，请尝试其他关键词"
+    />
+  }
+
+  <!-- No Services State -->
+  @if (!isLoading() && services().length === 0) {
+    <app-empty-state
+      icon="📋"
+      title="暂无可用服务"
+      description="服务列表暂为空，请稍后再试"
+    />
+  }
+
+  <!-- Service Grid -->
+  @if (!isLoading() && filteredServices().length > 0) {
+    <div class="services-grid">
+      @for (service of filteredServices(); track service.id) {
+        <div
+          class="service-card-wrapper"
+          [class.selected]="isSelected(service)"
+          (click)="selectService(service)"
+          (keydown.enter)="selectService(service)"
+          tabindex="0"
+          role="button"
+          [attr.aria-label]="'选择 ' + service.name"
+          [attr.aria-pressed]="isSelected(service)"
+        >
+          <app-card
+            variant="glass"
+            [styleClass]="isSelected(service) ? 'gradient-card-selected service-card' : 'service-card'"
+          >
+            <!-- Icon Placeholder -->
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-start/20 to-primary-end/20 flex items-center justify-center flex-shrink-0">
+                <span class="text-xl">💈</span>
+              </div>
+              <div>
+                <h3 class="text-h3 font-semibold text-gray-900">{{ service.name }}</h3>
+              </div>
+            </div>
+
+            <!-- Description (truncated) -->
+            <p class="text-body-sm text-gray-500 mb-4 line-clamp-2">{{ service.description }}</p>
+
+            <!-- Duration + Price -->
+            <div class="flex items-center justify-between pt-3 border-t border-white/30">
+              <div class="flex items-center gap-1.5 text-body-sm text-gray-500">
+                <span>🕐</span>
+                <span>{{ service.durationMinutes }} 分钟</span>
+              </div>
+              <span class="text-h3 font-bold gradient-text">{{ service.price | currency }}</span>
+            </div>
+          </app-card>
         </div>
       }
     </div>
-  } @else {
-    @for (service of services(); track service.id) {
-      <div
-        class="service-card"
-        (click)="selectService(service)"
-        [class.selected]="isSelected(service)"
-        tabindex="0"
-        (keydown.enter)="selectService(service)"
-      >
-        <h3>{{ service.name }}</h3>
-        <p>{{ service.description }}</p>
-        <div class="service-meta">
-          <span class="duration">{{ service.durationMinutes }} min</span>
-          <span class="price">{{ service.price | currency }}</span>
-        </div>
-      </div>
-    }
   }
 </div>

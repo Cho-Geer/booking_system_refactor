@@ -1,64 +1,108 @@
-<div class="confirmation-container">
+<div class="confirmation-page page-enter">
   @if (!hasSelection()) {
-    <div class="empty-state">
-      <h2>No booking selected</h2>
-      <p>Please select a time slot to proceed with booking.</p>
-      <button routerLink="/booking" class="btn-primary min-h-[44px]" aria-label="Go back to booking page">
-        Back to Booking
-      </button>
+    <div class="flex justify-center py-16">
+      <app-card variant="glass" styleClass="max-w-md w-full text-center">
+        <div class="py-8">
+          <div class="w-16 h-16 rounded-full bg-white/50 flex items-center justify-center mx-auto mb-4">
+            <span class="text-2xl">📋</span>
+          </div>
+          <h2 class="text-xl font-bold text-gray-900 mb-2">未选择预约</h2>
+          <p class="text-sm text-gray-500 mb-6">请先选择时间段再进行预约确认</p>
+          <app-button
+            label="返回预约"
+            variant="primary"
+            (onClick)="cancelBooking()"
+          />
+        </div>
+      </app-card>
     </div>
   } @else {
-    <div class="confirmation-card w-full">
-      <h2>Booking Confirmation</h2>
-
-      <div class="booking-details">
-        <div class="detail-row">
-          <span class="label">Service:</span>
-          <span class="value">{{ selectedServiceName() }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="label">Date:</span>
-          <span class="value">{{ selectedSlot()?.startTime | date:'fullDate' }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="label">Time:</span>
-          <span class="value">{{ selectedSlot()?.startTime | date:'shortTime' }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="label">Duration:</span>
-          <span class="value">{{ serviceDuration() }} minutes</span>
-        </div>
-        <div class="detail-row">
-          <span class="label">Price:</span>
-          <span class="value price">{{ servicePrice() | currency }}</span>
-        </div>
+    <div class="confirmation-content">
+      <!-- Header -->
+      <div class="mb-6 sm:mb-8">
+        <h1 class="text-2xl font-bold gradient-text">确认预约</h1>
+        <p class="text-sm text-gray-500 mt-1">请确认您的预约信息</p>
       </div>
 
+      <!-- Booking Details Card -->
+      <app-card variant="glass" headerIcon="pi pi-calendar" header="预约详情" class="mb-5">
+        <div class="space-y-4">
+          <div class="detail-row">
+            <span class="detail-label">服务项目</span>
+            <span class="detail-value">{{ selectedServiceName() }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">预约日期</span>
+            <span class="detail-value">{{ selectedSlot()?.startTime | date:'fullDate' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">预约时间</span>
+            <span class="detail-value">{{ selectedSlot()?.startTime | date:'shortTime' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">服务时长</span>
+            <span class="detail-value">{{ serviceDuration() }} 分钟</span>
+          </div>
+          <div class="detail-row detail-row-price">
+            <span class="detail-label">费用</span>
+            <span class="detail-value price">{{ servicePrice() | currency }}</span>
+          </div>
+        </div>
+      </app-card>
+
+      <!-- Customer Info -->
+      <app-card variant="glass" headerIcon="pi pi-user" header="客户信息" class="mb-5">
+        <p class="text-body text-gray-700">
+          {{ authStore.user()?.name || '未登录用户' }}
+        </p>
+        @if (authStore.user()?.email) {
+          <p class="text-body-sm text-gray-500 mt-1">
+            {{ authStore.user()?.email }}
+          </p>
+        }
+      </app-card>
+
+      <!-- Error message -->
       @if (error()) {
-        <div class="error-message">
-          <p>{{ error() }}</p>
+        <div class="glass-level-1 p-4 mb-5 border-l-4 border-red-500">
+          <p class="text-sm text-red-600">{{ error() }}</p>
         </div>
       }
 
-      <div class="actions">
-        <button
-          class="btn-secondary min-h-[44px]"
-          (click)="cancelBooking()"
+      <!-- Terms acceptance -->
+      <div class="mb-5">
+        <label class="flex items-start gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            [(ngModel)]="acceptTerms"
+            class="mt-1 w-4 h-4 rounded border-gray-300 text-primary-start focus:ring-primary-start"
+          />
+          <span class="text-sm text-gray-600">
+            我已阅读并同意
+            <a routerLink="/legal/terms" target="_blank" class="text-primary-start hover:underline">服务条款</a>
+            和
+            <a routerLink="/legal/privacy" target="_blank" class="text-primary-start hover:underline">隐私政策</a>
+          </span>
+        </label>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-col-reverse sm:flex-row gap-3">
+        <app-button
+          label="返回"
+          variant="ghost"
+          class="w-full sm:w-auto"
           [disabled]="isProcessing()"
-        >
-          Cancel
-        </button>
-        <button
-          class="btn-primary min-h-[44px]"
-          (click)="confirmBooking()"
-          [disabled]="isProcessing()"
-        >
-          @if (isProcessing()) {
-            Processing...
-          } @else {
-            Confirm Booking
-          }
-        </button>
+          (onClick)="cancelBooking()"
+        />
+        <app-button
+          label="确认预约"
+          variant="primary"
+          class="w-full sm:flex-1"
+          [disabled]="isProcessing() || !acceptTerms"
+          [loading]="isProcessing()"
+          (onClick)="confirmBooking()"
+        />
       </div>
     </div>
   }

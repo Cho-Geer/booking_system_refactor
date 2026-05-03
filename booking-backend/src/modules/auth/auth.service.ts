@@ -160,7 +160,7 @@ export class AuthService {
    */
   async registerComplete(
     completeDto: RegisterCompleteDto,
-  ): Promise<AuthResponseDto> {
+  ): Promise<AuthResponseDto & { refreshToken: string }> {
     const { contact, contactType, code, password, name } = completeDto;
 
     // 1. 验证码校验
@@ -304,7 +304,13 @@ export class AuthService {
       this.logger.warn(`SMS not integrated yet. Code for ${contact}: ${code}`);
     }
 
-    return { expiresIn: VERIFICATION_CODE_TTL };
+    return {
+      maskedContact:
+        contactType === ContactType.PHONE
+          ? maskPhone(contact)
+          : maskEmail(contact),
+      expiresIn: VERIFICATION_CODE_TTL,
+    };
   }
 
   /**
@@ -313,7 +319,7 @@ export class AuthService {
    */
   async loginVerifyCode(
     verifyDto: LoginVerifyCodeDto,
-  ): Promise<AuthResponseDto> {
+  ): Promise<AuthResponseDto & { refreshToken: string }> {
     const { contact, contactType, code } = verifyDto;
 
     // 1. 计算 hash 查找用户
@@ -369,7 +375,7 @@ export class AuthService {
    * 密码登录
    * POST /v1/auth/login/password
    */
-  async loginPassword(loginDto: LoginPasswordDto): Promise<AuthResponseDto> {
+  async loginPassword(loginDto: LoginPasswordDto): Promise<AuthResponseDto & { refreshToken: string }> {
     const { contact, contactType, password } = loginDto;
 
     // 1. 计算 hash 查找用户
@@ -414,7 +420,7 @@ export class AuthService {
    */
   async refreshTokens(
     refreshDto: RefreshTokenRequestDto,
-  ): Promise<AuthResponseDto> {
+  ): Promise<AuthResponseDto & { refreshToken: string }> {
     const { refreshToken } = refreshDto;
 
     // 1. 验证 JWT
@@ -505,7 +511,7 @@ export class AuthService {
       expiresAt: Date;
       refreshExpiresAt: Date;
     };
-    response: AuthResponseDto;
+    response: AuthResponseDto & { refreshToken: string };
   } {
     const jti = crypto.randomUUID();
 
@@ -575,7 +581,7 @@ export class AuthService {
   private async _createTokenPair(
     user: UserPayload,
     tx?: any,
-  ): Promise<AuthResponseDto> {
+  ): Promise<AuthResponseDto & { refreshToken: string }> {
     const { sessionData, response } = this.buildTokenPair(user);
 
     const client = tx || this.prisma;
@@ -587,7 +593,7 @@ export class AuthService {
   /**
    * 生成 JWT Token 对（用于首次登录/注册）
    */
-  private async generateTokens(user: UserPayload): Promise<AuthResponseDto> {
+  private async generateTokens(user: UserPayload): Promise<AuthResponseDto & { refreshToken: string }> {
     return this._createTokenPair(user);
   }
 
@@ -597,7 +603,7 @@ export class AuthService {
   private async rotateToken(
     user: UserPayload,
     oldSessionId: string,
-  ): Promise<AuthResponseDto> {
+  ): Promise<AuthResponseDto & { refreshToken: string }> {
     return this.prisma.$transaction(async (tx) => {
       // 吊销旧会话
       await tx.userSession.update({

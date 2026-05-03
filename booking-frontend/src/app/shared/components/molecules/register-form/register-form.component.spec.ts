@@ -188,7 +188,7 @@ describe('RegisterFormComponent', () => {
       expect(errorMsg).toBeTruthy();
     });
 
-    it('should show password requirements with correct states', () => {
+    it('should show password requirements with correct states', async () => {
       setInputs({
         passwordRequirements: {
           hasMinLength: true,
@@ -200,8 +200,36 @@ describe('RegisterFormComponent', () => {
       });
       fixture.detectChanges();
 
-      const deferBlocks = fixture.getDeferBlocks();
-      // Password requirements are in a @defer block
+      const deferBlocks = await fixture.getDeferBlocks();
+      await deferBlocks[0].render(DeferBlockState.Complete);
+      fixture.detectChanges();
+
+      const requirementList = fixture.nativeElement.querySelector('.password-requirements');
+      expect(requirementList).toBeTruthy();
+    });
+
+    it('should display password min length requirement as 8 characters', async () => {
+      setInputs({
+        passwordRequirements: {
+          hasMinLength: false,
+          hasUpperCase: false,
+          hasLowerCase: false,
+          hasNumber: false,
+          hasSpecialChar: false,
+        },
+      });
+      fixture.detectChanges();
+
+      const deferBlocks = await fixture.getDeferBlocks();
+      await deferBlocks[0].render(DeferBlockState.Complete);
+      fixture.detectChanges();
+
+      const requirementItems = fixture.nativeElement.querySelectorAll('.password-requirements li span');
+      const minLengthItem = Array.from(requirementItems).find(
+        (span: HTMLSpanElement) => span.textContent?.includes('至少')
+      );
+      expect(minLengthItem).toBeTruthy();
+      expect(minLengthItem!.textContent).toContain('至少 8 个字符');
     });
   });
 
@@ -293,6 +321,31 @@ describe('RegisterFormComponent', () => {
         (btn: HTMLButtonElement) => btn.textContent?.includes('完成注册')
       ) as HTMLButtonElement;
       expect(submitBtn).toBeTruthy();
+    });
+  });
+
+  describe('glassmorphism CSS classes', () => {
+    it('[RED] should have glass-input class on text inputs', () => {
+      const inputs = fixture.nativeElement.querySelectorAll('input[type="text"], input[type="password"]');
+      inputs.forEach((input: HTMLElement) => {
+        expect(input.classList.contains('glass-input')).toBe(true);
+      });
+    });
+
+    it('[RED] should have btn-primary-glass class on submit button', () => {
+      const buttons = fixture.nativeElement.querySelectorAll('button');
+      const submitBtn = Array.from(buttons).find(
+        (btn: HTMLButtonElement) => btn.textContent?.includes('完成注册')
+      ) as HTMLButtonElement;
+      expect(submitBtn.classList.contains('btn-primary-glass')).toBe(true);
+    });
+
+    it('[RED] should have btn-secondary-glass class on back button', () => {
+      const buttons = fixture.nativeElement.querySelectorAll('button');
+      const backBtn = Array.from(buttons).find(
+        (btn: HTMLButtonElement) => btn.textContent?.includes('返回')
+      ) as HTMLButtonElement;
+      expect(backBtn.classList.contains('btn-secondary-glass')).toBe(true);
     });
   });
 });

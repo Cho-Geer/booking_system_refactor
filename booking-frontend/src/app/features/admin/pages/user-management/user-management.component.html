@@ -1,121 +1,214 @@
 <div class="space-y-6">
   <!-- Page Header -->
-  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-    <h1 class="text-xl sm:text-2xl font-bold text-gray-800">User Management</h1>
-    <p-button label="New User" icon="pi pi-plus" (onClick)="openNew()" />
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+    <div>
+      <h1 class="text-2xl sm:text-display font-bold text-text-primary">User Management</h1>
+      <p class="text-sm text-text-secondary mt-1">Manage system users and their roles</p>
+    </div>
+    <app-button label="New User" variant="primary" icon="pi pi-plus" (onClick)="openNew()"></app-button>
   </div>
 
-  <!-- Error State -->
-  @if (vm().error) {
-    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-      {{ vm().error }}
+  <!-- Loading State -->
+  @if (vm().isLoading && vm().users.length === 0) {
+    <div class="flex justify-center py-12">
+      <app-spinner></app-spinner>
     </div>
   }
 
-  <!-- Filters - stack on mobile -->
-  <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 sm:flex-wrap">
-    <span class="p-input-icon-left w-full sm:w-auto">
-      <i class="pi pi-search"></i>
-      <input pInputText [(ngModel)]="searchQuery" placeholder="Search users..." (input)="applyFilter()" class="p-2 border rounded w-full sm:w-auto" />
-    </span>
-    <p-select
-      [(ngModel)]="selectedRoleFilter"
-      [options]="roleOptions"
-      placeholder="All Roles"
-      (onChange)="applyFilter()"
-      class="w-full sm:w-40"
-    />
-    <p-select
-      [(ngModel)]="selectedStatusFilter"
-      [options]="statusOptions"
-      placeholder="All Statuses"
-      (onChange)="applyFilter()"
-      class="w-full sm:w-40"
-    />
-  </div>
+  @if (!vm().isLoading) {
+    <!-- Stats Summary -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+      <app-card variant="elevated">
+        <div class="flex items-center gap-4 p-2">
+          <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+            <i class="pi pi-users text-blue-600 text-xl"></i>
+          </div>
+          <div>
+            <p class="text-3xl font-bold text-text-primary">{{ vm().usersTotal }}</p>
+            <p class="text-sm text-text-secondary">Total Users</p>
+          </div>
+        </div>
+      </app-card>
 
-  <!-- Users Table - horizontal scroll on mobile -->
-  <div class="table-scroll-container">
-    <p-table
-      [value]="vm().users"
-      [loading]="vm().isLoading"
-      [paginator]="true"
-      [rows]="10"
-      [totalRecords]="vm().usersTotal"
-      [rowsPerPageOptions]="[10, 25, 50]"
-      [showCurrentPageReport]="true"
-      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} users"
-      [tableStyle]="{ 'min-width': '700px' }"
-    >
-      <ng-template #header>
-        <tr>
-          <th pSortableColumn="name">Name <p-sortIcon field="name" /></th>
-          <th pSortableColumn="email">Email <p-sortIcon field="email" /></th>
-          <th pSortableColumn="role">Role <p-sortIcon field="role" /></th>
-          <th pSortableColumn="status">Status <p-sortIcon field="status" /></th>
-          <th pSortableColumn="createdAt">Created <p-sortIcon field="createdAt" /></th>
-          <th>Actions</th>
-        </tr>
-      </ng-template>
-      <ng-template #body let-user>
-        <tr>
-          <td>{{ user.name }}</td>
-          <td class="truncate max-w-[150px]">{{ user.email }}</td>
-          <td><p-tag [value]="user.role" [severity]="user.role === 'ADMIN' || user.role === 'SUPER_ADMIN' ? 'info' : 'success'" /></td>
-          <td><p-tag [value]="user.status" [severity]="getStatusSeverity(user.status)" /></td>
-          <td>{{ user.createdAt | date:'short' }}</td>
-          <td>
-            <div class="flex gap-2">
-              <p-button icon="pi pi-pencil" [rounded]="true" [outlined]="true" size="small" (onClick)="editUser(user)" />
-              <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" size="small" (onClick)="confirmDeleteUser(user)" />
-            </div>
-          </td>
-        </tr>
-      </ng-template>
-      <ng-template #emptymessage>
-        <tr>
-          <td colspan="6" class="text-center py-8 text-gray-500">No users found.</td>
-        </tr>
-      </ng-template>
-    </p-table>
-  </div>
+      <app-card variant="elevated">
+        <div class="flex items-center gap-4 p-2">
+          <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+            <i class="pi pi-check-circle text-green-600 text-xl"></i>
+          </div>
+          <div>
+            <p class="text-3xl font-bold text-text-primary">{{ activeUsers() }}</p>
+            <p class="text-sm text-text-secondary">Active Users</p>
+          </div>
+        </div>
+      </app-card>
 
-  <!-- User Dialog - full-screen on mobile -->
+      <app-card variant="elevated">
+        <div class="flex items-center gap-4 p-2">
+          <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
+            <i class="pi pi-star text-purple-600 text-xl"></i>
+          </div>
+          <div>
+            <p class="text-3xl font-bold text-text-primary">{{ newThisWeek() }}</p>
+            <p class="text-sm text-text-secondary">New This Week</p>
+          </div>
+        </div>
+      </app-card>
+    </div>
+
+    <!-- Error State -->
+    @if (vm().error) {
+      <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+        {{ vm().error }}
+      </div>
+    }
+
+    <!-- Filter Bar -->
+    <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 sm:items-center sm:flex-wrap bg-white p-4 rounded-xl shadow-sm border border-border">
+      <app-input
+        [value]="searchQuery()"
+        placeholder="Search users..."
+        (valueChange)="searchQuery.set($event); applyFilter()"
+        styleClass="w-full sm:w-56"
+      ></app-input>
+      <app-dropdown
+        [options]="filterRoleOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="All Roles"
+        styleClass="w-full sm:w-40"
+        (valueChange)="onRoleFilterChange($event)"
+      ></app-dropdown>
+      <app-dropdown
+        [options]="filterStatusOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="All Statuses"
+        styleClass="w-full sm:w-40"
+        (valueChange)="onStatusFilterChange($event)"
+      ></app-dropdown>
+      <app-button
+        label="Clear"
+        variant="ghost"
+        icon="pi pi-filter-slash"
+        size="sm"
+        (onClick)="clearFilters()"
+      ></app-button>
+    </div>
+
+    <!-- Users Table -->
+    <div class="bg-white rounded-xl shadow-sm border border-border overflow-hidden">
+      <p-table
+        [value]="vm().users"
+        [loading]="vm().isLoading"
+        [paginator]="true"
+        [rows]="10"
+        [totalRecords]="vm().usersTotal"
+        [rowsPerPageOptions]="[10, 25, 50]"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} users"
+        [tableStyle]="{ 'min-width': '750px' }"
+        stripedRows="true"
+        [rowHover]="true"
+      >
+        <ng-template #header>
+          <tr>
+            <th pSortableColumn="name">Name <p-sortIcon field="name" /></th>
+            <th pSortableColumn="email">Email <p-sortIcon field="email" /></th>
+            <th pSortableColumn="role">Role <p-sortIcon field="role" /></th>
+            <th pSortableColumn="status">Status <p-sortIcon field="status" /></th>
+            <th pSortableColumn="createdAt">Created <p-sortIcon field="createdAt" /></th>
+            <th>Actions</th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-user>
+          <tr>
+            <td>
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-primary-start/10 flex items-center justify-center text-sm font-semibold text-primary-start flex-shrink-0">
+                  {{ user.name.charAt(0).toUpperCase() }}
+                </div>
+                <span class="font-medium text-text-primary truncate">{{ user.name }}</span>
+              </div>
+            </td>
+            <td class="truncate max-w-[180px] text-text-secondary">{{ user.email }}</td>
+            <td>
+              <app-badge [status]="mapRoleToBadge(user.role)" [customLabel]="user.role === 'SUPER_ADMIN' ? 'Super Admin' : user.role === 'ADMIN' ? 'Admin' : 'Customer'" size="sm"></app-badge>
+            </td>
+            <td><p-tag [value]="user.status" [severity]="getStatusSeverity(user.status)" /></td>
+            <td class="text-text-secondary text-sm">{{ user.createdAt | date:'short' }}</td>
+            <td>
+              <div class="flex gap-2">
+                <app-button icon="pi pi-pencil" variant="ghost" size="sm" [iconOnly]="true" (onClick)="editUser(user)"></app-button>
+                <app-button icon="pi pi-trash" variant="danger" size="sm" [iconOnly]="true" (onClick)="confirmDeleteUser(user)"></app-button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template #emptymessage>
+          <tr>
+            <td colspan="6" class="text-center py-8 text-text-secondary">No users found.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  }
+
+  <!-- User Dialog -->
   <p-dialog
     [(visible)]="userDialogVisible"
     [header]="isEdit() ? 'Edit User' : 'New User'"
     [modal]="true"
     [style]="{ width: '450px' }"
-    [class]="'modal-fullscreen-mobile'"
+    styleClass="rounded-xl"
     (onHide)="closeDialog()"
   >
     <ng-template #content>
       <div class="flex flex-col gap-4 p-4">
+        <!-- Name -->
         <div>
-          <label class="block font-medium mb-1">Name</label>
-          <input pInputText [(ngModel)]="formName" class="w-full" required />
+          <label class="block font-medium mb-1 text-text-primary">Name *</label>
+          <input pInputText [(ngModel)]="formName" class="w-full" [class.ng-invalid]="submitted() && formErrors.name" />
+          @if (submitted() && formErrors.name) {
+            <small class="text-danger">{{ formErrors.name }}</small>
+          }
         </div>
+
         @if (!isEdit()) {
+          <!-- Email -->
           <div>
-            <label class="block font-medium mb-1">Email</label>
-            <input pInputText [(ngModel)]="formEmail" class="w-full" required />
+            <label class="block font-medium mb-1 text-text-primary">Email *</label>
+            <input pInputText [(ngModel)]="formEmail" class="w-full" [class.ng-invalid]="submitted() && formErrors.email" />
+            @if (submitted() && formErrors.email) {
+              <small class="text-danger">{{ formErrors.email }}</small>
+            }
           </div>
+
+          <!-- Phone -->
           <div>
-            <label class="block font-medium mb-1">Phone</label>
+            <label class="block font-medium mb-1 text-text-primary">Phone</label>
             <input pInputText [(ngModel)]="formPhone" class="w-full" />
           </div>
+
+          <!-- Password -->
           <div>
-            <label class="block font-medium mb-1">Password</label>
-            <input pInputText [(ngModel)]="formPassword" class="w-full" type="password" required />
+            <label class="block font-medium mb-1 text-text-primary">Password *</label>
+            <input pInputText [(ngModel)]="formPassword" class="w-full" type="password" [class.ng-invalid]="submitted() && formErrors.password" />
+            @if (submitted() && formErrors.password) {
+              <small class="text-danger">{{ formErrors.password }}</small>
+            }
           </div>
         }
+
+        <!-- Role -->
         <div>
-          <label class="block font-medium mb-1">Role</label>
+          <label class="block font-medium mb-1 text-text-primary">Role</label>
           <p-select [(ngModel)]="formRole" [options]="roleOptions" class="w-full" />
         </div>
+
         @if (isEdit()) {
+          <!-- Status -->
           <div>
-            <label class="block font-medium mb-1">Status</label>
+            <label class="block font-medium mb-1 text-text-primary">Status</label>
             <p-select [(ngModel)]="formStatus" [options]="statusOptions" class="w-full" />
           </div>
         }
@@ -123,27 +216,27 @@
     </ng-template>
     <ng-template #footer>
       <div class="flex flex-col-reverse sm:flex-row gap-2 sm:gap-2">
-        <p-button label="Cancel" [outlined]="true" (onClick)="closeDialog()" class="w-full sm:w-auto" />
-        <p-button label="Save" (onClick)="saveUser()" class="w-full sm:w-auto" />
+        <app-button label="Cancel" variant="secondary" (onClick)="closeDialog()"></app-button>
+        <app-button label="Save" variant="primary" (onClick)="saveUser()"></app-button>
       </div>
     </ng-template>
   </p-dialog>
 
-  <!-- Delete Confirmation Dialog - full-screen on mobile -->
+  <!-- Delete Confirmation Dialog -->
   <p-dialog
     [(visible)]="deleteDialogVisible"
     header="Confirm Delete"
     [modal]="true"
     [style]="{ width: '400px' }"
-    [class]="'modal-fullscreen-mobile'"
+    styleClass="rounded-xl"
   >
     <ng-template #content>
-      <p class="p-4">Are you sure you want to delete user <strong>{{ userToDelete()?.name }}</strong>? This action cannot be undone.</p>
+      <p class="p-4 text-text-primary">Are you sure you want to delete user <strong>{{ userToDelete()?.name }}</strong>? This action cannot be undone.</p>
     </ng-template>
     <ng-template #footer>
       <div class="flex flex-col-reverse sm:flex-row gap-2 sm:gap-2">
-        <p-button label="Cancel" [outlined]="true" (onClick)="deleteDialogVisible.set(false)" class="w-full sm:w-auto" />
-        <p-button label="Delete" severity="danger" (onClick)="deleteUser()" class="w-full sm:w-auto" />
+        <app-button label="Cancel" variant="secondary" (onClick)="deleteDialogVisible.set(false)"></app-button>
+        <app-button label="Delete" variant="danger" (onClick)="deleteUser()"></app-button>
       </div>
     </ng-template>
   </p-dialog>

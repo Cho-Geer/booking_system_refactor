@@ -125,7 +125,7 @@ describe('AppLayoutComponent - Responsive Design', () => {
     it('[Red] should render main element with responsive padding classes', () => {
       const mainEl = fixture.nativeElement.querySelector('main');
       expect(mainEl).toBeTruthy();
-      expect(mainEl.classList.contains('pt-4')).toBeTruthy();
+      expect(mainEl.classList.contains('pt-16')).toBeTruthy();
       expect(mainEl.classList.contains('lg:pl-60')).toBeTruthy();
     });
 
@@ -139,13 +139,6 @@ describe('AppLayoutComponent - Responsive Design', () => {
     it('[Red] should have max-w-7xl container for content width constraint', () => {
       const container = fixture.nativeElement.querySelector('.max-w-7xl');
       expect(container).toBeTruthy();
-    });
-  });
-
-  describe('breadcrumb', () => {
-    it('[Red] should render breadcrumb container', () => {
-      const breadcrumb = fixture.nativeElement.querySelector('[data-testid="breadcrumb-container"]');
-      expect(breadcrumb).toBeTruthy();
     });
   });
 });

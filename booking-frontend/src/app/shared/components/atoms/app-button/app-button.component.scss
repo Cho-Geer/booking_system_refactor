@@ -1,5 +1,4 @@
 /* AppButton - Atomic component wrapper for PrimeNG p-button */
-/* Styling is handled via Tailwind and PrimeNG theme configuration */
 
 /* Button click feedback - smooth scale on press */
 .app-button-click-feedback {
@@ -8,4 +7,94 @@
 
 .app-button-click-feedback:active {
   transform: scale(0.98);
+}
+
+/* Primary variant - gradient background */
+.app-button--primary ::ng-deep .p-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  color: #ffffff;
+}
+
+.app-button--primary ::ng-deep .p-button:not(:disabled):hover {
+  filter: brightness(1.1);
+}
+
+/* Secondary variant - white with border */
+.app-button--secondary ::ng-deep .p-button {
+  background: var(--color-bg-primary, #ffffff);
+  border: 1px solid var(--color-border, #E5E6EB);
+  color: var(--color-text-primary, #1D2129);
+}
+
+.app-button--secondary ::ng-deep .p-button:not(:disabled):hover {
+  background: var(--color-bg-secondary, #F2F3F5);
+}
+
+/* Ghost variant - transparent */
+.app-button--ghost ::ng-deep .p-button {
+  background: transparent;
+  border: none;
+  color: #667eea;
+}
+
+.app-button--ghost ::ng-deep .p-button:not(:disabled):hover {
+  background: rgba(102, 126, 234, 0.08);
+}
+
+/* Danger variant - red background */
+.app-button--danger ::ng-deep .p-button {
+  background: #F53F3F;
+  border: none;
+  color: #ffffff;
+}
+
+.app-button--danger ::ng-deep .p-button:not(:disabled):hover {
+  filter: brightness(1.1);
+}
+
+/* Size modifiers */
+.app-button--sm ::ng-deep .p-button {
+  height: 32px;
+  padding: 0 12px;
+  font-size: 0.875rem;
+}
+
+.app-button--md ::ng-deep .p-button {
+  height: 40px;
+  padding: 0 16px;
+  font-size: 1rem;
+}
+
+.app-button--lg ::ng-deep .p-button {
+  height: 48px;
+  padding: 0 24px;
+  font-size: 1rem;
+}
+
+/* Icon-only mode */
+.app-button--icon-only ::ng-deep .p-button {
+  width: var(--p-button-icon-only-width, 40px);
+  padding: 0;
+}
+
+/* Disabled state */
+::ng-deep .p-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Dark mode adaptations */
+[data-theme="dark"] .app-button--secondary ::ng-deep .p-button {
+  background: var(--color-bg-secondary, #272E3B);
+  border-color: var(--color-border, #4E5969);
+  color: var(--color-text-primary, #F2F3F5);
+}
+
+[data-theme="dark"] .app-button--ghost ::ng-deep .p-button {
+  color: #90caf9;
+}
+
+[data-theme="dark"] .app-button--ghost ::ng-deep .p-button:not(:disabled):hover {
+  background: rgba(144, 202, 249, 0.12);
 }

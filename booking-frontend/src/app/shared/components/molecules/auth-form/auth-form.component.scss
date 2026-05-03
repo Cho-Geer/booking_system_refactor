@@ -17,7 +17,7 @@
   transition: color 0.2s ease;
 
   &.active {
-    color: var(--primary-color, #1976d2);
+    color: var(--color-primary, #667eea);
 
     &::after {
       content: '';
@@ -26,12 +26,12 @@
       left: 0;
       right: 0;
       height: 2px;
-      background-color: var(--primary-color, #1976d2);
+      background-color: var(--color-primary, #667eea);
     }
   }
 
   &:hover {
-    color: var(--primary-color, #1976d2);
+    color: var(--color-primary, #667eea);
   }
 }
 
@@ -50,14 +50,15 @@ input, select {
   width: 100%;
   padding: 0.75rem;
   border: 2px solid var(--border-color, #e0e0e0);
-  border-radius: 8px;
+  border-radius: 12px;
   font-size: 1rem;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 input:focus, select:focus {
   outline: none;
-  border-color: var(--primary-color, #1976d2);
+  border-color: var(--color-primary, #667eea);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
 }
 
 input.error, select.error {
@@ -77,7 +78,7 @@ input.error, select.error {
   padding: 0.75rem 1rem;
   background: none;
   border: none;
-  color: var(--primary-color, #1976d2);
+  color: var(--color-primary, #667eea);
   font-size: 0.9rem;
   cursor: pointer;
   white-space: nowrap;
@@ -102,16 +103,17 @@ input.error, select.error {
 .btn-primary {
   width: 100%;
   padding: 0.75rem;
-  background-color: var(--primary-color, #1976d2);
+  background: linear-gradient(135deg, var(--color-primary, #667eea), #764ba2);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: opacity 0.2s ease, box-shadow 0.2s ease;
 
   &:hover:not(:disabled) {
-    background-color: var(--primary-dark, #1565c0);
+    opacity: 0.9;
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
   }
 
   &:disabled {
@@ -137,7 +139,7 @@ input.error, select.error {
     }
 
     a {
-      color: var(--primary-color, #1976d2);
+      color: var(--color-primary, #667eea);
       text-decoration: none;
 
       &:hover {
@@ -184,7 +186,7 @@ input.error, select.error {
 
   &.active {
     .step-number {
-      background: var(--primary-color, #1976d2);
+      background: var(--color-primary, #667eea);
       color: white;
     }
     .step-label {
@@ -234,12 +236,12 @@ input.error, select.error {
   transition: all 0.2s ease;
 
   &:hover {
-    border-color: var(--primary-color, #1976d2);
+    border-color: var(--color-primary, #667eea);
   }
 
   &.active {
-    border-color: var(--primary-color, #1976d2);
-    background: var(--primary-color, #1976d2);
+    border-color: var(--color-primary, #667eea);
+    background: linear-gradient(135deg, var(--color-primary, #667eea), #764ba2);
     color: white;
   }
 }
@@ -263,8 +265,8 @@ input.error, select.error {
     transition: all 0.2s ease;
 
     &:hover {
-      border-color: var(--primary-color, #1976d2);
-      color: var(--primary-color, #1976d2);
+      border-color: var(--color-primary, #667eea);
+      color: var(--color-primary, #667eea);
     }
   }
 

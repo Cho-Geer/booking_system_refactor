@@ -13,7 +13,10 @@ describe('UserManagementComponent', () => {
 
   beforeEach(async () => {
     mockAdminService = {
-      getStats: jest.fn(),
+      getStats: jest.fn().mockReturnValue(of({
+        totalBookings: 100, todayBookings: 10, activeUsers: 50, totalRevenue: 5000,
+        bookingTrend: [], servicePopularity: [],
+      })),
       getUsers: jest.fn().mockReturnValue(of({ items: [], total: 0, page: 1, limit: 10 })),
       createUser: jest.fn(),
       updateUser: jest.fn(),
@@ -52,7 +55,7 @@ describe('UserManagementComponent', () => {
 
   it('should display users from store', () => {
     const users: AdminUser[] = [
-      { id: '1', name: 'Alice', email: 'al***@test.com', role: 'CUSTOMER', status: 'ACTIVE', createdAt: '2026-01-01T00:00:00Z' },
+      { id: '1', name: 'Alice', email: 'alice@test.com', role: 'CUSTOMER', status: 'ACTIVE', createdAt: '2026-01-01T00:00:00Z' },
     ];
 
     store.setUsers(users, 1, 1);
@@ -69,7 +72,7 @@ describe('UserManagementComponent', () => {
 
   it('should open user dialog for editing existing user', () => {
     const user: AdminUser = {
-      id: '1', name: 'Alice', email: 'al***@test.com', role: 'CUSTOMER', status: 'ACTIVE', createdAt: '2026-01-01T00:00:00Z',
+      id: '1', name: 'Alice', email: 'alice@test.com', role: 'CUSTOMER', status: 'ACTIVE', createdAt: '2026-01-01T00:00:00Z',
     };
 
     component.editUser(user);
@@ -86,5 +89,64 @@ describe('UserManagementComponent', () => {
 
   it('should load users on init', () => {
     expect(mockAdminService.getUsers).toHaveBeenCalled();
+  });
+
+  // ==========================================
+  // [RED] Enhanced tests for redesigned features
+  // ==========================================
+
+  it('[RED] should compute stats from users list', () => {
+    const users: AdminUser[] = [
+      { id: '1', name: 'Alice', email: 'alice@test.com', role: 'CUSTOMER', status: 'ACTIVE', createdAt: '2026-05-01T00:00:00Z' },
+      { id: '2', name: 'Bob', email: 'bob@test.com', role: 'ADMIN', status: 'ACTIVE', createdAt: '2026-04-01T00:00:00Z' },
+      { id: '3', name: 'Carol', email: 'carol@test.com', role: 'CUSTOMER', status: 'INACTIVE', createdAt: '2026-05-02T00:00:00Z' },
+    ];
+    store.setUsers(users, 3, 1);
+
+    expect(component.totalUsers()).toBe(3);
+    expect(component.activeUsers()).toBe(2);
+    expect(component.newThisWeek()).toBeGreaterThanOrEqual(2);
+  });
+
+  it('[RED] should clear all filters when clearFilters is called', () => {
+    component.searchQuery.set('Alice');
+    component.selectedRoleFilter.set('ADMIN');
+    component.selectedStatusFilter.set('ACTIVE');
+
+    component.clearFilters();
+
+    expect(component.searchQuery()).toBe('');
+    expect(component.selectedRoleFilter()).toBe('');
+    expect(component.selectedStatusFilter()).toBe('');
+  });
+
+  it('[RED] should validate form on save with empty name', () => {
+    component.formName = '';
+    component.formEmail = '';
+    component.openNew();
+    component.saveUser();
+
+    expect(component.submitted()).toBe(true);
+    expect(component.formErrors.name).toBe('Name is required');
+  });
+
+  it('[RED] should map role to badge status correctly', () => {
+    expect(component.mapRoleToBadge('CUSTOMER')).toBe('completed');
+    expect(component.mapRoleToBadge('ADMIN')).toBe('processing');
+    expect(component.mapRoleToBadge('SUPER_ADMIN')).toBe('confirmed');
+  });
+
+  it('[RED] should show confirm delete dialog and delete user', () => {
+    const user: AdminUser = {
+      id: '1', name: 'Alice', email: 'alice@test.com', role: 'CUSTOMER', status: 'ACTIVE', createdAt: '2026-01-01T00:00:00Z',
+    };
+    mockAdminService.deleteUser.mockReturnValue(of(null));
+
+    component.confirmDeleteUser(user);
+    expect(component.deleteDialogVisible()).toBe(true);
+    expect(component.userToDelete()?.id).toBe('1');
+
+    component.deleteUser();
+    expect(mockAdminService.deleteUser).toHaveBeenCalledWith('1');
   });
 });

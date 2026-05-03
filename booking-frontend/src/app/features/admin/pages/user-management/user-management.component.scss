@@ -2,6 +2,15 @@
   display: block;
 }
 
+/* Table row hover and striped overrides */
+::ng-deep .p-datatable .p-datatable-tbody > tr {
+  transition: background-color 0.15s ease;
+}
+
+::ng-deep .p-datatable .p-datatable-tbody > tr:hover {
+  background-color: var(--color-bg-secondary, #F2F3F5) !important;
+}
+
 @media (max-width: 640px) {
   ::ng-deep .p-select,
   ::ng-deep .p-inputtext {

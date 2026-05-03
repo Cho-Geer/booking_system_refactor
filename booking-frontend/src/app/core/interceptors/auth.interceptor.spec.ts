@@ -60,7 +60,7 @@ describe('AuthInterceptor', () => {
   });
 
   it('should add Authorization header when user is authenticated', () => {
-    authStore.loginSuccess(mockToken, 'test-refresh-token');
+    authStore.loginSuccess(mockToken);
 
     httpClient.get('/api/test').subscribe();
 
@@ -71,7 +71,7 @@ describe('AuthInterceptor', () => {
   });
 
   it('should stop adding header after user state is cleared', () => {
-    authStore.loginSuccess(mockToken, 'test-refresh-token');
+    authStore.loginSuccess(mockToken);
     // Use synchronous clearAuthState (unlike async logout()) for test simplicity
     authStore.clearAuthState();
 
@@ -90,7 +90,7 @@ describe('AuthInterceptor', () => {
 
   it('[GREEN] should fetch user profile after successful token refresh and retry request', () => {
     // Arrange: set up authenticated state
-    authStore.loginSuccess(mockToken, 'test-refresh-token');
+    authStore.loginSuccess(mockToken);
 
     // Spy on fetchUserProfile to verify it's called
     const fetchSpy = jest.spyOn(authStore, 'fetchUserProfile');
@@ -105,14 +105,15 @@ describe('AuthInterceptor', () => {
     // Flush 401 to trigger refresh
     initialReq.flush({}, { status: 401, statusText: 'Unauthorized' });
 
-    // Expect refresh token API call
+    // Expect refresh token API call (withCredentials, empty body)
     const refreshReq = httpMock.expectOne('/api/auth/refresh');
     expect(refreshReq.request.method).toBe('POST');
+    expect(refreshReq.request.body).toEqual({});
+    expect(refreshReq.request.withCredentials).toBe(true);
     refreshReq.flush({
       success: true,
       data: {
         accessToken: 'new-access-token',
-        refreshToken: 'new-refresh-token',
         expiresIn: 900,
         tokenType: 'Bearer',
       },
@@ -141,7 +142,7 @@ describe('AuthInterceptor', () => {
 
   it('[GREEN] should call fetchUserProfile after successful token refresh', () => {
     // Arrange: set up authenticated state
-    authStore.loginSuccess(mockToken, 'test-refresh-token');
+    authStore.loginSuccess(mockToken);
     const fetchSpy = jest.spyOn(authStore, 'fetchUserProfile');
 
     // Act: make an authenticated request
@@ -157,11 +158,11 @@ describe('AuthInterceptor', () => {
     // Expect refresh token API call
     const refreshReq = httpMock.expectOne('/api/auth/refresh');
     expect(refreshReq.request.method).toBe('POST');
+    expect(refreshReq.request.body).toEqual({});
     refreshReq.flush({
       success: true,
       data: {
         accessToken: 'new-access-token',
-        refreshToken: 'new-refresh-token',
         expiresIn: 900,
         tokenType: 'Bearer',
       },

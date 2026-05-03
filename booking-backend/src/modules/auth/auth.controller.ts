@@ -7,7 +7,11 @@ import {
   UsePipes,
   ValidationPipe,
   Headers,
+  Req,
+  Res,
+  UnauthorizedException,
 } from "@nestjs/common";
+import { Request, Response } from "express";
 import {
   ApiTags,
   ApiOperation,
@@ -21,7 +25,6 @@ import { RegisterCompleteDto } from "./dto/register-complete.dto";
 import { LoginSendCodeDto } from "./dto/login-send-code.dto";
 import { LoginVerifyCodeDto } from "./dto/login-verify-code.dto";
 import { LoginPasswordDto } from "./dto/login-password.dto";
-import { RefreshTokenRequestDto } from "./dto/auth-response.dto";
 import {
   AuthResponseDto,
   SendCodeResponseDto,
@@ -35,6 +38,18 @@ import { RateLimit } from "../rate-limiter/rate-limiter.decorator";
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
+  /** HttpOnly cookie configuration for refresh token */
+  private readonly REFRESH_COOKIE_OPTIONS = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict" as const,
+    path: "/",
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in ms
+  };
+
+  /** Cookie name for refresh token */
+  private readonly REFRESH_COOKIE_NAME = "refreshToken";
 
   // ==================== 注册流程 ====================
 
@@ -71,7 +86,7 @@ export class AuthController {
   @ApiBody({ type: RegisterCompleteDto })
   @ApiResponse({
     status: 201,
-    description: "注册成功，返回 Token 对",
+    description: "注册成功，返回 Token（refreshToken 通过 HttpOnly Cookie 传输）",
     type: AuthResponseDto,
   })
   @ApiResponse({
@@ -84,8 +99,11 @@ export class AuthController {
   })
   async registerComplete(
     @Body() completeDto: RegisterCompleteDto,
+    @Res({ passthrough: true }) res: Response,
   ): Promise<AuthResponseDto> {
-    return this.authService.registerComplete(completeDto);
+    const result = await this.authService.registerComplete(completeDto);
+    this.setRefreshCookie(res, result.refreshToken);
+    return this.stripRefreshToken(result);
   }
 
   // ==================== 登录流程 ====================
@@ -115,7 +133,7 @@ export class AuthController {
   @ApiBody({ type: LoginVerifyCodeDto })
   @ApiResponse({
     status: 200,
-    description: "登录成功，返回 Token 对",
+    description: "登录成功，返回 Token（refreshToken 通过 HttpOnly Cookie 传输）",
     type: AuthResponseDto,
   })
   @ApiResponse({
@@ -128,8 +146,11 @@ export class AuthController {
   })
   async loginVerifyCode(
     @Body() verifyDto: LoginVerifyCodeDto,
+    @Res({ passthrough: true }) res: Response,
   ): Promise<AuthResponseDto> {
-    return this.authService.loginVerifyCode(verifyDto);
+    const result = await this.authService.loginVerifyCode(verifyDto);
+    this.setRefreshCookie(res, result.refreshToken);
+    return this.stripRefreshToken(result);
   }
 
   @Public()
@@ -140,7 +161,7 @@ export class AuthController {
   @ApiBody({ type: LoginPasswordDto })
   @ApiResponse({
     status: 200,
-    description: "登录成功，返回 Token 对",
+    description: "登录成功，返回 Token（refreshToken 通过 HttpOnly Cookie 传输）",
     type: AuthResponseDto,
   })
   @ApiResponse({
@@ -153,8 +174,11 @@ export class AuthController {
   })
   async loginPassword(
     @Body() loginDto: LoginPasswordDto,
+    @Res({ passthrough: true }) res: Response,
   ): Promise<AuthResponseDto> {
-    return this.authService.loginPassword(loginDto);
+    const result = await this.authService.loginPassword(loginDto);
+    this.setRefreshCookie(res, result.refreshToken);
+    return this.stripRefreshToken(result);
   }
 
   // ==================== Token 管理 ====================
@@ -163,11 +187,10 @@ export class AuthController {
   @Post("refresh")
   @RateLimit({ tier: "auth", key: "ip" })
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: "刷新 Token（旋转模式）" })
-  @ApiBody({ type: RefreshTokenRequestDto })
+  @ApiOperation({ summary: "刷新 Token（旋转模式，refreshToken 来自 Cookie）" })
   @ApiResponse({
     status: 200,
-    description: "刷新成功，返回新 Token 对",
+    description: "刷新成功，返回新 Token（refreshToken 通过 HttpOnly Cookie 传输）",
     type: AuthResponseDto,
   })
   @ApiResponse({
@@ -175,9 +198,16 @@ export class AuthController {
     description: "Refresh Token 无效或已过期",
   })
   async refreshTokens(
-    @Body() refreshDto: RefreshTokenRequestDto,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
   ): Promise<AuthResponseDto> {
-    return this.authService.refreshTokens(refreshDto);
+    const refreshToken = req.cookies?.[this.REFRESH_COOKIE_NAME];
+    if (!refreshToken) {
+      throw new UnauthorizedException("Refresh token not found");
+    }
+    const result = await this.authService.refreshTokens({ refreshToken });
+    this.setRefreshCookie(res, result.refreshToken);
+    return this.stripRefreshToken(result);
   }
 
   @Post("logout")
@@ -194,12 +224,53 @@ export class AuthController {
     description: "未认证",
   })
   async logout(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
     @Headers("Authorization") authHeader: string,
   ): Promise<LogoutResponseDto> {
-    const token = authHeader?.replace("Bearer ", "") || "";
-    // Extract userId from JWT payload in production
-    // For now, placeholder
-    const userId = "temp-user-id";
-    return this.authService.logout(userId, token, token);
+    const accessToken = authHeader?.replace("Bearer ", "") || "";
+    const refreshToken =
+      req.cookies?.[this.REFRESH_COOKIE_NAME] || "";
+    const user = req.user as { id?: string; sub?: string } | undefined;
+    const userId = user?.id || user?.sub;
+
+    if (!userId) {
+      throw new UnauthorizedException("无法获取用户身份");
+    }
+
+    this.clearRefreshCookie(res);
+    return this.authService.logout(userId, accessToken, refreshToken);
+  }
+
+  // ==================== Helpers ====================
+
+  /**
+   * Set the HttpOnly refresh token cookie on the response.
+   */
+  private setRefreshCookie(res: Response, token: string): void {
+    res.cookie(this.REFRESH_COOKIE_NAME, token, this.REFRESH_COOKIE_OPTIONS);
+  }
+
+  /**
+   * Clear the refresh token cookie.
+   */
+  private clearRefreshCookie(res: Response): void {
+    res.clearCookie(this.REFRESH_COOKIE_NAME, {
+      path: this.REFRESH_COOKIE_OPTIONS.path,
+    });
+  }
+
+  /**
+   * Strip the refreshToken from the response body before sending JSON.
+   * The refreshToken is transmitted via HttpOnly cookie, not in the response body.
+   */
+  private stripRefreshToken(
+    result: AuthResponseDto & { refreshToken: string },
+  ): AuthResponseDto {
+    return {
+      accessToken: result.accessToken,
+      expiresIn: result.expiresIn,
+      tokenType: result.tokenType,
+    };
   }
 }

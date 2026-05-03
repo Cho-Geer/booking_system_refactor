@@ -1,146 +1,303 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AppSidebarComponent, SidebarItem, SidebarSection } from './app-sidebar.component';
-import { By } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
+import { Component, input } from '@angular/core';
+import { NgClass } from '@angular/common';
+
+// Stub p-avatar
+@Component({
+  selector: 'p-avatar',
+  standalone: true,
+  template: '<div class="avatar-stub">{{ label()?.charAt(0) }}</div>',
+})
+class StubAvatarComponent {
+  label = input<string>();
+}
 
 describe('AppSidebarComponent', () => {
-  let component: AppSidebarComponent;
   let fixture: ComponentFixture<AppSidebarComponent>;
+  let component: AppSidebarComponent;
+
+  const mockItems: SidebarItem[] = [
+    { label: 'Dashboard', route: '/admin', icon: 'pi pi-chart-bar' },
+    { label: 'Services', route: '/services', icon: 'pi pi-calendar' },
+  ];
+
+  const mockSections: SidebarSection[] = [
+    {
+      title: 'Main',
+      items: [
+        { label: 'Dashboard', route: '/admin', icon: 'pi pi-chart-bar' },
+      ],
+    },
+    {
+      title: 'Management',
+      items: [
+        { label: 'Services', route: '/services', icon: 'pi pi-calendar' },
+      ],
+    },
+  ];
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AppSidebarComponent],
-      providers: [provideRouter([])],
+      imports: [AppSidebarComponent, StubAvatarComponent],
+      providers: [
+        provideRouter([]),
+      ],
+    }).overrideComponent(AppSidebarComponent, {
+      set: {
+        imports: [NgClass, StubAvatarComponent],
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(AppSidebarComponent);
     component = fixture.componentInstance;
+  });
+
+  it('should render desktop sidebar with correct base classes', () => {
+    fixture.componentRef.setInput('items', mockItems);
+    fixture.componentRef.setInput('sections', []);
+    fixture.componentRef.setInput('isOpen', false);
+    fixture.componentRef.setInput('solid', true);
     fixture.detectChanges();
+
+    const desktopSidebar = fixture.nativeElement.querySelector('aside');
+    expect(desktopSidebar).toBeTruthy();
+    expect(desktopSidebar.classList.contains('hidden')).toBe(true);
+    expect(desktopSidebar.classList.contains('lg:flex')).toBe(true);
+    expect(desktopSidebar.classList.contains('flex-col')).toBe(true);
+    expect(desktopSidebar.classList.contains('fixed')).toBe(true);
+    expect(desktopSidebar.classList.contains('left-0')).toBe(true);
+    expect(desktopSidebar.classList.contains('top-16')).toBe(true);
+    expect(desktopSidebar.classList.contains('bottom-0')).toBe(true);
+    expect(desktopSidebar.classList.contains('w-60')).toBe(true);
+    expect(desktopSidebar.classList.contains('z-40')).toBe(true);
   });
 
-  it('should create the component', () => {
-    expect(component).toBeTruthy();
+  it('should have border-right class for visual separation', () => {
+    fixture.componentRef.setInput('items', mockItems);
+    fixture.componentRef.setInput('sections', []);
+    fixture.componentRef.setInput('isOpen', false);
+    fixture.componentRef.setInput('solid', true);
+    fixture.detectChanges();
+
+    const desktopSidebar = fixture.nativeElement.querySelector('aside');
+    expect(desktopSidebar.classList.contains('border-r')).toBe(true);
+    expect(desktopSidebar.classList.contains('border-gray-200')).toBe(true);
   });
 
-  describe('desktop sidebar', () => {
-    it('[Red] should have solid white background and right border', () => {
-      const aside = fixture.debugElement.query(By.css('aside'));
-      expect(aside).toBeTruthy();
-      const classes = aside.nativeElement.className;
-      expect(classes).toContain('bg-white');
-      expect(classes).toContain('border-r');
-      expect(classes).toContain('border-gray-200');
-    });
+  it('should have solid white background in light mode', () => {
+    fixture.componentRef.setInput('items', mockItems);
+    fixture.componentRef.setInput('sections', []);
+    fixture.componentRef.setInput('isOpen', false);
+    fixture.componentRef.setInput('solid', true);
+    fixture.detectChanges();
 
-    it('[Red] should have top padding to clear header', () => {
-      const aside = fixture.debugElement.query(By.css('aside'));
-      expect(aside.nativeElement.classList.contains('pt-16')).toBe(true);
-    });
-
-    it('[Red] should not have glass blur classes by default', () => {
-      const aside = fixture.debugElement.query(By.css('aside'));
-      const classes = aside.nativeElement.className;
-      expect(classes).not.toContain('backdrop-blur');
-      expect(classes).not.toContain('bg-white/75');
-    });
+    const desktopSidebar = fixture.nativeElement.querySelector('aside');
+    expect(desktopSidebar.classList.contains('bg-white')).toBe(true);
   });
 
-  describe('section groups', () => {
-    it('[Red] should render section titles when sections are provided', () => {
-      const sections: SidebarSection[] = [
-        { title: 'Main', items: [{ label: 'Home', route: '/', icon: 'pi pi-home' }] },
-        { title: 'Management', items: [{ label: 'Users', route: '/admin/users', icon: 'pi pi-users' }] },
-      ];
-      fixture.componentRef.setInput('sections', sections);
-      fixture.detectChanges();
+  it('should have shadow-lg for depth', () => {
+    fixture.componentRef.setInput('items', mockItems);
+    fixture.componentRef.setInput('sections', []);
+    fixture.componentRef.setInput('isOpen', false);
+    fixture.componentRef.setInput('solid', true);
+    fixture.detectChanges();
 
-      const titles = fixture.debugElement.queryAll(By.css('[data-testid="section-title"]'));
-      expect(titles.length).toBe(2);
-      expect(titles[0].nativeElement.textContent.trim()).toBe('Main');
-      expect(titles[1].nativeElement.textContent.trim()).toBe('Management');
-    });
-
-    it('[Red] should render flat items when no sections provided', () => {
-      const items: SidebarItem[] = [
-        { label: 'Home', route: '/', icon: 'pi pi-home' },
-        { label: 'Profile', route: '/profile', icon: 'pi pi-user' },
-      ];
-      fixture.componentRef.setInput('items', items);
-      fixture.detectChanges();
-
-      const aside = fixture.debugElement.query(By.css('aside'));
-      const navLinks = aside.queryAll(By.css('nav a'));
-      expect(navLinks.length).toBe(2);
-    });
+    const desktopSidebar = fixture.nativeElement.querySelector('aside');
+    expect(desktopSidebar.classList.contains('shadow-lg')).toBe(true);
   });
 
-  describe('navigation items', () => {
-    it('[Red] should render PrimeIcons instead of emoji', () => {
-      const items: SidebarItem[] = [
-        { label: 'Home', route: '/', icon: 'pi pi-home' },
-      ];
-      fixture.componentRef.setInput('items', items);
-      fixture.detectChanges();
+  it('should render flat navigation items when no sections', () => {
+    fixture.componentRef.setInput('items', mockItems);
+    fixture.componentRef.setInput('sections', []);
+    fixture.componentRef.setInput('isOpen', false);
+    fixture.componentRef.setInput('solid', true);
+    fixture.detectChanges();
 
-      const iconEl = fixture.debugElement.query(By.css('.pi'));
-      expect(iconEl).toBeTruthy();
-      expect(iconEl.nativeElement.classList.contains('pi-home')).toBe(true);
-    });
+    expect(fixture.nativeElement.textContent).toContain('Dashboard');
+    expect(fixture.nativeElement.textContent).toContain('Services');
+  });
 
-    it('[Red] should have active state with left gradient accent bar', () => {
-      const items: SidebarItem[] = [
-        { label: 'Home', route: '/', icon: 'pi pi-home' },
-      ];
-      fixture.componentRef.setInput('items', items);
-      fixture.detectChanges();
+  it('should render sectioned navigation with titles', () => {
+    fixture.componentRef.setInput('items', []);
+    fixture.componentRef.setInput('sections', mockSections);
+    fixture.componentRef.setInput('isOpen', false);
+    fixture.componentRef.setInput('solid', true);
+    fixture.detectChanges();
 
-      const link = fixture.debugElement.query(By.css('aside nav a'));
-      const classes = link.nativeElement.className;
-      expect(classes).toContain('border-l-[3px]');
-      expect(classes).toContain('border-transparent');
-    });
+    const sectionTitles = fixture.nativeElement.querySelectorAll('[data-testid="section-title"]');
+    expect(sectionTitles.length).toBe(2);
+    expect(sectionTitles[0].textContent.trim()).toBe('Main');
+    expect(sectionTitles[1].textContent.trim()).toBe('Management');
+  });
 
-    it('[Red] should render badge when provided', () => {
-      const items: SidebarItem[] = [
-        { label: 'Messages', route: '/messages', icon: 'pi pi-envelope', badge: 3 },
-      ];
-      fixture.componentRef.setInput('items', items);
-      fixture.detectChanges();
+  it('should have section titles with uppercase and smaller font', () => {
+    fixture.componentRef.setInput('items', []);
+    fixture.componentRef.setInput('sections', mockSections);
+    fixture.componentRef.setInput('isOpen', false);
+    fixture.componentRef.setInput('solid', true);
+    fixture.detectChanges();
 
-      const badge = fixture.debugElement.query(By.css('[data-testid="sidebar-badge"]'));
-      expect(badge).toBeTruthy();
-      expect(badge.nativeElement.textContent.trim()).toBe('3');
+    const sectionTitles = fixture.nativeElement.querySelectorAll('[data-testid="section-title"]');
+    sectionTitles.forEach((title: HTMLElement) => {
+      expect(title.classList.contains('uppercase')).toBe(true);
+      expect(title.classList.contains('text-xs')).toBe(true);
+      expect(title.classList.contains('font-semibold')).toBe(true);
+      expect(title.classList.contains('tracking-wider')).toBe(true);
     });
   });
 
-  describe('bottom profile', () => {
-    it('[Red] should render user profile summary at bottom when user provided', () => {
-      fixture.componentRef.setInput('userName', 'Alice');
-      fixture.componentRef.setInput('userRole', 'ADMIN');
-      fixture.detectChanges();
+  it('should render nav items with proper padding and hover states', () => {
+    fixture.componentRef.setInput('items', mockItems);
+    fixture.componentRef.setInput('sections', []);
+    fixture.componentRef.setInput('isOpen', false);
+    fixture.componentRef.setInput('solid', true);
+    fixture.detectChanges();
 
-      const profile = fixture.debugElement.query(By.css('[data-testid="sidebar-profile"]'));
-      expect(profile).toBeTruthy();
-      expect(profile.nativeElement.textContent).toContain('Alice');
-      expect(profile.nativeElement.textContent).toContain('ADMIN');
+    const navItems = fixture.nativeElement.querySelectorAll('aside nav a');
+    expect(navItems.length).toBeGreaterThan(0);
+
+    navItems.forEach((item: HTMLElement) => {
+      expect(item.classList.contains('flex')).toBe(true);
+      expect(item.classList.contains('items-center')).toBe(true);
+      expect(item.classList.contains('gap-3')).toBe(true);
+      expect(item.classList.contains('px-3')).toBe(true);
+      expect(item.classList.contains('py-2.5')).toBe(true);
+      expect(item.classList.contains('rounded-lg')).toBe(true);
+      expect(item.classList.contains('text-sm')).toBe(true);
+      expect(item.classList.contains('font-medium')).toBe(true);
+      expect(item.classList.contains('transition-all')).toBe(true);
+      expect(item.classList.contains('duration-200')).toBe(true);
+      expect(item.classList.contains('border-l-[3px]')).toBe(true);
+      expect(item.classList.contains('border-transparent')).toBe(true);
     });
   });
 
-  describe('mobile drawer', () => {
-    it('[Red] should render overlay backdrop when isOpen is true', () => {
-      fixture.componentRef.setInput('isOpen', true);
-      fixture.detectChanges();
+  it('should render user profile at bottom with border-top', () => {
+    fixture.componentRef.setInput('items', mockItems);
+    fixture.componentRef.setInput('sections', []);
+    fixture.componentRef.setInput('isOpen', false);
+    fixture.componentRef.setInput('solid', true);
+    fixture.componentRef.setInput('userName', 'John Doe');
+    fixture.componentRef.setInput('userRole', 'ADMIN');
+    fixture.detectChanges();
 
-      const overlay = fixture.debugElement.query(By.css('[data-testid="mobile-overlay"]'));
-      expect(overlay).toBeTruthy();
+    const profile = fixture.nativeElement.querySelector('[data-testid="sidebar-profile"]');
+    expect(profile).toBeTruthy();
+    expect(profile.classList.contains('border-t')).toBe(true);
+    expect(profile.classList.contains('border-gray-200')).toBe(true);
+    expect(profile.classList.contains('p-4')).toBe(true);
+  });
+
+  it('should display user name and role in profile', () => {
+    fixture.componentRef.setInput('items', mockItems);
+    fixture.componentRef.setInput('sections', []);
+    fixture.componentRef.setInput('isOpen', false);
+    fixture.componentRef.setInput('solid', true);
+    fixture.componentRef.setInput('userName', 'John Doe');
+    fixture.componentRef.setInput('userRole', 'ADMIN');
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain('John Doe');
+    expect(fixture.nativeElement.textContent).toContain('ADMIN');
+  });
+
+  it('should render mobile overlay when isOpen is true', () => {
+    fixture.componentRef.setInput('items', mockItems);
+    fixture.componentRef.setInput('sections', []);
+    fixture.componentRef.setInput('isOpen', true);
+    fixture.componentRef.setInput('solid', true);
+    fixture.detectChanges();
+
+    const overlay = fixture.nativeElement.querySelector('[data-testid="mobile-overlay"]');
+    expect(overlay).toBeTruthy();
+    expect(overlay.classList.contains('fixed')).toBe(true);
+    expect(overlay.classList.contains('inset-0')).toBe(true);
+    expect(overlay.classList.contains('bg-black/40')).toBe(true);
+    expect(overlay.classList.contains('backdrop-blur-sm')).toBe(true);
+    expect(overlay.classList.contains('z-40')).toBe(true);
+    expect(overlay.classList.contains('lg:hidden')).toBe(true);
+  });
+
+  it('should render mobile drawer when isOpen is true', () => {
+    fixture.componentRef.setInput('items', mockItems);
+    fixture.componentRef.setInput('sections', []);
+    fixture.componentRef.setInput('isOpen', true);
+    fixture.componentRef.setInput('solid', true);
+    fixture.detectChanges();
+
+    const drawer = fixture.nativeElement.querySelector('[data-testid="mobile-drawer"]');
+    expect(drawer).toBeTruthy();
+    expect(drawer.classList.contains('fixed')).toBe(true);
+    expect(drawer.classList.contains('top-0')).toBe(true);
+    expect(drawer.classList.contains('left-0')).toBe(true);
+    expect(drawer.classList.contains('bottom-0')).toBe(true);
+    expect(drawer.classList.contains('w-64')).toBe(true);
+    expect(drawer.classList.contains('z-50')).toBe(true);
+    expect(drawer.classList.contains('lg:hidden')).toBe(true);
+    expect(drawer.classList.contains('translate-x-0')).toBe(true);
+  });
+
+  it('should have mobile drawer hidden when isOpen is false', () => {
+    fixture.componentRef.setInput('items', mockItems);
+    fixture.componentRef.setInput('sections', []);
+    fixture.componentRef.setInput('isOpen', false);
+    fixture.componentRef.setInput('solid', true);
+    fixture.detectChanges();
+
+    const drawer = fixture.nativeElement.querySelector('[data-testid="mobile-drawer"]');
+    expect(drawer.classList.contains('-translate-x-full')).toBe(true);
+  });
+
+  it('should emit close event when overlay is clicked', () => {
+    fixture.componentRef.setInput('items', mockItems);
+    fixture.componentRef.setInput('sections', []);
+    fixture.componentRef.setInput('isOpen', true);
+    fixture.componentRef.setInput('solid', true);
+    fixture.detectChanges();
+
+    const closeSpy = jest.spyOn(component.close, 'emit');
+    const overlay = fixture.nativeElement.querySelector('[data-testid="mobile-overlay"]');
+    overlay.click();
+    expect(closeSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('should have mobile drawer with border and background', () => {
+    fixture.componentRef.setInput('items', mockItems);
+    fixture.componentRef.setInput('sections', []);
+    fixture.componentRef.setInput('isOpen', true);
+    fixture.componentRef.setInput('solid', true);
+    fixture.detectChanges();
+
+    const drawer = fixture.nativeElement.querySelector('[data-testid="mobile-drawer"]');
+    expect(drawer.classList.contains('border-r')).toBe(true);
+    expect(drawer.classList.contains('border-gray-200')).toBe(true);
+    expect(drawer.classList.contains('bg-white')).toBe(true);
+  });
+
+  it('should render nav items with left accent bar on active state', () => {
+    fixture.componentRef.setInput('items', mockItems);
+    fixture.componentRef.setInput('sections', []);
+    fixture.componentRef.setInput('isOpen', false);
+    fixture.componentRef.setInput('solid', true);
+    fixture.detectChanges();
+
+    const navItems = fixture.nativeElement.querySelectorAll('aside nav a');
+    navItems.forEach((item: HTMLElement) => {
+      expect(item.classList.contains('border-l-[3px]')).toBe(true);
+      expect(item.classList.contains('border-transparent')).toBe(true);
     });
+  });
 
-    it('[Red] should render mobile drawer when isOpen is true', () => {
-      fixture.componentRef.setInput('isOpen', true);
-      fixture.detectChanges();
+  it('should not render profile section when no userName', () => {
+    fixture.componentRef.setInput('items', mockItems);
+    fixture.componentRef.setInput('sections', []);
+    fixture.componentRef.setInput('isOpen', false);
+    fixture.componentRef.setInput('solid', true);
+    fixture.componentRef.setInput('userName', undefined);
+    fixture.detectChanges();
 
-      const drawer = fixture.debugElement.query(By.css('[data-testid="mobile-drawer"]'));
-      expect(drawer).toBeTruthy();
-    });
+    expect(fixture.nativeElement.querySelector('[data-testid="sidebar-profile"]')).toBeFalsy();
   });
 });

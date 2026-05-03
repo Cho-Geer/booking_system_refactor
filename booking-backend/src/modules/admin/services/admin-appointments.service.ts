@@ -1,0 +1,223 @@
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  Logger,
+} from "@nestjs/common";
+import { PrismaService } from "../../../common/database/prisma.service";
+import {
+  AdminAppointmentsQueryDto,
+  UpdateAppointmentStatusDto,
+  BatchCancelDto,
+  BatchCancelResponseDto,
+  AdminAppointmentDto,
+} from "../dto/admin-appointment.dto";
+import { MetaDto } from "../../../common/dto/base.dto";
+import { toAdminAppointmentDto } from "../mappers/appointment.mapper";
+
+/**
+ * Valid state transitions for admin appointment status updates.
+ * Key: current status, Value: allowed target statuses.
+ */
+const VALID_TRANSITIONS: Record<string, string[]> = {
+  PENDING: ["CONFIRMED", "CANCELLED"],
+  CONFIRMED: ["COMPLETED", "CANCELLED"],
+  COMPLETED: ["CANCELLED"],
+  CANCELLED: [],
+  EXPIRED: [],
+};
+
+@Injectable()
+export class AdminAppointmentsService {
+  private readonly logger = new Logger(AdminAppointmentsService.name);
+
+  constructor(private readonly prisma: PrismaService) {}
+
+  /**
+   * Retrieve paginated appointments with optional filters.
+   *
+   * Supports filtering by:
+   * - date range (startDate / endDate on appointmentDate)
+   * - serviceId
+   * - userId
+   * - status
+   */
+  async findAll(
+    query: AdminAppointmentsQueryDto,
+  ): Promise<{ items: AdminAppointmentDto[]; meta: MetaDto }> {
+    const {
+      page = 1,
+      limit = 20,
+      status,
+      startDate,
+      endDate,
+      serviceId,
+      userId,
+    } = query;
+
+    const skip = (page - 1) * limit;
+    const where: Record<string, unknown> = {};
+
+    if (status) {
+      where.status = status;
+    }
+    if (serviceId) {
+      where.serviceId = serviceId;
+    }
+    if (userId) {
+      where.userId = userId;
+    }
+    if (startDate || endDate) {
+      const dateFilter: Record<string, Date> = {};
+      if (startDate) {
+        dateFilter.gte = new Date(startDate);
+      }
+      if (endDate) {
+        // Set to end of day for inclusive filtering
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        dateFilter.lte = end;
+      }
+      where.appointmentDate = dateFilter;
+    }
+
+    const [appointments, total] = await Promise.all([
+      this.prisma.appointment.findMany({
+        skip,
+        take: limit,
+        where,
+        include: {
+          user: { select: { name: true } },
+          service: { select: { name: true } },
+          timeSlot: true,
+        },
+        orderBy: { createdAt: "desc" },
+      }),
+      this.prisma.appointment.count({ where }),
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      items: appointments.map((appt) => toAdminAppointmentDto(appt)),
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1,
+      },
+    };
+  }
+
+  /**
+   * Update appointment status with state machine validation.
+   *
+   * Valid transitions:
+   * - PENDING  → CONFIRMED, CANCELLED
+   * - CONFIRMED → COMPLETED, CANCELLED
+   * - COMPLETED → CANCELLED
+   * - CANCELLED → (none)
+   * - EXPIRED   → (none)
+   *
+   * Cancellation requires a reason.
+   */
+  async updateStatus(
+    id: string,
+    dto: UpdateAppointmentStatusDto,
+    performedBy?: string,
+  ): Promise<{ id: string; status: string; updatedAt: Date }> {
+    const appointment = await this.prisma.appointment.findUnique({
+      where: { id },
+    });
+
+    if (!appointment) {
+      throw new NotFoundException(`Appointment with ID ${id} not found`);
+    }
+
+    const currentStatus = appointment.status;
+    const newStatus = dto.status;
+
+    // Validate state transition
+    const allowedTransitions = VALID_TRANSITIONS[currentStatus];
+    if (!allowedTransitions || !allowedTransitions.includes(newStatus)) {
+      throw new BadRequestException(
+        `Cannot transition from ${currentStatus} to ${newStatus}`,
+      );
+    }
+
+    // Cancellation requires a reason
+    const updateData: Record<string, unknown> = { status: newStatus };
+    if (newStatus === "CANCELLED" && dto.reason) {
+      updateData.remarks = dto.reason;
+    }
+
+    const updated = await this.prisma.appointment.update({
+      where: { id },
+      data: updateData,
+    });
+
+    this.logger.log(
+      `Admin updated appointment ${id}: ${currentStatus} -> ${newStatus}${performedBy ? ` by ${performedBy}` : ""}`,
+    );
+
+    return {
+      id: updated.id,
+      status: updated.status,
+      updatedAt: updated.updatedAt,
+    };
+  }
+
+  /**
+   * Batch cancel appointments. Non-transactional — processes each
+   * appointment individually and collects failures.
+   */
+  async batchCancel(dto: BatchCancelDto): Promise<BatchCancelResponseDto> {
+    const failedIds: string[] = [];
+    let successCount = 0;
+
+    for (const id of dto.ids) {
+      try {
+        const appointment = await this.prisma.appointment.findUnique({
+          where: { id },
+        });
+
+        if (!appointment) {
+          failedIds.push(id);
+          continue;
+        }
+
+        if (appointment.status === "CANCELLED") {
+          failedIds.push(id);
+          continue;
+        }
+
+        const updateData: Record<string, unknown> = {
+          status: "CANCELLED",
+        };
+        if (dto.reason) {
+          updateData.remarks = dto.reason;
+        }
+
+        await this.prisma.appointment.update({
+          where: { id },
+          data: updateData,
+        });
+
+        successCount++;
+      } catch (error) {
+        this.logger.warn(
+          `Failed to cancel appointment ${id}: ${(error as Error).message}`,
+        );
+        failedIds.push(id);
+      }
+    }
+
+    return {
+      successCount,
+      failedCount: failedIds.length,
+      failedIds,
+    };
+  }
+}

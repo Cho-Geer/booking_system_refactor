@@ -4,7 +4,7 @@ import {
   HttpTestingController,
 } from '@angular/common/http/testing';
 import { ApiService, ApiResponse } from './api.service';
-import { LoginPasswordDto, RegisterCompleteDto, ContactType, AuthResponseDto } from '../../features/auth/dto/auth.dto';
+import { LoginPasswordDto, RegisterCompleteDto, LoginSendCodeDto, ContactType, AuthResponseDto, LoginSendCodeResponse } from '../../features/auth/dto/auth.dto';
 
 describe('ApiService', () => {
   let service: ApiService;
@@ -33,7 +33,6 @@ describe('ApiService', () => {
       };
       const mockResponse: AuthResponseDto = {
         accessToken: 'jwt-token-123',
-        refreshToken: 'refresh-token-123',
         expiresIn: 900,
         tokenType: 'Bearer',
       };
@@ -45,6 +44,7 @@ describe('ApiService', () => {
       const req = httpMock.expectOne(`${apiUrl}/auth/login/password`);
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual(mockCredentials);
+      expect(req.request.withCredentials).toBe(true);
       req.flush(mockResponse);
     });
 
@@ -78,7 +78,6 @@ describe('ApiService', () => {
       };
       const mockResponse: AuthResponseDto = {
         accessToken: 'jwt-token-456',
-        refreshToken: 'refresh-token-456',
         expiresIn: 900,
         tokenType: 'Bearer',
       };
@@ -90,6 +89,7 @@ describe('ApiService', () => {
       const req = httpMock.expectOne(`${apiUrl}/auth/register/complete`);
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual(mockData);
+      expect(req.request.withCredentials).toBe(true);
       req.flush(mockResponse);
     });
 
@@ -114,6 +114,95 @@ describe('ApiService', () => {
     });
   });
 
+  describe('loginSendCode()', () => {
+    it('should send POST request to /api/auth/login/send-code with contact info', () => {
+      const mockDto: LoginSendCodeDto = {
+        contact: 'test@example.com',
+        contactType: ContactType.EMAIL,
+      };
+      const mockResponse: LoginSendCodeResponse = {
+        maskedContact: 'tes***@example.com',
+        expiresIn: 300,
+      };
+
+      service.loginSendCode(mockDto).subscribe((response) => {
+        expect(response).toEqual(mockResponse);
+        expect(response.maskedContact).toBe('tes***@example.com');
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/auth/login/send-code`);
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual(mockDto);
+      expect(req.request.withCredentials).toBe(true);
+      req.flush(mockResponse);
+    });
+
+    it('should handle login send code error', () => {
+      const mockDto: LoginSendCodeDto = {
+        contact: 'unknown@example.com',
+        contactType: ContactType.EMAIL,
+      };
+
+      service.loginSendCode(mockDto).subscribe({
+        next: () => fail('expected error'),
+        error: (error) => {
+          expect(error).toBeTruthy();
+        },
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/auth/login/send-code`);
+      req.flush({ message: 'Failed to send code' }, { status: 500, statusText: 'Internal Server Error' });
+    });
+
+    it('should support maskedContact being optional for non-existent users (anti-enumeration)', () => {
+      const mockDto: LoginSendCodeDto = {
+        contact: 'nonexistent@example.com',
+        contactType: ContactType.EMAIL,
+      };
+
+      service.loginSendCode(mockDto).subscribe((response) => {
+        // Non-existent users: backend returns 200 with only expiresIn (no maskedContact)
+        expect(response.maskedContact).toBeUndefined();
+        expect(response.expiresIn).toBe(300);
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/auth/login/send-code`);
+      req.flush({ expiresIn: 300 });
+    });
+  });
+
+  describe('refreshToken()', () => {
+    const mockResponse: AuthResponseDto = {
+      accessToken: 'new-jwt-token',
+      expiresIn: 900,
+      tokenType: 'Bearer',
+    };
+
+    it('[GREEN] should send POST request to /api/auth/refresh with empty body and withCredentials', () => {
+      service.refreshToken().subscribe((response) => {
+        expect(response).toEqual(mockResponse);
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/auth/refresh`);
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual({});
+      expect(req.request.withCredentials).toBe(true);
+      req.flush(mockResponse);
+    });
+
+    it('[GREEN] should handle refresh error', () => {
+      service.refreshToken().subscribe({
+        next: () => fail('expected error'),
+        error: (error) => {
+          expect(error).toBeTruthy();
+        },
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/auth/refresh`);
+      req.flush({ message: 'Token refresh failed' }, { status: 401, statusText: 'Unauthorized' });
+    });
+  });
+
   describe('getServices()', () => {
     const mockServices = [
       { id: '1', name: 'Haircut', description: 'Standard haircut', durationMinutes: 30, price: 25 },
@@ -121,11 +210,13 @@ describe('ApiService', () => {
     ];
 
     it('should send GET request to /api/services and unwrap ApiResponse', (done) => {
-      const wrappedResponse: ApiResponse<typeof mockServices> = {
-        success: true,
-        code: 200,
+      const wrappedResponse: ApiResponse<{ items: typeof mockServices; meta: any }> = {
+        statusCode: 200,
         message: 'OK',
-        data: mockServices,
+        data: { 
+          items: mockServices, 
+          meta: { total: 2, page: 1, limit: 10, totalPages: 1, hasNext: false, hasPrev: false } 
+        },
         timestamp: '2026-04-24T10:00:00.000Z',
         requestId: 'req-test-uuid',
       };
@@ -193,12 +284,14 @@ describe('ApiService', () => {
     // ============================================================
 
     it('[GREEN] should unwrap ApiResponse envelope from backend for getServices', (done) => {
-      // Simulate the actual backend ResponseInterceptor response format
-      const wrappedResponse: ApiResponse<typeof mockServices> = {
-        success: true,
-        code: 200,
+      // Simulate the NEW backend paginated response format
+      const wrappedResponse: ApiResponse<{ items: typeof mockServices; meta: any }> = {
+        statusCode: 200,
         message: 'OK',
-        data: mockServices,
+        data: { 
+          items: mockServices, 
+          meta: { total: 2, page: 1, limit: 10, totalPages: 1, hasNext: false, hasPrev: false } 
+        },
         timestamp: '2026-04-24T10:00:00.000Z',
         requestId: 'req-test-uuid',
       };
@@ -223,11 +316,14 @@ describe('ApiService', () => {
     });
 
     it('[GREEN] should return actual data array from wrapped response for getServices', (done) => {
-      const wrappedResponse: ApiResponse<typeof mockServices> = {
-        success: true,
-        code: 200,
+      // Simulate the NEW backend paginated response format
+      const wrappedResponse: ApiResponse<{ items: typeof mockServices; meta: any }> = {
+        statusCode: 200,
         message: 'OK',
-        data: mockServices,
+        data: { 
+          items: mockServices, 
+          meta: { total: 2, page: 1, limit: 10, totalPages: 1, hasNext: false, hasPrev: false } 
+        },
         timestamp: '2026-04-24T10:00:00.000Z',
         requestId: 'req-test-uuid',
       };
@@ -312,8 +408,7 @@ describe('ApiService', () => {
 
     it('[GREEN] should unwrap ApiResponse envelope for getAvailableSlots', (done) => {
       const wrappedResponse: ApiResponse<typeof mockSlots> = {
-        success: true,
-        code: 200,
+        statusCode: 200,
         message: 'OK',
         data: mockSlots,
         timestamp: '2026-04-24T10:00:00.000Z',
@@ -469,11 +564,14 @@ describe('ApiService', () => {
     ];
 
     it('[RED] should fail: getMyAppointments should send GET to /api/appointments', () => {
-      const wrappedResponse: ApiResponse<typeof mockAppointments> = {
-        success: true,
-        code: 200,
+      // Simulate NEW backend paginated response format
+      const wrappedResponse: ApiResponse<{ items: typeof mockAppointments; meta: any }> = {
+        statusCode: 200,
         message: 'OK',
-        data: mockAppointments,
+        data: { 
+          items: mockAppointments, 
+          meta: { total: 2, page: 1, limit: 10, totalPages: 1, hasNext: false, hasPrev: false } 
+        },
         timestamp: '2026-04-30T10:00:00.000Z',
         requestId: 'req-test-uuid',
       };
@@ -513,7 +611,7 @@ describe('ApiService', () => {
         );
       });
       expect(req.request.method).toBe('GET');
-      req.flush({ success: true, code: 200, message: 'OK', data: [], timestamp: '', requestId: '' });
+       req.flush({ statusCode: 200, message: 'OK', data: { items: [], meta: { total: 0, page: 1, limit: 10, totalPages: 0, hasNext: false, hasPrev: false } }, timestamp: '', requestId: '' });
     });
   });
 
@@ -521,8 +619,7 @@ describe('ApiService', () => {
     it('[RED] should fail: updateProfile should send PUT to /api/users/profile', () => {
       const updateData = { name: 'New Name' };
       const wrappedResponse: ApiResponse<{ user: { id: string; name: string; role: string } }> = {
-        success: true,
-        code: 200,
+        statusCode: 200,
         message: 'OK',
         data: { user: { id: '1', name: 'New Name', role: 'CUSTOMER' } },
         timestamp: '2026-04-30T10:00:00.000Z',

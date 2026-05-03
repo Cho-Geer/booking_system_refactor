@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { TableModule } from 'primeng/table';
 import { Dialog } from 'primeng/dialog';
@@ -6,7 +6,6 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { FormsModule } from '@angular/forms';
-import { Tag } from 'primeng/tag';
 import { AdminStore } from '../../stores/admin.store';
 import { AdminService } from '../../services/admin.service';
 import {
@@ -16,13 +15,22 @@ import {
   CreateAdminUserRequest,
   UpdateAdminUserRequest,
 } from '../../dto/admin.dto';
+import { AppCardComponent } from '../../../../shared/components/atoms/app-card/app-card.component';
+import { AppButtonComponent } from '../../../../shared/components/atoms/app-button/app-button.component';
+import { AppBadgeComponent, BadgeStatus } from '../../../../shared/components/atoms/app-badge/app-badge.component';
+import { AppInputComponent } from '../../../../shared/components/atoms/app-input/app-input.component';
+import { AppDropdownComponent } from '../../../../shared/components/atoms/app-dropdown/app-dropdown.component';
+import { AppSpinnerComponent } from '../../../../shared/components/atoms/app-spinner/app-spinner.component';
+import { Tag } from 'primeng/tag';
 
 @Component({
   selector: 'app-user-management',
   standalone: true,
   imports: [
     TableModule, Dialog, ButtonModule, InputTextModule, SelectModule,
-    FormsModule, Tag, DatePipe,
+    FormsModule, DatePipe,
+    AppCardComponent, AppButtonComponent, AppBadgeComponent,
+    AppInputComponent, AppDropdownComponent, AppSpinnerComponent, Tag,
   ],
   templateUrl: './user-management.component.html',
   styleUrl: './user-management.component.scss',
@@ -54,6 +62,9 @@ export class UserManagementComponent implements OnInit {
   formStatus: AdminUserStatus = 'ACTIVE';
   formPassword = '';
 
+  // Form validation
+  formErrors: { name?: string; email?: string; password?: string } = {};
+
   readonly roleOptions = [
     { label: 'Customer', value: 'CUSTOMER' as AdminUserRole },
     { label: 'Admin', value: 'ADMIN' as AdminUserRole },
@@ -65,6 +76,25 @@ export class UserManagementComponent implements OnInit {
     { label: 'Inactive', value: 'INACTIVE' as AdminUserStatus },
     { label: 'Blocked', value: 'BLOCKED' as AdminUserStatus },
   ];
+
+  readonly filterRoleOptions = [
+    { label: 'All Roles', value: '' },
+    ...this.roleOptions,
+  ];
+
+  readonly filterStatusOptions = [
+    { label: 'All Statuses', value: '' },
+    ...this.statusOptions,
+  ];
+
+  // Stats computed from users list
+  readonly totalUsers = computed(() => this.vm().users.length);
+  readonly activeUsers = computed(() => this.vm().users.filter(u => u.status === 'ACTIVE').length);
+  readonly newThisWeek = computed(() => {
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    return this.vm().users.filter(u => new Date(u.createdAt) >= oneWeekAgo).length;
+  });
 
   ngOnInit(): void {
     this.loadUsers();
@@ -92,6 +122,7 @@ export class UserManagementComponent implements OnInit {
     this.isEdit.set(false);
     this.selectedUser.set(null);
     this.submitted.set(false);
+    this.formErrors = {};
     this.userDialogVisible.set(true);
   }
 
@@ -105,6 +136,7 @@ export class UserManagementComponent implements OnInit {
     this.formStatus = user.status;
     this.formPassword = '';
     this.submitted.set(false);
+    this.formErrors = {};
     this.userDialogVisible.set(true);
   }
 
@@ -121,6 +153,22 @@ export class UserManagementComponent implements OnInit {
 
   saveUser(): void {
     this.submitted.set(true);
+    this.formErrors = {};
+
+    // Validation
+    if (!this.formName.trim()) {
+      this.formErrors.name = 'Name is required';
+    }
+    if (!this.isEdit() && !this.formEmail.trim()) {
+      this.formErrors.email = 'Email is required';
+    }
+    if (!this.isEdit() && !this.formPassword.trim()) {
+      this.formErrors.password = 'Password is required';
+    }
+
+    if (Object.keys(this.formErrors).length > 0) {
+      return;
+    }
 
     if (this.isEdit() && this.selectedUser()) {
       const updates: UpdateAdminUserRequest = {
@@ -170,6 +218,32 @@ export class UserManagementComponent implements OnInit {
     this.loadUsers();
   }
 
+  clearFilters(): void {
+    this.searchQuery.set('');
+    this.selectedRoleFilter.set('');
+    this.selectedStatusFilter.set('');
+    this.loadUsers();
+  }
+
+  onRoleFilterChange(value: unknown): void {
+    this.selectedRoleFilter.set(value as AdminUserRole | '');
+    this.applyFilter();
+  }
+
+  onStatusFilterChange(value: unknown): void {
+    this.selectedStatusFilter.set(value as AdminUserStatus | '');
+    this.applyFilter();
+  }
+
+  mapRoleToBadge(role: AdminUserRole): BadgeStatus {
+    switch (role) {
+      case 'CUSTOMER': return 'completed';
+      case 'ADMIN': return 'processing';
+      case 'SUPER_ADMIN': return 'confirmed';
+      default: return 'pending';
+    }
+  }
+
   getStatusSeverity(status: string): 'success' | 'warn' | 'danger' | 'info' | undefined {
     switch (status) {
       case 'ACTIVE': return 'success';
@@ -186,5 +260,6 @@ export class UserManagementComponent implements OnInit {
     this.formRole = 'CUSTOMER';
     this.formStatus = 'ACTIVE';
     this.formPassword = '';
+    this.formErrors = {};
   }
 }

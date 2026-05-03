@@ -49,9 +49,9 @@ export interface LoginPasswordDto {
 }
 
 // Auth response (no user object, token only)
+// refreshToken is transmitted via HttpOnly cookie, not in JSON body
 export interface AuthResponseDto {
   accessToken: string;
-  refreshToken: string;
   expiresIn: number;
   tokenType: 'Bearer';
 }
@@ -64,6 +64,7 @@ export interface RegisterSendCodeResponse {
 
 // Login send code response
 export interface LoginSendCodeResponse {
+  maskedContact?: string;
   expiresIn: number;
 }
 

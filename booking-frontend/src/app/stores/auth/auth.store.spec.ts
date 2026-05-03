@@ -43,10 +43,6 @@ describe('AuthStore', () => {
     expect(store.token()).toBeNull();
   });
 
-  it('should initialize with null refreshToken', () => {
-    expect(store.refreshToken()).toBeNull();
-  });
-
   it('should initialize with isLoading false', () => {
     expect(store.isLoading()).toBe(false);
   });
@@ -59,16 +55,14 @@ describe('AuthStore', () => {
     expect(store.isAuthenticated()).toBe(false);
   });
 
-  it('should set token and refreshToken on login success', () => {
+  it('should set token on login success', () => {
     const mockToken = 'jwt-token-123';
-    const mockRefreshToken = 'jwt-refresh-token-456';
 
-    // LoginSuccess stores tokens only (user is set separately via setUserProfile)
+    // LoginSuccess stores token only (user is set separately via setUserProfile)
     // isAuthenticated requires both user AND token, so it stays false until setUserProfile
-    store.loginSuccess(mockToken, mockRefreshToken);
+    store.loginSuccess(mockToken);
 
     expect(store.token()).toBe(mockToken);
-    expect(store.refreshToken()).toBe(mockRefreshToken);
     expect(store.isAuthenticated()).toBe(false); // user not yet set
     expect(store.error()).toBeNull();
     expect(store.isLoading()).toBe(false);
@@ -82,21 +76,11 @@ describe('AuthStore', () => {
       userType: 'user',
     };
 
-    store.loginSuccess('jwt-token-123', 'jwt-refresh-token-456');
+    store.loginSuccess('jwt-token-123');
     store.setUserProfile(mockUser);
 
     expect(store.user()).toEqual(mockUser);
     expect(store.isAuthenticated()).toBe(true);
-  });
-
-  it('should handle loginSuccess without refreshToken (backward compatible)', () => {
-    const mockToken = 'jwt-token-123';
-
-    store.loginSuccess(mockToken);
-
-    expect(store.token()).toBe(mockToken);
-    expect(store.refreshToken()).toBeNull();
-    expect(store.isAuthenticated()).toBe(false); // user not yet set
   });
 
   it('should clear user and tokens on clearAuthState', () => {
@@ -107,7 +91,7 @@ describe('AuthStore', () => {
       userType: 'user',
     };
 
-    store.loginSuccess('jwt-token-123', 'jwt-refresh-token-456');
+    store.loginSuccess('jwt-token-123');
     store.setUserProfile(mockUser);
     expect(store.isAuthenticated()).toBe(true);
     expect(store.user()).toEqual(mockUser);
@@ -116,7 +100,6 @@ describe('AuthStore', () => {
 
     expect(store.user()).toBeNull();
     expect(store.token()).toBeNull();
-    expect(store.refreshToken()).toBeNull();
     expect(store.isAuthenticated()).toBe(false);
     expect(store.error()).toBeNull();
     expect(store.isLoading()).toBe(false);
@@ -148,7 +131,7 @@ describe('AuthStore', () => {
 
     expect(store.currentUser()).toBeNull();
 
-    store.loginSuccess('jwt-token-123', 'refresh-token');
+    store.loginSuccess('jwt-token-123');
     store.setUserProfile(mockUser);
 
     expect(store.currentUser()).toEqual(mockUser);
@@ -159,19 +142,9 @@ describe('AuthStore', () => {
 
     expect(store.currentToken()).toBeNull();
 
-    store.loginSuccess(mockToken, 'refresh-token');
+    store.loginSuccess(mockToken);
 
     expect(store.currentToken()).toBe(mockToken);
-  });
-
-  it('should expose currentRefreshToken computed signal', () => {
-    const mockRefreshToken = 'jwt-refresh-token-456';
-
-    expect(store.currentRefreshToken()).toBeNull();
-
-    store.loginSuccess('jwt-token-123', mockRefreshToken);
-
-    expect(store.currentRefreshToken()).toBe(mockRefreshToken);
   });
 
   // ==========================================
@@ -263,7 +236,6 @@ describe('AuthStore', () => {
 
       expect(apiServiceMock.registerComplete).toHaveBeenCalledWith(mockDto);
       expect(store.token()).toBe('jwt-token');
-      expect(store.refreshToken()).toBe('jwt-refresh');
     });
 
     it('[RED] should fail: should fetch user profile after registration', async () => {
@@ -339,7 +311,6 @@ describe('AuthStore', () => {
 
       expect(apiServiceMock.loginPassword).toHaveBeenCalledWith(mockDto);
       expect(store.token()).toBe('jwt-token');
-      expect(store.refreshToken()).toBe('jwt-refresh');
       expect(store.isAuthenticated()).toBe(true);
     });
 
@@ -387,12 +358,11 @@ describe('AuthStore', () => {
       expect(store.refreshAccessToken).toBeDefined();
     });
 
-    it('[RED] should fail: should call apiService.refreshToken with stored refreshToken', async () => {
-      store.loginSuccess('old-token', 'stored-refresh-token');
+    it('[GREEN] should call apiService.refreshToken (no params) and update token', async () => {
+      store.loginSuccess('old-token');
       apiServiceMock.refreshToken.mockReturnValue(
         of({
           accessToken: 'new-token',
-          refreshToken: 'new-refresh',
           expiresIn: 3600,
           tokenType: 'Bearer',
         })
@@ -400,17 +370,83 @@ describe('AuthStore', () => {
 
       await store.refreshAccessToken();
 
-      expect(apiServiceMock.refreshToken).toHaveBeenCalledWith(
-        'stored-refresh-token'
-      );
+      expect(apiServiceMock.refreshToken).toHaveBeenCalledWith();
       expect(store.token()).toBe('new-token');
-      expect(store.refreshToken()).toBe('new-refresh');
     });
 
-    it('[RED] should fail: should set error when no refresh token available', async () => {
+    it('[GREEN] should set error when refresh call fails', async () => {
+      apiServiceMock.refreshToken.mockReturnValue(
+        throwError(() => new Error('Refresh failed'))
+      );
+
       await store.refreshAccessToken();
 
-      expect(store.error()).toBeTruthy();
+      expect(store.error()).toBe('Refresh failed');
+    });
+  });
+
+  describe('[GREEN] restoreSession()', () => {
+    it('[GREEN] should fail: restoreSession is not yet defined', () => {
+      expect(store.restoreSession).toBeDefined();
+    });
+
+    it('[GREEN] should call apiService.refreshToken and fetch user profile on success', async () => {
+      apiServiceMock.refreshToken.mockReturnValue(
+        of({
+          accessToken: 'session-token',
+          expiresIn: 3600,
+          tokenType: 'Bearer',
+        })
+      );
+      apiServiceMock.getUserProfile.mockReturnValue(
+        of({
+          id: '1',
+          name: 'Session User',
+          email: 'ses***@example.com',
+          userType: 'CUSTOMER',
+          createdAt: '2026-01-01T00:00:00Z',
+        })
+      );
+
+      const result = await store.restoreSession();
+
+      expect(apiServiceMock.refreshToken).toHaveBeenCalledWith();
+      expect(apiServiceMock.getUserProfile).toHaveBeenCalled();
+      expect(store.token()).toBe('session-token');
+      expect(store.user()).toEqual(
+        expect.objectContaining({ id: '1', name: 'Session User' })
+      );
+      expect(result).toBe(true);
+    });
+
+    it('[GREEN] should return false when refresh fails (no cookie or expired)', async () => {
+      apiServiceMock.refreshToken.mockReturnValue(
+        throwError(() => new Error('No refresh token cookie'))
+      );
+
+      const result = await store.restoreSession();
+
+      expect(result).toBe(false);
+      expect(store.token()).toBeNull();
+      expect(store.user()).toBeNull();
+    });
+
+    it('[GREEN] should set token but continue when profile fetch fails', async () => {
+      apiServiceMock.refreshToken.mockReturnValue(
+        of({
+          accessToken: 'session-token',
+          expiresIn: 3600,
+          tokenType: 'Bearer',
+        })
+      );
+      apiServiceMock.getUserProfile.mockReturnValue(
+        throwError(() => new Error('Profile fetch failed'))
+      );
+
+      const result = await store.restoreSession();
+
+      expect(result).toBe(true);
+      expect(store.token()).toBe('session-token');
     });
   });
 
@@ -426,7 +462,7 @@ describe('AuthStore', () => {
         name: 'Test User',
         userType: 'CUSTOMER',
       };
-      store.loginSuccess('jwt-token', 'jwt-refresh');
+      store.loginSuccess('jwt-token');
       store.setUserProfile(mockUser);
       apiServiceMock.logout.mockReturnValue(of({ message: 'Logged out' }));
 
@@ -435,12 +471,11 @@ describe('AuthStore', () => {
       expect(apiServiceMock.logout).toHaveBeenCalled();
       expect(store.user()).toBeNull();
       expect(store.token()).toBeNull();
-      expect(store.refreshToken()).toBeNull();
       expect(store.isAuthenticated()).toBe(false);
     });
 
     it('[RED] should fail: should clear state even if API call fails', async () => {
-      store.loginSuccess('jwt-token', 'jwt-refresh');
+      store.loginSuccess('jwt-token');
       apiServiceMock.logout.mockReturnValue(
         throwError(() => new Error('Network error'))
       );
@@ -449,7 +484,6 @@ describe('AuthStore', () => {
 
       // State should still be cleared on logout even if API fails
       expect(store.token()).toBeNull();
-      expect(store.refreshToken()).toBeNull();
     });
   });
 

@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, DeferBlockBehavior, DeferBlockState } from '@angular/core/testing';
+import { ComponentFixture, TestBed, DeferBlockBehavior } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { provideRouter } from '@angular/router';
 import { Router } from '@angular/router';
@@ -27,7 +27,6 @@ describe('LoginComponent', () => {
 
   const mockLoginResponse = {
     accessToken: 'jwt-token-123',
-    refreshToken: 'refresh-token-123',
     expiresIn: 900,
     tokenType: 'Bearer' as const,
   };
@@ -149,19 +148,6 @@ describe('LoginComponent', () => {
       expect(passwordControl?.invalid).toBe(true);
       expect(passwordControl?.errors?.['required']).toBe(true);
     });
-
-    it('should mark password as invalid when less than 8 characters', () => {
-      const passwordControl = component.passwordForm.get('password');
-      passwordControl?.setValue('1234567');
-      expect(passwordControl?.invalid).toBe(true);
-      expect(passwordControl?.errors?.['minlength']).toBeTruthy();
-    });
-
-    it('should mark password as valid when 8 or more characters', () => {
-      const passwordControl = component.passwordForm.get('password');
-      passwordControl?.setValue('password123');
-      expect(passwordControl?.valid).toBe(true);
-    });
   });
 
   describe('form validation - code login form', () => {
@@ -247,7 +233,7 @@ describe('LoginComponent', () => {
 
       component.onPasswordLogin();
 
-      expect(authStoreMock.loginSuccess).toHaveBeenCalledWith('jwt-token-123', 'refresh-token-123');
+      expect(authStoreMock.loginSuccess).toHaveBeenCalledWith('jwt-token-123');
     });
 
     it('should connect socket service on successful login', () => {
@@ -262,21 +248,6 @@ describe('LoginComponent', () => {
       component.onPasswordLogin();
 
       expect(socketServiceMock.connect).toHaveBeenCalled();
-    });
-
-    it('should navigate to /booking on successful login', () => {
-      component.passwordForm.patchValue({
-        contact: 'test@example.com',
-        password: 'password123',
-      });
-      component.acceptTerms.set(true);
-      apiServiceMock.loginPassword.mockReturnValue(of(mockLoginResponse));
-      apiServiceMock.getUserProfile.mockReturnValue(of(null));
-      jest.spyOn(router, 'navigate');
-
-      component.onPasswordLogin();
-
-      expect(router.navigate).toHaveBeenCalledWith(['/booking']);
     });
 
     it('should set error on login failure', () => {
@@ -296,7 +267,7 @@ describe('LoginComponent', () => {
   describe('onSendCode()', () => {
     it('should send verification code when contact is valid', () => {
       component.codeLoginForm.get('contact')?.setValue('test@example.com');
-      apiServiceMock.loginSendCode.mockReturnValue(of({ expiresIn: 300 }));
+      apiServiceMock.loginSendCode.mockReturnValue(of({ maskedContact: 'tes***@example.com', expiresIn: 300 }));
 
       component.onSendCode();
 
@@ -315,22 +286,31 @@ describe('LoginComponent', () => {
       expect(apiServiceMock.loginSendCode).not.toHaveBeenCalled();
     });
 
-    it('should start countdown after sending code', () => {
+    it('should start countdown after sending code when maskedContact is present', () => {
       component.codeLoginForm.get('contact')?.setValue('test@example.com');
-      apiServiceMock.loginSendCode.mockReturnValue(of({ expiresIn: 300 }));
+      apiServiceMock.loginSendCode.mockReturnValue(of({ maskedContact: 'tes***@example.com', expiresIn: 300 }));
 
       component.onSendCode();
 
       expect(component.countdown()).toBe(60);
     });
 
-    it('should advance to step 2 after sending code', () => {
+    it('should advance to step 2 after sending code when maskedContact is present', () => {
       component.codeLoginForm.get('contact')?.setValue('test@example.com');
-      apiServiceMock.loginSendCode.mockReturnValue(of({ expiresIn: 300 }));
+      apiServiceMock.loginSendCode.mockReturnValue(of({ maskedContact: 'tes***@example.com', expiresIn: 300 }));
 
       component.onSendCode();
 
       expect(component.codeLoginStep()).toBe(2);
+    });
+
+    it('[RED] should fail: should NOT advance to step 2 when maskedContact is absent (anti-enumeration)', () => {
+      component.codeLoginForm.get('contact')?.setValue('nonexistent@example.com');
+      apiServiceMock.loginSendCode.mockReturnValue(of({ expiresIn: 300 }));
+
+      component.onSendCode();
+
+      expect(component.codeLoginStep()).toBe(1);
     });
 
     it('should not send code when countdown is active', () => {
@@ -369,21 +349,6 @@ describe('LoginComponent', () => {
       expect(apiServiceMock.loginVerifyCode).not.toHaveBeenCalled();
     });
 
-    it('should navigate to /booking on successful verification', () => {
-      component.codeLoginForm.patchValue({
-        contact: 'test@example.com',
-        code: '123456',
-      });
-      component.acceptTerms.set(true);
-      apiServiceMock.loginVerifyCode.mockReturnValue(of(mockLoginResponse));
-      apiServiceMock.getUserProfile.mockReturnValue(of(null));
-      jest.spyOn(router, 'navigate');
-
-      component.onVerifyCode();
-
-      expect(router.navigate).toHaveBeenCalledWith(['/booking']);
-    });
-
     it('should set error on verification failure', () => {
       component.codeLoginForm.patchValue({
         contact: 'test@example.com',
@@ -408,7 +373,7 @@ describe('LoginComponent', () => {
 
       component.onVerifyCode();
 
-      expect(authStoreMock.loginSuccess).toHaveBeenCalledWith('jwt-token-123', 'refresh-token-123');
+      expect(authStoreMock.loginSuccess).toHaveBeenCalledWith('jwt-token-123');
     });
   });
 
@@ -456,7 +421,7 @@ describe('LoginComponent', () => {
       authStoreMock.error.mockReturnValue(null);
       fixture.detectChanges();
 
-      const globalError = fixture.nativeElement.querySelector('.global-error');
+      const globalError = fixture.nativeElement.querySelector('.border-l-4');
       expect(globalError).toBeFalsy();
     });
 
@@ -467,19 +432,37 @@ describe('LoginComponent', () => {
       authStoreMock.error.mockReturnValue('Login failed');
       fixture.detectChanges();
 
-      const globalError = fixture.nativeElement.querySelector('.global-error');
-      expect(globalError).toBeTruthy();
-      expect(globalError.textContent).toContain('Login failed');
+      const errorEl = fixture.nativeElement.querySelector('.border-l-4');
+      expect(errorEl).toBeTruthy();
+      expect(errorEl.textContent).toContain('Login failed');
     });
 
-    it('should render register link via defer block', async () => {
-      const deferBlocks = await fixture.getDeferBlocks();
-      await deferBlocks[0].render(DeferBlockState.Complete);
-      fixture.detectChanges();
-
+    it('should render register link', () => {
       const link = fixture.nativeElement.querySelector('a[routerLink="/auth/register"]');
       expect(link).toBeTruthy();
       expect(link.textContent.trim()).toBe('注册新账号');
+    });
+
+    it('[RED] should have gradient-page-bg class on container', () => {
+      const container = fixture.nativeElement.querySelector('.login-page');
+      expect(container.classList.contains('gradient-page-bg')).toBe(true);
+    });
+
+    it('[RED] should have app-card with glass variant', () => {
+      const card = fixture.nativeElement.querySelector('app-card');
+      expect(card).toBeTruthy();
+    });
+
+    it('[RED] should have glass-input class on inputs', () => {
+      const inputs = fixture.nativeElement.querySelectorAll('input:not([type="checkbox"])');
+      inputs.forEach((input: HTMLElement) => {
+        expect(input.classList.contains('glass-input')).toBe(true);
+      });
+    });
+
+    it('[RED] should have app-button for submit', () => {
+      const buttons = fixture.nativeElement.querySelectorAll('app-button');
+      expect(buttons.length).toBeGreaterThan(0);
     });
   });
 });

@@ -14,15 +14,12 @@ export class PaginationDto {
   @IsOptional()
   page?: number = 1;
 
-  @ApiPropertyOptional({ description: "Page size", default: 10 })
+  @ApiPropertyOptional({ description: "Page size", default: 20 })
   @IsOptional()
-  pageSize?: number = 10;
+  limit?: number = 20;
 }
 
-export class PaginatedResponseDto<T> {
-  @ApiProperty({ description: "Data items" })
-  data: T[];
-
+export class MetaDto {
   @ApiProperty({ description: "Total count" })
   total: number;
 
@@ -30,8 +27,22 @@ export class PaginatedResponseDto<T> {
   page: number;
 
   @ApiProperty({ description: "Page size" })
-  pageSize: number;
+  limit: number;
 
   @ApiProperty({ description: "Total pages" })
   totalPages: number;
+
+  @ApiProperty({ description: "Has next page" })
+  hasNext: boolean;
+
+  @ApiProperty({ description: "Has previous page" })
+  hasPrev: boolean;
+}
+
+export class PaginatedResponseDto<T> {
+  @ApiProperty({ description: "Data items" })
+  items: T[];
+
+  @ApiProperty({ description: "Pagination metadata" })
+  meta: MetaDto;
 }

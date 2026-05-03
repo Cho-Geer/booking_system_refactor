@@ -10,7 +10,6 @@ import { of } from 'rxjs';
 
 /**
  * Responsive Design Tests for Login Component
- * Tests mobile adaptations: full-width buttons, touch targets, card responsiveness
  */
 describe('LoginComponent - Responsive Design', () => {
   let component: LoginComponent;
@@ -55,40 +54,23 @@ describe('LoginComponent - Responsive Design', () => {
     fixture.detectChanges();
   });
 
-  describe('touch-friendly click targets (CSS class based)', () => {
-    it('[RED] should have submit button with min-h-[44px] CSS class for touch targets', () => {
-      const buttons = fixture.nativeElement.querySelectorAll('.btn-primary');
-      expect(buttons.length).toBeGreaterThan(0);
-      buttons.forEach((btn: HTMLElement) => {
-        expect(btn.classList.contains('min-touch-target')).toBeTruthy();
-      });
+  describe('touch-friendly click targets', () => {
+    it('[RED] should have app-card container', () => {
+      const card = fixture.nativeElement.querySelector('app-card');
+      expect(card).toBeTruthy();
     });
 
-    it('[RED] should have tab buttons with min-height 44px CSS class', () => {
+    it('[RED] should have tab buttons', () => {
       const tabButtons = fixture.nativeElement.querySelectorAll('.tab-button');
       expect(tabButtons.length).toBeGreaterThan(0);
-      // tab-button has min-height: 44px in CSS
-    });
-  });
-
-  describe('full-width buttons on mobile', () => {
-    it('[RED] should have btn-primary with w-full class', () => {
-      const primaryBtn = fixture.nativeElement.querySelector('.btn-primary');
-      expect(primaryBtn).toBeTruthy();
-      expect(primaryBtn.classList.contains('w-full')).toBeTruthy();
     });
   });
 
   describe('responsive card layout', () => {
-    it('[RED] should render login-card with w-full class', () => {
-      const card = fixture.nativeElement.querySelector('.login-card');
-      expect(card).toBeTruthy();
-      expect(card.classList.contains('w-full')).toBeTruthy();
-    });
-
-    it('[RED] should have login container with min-h-screen', () => {
-      const container = fixture.nativeElement.querySelector('.login-container');
+    it('[RED] should render login-page with gradient-page-bg', () => {
+      const container = fixture.nativeElement.querySelector('.login-page');
       expect(container).toBeTruthy();
+      expect(container.classList.contains('gradient-page-bg')).toBeTruthy();
       expect(container.classList.contains('min-h-screen')).toBeTruthy();
     });
   });

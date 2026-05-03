@@ -87,4 +87,67 @@ describe('ServiceManagementComponent', () => {
   it('should load services on init', () => {
     expect(mockAdminService.getAdminServices).toHaveBeenCalled();
   });
+
+  // ==========================================
+  // [RED] Enhanced tests for redesigned features
+  // ==========================================
+
+  it('[RED] should compute stats from services list', () => {
+    const services: AdminServiceItem[] = [
+      { id: '1', name: 'Haircut', description: 'Cut', duration: 30, price: 25, active: true, createdAt: '2026-01-01T00:00:00Z' },
+      { id: '2', name: 'Massage', description: 'Massage', duration: 60, price: 50, active: true, createdAt: '2026-01-02T00:00:00Z' },
+      { id: '3', name: 'Old Service', description: 'Old', duration: 45, price: 40, active: false, createdAt: '2026-01-03T00:00:00Z' },
+    ];
+    store.setServices(services, 3, 1);
+
+    expect(component.totalServices()).toBe(3);
+    expect(component.activeServicesCount()).toBe(2);
+    expect(component.averagePrice()).toBeCloseTo(38.33, 1);
+  });
+
+  it('[RED] should toggle view mode between grid and list', () => {
+    expect(component.viewMode()).toBe('list');
+
+    component.toggleView('grid');
+    expect(component.viewMode()).toBe('grid');
+
+    component.toggleView('list');
+    expect(component.viewMode()).toBe('list');
+  });
+
+  it('[RED] should clear filters when clearFilters is called', () => {
+    component.searchQuery.set('Haircut');
+    component.categoryFilter.set('Category A');
+    component.statusFilter.set('active');
+
+    component.clearFilters();
+
+    expect(component.searchQuery()).toBe('');
+    expect(component.categoryFilter()).toBe('');
+    expect(component.statusFilter()).toBe('');
+  });
+
+  it('[RED] should validate form on save with empty name', () => {
+    component.formName = '';
+    component.formDuration = null;
+    component.openNew();
+    component.saveService();
+
+    expect(component.submitted()).toBe(true);
+    expect(component.formErrors.name).toBe('Service name is required');
+  });
+
+  it('[RED] should show confirm delete dialog and delete service', () => {
+    const svc: AdminServiceItem = {
+      id: '1', name: 'Haircut', description: 'Cut', duration: 30, price: 25, active: true, createdAt: '2026-01-01T00:00:00Z',
+    };
+    mockAdminService.deleteAdminService.mockReturnValue(of(null));
+
+    component.confirmDeleteService(svc);
+    expect(component.deleteDialogVisible()).toBe(true);
+    expect(component.serviceToDelete()?.id).toBe('1');
+
+    component.deleteService();
+    expect(mockAdminService.deleteAdminService).toHaveBeenCalledWith('1');
+  });
 });

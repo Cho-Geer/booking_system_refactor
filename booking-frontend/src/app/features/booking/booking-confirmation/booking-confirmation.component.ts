@@ -1,24 +1,29 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { DatePipe, CurrencyPipe } from '@angular/common';
 import { BookingStore } from '../../../stores/booking/booking.store';
 import { AuthStore } from '../../../stores/auth/auth.store';
-import { Router } from '@angular/router';
-
-/** Placeholder values for missing service data - TODO: Replace with real data */
-const PLACEHOLDER_SERVICE_NAME = 'Standard Service';
-const PLACEHOLDER_SERVICE_DURATION_MINUTES = 30;
-const PLACEHOLDER_SERVICE_PRICE = 50;
+import { Router, RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { AppCardComponent } from '../../../shared/components/atoms/app-card/app-card.component';
+import { AppButtonComponent } from '../../../shared/components/atoms/app-button/app-button.component';
 
 @Component({
   selector: 'app-booking-confirmation',
   standalone: true,
-  imports: [DatePipe, CurrencyPipe],
+  imports: [
+    DatePipe,
+    CurrencyPipe,
+    FormsModule,
+    RouterModule,
+    AppCardComponent,
+    AppButtonComponent,
+  ],
   templateUrl: './booking-confirmation.component.html',
   styleUrl: './booking-confirmation.component.scss',
 })
 export class BookingConfirmationComponent {
   private bookingStore = inject(BookingStore);
-  private authStore = inject(AuthStore);
+  authStore = inject(AuthStore);
   private router = inject(Router);
 
   hasSelection = this.bookingStore.hasSelection;
@@ -26,18 +31,26 @@ export class BookingConfirmationComponent {
   error = this.bookingStore.error;
   isProcessing = this.bookingStore.isLoading;
 
-  // TODO: Replace hardcoded placeholder values with real data from route state or booking store.
-  // These should be populated from the selected service details passed through navigation state
-  // or retrieved from the booking store based on the current selection.
-  selectedServiceName = signal(PLACEHOLDER_SERVICE_NAME);
-  serviceDuration = signal(PLACEHOLDER_SERVICE_DURATION_MINUTES);
-  servicePrice = signal(PLACEHOLDER_SERVICE_PRICE);
+  // Terms acceptance
+  acceptTerms = false;
+
+  /** Derive selected service details from BookingStore state */
+  private selectedService = computed(() => {
+    const serviceId = this.bookingStore.selectedServiceId();
+    if (!serviceId) return null;
+    return this.bookingStore.services().find(s => s.id === serviceId) ?? null;
+  });
+
+  /** Computed display values derived from the selected service */
+  selectedServiceName = computed(() => this.selectedService()?.name ?? 'Unknown Service');
+  serviceDuration = computed(() => this.selectedService()?.durationMinutes ?? 30);
+  servicePrice = computed(() => this.selectedService()?.price ?? 0);
 
   confirmBooking(): void {
     const slot = this.selectedSlot();
     const user = this.authStore.user();
 
-    if (!slot || !user) {
+    if (!slot || !user || !this.acceptTerms) {
       return;
     }
 

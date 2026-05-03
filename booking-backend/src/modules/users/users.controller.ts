@@ -90,9 +90,9 @@ export class UsersController {
   @ApiResponse({ status: 200, description: "List of users" })
   async findAll(
     @Query("page", OptionalParseIntPipe) page: number = 1,
-    @Query("pageSize", OptionalParseIntPipe) pageSize: number = 10,
+    @Query("limit", OptionalParseIntPipe) limit: number = 20,
   ) {
-    return this.usersService.findAll(page, pageSize);
+    return this.usersService.findAll(page, limit);
   }
 
   @Get("profile")

@@ -1,31 +1,128 @@
-<div class="time-slots-container">
+<div class="time-slots-page page-enter">
+  <!-- Header -->
+  <div class="mb-6 sm:mb-8">
+    <h1 class="text-2xl font-bold gradient-text">选择时间</h1>
+    <p class="text-sm text-gray-500 mt-1">请选择您期望的预约日期和时间段</p>
+  </div>
+
   @if (isLoading()) {
-    <div class="loading" role="status" aria-live="polite">Loading available time slots...</div>
+    <div class="loading-skeleton space-y-4" role="status" aria-live="polite">
+      <!-- Calendar skeleton -->
+      <app-card variant="glass">
+        <div class="space-y-3">
+          <div class="h-6 w-40 bg-white/40 rounded skeleton mx-auto"></div>
+          <div class="grid grid-cols-7 gap-2">
+            @for (item of [1,2,3,4,5,6,7,8,9,10,11,12,13,14]; track item) {
+              <div class="h-10 bg-white/40 rounded skeleton"></div>
+            }
+          </div>
+        </div>
+      </app-card>
+      <!-- Slot skeletons -->
+      <div class="time-slots-grid">
+        @for (item of [1,2,3,4,5,6]; track item) {
+          <div class="h-16 bg-white/40 rounded-xl skeleton"></div>
+        }
+      </div>
+    </div>
   } @else if (error()) {
-    <div class="error" role="alert" aria-live="assertive">
-      <p>{{ error() }}</p>
-      <button (click)="retryLoad()" aria-label="Retry loading time slots" class="min-h-[44px]">Retry</button>
+    <div class="glass-level-1 rounded-2xl p-6 sm:p-8 text-center">
+      <div class="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
+        <span class="text-2xl text-red-500">!</span>
+      </div>
+      <h3 class="text-lg font-bold text-gray-900 mb-2">加载失败</h3>
+      <p class="text-sm text-gray-500 mb-6">{{ error() }}</p>
+      <button
+        class="px-6 py-2.5 rounded-xl gradient-primary text-white font-medium text-sm hover:opacity-90 transition-all shadow-glass active:scale-[0.98] min-h-[44px]"
+        (click)="retryLoad()"
+        aria-label="Retry loading time slots"
+      >
+        重新加载
+      </button>
     </div>
   } @else {
-    <div class="time-slots">
+    <!-- Calendar Widget -->
+    <app-card variant="glass" class="mb-6">
+      <div class="flex flex-col items-center">
+        <label class="text-sm font-medium text-gray-600 mb-3">选择日期</label>
+        <p-datepicker
+          [(ngModel)]="selectedDate"
+          (onSelect)="onDateSelect($event)"
+          [minDate]="minDate"
+          [inline]="true"
+          [readonlyInput]="true"
+          styleClass="w-full"
+          inputStyleClass="glass-input"
+        ></p-datepicker>
+      </div>
+    </app-card>
+
+    <!-- Legend -->
+    <div class="flex flex-wrap gap-4 mb-4 text-xs text-gray-500">
+      <div class="flex items-center gap-1.5">
+        <span class="w-3 h-3 rounded-full bg-green-400"></span>
+        <span>充足</span>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <span class="w-3 h-3 rounded-full bg-yellow-400"></span>
+        <span>少量剩余</span>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <span class="w-3 h-3 rounded-full bg-red-400"></span>
+        <span>已满</span>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <span class="w-3 h-3 rounded-full bg-gray-300"></span>
+        <span>不可用</span>
+      </div>
+    </div>
+
+    <!-- Time slots -->
+    <div class="time-slots-grid">
       @for (slot of availableSlots(); track slot.id) {
+        @let availability = getSlotAvailability(slot);
         <button
-          class="slot-button w-full"
-          [class.selected]="isSelected(slot)"
-          [class.unavailable]="!slot.available"
-          [disabled]="!slot.available"
+          class="slot-card"
+          [class.slot-available]="availability === 'available'"
+          [class.slot-few]="availability === 'few'"
+          [class.slot-full]="availability === 'full'"
+          [class.slot-unavailable]="availability === 'unavailable'"
+          [class.slot-selected]="isSelected(slot)"
+          [disabled]="availability === 'unavailable' || availability === 'full'"
           (click)="onSlotClick(slot)"
           type="button"
+          [attr.aria-label]="'Slot at ' + (slot.startTime | date:'shortTime')"
         >
-          <span class="time">{{ slot.startTime | date:'shortTime' }}</span>
-          <span class="date">{{ slot.startTime | date:'mediumDate' }}</span>
-          @if (!slot.available) {
-            <span class="badge">已预约</span>
-          }
+          <div class="flex items-center justify-between w-full">
+            <span class="slot-time font-semibold">{{ slot.startTime | date:'shortTime' }}</span>
+            @if (availability === 'available' && !isSelected(slot)) {
+              <span class="relative flex h-2.5 w-2.5">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+              </span>
+            }
+            @if (isSelected(slot)) {
+              <span class="text-white text-sm font-medium">已选</span>
+            }
+            @if (availability === 'unavailable') {
+              <span class="text-gray-400 text-xs">已预约</span>
+            }
+            @if (availability === 'full') {
+              <span class="text-red-400 text-xs">已满</span>
+            }
+            @if (availability === 'few') {
+              <span class="text-yellow-600 text-xs">仅剩{{ slot.capacity - slot.bookedCount }}席</span>
+            }
+          </div>
         </button>
       } @empty {
-        <div class="empty-state">
-          <p>No available time slots</p>
+        <!-- Empty state -->
+        <div class="col-span-full">
+          <app-empty-state
+            icon="📅"
+            title="暂无可用时间段"
+            description="所选日期暂无可用时间段，请选择其他日期"
+          />
         </div>
       }
     </div>
