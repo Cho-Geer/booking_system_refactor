@@ -27,7 +27,7 @@
     {
       "id": "ADMIN-DASHBOARD-REDESIGN",
       "name": "Redesign Admin Dashboard",
-      "description": "Redesign admin dashboard with real charts, stats cards, recent bookings, quick actions, and page header using enhanced atomic components.",
+      "description": "Redesign admin dashboard with real charts, stats cards, recent bookings and quick actions.",
       "status": "completed",
       "dependencies": ["LAYOUT-REDESIGN"],
       "assignee": "@Coder-FE"
@@ -83,7 +83,7 @@
     {
       "id": "SHARED-COMPONENTS-UPDATE",
       "name": "Update Shared Atomic Components",
-      "description": "Update app-badge, app-button, app-card, app-header, app-sidebar, auth-form, register-form with styles, specs, and new features.",
+      "description": "Update app-badge, app-button, app-card, app-header, app-sidebar, auth-form, register-form components with styles, specs, and new features.",
       "status": "completed",
       "dependencies": [],
       "assignee": "@Coder-FE"
@@ -108,6 +108,22 @@
       "id": "INTERCEPTORS-ROUTES-UPDATE",
       "name": "Update Auth Interceptor, Routes, and API Service",
       "description": "Update auth interceptor with specs, app routes with role-based routing, and API service with new endpoints.",
+      "status": "completed",
+      "dependencies": [],
+      "assignee": "@Coder-FE"
+    },
+    {
+      "id": "MODAL-ENHANCEMENT",
+      "name": "Enhance Modal with Standardized Layout and Size Presets",
+      "description": "Add modal size presets (sm/md/lg/fullscreen), add header/body/footer slots with flex/grid, update dashboard table and design docs",
+      "status": "completed",
+      "dependencies": [],
+      "assignee": "@Coder-FE"
+    },
+    {
+      "id": "DASHBOARD-RECENT-BOOKINGS-REFINE",
+      "name": "Refine Recent Bookings Table Spacing",
+      "description": "Increase table cell padding and spacing",
       "status": "completed",
       "dependencies": [],
       "assignee": "@Coder-FE"

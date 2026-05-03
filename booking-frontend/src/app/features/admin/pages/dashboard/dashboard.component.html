@@ -133,23 +133,23 @@
         <table class="w-full text-sm">
           <thead>
             <tr class="border-b border-border text-left text-text-secondary">
-              <th class="pb-3 font-medium">Service</th>
-              <th class="pb-3 font-medium">Customer</th>
-              <th class="pb-3 font-medium">Date</th>
-              <th class="pb-3 font-medium">Status</th>
-              <th class="pb-3 font-medium text-right">Actions</th>
+              <th class="pb-4 font-medium">Service</th>
+              <th class="pb-4 font-medium">Customer</th>
+              <th class="pb-4 font-medium">Date</th>
+              <th class="pb-4 font-medium">Status</th>
+              <th class="pb-4 font-medium text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
             @for (booking of recentBookings(); track booking.id) {
               <tr class="border-b border-border-light hover:bg-bg-secondary transition-colors">
-                <td class="py-3 text-text-primary font-medium">{{ booking.serviceName }}</td>
-                <td class="py-3 text-text-secondary">{{ booking.userName }}</td>
-                <td class="py-3 text-text-secondary">{{ booking.appointmentDate | date:'MMM d, y' }}</td>
-                <td class="py-3">
+                <td class="py-4 text-text-primary font-medium">{{ booking.serviceName }}</td>
+                <td class="py-4 text-text-secondary">{{ booking.userName }}</td>
+                <td class="py-4 text-text-secondary">{{ booking.appointmentDate | date:'MMM d, y' }}</td>
+                <td class="py-4">
                   <app-badge [status]="mapStatus(booking.status)"></app-badge>
                 </td>
-                <td class="py-3 text-right">
+                <td class="py-4 text-right">
                   <app-button label="View" variant="ghost" size="sm" icon="pi pi-eye"></app-button>
                 </td>
               </tr>
@@ -157,8 +157,8 @@
           </tbody>
         </table>
       </div>
-      <div class="mt-4 text-right">
-        <a routerLink="/admin/appointments" class="text-primary-600 text-sm hover:underline view-all-link">View All</a>
+      <div class="mt-6 text-right">
+        <a routerLink="/admin/appointments" class="text-primary-start text-sm hover:underline view-all-link">View All</a>
       </div>
     </app-card>
   }
