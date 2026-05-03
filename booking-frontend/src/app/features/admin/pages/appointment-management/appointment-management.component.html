@@ -25,7 +25,7 @@
   @if (!vm().isLoading) {
     <!-- Stats Summary -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-      <app-card variant="elevated">
+      <app-card variant="sharp">
         <div class="flex items-center gap-4 p-2">
           <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
             <i class="pi pi-calendar text-blue-600 text-xl"></i>
@@ -37,7 +37,7 @@
         </div>
       </app-card>
 
-      <app-card variant="elevated">
+      <app-card variant="sharp">
         <div class="flex items-center gap-4 p-2">
           <div class="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
             <i class="pi pi-clock text-amber-600 text-xl"></i>
@@ -49,7 +49,7 @@
         </div>
       </app-card>
 
-      <app-card variant="elevated">
+      <app-card variant="sharp">
         <div class="flex items-center gap-4 p-2">
           <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
             <i class="pi pi-check-circle text-green-600 text-xl"></i>
@@ -61,7 +61,7 @@
         </div>
       </app-card>
 
-      <app-card variant="elevated">
+      <app-card variant="sharp">
         <div class="flex items-center gap-4 p-2">
           <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
             <i class="pi pi-ban text-red-600 text-xl"></i>
@@ -137,7 +137,7 @@
 
     <!-- Calendar View -->
     @if (viewMode() === 'calendar') {
-      <app-card variant="elevated" header="Appointment Calendar">
+      <app-card variant="sharp" header="Appointment Calendar">
         <div class="p-2">
           <div class="grid grid-cols-7 gap-1 mb-2">
             @for (day of ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']; track day) {

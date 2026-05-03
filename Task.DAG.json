@@ -151,6 +151,14 @@
       "status": "completed",
       "dependencies": ["PHASE2-ATOMIC-REDESIGN"],
       "assignee": "@Coder-FE"
+    },
+    {
+      "id": "PHASE4-DASHBOARD-REDESIGN",
+      "name": "Phase 4: Dashboard Page Redesign",
+      "description": "Rewrite dashboard to match prototype: welcome card, stats cards with progress bars, booking trends chart with dual-axis, booking distribution (doughnut+bar), recent bookings (responsive table/cards), quick booking form, service popularity with progress bars, staff workload, system status. Update chart colors to prototype palette (#00c6ff).",
+      "status": "completed",
+      "dependencies": ["PHASE3-LAYOUT-REDESIGN"],
+      "assignee": "@Coder-FE"
     }
   ]
 }
