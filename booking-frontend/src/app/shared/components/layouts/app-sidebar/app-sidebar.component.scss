@@ -1,3 +1,8 @@
 :host {
   display: block;
 }
+
+/* Desktop sidebar background */
+.desktop-sidebar {
+  background: var(--color-bg-primary, #ffffff);
+}

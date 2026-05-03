@@ -2,10 +2,8 @@
   <!-- Page Header -->
   <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
     <div>
-      <h1 class="text-2xl sm:text-display font-bold text-text-primary">Dashboard</h1>
-      <p class="text-sm text-text-secondary mt-1 dashboard-subtitle">Overview of your booking system</p>
+      <p class="text-sm text-text-secondary dashboard-date">{{ today | date:'longDate' }}</p>
     </div>
-    <p class="text-sm text-text-secondary dashboard-date">{{ today | date:'longDate' }}</p>
   </div>
 
   <!-- Quick Actions -->

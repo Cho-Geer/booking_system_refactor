@@ -12,7 +12,7 @@ import { AppSidebarComponent, SidebarItem, SidebarSection } from '../app-sidebar
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [RouterOutlet, NgClass, AppHeaderComponent, AppSidebarComponent],
+  imports: [RouterOutlet, AppHeaderComponent, AppSidebarComponent],
   templateUrl: './app-layout.component.html',
   styleUrl: './app-layout.component.scss',
 })
@@ -37,14 +37,11 @@ export class AppLayoutComponent implements OnInit {
   readonly navLinks = computed<NavLink[]>(() => {
     if (this.isAdmin()) {
       return [
-        { label: '仪表盘', route: '/admin', icon: 'pi pi-chart-bar' },
-        { label: '预约服务', route: '/booking/services', icon: 'pi pi-calendar' },
         { label: '我的预约', route: '/my-bookings', icon: 'pi pi-list' },
         { label: '个人资料', route: '/profile', icon: 'pi pi-user' },
       ];
     }
     return [
-      { label: '预约服务', route: '/booking/services', icon: 'pi pi-calendar' },
       { label: '我的预约', route: '/my-bookings', icon: 'pi pi-list' },
       { label: '个人资料', route: '/profile', icon: 'pi pi-user' },
     ];
@@ -55,40 +52,41 @@ export class AppLayoutComponent implements OnInit {
       return [
         { label: '仪表盘', route: '/admin', icon: 'pi pi-chart-bar' },
         { label: '预约服务', route: '/booking/services', icon: 'pi pi-calendar' },
-        { label: '我的预约', route: '/my-bookings', icon: 'pi pi-list' },
-        { label: '个人资料', route: '/profile', icon: 'pi pi-user' },
       ];
     }
     return [
       { label: '预约服务', route: '/booking/services', icon: 'pi pi-calendar' },
-      { label: '我的预约', route: '/my-bookings', icon: 'pi pi-list' },
-      { label: '个人资料', route: '/profile', icon: 'pi pi-user' },
     ];
   });
 
   readonly sidebarSections = computed<SidebarSection[]>(() => {
-    if (this.isAdmin()) {
-      return [
-        {
-          title: 'Main',
-          items: [
-            { label: '仪表盘', route: '/admin', icon: 'pi pi-chart-bar' },
-            { label: '预约服务', route: '/booking/services', icon: 'pi pi-calendar' },
-          ],
-        },
-        {
-          title: 'Management',
-          items: [
-            { label: '我的预约', route: '/my-bookings', icon: 'pi pi-list' },
-            { label: '个人资料', route: '/profile', icon: 'pi pi-user' },
-          ],
-        },
-      ];
-    }
+    // No sections - flat navigation now
     return [];
   });
 
-  readonly menuItems = computed<MenuItem[]>(() => []);
+  readonly menuItems = computed<MenuItem[]>(() => [
+    {
+      label: this.userName() ?? 'User',
+      items: [
+        {
+          label: '个人资料',
+          icon: 'pi pi-user',
+          routerLink: '/profile',
+        },
+        {
+          label: '安全设置',
+          icon: 'pi pi-lock',
+          command: () => this.router.navigate(['/profile']),
+        },
+        { separator: true },
+        {
+          label: '退出登录',
+          icon: 'pi pi-sign-out',
+          command: () => this.onLogout(),
+        },
+      ],
+    },
+  ]);
 
   sidebarOpen = false;
 
@@ -99,6 +97,17 @@ export class AppLayoutComponent implements OnInit {
   async onLogout(): Promise<void> {
     await this.authStore.logout();
     await this.router.navigate(['/auth/login']);
+  }
+
+  onHeaderAction(action: string): void {
+    switch (action) {
+      case 'new-booking':
+        this.router.navigate(['/booking/services']);
+        break;
+      case 'add-service':
+        this.router.navigate(['/admin/services']);
+        break;
+    }
   }
 
   async ngOnInit(): Promise<void> {

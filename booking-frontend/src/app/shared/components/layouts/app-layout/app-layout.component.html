@@ -1,26 +1,30 @@
-<div data-testid="layout-wrapper" class="min-h-screen transition-colors duration-300"
-     [ngClass]="isAdminRoute() ? 'bg-[#F2F3F5]' : 'gradient-page-bg'">
-  <app-header [navLinks]="navLinks()"
-              [userName]="userName()"
-              [userRole]="userRole()"
-              [isAdmin]="isAdmin()"
-              [menuItems]="menuItems()"
-              (menuToggle)="onMenuToggle()"
-              (logout)="onLogout()" />
+<div data-testid="layout-container" class="layout-container">
+  <div data-testid="layout-wrapper" class="layout-wrapper">
+    <app-header [navLinks]="navLinks()"
+                [userName]="userName()"
+                [userRole]="userRole()"
+                [isAdmin]="isAdmin()"
+                [menuItems]="menuItems()"
+                (menuToggle)="onMenuToggle()"
+                (logout)="onLogout()"
+                (actionClick)="onHeaderAction($event)" />
 
-  <app-sidebar [items]="sidebarItems()"
-               [sections]="sidebarSections()"
-               [isOpen]="sidebarOpen"
-               [isAdmin]="isAdmin()"
-               [solid]="isAdminRoute()"
-               [userName]="userName()"
-               [userRole]="userRole()"
-               (close)="sidebarOpen = false" />
+    <div class="layout-content">
+      <app-sidebar [items]="sidebarItems()"
+                   [sections]="sidebarSections()"
+                   [navLinks]="navLinks()"
+                   [isOpen]="sidebarOpen"
+                   [isAdmin]="isAdmin()"
+                   [solid]="isAdminRoute()"
+                   [userName]="userName()"
+                   [userRole]="userRole()"
+                   (close)="sidebarOpen = false" />
 
-  <main class="pt-16 lg:pl-60 min-h-screen transition-all duration-300 z-[1] relative w-full">
-    <div class="mx-auto p-4 lg:p-6 animate-page-enter"
-         [ngClass]="isAdminRoute() ? 'max-w-6xl' : 'max-w-7xl'">
-      <router-outlet />
+      <main class="main-content">
+        <div class="content-wrapper">
+          <router-outlet />
+        </div>
+      </main>
     </div>
-  </main>
+  </div>
 </div>

@@ -39,6 +39,14 @@
       "status": "completed",
       "dependencies": ["ADMIN-DASHBOARD-REDESIGN"],
       "assignee": "@Coder-FE"
+    },
+    {
+      "id": "DEEPSEEK-LAYOUT",
+      "name": "DeepSeek-style Layout Redesign",
+      "description": "Implement DeepSeek-style layout with 48px side margins, dark sidebar with design system variables, simplify header (move nav items from sidebar), add light/dark mode support to sidebar, set main content background black.",
+      "status": "completed",
+      "dependencies": ["LAYOUT-REDESIGN"],
+      "assignee": "@Coder-FE"
     }
   ]
 }

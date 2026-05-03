@@ -2,6 +2,7 @@ import { Component, input, output } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { Avatar } from 'primeng/avatar';
+import { NavLink } from '../app-header/app-header.component';
 
 export interface SidebarItem {
   label: string;
@@ -18,13 +19,14 @@ export interface SidebarSection {
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, NgClass, Avatar],
+  imports: [RouterLink, RouterLinkActive, Avatar],
   templateUrl: './app-sidebar.component.html',
   styleUrl: './app-sidebar.component.scss',
 })
 export class AppSidebarComponent {
   readonly items = input<SidebarItem[]>([]);
   readonly sections = input<SidebarSection[]>([]);
+  readonly navLinks = input<NavLink[]>([]);
   readonly isOpen = input<boolean>(false);
   readonly isAdmin = input<boolean>(false);
 
