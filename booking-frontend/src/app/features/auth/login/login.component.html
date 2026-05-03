@@ -1,6 +1,6 @@
 <div class="login-page min-h-screen w-full gradient-page-bg flex items-center justify-center px-4 py-8">
   <div class="max-w-[450px] w-full">
-    <app-card variant="glass" styleClass="w-full">
+    <app-card variant="sharp" styleClass="w-full">
       <div class="p-6 lg:p-8">
     <!-- Tabs -->
     <div class="tabs">
@@ -24,7 +24,7 @@
 
     <!-- Error -->
     @if (error()) {
-      <div class="glass-level-1 p-4 mb-4 border-l-4 border-red-500">
+      <div class="sharp-card p-4 mb-4 border-l-4 border-red-500">
         <p class="text-sm text-red-600">{{ error() }}</p>
       </div>
     }
@@ -58,7 +58,7 @@
           <label for="password-contact">{{ contactType() === ContactType.EMAIL ? '邮箱' : '手机号' }}</label>
           <input
             id="password-contact"
-            class="glass-input"
+            class="sharp-input"
             [type]="contactType() === ContactType.EMAIL ? 'email' : 'tel'"
             formControlName="contact"
             [placeholder]="contactType() === ContactType.EMAIL ? 'Enter your email' : 'Enter your phone number'"
@@ -83,7 +83,7 @@
           <label for="password">密码</label>
           <input
             id="password"
-            class="glass-input"
+            class="sharp-input"
             type="password"
             formControlName="password"
             placeholder="Enter your password"
@@ -155,7 +155,7 @@
       </div>
 
       @if (showAntiEnumMessage()) {
-        <div class="glass-level-1 p-3 mb-4 border-l-4 border-green-500">
+        <div class="sharp-card p-3 mb-4 border-l-4 border-green-500">
           <span class="text-sm text-green-700">如果该账号存在，验证码已发送至您的{{ contactType() === ContactType.EMAIL ? '邮箱' : '手机号' }}</span>
         </div>
       }
@@ -189,7 +189,7 @@
             <label for="code-contact">{{ contactType() === ContactType.EMAIL ? '邮箱' : '手机号' }}</label>
             <input
               id="code-contact"
-              class="glass-input"
+              class="sharp-input"
               [type]="contactType() === ContactType.EMAIL ? 'email' : 'tel'"
               formControlName="contact"
               [placeholder]="contactType() === ContactType.EMAIL ? 'Enter your email' : 'Enter your phone number'"
@@ -218,7 +218,7 @@
             <div class="verify-input-wrapper">
               <input
                 id="verify-code"
-                class="glass-input"
+                class="sharp-input"
                 type="text"
                 inputmode="numeric"
                 pattern="\d{6}"

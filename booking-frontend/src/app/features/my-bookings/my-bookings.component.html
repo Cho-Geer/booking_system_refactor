@@ -28,7 +28,7 @@
   @if (isLoading()) {
     <div class="space-y-4">
       @for (item of [1,2,3]; track item) {
-        <app-card variant="glass">
+        <app-card variant="sharp">
           <div class="flex gap-4">
             <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-white/40 skeleton flex-shrink-0"></div>
             <div class="flex-1 space-y-3">
@@ -44,7 +44,7 @@
 
   <!-- Error State -->
   @if (!isLoading() && loadError()) {
-    <app-card variant="glass" styleClass="text-center p-6 sm:p-8">
+    <app-card variant="sharp" styleClass="text-center p-6 sm:p-8">
       <div class="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
         <span class="text-2xl text-red-500">!</span>
       </div>
@@ -98,7 +98,7 @@
     @if (filteredAppointments().length > 0) {
       <div class="space-y-4">
         @for (booking of filteredAppointments(); track booking.id) {
-          <app-card variant="glass" data-testid="booking-card">
+          <app-card variant="sharp" data-testid="booking-card">
             <div class="flex gap-3 sm:gap-4">
               <!-- Service image placeholder -->
               <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-gradient-to-br from-primary-start/20 to-primary-end/20 flex items-center justify-center flex-shrink-0">

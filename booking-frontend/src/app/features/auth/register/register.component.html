@@ -1,6 +1,6 @@
 <div class="register-page min-h-screen w-full gradient-page-bg flex items-center justify-center px-4 py-8">
   <div class="max-w-[480px] w-full">
-    <app-card variant="glass" styleClass="w-full">
+    <app-card variant="sharp" styleClass="w-full">
       <div class="p-6 lg:p-8">
     <h2 class="text-2xl font-bold mb-1 gradient-text">欢迎注册</h2>
     <p class="text-sm text-gray-500 mb-4">
@@ -9,7 +9,7 @@
     </p>
 
     @if (error()) {
-      <div class="glass-level-1 p-4 mb-4 border-l-4 border-red-500">
+      <div class="sharp-card p-4 mb-4 border-l-4 border-red-500">
         <p class="text-sm text-red-600">{{ error() }}</p>
       </div>
     }
@@ -56,7 +56,7 @@
           <label for="contact">{{ contactType() === ContactType.EMAIL ? '邮箱' : '手机号' }}</label>
           <input
             id="contact"
-            class="glass-input"
+            class="sharp-input"
             [type]="contactType() === ContactType.EMAIL ? 'email' : 'tel'"
             formControlName="contact"
             [placeholder]="contactType() === ContactType.EMAIL ? 'Enter your email' : 'Enter your phone number'"
@@ -90,7 +90,7 @@
           <div class="verify-input-wrapper">
             <input
               id="code"
-              class="glass-input"
+              class="sharp-input"
               type="text"
               inputmode="numeric"
               pattern="\d{6}"
@@ -123,7 +123,7 @@
           <label for="name">姓名</label>
           <input
             id="name"
-            class="glass-input"
+            class="sharp-input"
             type="text"
             formControlName="name"
             placeholder="Enter your name"
@@ -145,7 +145,7 @@
           <label for="password">密码</label>
           <input
             id="password"
-            class="glass-input"
+            class="sharp-input"
             type="password"
             formControlName="password"
             placeholder="Set login password"
@@ -164,7 +164,7 @@
           <label for="confirmPassword">确认密码</label>
           <input
             id="confirmPassword"
-            class="glass-input"
+            class="sharp-input"
             type="password"
             formControlName="confirmPassword"
             placeholder="Confirm your password"

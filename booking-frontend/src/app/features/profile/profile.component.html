@@ -7,7 +7,7 @@
 
   @if (user(); as u) {
     <!-- Avatar Card -->
-    <app-card variant="glass" class="mb-6 text-center">
+    <app-card variant="sharp" class="mb-6 text-center">
       <div class="relative inline-flex">
         <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-primary-start to-primary-end flex items-center justify-center text-white text-xl sm:text-2xl font-bold ring-4 ring-white shadow-lg">
           {{ avatarInitials() }}
@@ -25,7 +25,7 @@
     </app-card>
 
     <!-- Profile Info Card -->
-    <app-card variant="glass" header="基本信息" headerIcon="pi pi-user" class="mb-6">
+    <app-card variant="sharp" header="基本信息" headerIcon="pi pi-user" class="mb-6">
       <div class="flex items-center justify-between mb-4">
         <div></div>
         <app-button
@@ -45,7 +45,7 @@
             <div>
               <input
                 type="text"
-                class="glass-input w-full min-h-[44px]"
+                class="sharp-input w-full min-h-[44px]"
                 [ngModel]="editName()"
                 (ngModelChange)="editName.set($event)"
                 placeholder="请输入您的姓名"
@@ -122,7 +122,7 @@
     </app-card>
 
     <!-- Account Security Card -->
-    <app-card variant="glass" header="账户安全" headerIcon="pi pi-shield" class="mb-6">
+    <app-card variant="sharp" header="账户安全" headerIcon="pi pi-shield" class="mb-6">
       <div class="flex items-center justify-between py-3">
         <div>
           <p class="text-sm font-medium text-gray-900">登录密码</p>
@@ -141,7 +141,7 @@
 
   <!-- Loading State -->
   @if (!user()) {
-    <app-card variant="glass" styleClass="text-center py-12">
+    <app-card variant="sharp" styleClass="text-center py-12">
       <div class="w-16 h-16 rounded-full bg-white/50 skeleton mx-auto mb-4"></div>
       <div class="h-5 w-32 bg-white/50 rounded skeleton mx-auto mb-3"></div>
       <div class="h-4 w-48 bg-white/50 rounded skeleton mx-auto"></div>

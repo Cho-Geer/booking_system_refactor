@@ -1,7 +1,7 @@
 <div class="confirmation-page page-enter">
   @if (!hasSelection()) {
     <div class="flex justify-center py-16">
-      <app-card variant="glass" styleClass="max-w-md w-full text-center">
+      <app-card variant="sharp" styleClass="max-w-md w-full text-center">
         <div class="py-8">
           <div class="w-16 h-16 rounded-full bg-white/50 flex items-center justify-center mx-auto mb-4">
             <span class="text-2xl">📋</span>
@@ -25,7 +25,7 @@
       </div>
 
       <!-- Booking Details Card -->
-      <app-card variant="glass" headerIcon="pi pi-calendar" header="预约详情" class="mb-5">
+      <app-card variant="sharp" headerIcon="pi pi-calendar" header="预约详情" class="mb-5">
         <div class="space-y-4">
           <div class="detail-row">
             <span class="detail-label">服务项目</span>
@@ -51,7 +51,7 @@
       </app-card>
 
       <!-- Customer Info -->
-      <app-card variant="glass" headerIcon="pi pi-user" header="客户信息" class="mb-5">
+      <app-card variant="sharp" headerIcon="pi pi-user" header="客户信息" class="mb-5">
         <p class="text-body text-gray-700">
           {{ authStore.user()?.name || '未登录用户' }}
         </p>
@@ -64,7 +64,7 @@
 
       <!-- Error message -->
       @if (error()) {
-        <div class="glass-level-1 p-4 mb-5 border-l-4 border-red-500">
+        <div class="sharp-card p-4 mb-5 border-l-4 border-red-500">
           <p class="text-sm text-red-600">{{ error() }}</p>
         </div>
       }

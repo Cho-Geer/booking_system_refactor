@@ -1,61 +1,22 @@
-/* AppCard - Atomic component wrapper for PrimeNG p-card */
+:host ::ng-deep .p-card {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
 
-/* Card hover micro-interaction */
 .app-card-hover {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
-/* Default variant */
-.app-card--default {
-  background: var(--color-bg-primary, #ffffff);
-  border-radius: 1rem;
+.app-card--sharp {
+  background: var(--color-bg-secondary, #162032);
 }
 
-/* Glass variant */
-.app-card--glass {
-  background: var(--color-glass-light, rgba(255, 255, 255, 0.85));
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--color-glass-border, rgba(255, 255, 255, 0.3));
-  border-radius: 1rem;
+.app-card--bordered {
+  background: var(--color-bg-secondary, #162032);
+  border-color: var(--color-border, #2a3a50);
 }
 
-/* Elevated variant */
-.app-card--elevated {
-  background: var(--color-bg-primary, #ffffff);
-  border-radius: 1rem;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-}
-
-.app-card--elevated.hover-lift:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-glass-hover, 0 20px 60px rgba(102, 126, 234, 0.2));
-}
-
-/* Outlined variant */
-.app-card--outlined {
-  background: var(--color-bg-primary, #ffffff);
-  border-color: var(--color-border, #E5E6EB);
-  border-radius: 1rem;
-  box-shadow: none !important;
-}
-
-/* Dark mode adaptations */
-[data-theme="dark"] .app-card--default {
-  background: var(--color-bg-secondary, #272E3B);
-}
-
-[data-theme="dark"] .app-card--elevated {
-  background: #272E3B;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-}
-
-[data-theme="dark"] .app-card--glass {
-  background: var(--color-glass-light, rgba(39, 46, 59, 0.85));
-  border-color: var(--color-glass-border, rgba(255, 255, 255, 0.1));
-}
-
-[data-theme="dark"] .app-card--outlined {
-  background: var(--color-bg-secondary, #272E3B);
-  border-color: var(--color-border, #4E5969);
+.app-card--flat {
+  background: transparent;
 }

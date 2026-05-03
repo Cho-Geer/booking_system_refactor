@@ -1,5 +1,5 @@
 <div class="min-h-screen flex items-center justify-center gradient-page-bg px-4 py-8">
-  <app-card variant="glass" styleClass="max-w-md w-full text-center">
+  <app-card variant="sharp" styleClass="max-w-md w-full text-center">
     <!-- Success Checkmark Icon -->
     <div class="success-icon-wrapper mx-auto mb-6 mt-4">
       <div class="success-icon-circle animate-success-pop">
@@ -19,7 +19,7 @@
 
     <!-- Booking Details -->
     @if (selectedSlot(); as slot) {
-      <div class="glass-level-1 p-5 mb-6 text-left">
+      <div class="sharp-card p-5 mb-6 text-left">
         <h2 class="text-base font-semibold text-gray-800 mb-3">预约信息</h2>
         <dl class="space-y-2.5">
           <div class="flex justify-between text-sm">
@@ -33,7 +33,7 @@
         </dl>
       </div>
     } @else {
-      <div class="glass-level-1 p-5 mb-6">
+      <div class="sharp-card p-5 mb-6">
         <p class="text-gray-500 text-sm">暂无预约详情</p>
       </div>
     }

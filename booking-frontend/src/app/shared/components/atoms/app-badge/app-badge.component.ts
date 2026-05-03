@@ -29,9 +29,6 @@ export class AppBadgeComponent {
   /** Custom label text. If not provided, uses status default label. */
   readonly customLabel = input<string>();
 
-  /** Glass mode - applies translucent styling. */
-  readonly glass = input<boolean>(false);
-
   /** Size of the badge. */
   readonly size = input<BadgeSize>('md');
 
@@ -43,7 +40,6 @@ export class AppBadgeComponent {
     return this.customLabel() ?? BADGE_LABELS[this.status()];
   }
 
-  /** Combined CSS classes for the badge. */
   get statusClass(): string {
     const classes: string[] = [
       'app-badge',
@@ -51,10 +47,6 @@ export class AppBadgeComponent {
       `app-badge--${this.size()}`,
       `app-badge--${this.shape()}`,
     ];
-
-    if (this.glass()) {
-      classes.push('app-badge--glass');
-    }
 
     return classes.join(' ');
   }

@@ -135,6 +135,14 @@
       "status": "completed",
       "dependencies": [],
       "assignee": "@Coder-FE"
+    },
+    {
+      "id": "PHASE2-ATOMIC-REDESIGN",
+      "name": "Phase 2: Atomic Component Redesign",
+      "description": "Update app-card (sharp/bordered/flat variants), app-button (prototype colors), app-badge (removed glass mode), app-modal (fade-in animation, sharp-card style), app-input (sharp-input class). Replace all glass references across HTML files.",
+      "status": "completed",
+      "dependencies": ["PHASE1-THEME-REDESIGN"],
+      "assignee": "@Coder-FE"
     }
   ]
 }

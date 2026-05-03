@@ -1,19 +1,28 @@
-/* AppInput - Atomic component wrapper for PrimeNG p-inputtext */
+:host {
+  display: block;
+}
 
-/* Glass input variant with focus glow effect */
-.glass-input {
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: 12px;
+.sharp-input {
+  background: var(--color-bg-primary, #0c1220);
+  border: 1px solid var(--color-border, #2a3a50);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  color: var(--color-text-primary, #e2e8f0);
+  font-size: 0.875rem;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   outline: none;
+  width: 100%;
 }
 
-.glass-input:focus {
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2), 0 4px 12px rgba(102, 126, 234, 0.1);
+.sharp-input::placeholder {
+  color: var(--color-text-disabled, #475569);
 }
 
-.glass-input:hover:not(:focus) {
-  border-color: rgba(102, 126, 234, 0.3);
+.sharp-input:focus {
+  border-color: #00c6ff;
+  box-shadow: 0 0 0 2px rgba(0, 198, 255, 0.2);
+}
+
+.sharp-input:hover:not(:focus) {
+  border-color: rgba(0, 198, 255, 0.3);
 }
