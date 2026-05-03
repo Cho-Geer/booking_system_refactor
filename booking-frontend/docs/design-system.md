@@ -217,7 +217,30 @@ Base unit: 4px
 - `md`: 20px height, 8px horizontal padding
 - `lg`: 24px height, 12px horizontal padding
 
-### 6.4 Chart Component (NEW)
+### 6.4 Modal Component (Updated)
+
+**Integration:** Wraps PrimeNG p-dialog with standardized slots
+
+**Structure:**
+- `[app-modal-header]` / `[appModalHeader]` (optional, replaces default title)
+- Default `ng-content` (body)
+- `[app-modal-footer]` / `[appModalFooter]` (footer actions)
+
+**Size Presets:**
+- `sm`: 400px max width
+- `md`: 600px max width (default)
+- `lg`: 900px max width
+- `fullscreen`: Full screen, no border radius
+
+**Layout Patterns:**
+- **Footer Flex Layout**: Row-reverse on desktop, column-reverse on mobile (primary action on right/top)
+- **Body Flex**: Column layout with gap spacing
+
+**States:**
+- Open: glass-in animation
+- Responsive: fullscreen mode on small screens for `fullscreen` size
+
+### 6.5 Chart Component (NEW)
 
 **Integration:** Chart.js via PrimeNG p-chart
 

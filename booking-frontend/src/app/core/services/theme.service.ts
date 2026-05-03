@@ -11,8 +11,8 @@ const LIGHT_VALUE = 'light';
 export class ThemeService {
   private readonly destroyRef = inject(DestroyRef);
 
-  /** Whether the current theme is dark mode. */
-  readonly isDarkMode = signal<boolean>(false);
+  /** Whether the current theme is dark mode. Dark-first default. */
+  readonly isDarkMode = signal<boolean>(true);
 
   constructor() {
     // 1. Initialize from localStorage or system preference

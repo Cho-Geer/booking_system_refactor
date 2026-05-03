@@ -11,5 +11,18 @@
   [appendTo]="appendTo() || 'body'"
   (visibleChange)="visibleChange.emit($event)"
 >
-  <ng-content />
+  <!-- Header slot -->
+  <ng-content select="[app-modal-header]" />
+  <ng-content select="[appModalHeader]" />
+  
+  <!-- Body slot -->
+  <div class="app-modal-body">
+    <ng-content />
+  </div>
+  
+  <!-- Footer slot -->
+  <div class="app-modal-footer">
+    <ng-content select="[app-modal-footer]" />
+    <ng-content select="[appModalFooter]" />
+  </div>
 </p-dialog>

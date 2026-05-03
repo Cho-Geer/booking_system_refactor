@@ -12,6 +12,8 @@ export type DialogPosition =
   | 'bottomleft'
   | 'bottomright';
 
+export type ModalSize = 'sm' | 'md' | 'lg' | 'fullscreen';
+
 @Component({
   selector: 'app-modal',
   standalone: true,
@@ -62,13 +64,33 @@ export class AppModalComponent {
   /** Target element to attach the dialog. */
   readonly appendTo = input<string>();
 
+  /** Size of the modal. */
+  readonly size = input<ModalSize>('md');
+
   /** Emitted when the dialog visibility changes. */
   readonly visibleChange = output<boolean>();
 
-  /** Computed style class with glass animation added. */
+  /** Computed style class with glass animation and size added. */
   get combinedStyleClass(): string {
     const base = this.styleClass() || '';
     const animClass = 'animate-glass-in';
-    return base ? `${base} ${animClass}` : animClass;
+    const sizeClass = this.getSizeClass();
+    return [base, animClass, sizeClass].filter(Boolean).join(' ');
+  }
+
+  /** Get style class for modal size. */
+  private getSizeClass(): string {
+    switch (this.size()) {
+      case 'sm':
+        return 'app-modal--sm';
+      case 'md':
+        return 'app-modal--md';
+      case 'lg':
+        return 'app-modal--lg';
+      case 'fullscreen':
+        return 'app-modal--fullscreen';
+      default:
+        return '';
+    }
   }
 }
