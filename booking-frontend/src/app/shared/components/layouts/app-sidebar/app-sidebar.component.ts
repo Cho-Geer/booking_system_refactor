@@ -1,7 +1,5 @@
 import { Component, input, output } from '@angular/core';
-import { NgClass } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { Avatar } from 'primeng/avatar';
 import { NavLink } from '../app-header/app-header.component';
 
 export interface SidebarItem {
@@ -19,7 +17,7 @@ export interface SidebarSection {
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, Avatar],
+  imports: [RouterLink, RouterLinkActive],
   templateUrl: './app-sidebar.component.html',
   styleUrl: './app-sidebar.component.scss',
 })
@@ -28,15 +26,9 @@ export class AppSidebarComponent {
   readonly sections = input<SidebarSection[]>([]);
   readonly navLinks = input<NavLink[]>([]);
   readonly isOpen = input<boolean>(false);
-  readonly isAdmin = input<boolean>(false);
-
-  /** Solid mode — uses white background without blur for admin panels. */
-  readonly solid = input<boolean>(true);
-
   readonly userName = input<string>();
   readonly userRole = input<string>();
   readonly userAvatar = input<string>();
-
   readonly close = output<void>();
 
   onClose(): void {

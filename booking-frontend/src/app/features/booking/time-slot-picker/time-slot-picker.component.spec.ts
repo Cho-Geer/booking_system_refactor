@@ -381,7 +381,7 @@ describe('TimeSlotPickerComponent', () => {
       component = fixture.componentInstance;
       try { fixture.detectChanges(); } catch { /* NG0100 expected */ }
 
-      const error = fixture.nativeElement.querySelector('[class*="glass-level-1"]');
+      const error = fixture.nativeElement.querySelector('[class*="sharp-card"]');
       expect(error).toBeTruthy();
       expect(error.textContent).toContain('Failed to load slots');
     });

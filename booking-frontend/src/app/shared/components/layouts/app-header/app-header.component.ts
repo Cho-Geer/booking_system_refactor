@@ -35,7 +35,6 @@ export class AppHeaderComponent {
 
   sidebarOpen = false;
 
-  /** Current vertical scroll position in pixels. */
   readonly scrollY = signal(0);
 
   @HostListener('window:scroll')

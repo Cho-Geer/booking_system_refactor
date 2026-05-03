@@ -17,7 +17,7 @@ export interface ToastMessage {
   template: `
     <div class="fixed top-4 right-4 z-50 flex flex-col gap-3">
       <div *ngFor="let msg of messages"
-           class="glass-level-2 px-5 py-4 min-w-[320px] max-w-md flex items-start gap-3 cursor-pointer animate-toast-slide-in"
+           class="sharp-card px-5 py-4 min-w-[320px] max-w-md flex items-start gap-3 cursor-pointer animate-fade-in"
            [ngClass]="{'border-l-4': true}"
            [class.border-green-500]="msg.type === 'success'"
            [class.border-yellow-500]="msg.type === 'warning'"

@@ -24,7 +24,7 @@ describe('AppToastComponent', () => {
       { id: '2', type: 'error', title: 'Error', content: 'Fail' },
     ];
     fixture.detectChanges();
-    const items = fixture.nativeElement.querySelectorAll('.glass-level-2');
+    const items = fixture.nativeElement.querySelectorAll('.sharp-card');
     expect(items.length).toBe(2);
   });
 

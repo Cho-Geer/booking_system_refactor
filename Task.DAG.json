@@ -143,6 +143,14 @@
       "status": "completed",
       "dependencies": ["PHASE1-THEME-REDESIGN"],
       "assignee": "@Coder-FE"
+    },
+    {
+      "id": "PHASE3-LAYOUT-REDESIGN",
+      "name": "Phase 3: Layout Components Redesign",
+      "description": "Redesign AppSidebar (card-bg, gradient brand, accent-blue active links, user profile), AppHeader (search bar, notification/message/settings icons, solid bg), AppLayout (dark container bg, sidebar+content layout). Clean remaining glass references from register-form, toast, empty-state, spec files.",
+      "status": "completed",
+      "dependencies": ["PHASE2-ATOMIC-REDESIGN"],
+      "assignee": "@Coder-FE"
     }
   ]
 }

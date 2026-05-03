@@ -325,27 +325,27 @@ describe('RegisterFormComponent', () => {
   });
 
   describe('glassmorphism CSS classes', () => {
-    it('[RED] should have glass-input class on text inputs', () => {
+    it('[RED] should have sharp-input class on text inputs', () => {
       const inputs = fixture.nativeElement.querySelectorAll('input[type="text"], input[type="password"]');
       inputs.forEach((input: HTMLElement) => {
-        expect(input.classList.contains('glass-input')).toBe(true);
+        expect(input.classList.contains('sharp-input')).toBe(true);
       });
     });
 
-    it('[RED] should have btn-primary-glass class on submit button', () => {
+    it('[RED] should have bg-accent-blue class on submit button', () => {
       const buttons = fixture.nativeElement.querySelectorAll('button');
       const submitBtn = Array.from(buttons).find(
         (btn: HTMLButtonElement) => btn.textContent?.includes('完成注册')
       ) as HTMLButtonElement;
-      expect(submitBtn.classList.contains('btn-primary-glass')).toBe(true);
+      expect(submitBtn.classList.contains('bg-accent-blue')).toBe(true);
     });
 
-    it('[RED] should have btn-secondary-glass class on back button', () => {
+    it('[RED] should have border-border-color class on back button', () => {
       const buttons = fixture.nativeElement.querySelectorAll('button');
       const backBtn = Array.from(buttons).find(
         (btn: HTMLButtonElement) => btn.textContent?.includes('返回')
       ) as HTMLButtonElement;
-      expect(backBtn.classList.contains('btn-secondary-glass')).toBe(true);
+      expect(backBtn.classList.contains('border-border-color')).toBe(true);
     });
   });
 });

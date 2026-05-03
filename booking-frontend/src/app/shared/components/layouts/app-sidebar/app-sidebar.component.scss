@@ -1,8 +1,7 @@
-:host {
-  display: block;
+.sidebar {
+  background: var(--color-bg-secondary, #162032);
 }
 
-/* Desktop sidebar background */
-.desktop-sidebar {
-  background: var(--color-bg-primary, #ffffff);
+[data-theme="light"] .sidebar {
+  background: rgba(255, 255, 255, 1);
 }

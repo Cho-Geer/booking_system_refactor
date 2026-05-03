@@ -72,40 +72,30 @@ describe('AppCardComponent', () => {
       expect(combined).toContain('app-card--default');
     });
 
-    it('[RED] should apply glass variant classes when variant is glass', () => {
-      fixture.componentRef.setInput('variant', 'glass');
+    it('[RED] should apply sharp variant classes when variant is sharp', () => {
+      fixture.componentRef.setInput('variant', 'sharp');
       fixture.detectChanges();
 
       const combined = component.combinedStyleClass;
-      expect(combined).toContain('app-card--glass');
-      expect(combined).toContain('glass-level-1');
-      expect(combined).toContain('shadow-glass');
+      expect(combined).toContain('app-card--sharp');
+      expect(combined).toContain('sharp-card');
     });
 
-    it('[RED] should apply elevated variant classes', () => {
-      fixture.componentRef.setInput('variant', 'elevated');
+    it('[RED] should apply bordered variant classes', () => {
+      fixture.componentRef.setInput('variant', 'bordered');
       fixture.detectChanges();
 
       const combined = component.combinedStyleClass;
-      expect(combined).toContain('app-card--elevated');
-      expect(combined).toContain('shadow-xl');
+      expect(combined).toContain('app-card--bordered');
     });
 
-    it('[RED] should apply outlined variant classes', () => {
-      fixture.componentRef.setInput('variant', 'outlined');
+    it('[RED] should apply flat variant classes', () => {
+      fixture.componentRef.setInput('variant', 'flat');
       fixture.detectChanges();
 
       const combined = component.combinedStyleClass;
-      expect(combined).toContain('app-card--outlined');
-      expect(combined).toContain('border');
-    });
-
-    it('[RED] should still support legacy glass input mapped to glass variant', () => {
-      fixture.componentRef.setInput('glass', true);
-      fixture.detectChanges();
-
-      const combined = component.combinedStyleClass;
-      expect(combined).toContain('app-card--glass');
+      expect(combined).toContain('app-card--flat');
+      expect(combined).toContain('shadow-none');
     });
   });
 
