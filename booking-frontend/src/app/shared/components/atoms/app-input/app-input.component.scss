@@ -19,10 +19,15 @@
 }
 
 .sharp-input:focus {
-  border-color: #00c6ff;
-  box-shadow: 0 0 0 2px rgba(0, 198, 255, 0.2);
+  border-color: #2ecc71;
+  box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.15);
+}
+
+.sharp-input.error {
+  border-color: #e74c3c;
+  box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.15);
 }
 
 .sharp-input:hover:not(:focus) {
-  border-color: rgba(0, 198, 255, 0.3);
+  border-color: rgba(46, 204, 113, 0.3);
 }

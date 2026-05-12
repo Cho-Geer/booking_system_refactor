@@ -10,10 +10,11 @@ import {
   UpdateAppointmentStatusDto,
   BatchCancelDto,
   BatchCancelResponseDto,
+  CreateAdminAppointmentDto,
   AdminAppointmentDto,
 } from "../dto/admin-appointment.dto";
 import { MetaDto } from "../../../common/dto/base.dto";
-import { toAdminAppointmentDto } from "../mappers/appointment.mapper";
+import { toAdminAppointmentDto, generateAppointmentNumber } from "../mappers/appointment.mapper";
 
 /**
  * Valid state transitions for admin appointment status updates.
@@ -32,6 +33,73 @@ export class AdminAppointmentsService {
   private readonly logger = new Logger(AdminAppointmentsService.name);
 
   constructor(private readonly prisma: PrismaService) {}
+
+  /**
+   * Create a new appointment on behalf of a customer.
+   * Validates user and service exist, auto-assigns time slot if not provided,
+   * generates appointment number, and creates the appointment record.
+   */
+  async create(
+    dto: CreateAdminAppointmentDto,
+    performedBy?: string,
+  ): Promise<AdminAppointmentDto> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: dto.userId },
+    });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${dto.userId} not found`);
+    }
+
+    const service = await this.prisma.service.findUnique({
+      where: { id: dto.serviceId },
+    });
+    if (!service) {
+      throw new NotFoundException(`Service with ID ${dto.serviceId} not found`);
+    }
+
+    let timeSlotId = dto.timeSlotId;
+    if (!timeSlotId) {
+      const slot = await this.prisma.timeSlot.findFirst({
+        where: { isActive: true },
+        orderBy: { startTime: "asc" },
+      });
+      if (!slot) {
+        throw new BadRequestException("No available time slot found");
+      }
+      timeSlotId = slot.id;
+    } else {
+      const timeSlot = await this.prisma.timeSlot.findUnique({
+        where: { id: timeSlotId },
+      });
+      if (!timeSlot) {
+        throw new NotFoundException(`Time slot with ID ${timeSlotId} not found`);
+      }
+    }
+
+    const appointment = await this.prisma.appointment.create({
+      data: {
+        userId: dto.userId,
+        serviceId: dto.serviceId,
+        timeSlotId,
+        appointmentDate: new Date(dto.appointmentDate),
+        appointmentNumber: generateAppointmentNumber(),
+        customerInfo: {},
+        status: "PENDING",
+        remarks: dto.notes ?? null,
+      },
+      include: {
+        user: { select: { name: true } },
+        service: { select: { name: true } },
+        timeSlot: true,
+      },
+    });
+
+    this.logger.log(
+      `Admin created appointment ${appointment.appointmentNumber} for user ${dto.userId}${performedBy ? ` by ${performedBy}` : ""}`,
+    );
+
+    return toAdminAppointmentDto(appointment);
+  }
 
   /**
    * Retrieve paginated appointments with optional filters.
@@ -53,6 +121,7 @@ export class AdminAppointmentsService {
       endDate,
       serviceId,
       userId,
+      search,
     } = query;
 
     const skip = (page - 1) * limit;
@@ -66,6 +135,13 @@ export class AdminAppointmentsService {
     }
     if (userId) {
       where.userId = userId;
+    }
+    if (search) {
+      where.OR = [
+        { appointmentNumber: { contains: search, mode: "insensitive" } },
+        { user: { name: { contains: search, mode: "insensitive" } } },
+        { service: { name: { contains: search, mode: "insensitive" } } },
+      ];
     }
     if (startDate || endDate) {
       const dateFilter: Record<string, Date> = {};

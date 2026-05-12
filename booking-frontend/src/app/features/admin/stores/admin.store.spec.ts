@@ -4,6 +4,7 @@ import { AdminService } from '../services/admin.service';
 import {
   AdminStats,
   AdminUser,
+  StatCard,
   AdminServiceItem,
   AdminAppointment,
   AdminUsersQuery,
@@ -16,6 +17,8 @@ import {
   UpdateAppointmentStatusRequest,
   BatchCancelRequest,
   PaginatedResponse,
+  TimeDistributionItem,
+  SystemHealth,
 } from '../dto/admin.dto';
 import { of, throwError } from 'rxjs';
 
@@ -37,6 +40,8 @@ describe('AdminStore', () => {
       getAdminAppointments: jest.fn(),
       updateAppointmentStatus: jest.fn(),
       batchCancelAppointments: jest.fn(),
+      getSystemStatus: jest.fn(),
+      getTimeDistribution: jest.fn(),
     } as unknown as jest.Mocked<AdminService>;
 
     TestBed.configureTestingModule({
@@ -72,13 +77,18 @@ describe('AdminStore', () => {
   // ==========================================
 
   it('should set stats', () => {
+    const sc = (v: number, ch = 0, pos = true, tg = 1000, pp = 0): StatCard => ({
+      value: v, changePercentage: ch, isPositive: pos, target: tg, progressPercentage: pp,
+    });
     const mockStats: AdminStats = {
-      totalBookings: 100,
-      todayBookings: 10,
-      activeUsers: 50,
-      totalRevenue: 5000,
-      bookingTrend: [{ date: '2026-04-24', count: 5 }],
-      servicePopularity: [{ serviceName: 'Haircut', count: 20 }],
+      totalBookings: sc(100),
+      todayBookings: sc(10),
+      pendingBookings: sc(5),
+      activeUsers: sc(50),
+      totalRevenue: sc(5000),
+      bookingTrend: [{ date: '2026-04-24', count: 5, revenue: 250 }],
+      servicePopularity: [{ serviceName: 'Haircut', count: 20, percentage: 100 }],
+      timeDistribution: [{ hour: '09:00', count: 8 }],
     };
 
     store.setStats(mockStats);
@@ -234,9 +244,13 @@ describe('AdminStore', () => {
     });
 
     it('[RED] should fail: should call adminService.getStats and store stats', async () => {
+      const sc = (v: number, ch = 0, pos = true, tg = 1000, pp = 0): StatCard => ({
+        value: v, changePercentage: ch, isPositive: pos, target: tg, progressPercentage: pp,
+      });
       const mockStats: AdminStats = {
-        totalBookings: 100, todayBookings: 10, activeUsers: 50,
-        totalRevenue: 5000, bookingTrend: [], servicePopularity: [],
+        totalBookings: sc(100), todayBookings: sc(10), pendingBookings: sc(5), activeUsers: sc(50),
+        totalRevenue: sc(5000), bookingTrend: [], servicePopularity: [],
+        timeDistribution: [],
       };
       adminServiceMock.getStats.mockReturnValue(of(mockStats));
 
@@ -489,6 +503,78 @@ describe('AdminStore', () => {
 
       expect(adminServiceMock.batchCancelAppointments).toHaveBeenCalledWith(batchDto);
       expect(store.appointments().length).toBe(0);
+    });
+  });
+
+  // ==========================================
+  // Phase 3: Time Distribution, Staff Workload, System Health
+  // ==========================================
+
+  describe('[RED] Initial state for Phase 3 fields', () => {
+    it('[RED] should initialize timeDistribution as empty array', () => {
+      expect(store.timeDistribution()).toEqual([]);
+    });
+
+    it('[RED] should initialize systemHealth as null', () => {
+      expect(store.systemHealth()).toBeNull();
+    });
+  });
+
+  describe('[RED] loadTimeDistribution()', () => {
+    it('[RED] should fail: loadTimeDistribution is not yet defined', () => {
+      expect(store.loadTimeDistribution).toBeDefined();
+    });
+
+    it('[RED] should fail: should call adminService.getTimeDistribution and store result', async () => {
+      const mockData: TimeDistributionItem[] = [
+        { hour: '09:00', count: 8 },
+        { hour: '10:00', count: 12 },
+      ];
+      adminServiceMock.getTimeDistribution.mockReturnValue(of(mockData));
+
+      await store.loadTimeDistribution();
+
+      expect(adminServiceMock.getTimeDistribution).toHaveBeenCalled();
+      expect(store.timeDistribution()).toEqual(mockData);
+    });
+
+    it('[RED] should fail: should handle API error', async () => {
+      adminServiceMock.getTimeDistribution.mockReturnValue(
+        throwError(() => new Error('Failed to load time distribution'))
+      );
+
+      await store.loadTimeDistribution();
+
+      expect(store.error()).toBe('Failed to load time distribution');
+    });
+  });
+
+  describe('[RED] loadSystemStatus()', () => {
+    it('[RED] should fail: loadSystemStatus is not yet defined', () => {
+      expect(store.loadSystemStatus).toBeDefined();
+    });
+
+    it('[RED] should fail: should call adminService.getSystemStatus and store result', async () => {
+      const mockHealth: SystemHealth = {
+        server: 'Online', database: 'Online', api: 'Online',
+        lastBackup: '2026-05-06T02:15:00Z', uptime: '99.9%',
+      };
+      adminServiceMock.getSystemStatus.mockReturnValue(of(mockHealth));
+
+      await store.loadSystemStatus();
+
+      expect(adminServiceMock.getSystemStatus).toHaveBeenCalled();
+      expect(store.systemHealth()).toEqual(mockHealth);
+    });
+
+    it('[RED] should fail: should handle API error', async () => {
+      adminServiceMock.getSystemStatus.mockReturnValue(
+        throwError(() => new Error('Health check failed'))
+      );
+
+      await store.loadSystemStatus();
+
+      expect(store.error()).toBe('Health check failed');
     });
   });
 });

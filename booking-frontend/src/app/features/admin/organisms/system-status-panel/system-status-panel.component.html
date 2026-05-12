@@ -1,0 +1,60 @@
+<div class="sharp-card card-lift p-5 bg-card-bg cursor-pointer" (click)="toggleExpand()">
+  <div class="flex items-center justify-between mb-5">
+    <h3 class="text-base font-bold text-text-primary">System Status</h3>
+    <span class="text-text-secondary text-sm transition-transform duration-200"
+          [class.rotate-180]="expanded()">
+      &#x25BC;
+    </span>
+  </div>
+  <div class="space-y-4">
+    @for (item of statusItems(); track item.label) {
+      <div class="flex items-center justify-between">
+        <span class="text-sm text-text-primary">{{ item.label }}</span>
+        <span class="flex items-center text-xs" [class]="item.color">
+          <span class="w-2 h-2 rounded-full mr-2 inline-block"
+                [class.bg-accent-green]="item.status === 'Online'"
+                [class.bg-accent-yellow]="item.status === 'Degraded'"
+                [class.bg-accent-red]="item.status === 'Offline'"
+                [style.box-shadow]="item.status === 'Online' ? '0 0 6px rgba(46, 204, 113, 0.5)' : item.status === 'Degraded' ? '0 0 6px rgba(243, 156, 18, 0.5)' : item.status === 'Offline' ? '0 0 6px rgba(231, 76, 60, 0.5)' : ''"></span>
+          {{ item.status }}
+        </span>
+      </div>
+    }
+  </div>
+  @if (expanded() && metrics()) {
+    <div class="mt-4 pt-4 border-t border-border-color">
+      <div class="space-y-3">
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="text-text-secondary">CPU</span>
+            <span class="text-text-primary">{{ metrics()!.cpuUsage }}%</span>
+          </div>
+          <div class="h-1.5 bg-bg-card-bg-light rounded-full overflow-hidden">
+            <div class="h-full bg-accent-green rounded-full transition-all duration-300"
+                 [style.width.%]="metrics()!.cpuUsage"></div>
+          </div>
+        </div>
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="text-text-secondary">Memory</span>
+            <span class="text-text-primary">{{ metrics()!.memoryUsage }}%</span>
+          </div>
+          <div class="h-1.5 bg-bg-card-bg-light rounded-full overflow-hidden">
+            <div class="h-full bg-accent-purple rounded-full transition-all duration-300"
+                 [style.width.%]="metrics()!.memoryUsage"></div>
+          </div>
+        </div>
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="text-text-secondary">Disk</span>
+            <span class="text-text-primary">{{ metrics()!.diskUsage }}%</span>
+          </div>
+          <div class="h-1.5 bg-bg-card-bg-light rounded-full overflow-hidden">
+            <div class="h-full bg-accent-green rounded-full transition-all duration-300"
+                 [style.width.%]="metrics()!.diskUsage"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

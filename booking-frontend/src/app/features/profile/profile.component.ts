@@ -1,5 +1,4 @@
 import { Component, inject, signal, computed } from '@angular/core';
-import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthStore, User } from '../../stores/auth/auth.store';
@@ -14,7 +13,6 @@ import { AppBadgeComponent } from '../../shared/components/atoms/app-badge/app-b
   standalone: true,
   imports: [
     CommonModule,
-    RouterModule,
     FormsModule,
     AppCardComponent,
     AppButtonComponent,

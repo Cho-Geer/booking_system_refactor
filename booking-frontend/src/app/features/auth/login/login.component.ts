@@ -7,7 +7,7 @@ import {
   ValidationErrors,
   AbstractControl,
 } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthStore } from '../../../stores/auth/auth.store';
 import { ApiService } from '../../../core/services/api.service';
 import { SocketService } from '../../../core/services/socket.service';
@@ -67,7 +67,7 @@ function contactFormatValidator(type: ContactType): ValidatorFn {
   standalone: true,
   imports: [
     ReactiveFormsModule,
-    RouterModule,
+    RouterLink,
     CommonModule,
     FormsModule,
     AppCardComponent,

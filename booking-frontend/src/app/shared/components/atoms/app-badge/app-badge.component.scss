@@ -5,26 +5,26 @@
 .app-badge {
   display: inline-flex;
   align-items: center;
-  font-weight: 500;
+  font-weight: 600;
   border: 1px solid transparent;
   line-height: 1;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
 .app-badge--sm {
-  height: 16px;
-  padding: 0 6px;
-  font-size: 0.625rem;
-}
-
-.app-badge--md {
-  height: 20px;
+  height: 22px;
   padding: 0 8px;
   font-size: 0.75rem;
 }
 
+.app-badge--md {
+  height: 26px;
+  padding: 0 10px;
+  font-size: 0.8125rem;
+}
+
 .app-badge--lg {
-  height: 24px;
+  height: 30px;
   padding: 0 12px;
   font-size: 0.875rem;
 }
@@ -46,9 +46,9 @@
 }
 
 .app-badge--completed {
-  background: rgba(0, 198, 255, 0.15);
-  color: #00c6ff;
-  border-color: rgba(0, 198, 255, 0.3);
+  background: rgba(46, 204, 113, 0.15);
+  color: #2ecc71;
+  border-color: rgba(46, 204, 113, 0.3);
 }
 
 .app-badge--cancelled {
@@ -64,9 +64,9 @@
 }
 
 .app-badge--processing {
-  background: rgba(0, 198, 255, 0.1);
-  color: #00c6ff;
-  border-color: rgba(0, 198, 255, 0.2);
+  background: rgba(46, 204, 113, 0.1);
+  color: #2ecc71;
+  border-color: rgba(46, 204, 113, 0.2);
 }
 
 .app-badge--error {

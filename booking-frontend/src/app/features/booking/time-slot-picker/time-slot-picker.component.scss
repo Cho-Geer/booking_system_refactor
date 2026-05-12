@@ -89,10 +89,10 @@
 
 /* Selected state - gradient border */
 .slot-selected {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  background: var(--color-primary, #2ecc71) !important;
   color: white;
   border-color: transparent;
-  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 8px 32px rgba(46, 204, 113, 0.3);
   transform: translateY(-1px);
 }
 

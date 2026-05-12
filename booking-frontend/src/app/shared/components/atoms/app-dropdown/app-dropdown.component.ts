@@ -15,6 +15,9 @@ export class AppDropdownComponent {
   /** An array of selectable items. */
   readonly options = input<unknown[]>([]);
 
+  /** The currently selected value. */
+  readonly value = input<string>('');
+
   /** Name of the label field of an option. */
   readonly optionLabel = input<string>();
 

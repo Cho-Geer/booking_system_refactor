@@ -24,7 +24,7 @@
   min-height: 44px;
 
   &.active {
-    color: var(--color-primary, #667eea);
+    color: var(--color-primary, #2ecc71);
 
     &::after {
       content: '';
@@ -33,12 +33,12 @@
       left: 0;
       right: 0;
       height: 2px;
-      background-color: var(--color-primary, #667eea);
+      background-color: var(--color-primary, #2ecc71);
     }
   }
 
   &:hover {
-    color: var(--color-primary, #667eea);
+    color: var(--color-primary, #2ecc71);
   }
 }
 
@@ -59,7 +59,7 @@
 }
 
 .register-link {
-  color: var(--color-primary, #667eea);
+  color: var(--color-primary, #2ecc71);
   text-decoration: none;
   font-size: 0.9rem;
 
@@ -75,7 +75,7 @@
 
     &.active {
       color: #F2F3F5;
-      border-bottom-color: #667eea;
+      border-bottom-color: #2ecc71;
     }
   }
 
@@ -85,7 +85,7 @@
     color: #A0A8B0;
 
     &.active {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: var(--color-primary, #2ecc71);
       color: #ffffff;
       border-color: transparent;
     }

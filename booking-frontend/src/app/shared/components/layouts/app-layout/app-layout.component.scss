@@ -3,37 +3,42 @@
 }
 
 .layout-container {
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   background: var(--color-bg-primary, #0c1220);
 }
 
 .layout-wrapper {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .layout-content {
   display: flex;
   flex: 1;
-  gap: 0;
-  min-height: calc(100vh - 64px);
+  overflow: hidden;
+  min-height: 0;
+  align-items: stretch;
 }
 
 .main-content {
   flex: 1;
-  min-height: calc(100vh - 64px);
+  height: 100%;
   overflow-y: auto;
 }
 
-.content-wrapper {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 1.5rem;
+/* Subtle background grid pattern for admin dashboard */
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(42, 58, 80, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(42, 58, 80, 0.08) 1px, transparent 1px);
+  background-size: 40px 40px;
 }
 
-@media (max-width: 640px) {
-  .content-wrapper {
-    padding: 1rem;
-  }
+[data-theme="light"] .bg-grid {
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
 }

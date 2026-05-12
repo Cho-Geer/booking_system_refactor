@@ -1,5 +1,4 @@
 :host ::ng-deep .p-dialog {
-  animation: fadeIn 0.3s ease-in-out;
   background: var(--color-bg-secondary, #162032);
   border: 1px solid var(--color-border, #2a3a50);
   border-radius: 8px;
@@ -30,7 +29,7 @@
 }
 
 :host ::ng-deep .p-dialog .p-dialog-header-icon:hover {
-  color: #00c6ff;
+  color: #2ecc71;
 }
 
 .app-modal-body {
@@ -46,12 +45,39 @@
   margin-top: 1.5rem;
 }
 
+/* Dialog form inputs: consistent hover/focus with green border + glow */
+:host ::ng-deep .p-inputtext,
+:host ::ng-deep .p-textarea,
+:host ::ng-deep .p-select,
+:host ::ng-deep .p-inputnumber,
+:host ::ng-deep .p-datepicker .p-datepicker-dropdown {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+:host ::ng-deep .p-inputtext:enabled:hover,
+:host ::ng-deep .p-textarea:enabled:hover,
+:host ::ng-deep .p-select:not(.p-disabled):hover,
+:host ::ng-deep .p-inputnumber .p-inputtext:enabled:hover,
+:host ::ng-deep .p-datepicker .p-datepicker-dropdown:not(:disabled):hover {
+  border-color: var(--color-accent-green, #2ecc71) !important;
+}
+
+:host ::ng-deep .p-inputtext:enabled:focus,
+:host ::ng-deep .p-textarea:enabled:focus {
+  border-color: var(--color-accent-green, #2ecc71) !important;
+  box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.2) !important;
+}
+
+:host ::ng-deep .p-select:not(.p-disabled).p-focus {
+  border-color: var(--color-accent-green, #2ecc71) !important;
+  box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.2) !important;
+}
+
 @media (max-width: 640px) {
   .app-modal-footer {
     flex-direction: column-reverse;
   }
 }
-
 :host ::ng-deep .app-modal--sm {
   width: 90vw !important;
   max-width: 400px !important;

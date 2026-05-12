@@ -13,15 +13,13 @@
     <div class="flex justify-center py-12">
       <app-spinner></app-spinner>
     </div>
-  }
-
-  @if (!vm().isLoading) {
+  } @else {
     <!-- Stats Summary -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
       <app-card variant="sharp">
         <div class="flex items-center gap-4 p-2">
-          <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-            <i class="pi pi-wrench text-blue-600 text-xl"></i>
+          <div class="w-12 h-12 rounded-full bg-accent-green/10 flex items-center justify-center flex-shrink-0">
+            <i class="pi pi-wrench text-accent-green text-xl"></i>
           </div>
           <div>
             <p class="text-3xl font-bold text-text-primary">{{ vm().servicesTotal }}</p>
@@ -32,8 +30,8 @@
 
       <app-card variant="sharp">
         <div class="flex items-center gap-4 p-2">
-          <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-            <i class="pi pi-check-circle text-green-600 text-xl"></i>
+          <div class="w-12 h-12 rounded-full bg-accent-green/10 flex items-center justify-center flex-shrink-0">
+            <i class="pi pi-check-circle text-accent-green text-xl"></i>
           </div>
           <div>
             <p class="text-3xl font-bold text-text-primary">{{ activeServicesCount() }}</p>
@@ -44,8 +42,8 @@
 
       <app-card variant="sharp">
         <div class="flex items-center gap-4 p-2">
-          <div class="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
-            <i class="pi pi-dollar text-amber-600 text-xl"></i>
+          <div class="w-12 h-12 rounded-full bg-accent-yellow/10 flex items-center justify-center flex-shrink-0">
+            <i class="pi pi-dollar text-accent-yellow text-xl"></i>
           </div>
           <div>
             <p class="text-3xl font-bold text-text-primary">{{ averagePrice() | currency:'USD' }}</p>
@@ -57,44 +55,47 @@
 
     <!-- Error State -->
     @if (vm().error) {
-      <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+      <div class="bg-card-bg border border-accent-red/30 text-accent-red px-4 py-3 rounded-lg text-sm">
         {{ vm().error }}
       </div>
     }
 
     <!-- Filter Bar + View Toggle -->
-    <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 sm:items-center sm:justify-between bg-white p-4 rounded-xl shadow-sm border border-border">
-      <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 sm:items-center sm:flex-wrap">
-        <app-input
-          [value]="searchQuery()"
-          placeholder="Search services..."
-          (valueChange)="searchQuery.set($event); applyFilter()"
-          styleClass="w-full sm:w-56"
-        ></app-input>
-        <app-dropdown
-          [options]="categoryOptions"
-          optionLabel="label"
-          optionValue="value"
-          placeholder="All Categories"
-          styleClass="w-full sm:w-40"
-          (valueChange)="onCategoryFilterChange($event)"
-        ></app-dropdown>
-        <app-dropdown
-          [options]="filterStatusOptions"
-          optionLabel="label"
-          optionValue="value"
-          placeholder="Status"
-          styleClass="w-full sm:w-32"
-          (valueChange)="onStatusFilterChange($event)"
-        ></app-dropdown>
-        <app-button
-          label="Clear"
-          variant="ghost"
-          icon="pi pi-filter-slash"
-          size="sm"
-          (onClick)="clearFilters()"
-        ></app-button>
-      </div>
+    <app-filter-bar>
+      <app-search-input
+        [value]="searchQuery()"
+        placeholder="Search services..."
+        [suggestions]="searchSuggestions()"
+        [debounceMs]="300"
+        [minLength]="1"
+        styleClass="w-full sm:w-56"
+        (valueChange)="onSearchChange($event)"
+      ></app-search-input>
+      <app-dropdown
+        [value]="categoryFilter()"
+        [options]="categoryOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="All Categories"
+        styleClass="w-full sm:w-40"
+        (valueChange)="onCategoryFilterChange($event)"
+      ></app-dropdown>
+      <app-dropdown
+        [value]="statusFilter()"
+        [options]="filterStatusOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Status"
+        styleClass="w-full sm:w-32"
+        (valueChange)="onStatusFilterChange($event)"
+      ></app-dropdown>
+      <app-button
+        label="Clear"
+        variant="ghost"
+        icon="pi pi-filter-slash"
+        size="sm"
+        (onClick)="clearFilters()"
+      ></app-button>
       <!-- View Toggle -->
       <div class="flex gap-1 bg-bg-secondary rounded-lg p-1">
         <app-button
@@ -102,7 +103,7 @@
           variant="ghost"
           size="sm"
           [iconOnly]="true"
-          [styleClass]="viewMode() === 'list' ? 'bg-white shadow-sm rounded' : ''"
+          [styleClass]="viewMode() === 'list' ? 'bg-card-bg shadow-sm rounded' : ''"
           (onClick)="toggleView('list')"
         ></app-button>
         <app-button
@@ -110,11 +111,11 @@
           variant="ghost"
           size="sm"
           [iconOnly]="true"
-          [styleClass]="viewMode() === 'grid' ? 'bg-white shadow-sm rounded' : ''"
+          [styleClass]="viewMode() === 'grid' ? 'bg-card-bg shadow-sm rounded' : ''"
           (onClick)="toggleView('grid')"
         ></app-button>
       </div>
-    </div>
+    </app-filter-bar>
 
     <!-- Grid View -->
     @if (viewMode() === 'grid') {
@@ -126,7 +127,7 @@
                 <div class="w-12 h-12 rounded-lg bg-primary-start/10 flex items-center justify-center flex-shrink-0">
                   <i class="pi pi-wrench text-primary-start text-xl"></i>
                 </div>
-                <app-badge [status]="getActiveSeverity(svc.active)" [customLabel]="svc.active ? 'Active' : 'Inactive'" size="sm"></app-badge>
+                <app-badge [status]="getActiveSeverity(svc.active)" [customLabel]="svc.active ? 'ACTIVE' : 'INACTIVE'" size="sm"></app-badge>
               </div>
               <h3 class="font-semibold text-text-primary text-lg mb-1">{{ svc.name }}</h3>
               @if (svc.description) {
@@ -137,6 +138,7 @@
                 <span class="font-bold text-primary-start">{{ svc.price | currency:'USD' }}</span>
               </div>
               <div class="flex gap-2 mt-4 pt-3 border-t border-border-light">
+                <app-button icon="pi pi-eye" variant="ghost" size="sm" (onClick)="viewService(svc)">View</app-button>
                 <app-button icon="pi pi-pencil" variant="ghost" size="sm" (onClick)="editService(svc)">Edit</app-button>
                 <app-button icon="pi pi-trash" variant="danger" size="sm" (onClick)="confirmDeleteService(svc)">Delete</app-button>
               </div>
@@ -151,10 +153,10 @@
 
     <!-- List View -->
     @if (viewMode() === 'list') {
-      <div class="bg-white rounded-xl shadow-sm border border-border overflow-hidden">
+      <app-table-wrapper>
         <p-table
           [value]="vm().services"
-          [loading]="vm().isLoading"
+          [loading]="vm().isLoading || isFiltering()"
           [paginator]="true"
           [rows]="10"
           [totalRecords]="vm().servicesTotal"
@@ -195,12 +197,13 @@
               </td>
               <td class="text-text-secondary">{{ svc.duration }} min</td>
               <td class="font-medium text-text-primary">{{ svc.price | currency:'USD' }}</td>
-              <td><app-badge [status]="getActiveSeverity(svc.active)" [customLabel]="svc.active ? 'Active' : 'Inactive'" size="sm"></app-badge></td>
+              <td><app-badge [status]="getActiveSeverity(svc.active)" [customLabel]="svc.active ? 'ACTIVE' : 'INACTIVE'" size="sm"></app-badge></td>
               <td>
-                <div class="flex gap-2">
-                  <app-button icon="pi pi-pencil" variant="ghost" size="sm" [iconOnly]="true" (onClick)="editService(svc)"></app-button>
-                  <app-button icon="pi pi-trash" variant="danger" size="sm" [iconOnly]="true" (onClick)="confirmDeleteService(svc)"></app-button>
-                </div>
+              <div class="flex gap-2">
+                <app-button icon="pi pi-eye" variant="ghost" size="sm" [iconOnly]="true" (onClick)="viewService(svc)"></app-button>
+                <app-button icon="pi pi-pencil" variant="ghost" size="sm" [iconOnly]="true" (onClick)="editService(svc)"></app-button>
+                <app-button icon="pi pi-trash" variant="danger" size="sm" [iconOnly]="true" (onClick)="confirmDeleteService(svc)"></app-button>
+              </div>
               </td>
             </tr>
           </ng-template>
@@ -210,81 +213,100 @@
             </tr>
           </ng-template>
         </p-table>
-      </div>
+      </app-table-wrapper>
     }
   }
 
   <!-- Service Dialog -->
-  <p-dialog
-    [(visible)]="serviceDialogVisible"
-    [header]="isEdit() ? 'Edit Service' : 'New Service'"
+  <app-modal
+    [visible]="serviceDialogVisible()"
+    (visibleChange)="serviceDialogVisible.set($event); !$event && closeDialog()"
+    [header]="isViewMode() ? 'View Service' : isEdit() ? 'Edit Service' : 'New Service'"
     [modal]="true"
-    [style]="{ width: '500px' }"
-    styleClass="rounded-xl"
-    (onHide)="closeDialog()"
+    [closable]="true"
+    [styleClass]="'rounded-xl w-[480px]'"
   >
-    <ng-template #content>
-      <div class="flex flex-col gap-4 p-4">
-        <!-- Name -->
-        <div>
-          <label class="block font-medium mb-1 text-text-primary">Name *</label>
-          <input pInputText [(ngModel)]="formName" class="w-full" [class.ng-invalid]="submitted() && formErrors.name" />
-          @if (submitted() && formErrors.name) {
-            <small class="text-danger">{{ formErrors.name }}</small>
+    <div class="flex flex-col gap-4 p-4">
+      <!-- Name -->
+      <div>
+        <label class="block font-medium mb-1 text-text-primary">Name *</label>
+        <input pInputText [(ngModel)]="formName" class="w-full" placeholder="Enter service name" [class.ng-invalid]="submitted() && formErrors.name" [disabled]="isViewMode()" />
+        @if (submitted() && formErrors.name) {
+          <small class="text-danger">{{ formErrors.name }}</small>
+        }
+      </div>
+      <!-- Description -->
+      <div>
+        <label class="block font-medium mb-1 text-text-primary">Description</label>
+        <textarea pTextarea [(ngModel)]="formDescription" class="w-full" rows="3" placeholder="Enter description" [disabled]="isViewMode()"></textarea>
+      </div>
+      <div>
+        <label class="block font-medium mb-1 text-text-primary">Duration (min) *</label>
+        <p-inputNumber [(ngModel)]="formDuration" class="w-full" [min]="1" [max]="480" placeholder="Enter duration" [class.ng-invalid]="submitted() && formErrors.duration" [disabled]="isViewMode()" />
+        @if (submitted() && formErrors.duration) {
+          <small class="text-danger">{{ formErrors.duration }}</small>
+        }
+      </div>
+      <div>
+        <label class="block font-medium mb-1 text-text-primary">Price ($) *</label>
+        <p-inputNumber [(ngModel)]="formPrice" class="w-full" [min]="0" [max]="99999" mode="currency" currency="USD" placeholder="Enter price" [disabled]="isViewMode()" [class.ng-invalid]="submitted() && formErrors.price" />
+        @if (submitted() && formErrors.price) {
+          <small class="text-danger">{{ formErrors.price }}</small>
+        }
+      </div>
+      <div>
+        <label class="block font-medium mb-1 text-text-primary">Price per Minute</label>
+        @if (isViewMode()) {
+          <p class="text-text-primary font-medium">{{ (selectedService()?.pricePerMinute ?? formPricePerMinute ?? 0) | currency:'USD' }}</p>
+        } @else {
+          @if (computedPricePerMinute() !== null) {
+            <p class="text-text-primary font-medium">{{ computedPricePerMinute() | currency:'USD' }}/min</p>
+            <p class="text-xs text-text-secondary mt-1">Auto-calculated: ${{ formPrice }} / {{ formDuration }}min</p>
+          } @else {
+            <p class="text-text-secondary text-sm">Auto-calculated from Price / Duration</p>
           }
-        </div>
-        <!-- Description -->
-        <div>
-          <label class="block font-medium mb-1 text-text-primary">Description</label>
-          <textarea pTextarea [(ngModel)]="formDescription" class="w-full" rows="3"></textarea>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="block font-medium mb-1 text-text-primary">Duration (min) *</label>
-            <p-inputNumber [(ngModel)]="formDuration" class="w-full" [min]="1" [max]="480" [class.ng-invalid]="submitted() && formErrors.duration" />
-            @if (submitted() && formErrors.duration) {
-              <small class="text-danger">{{ formErrors.duration }}</small>
-            }
-          </div>
-          <div>
-            <label class="block font-medium mb-1 text-text-primary">Price ($)</label>
-            <p-inputNumber [(ngModel)]="formPrice" class="w-full" [min]="0" [max]="99999" mode="currency" currency="USD" />
-          </div>
-        </div>
-        <div>
-          <label class="block font-medium mb-1 text-text-primary">Image URL</label>
-          <input pInputText [(ngModel)]="formImageUrl" class="w-full" placeholder="https://..." />
-        </div>
-        <div class="flex items-center gap-3">
-          <label class="font-medium text-text-primary">Active</label>
-          <p-toggleSwitch [(ngModel)]="formActive" />
-        </div>
+        }
       </div>
-    </ng-template>
-    <ng-template #footer>
+      <div>
+        <label class="block font-medium mb-1 text-text-primary">Tax Rate (%)</label>
+        <p-inputNumber [(ngModel)]="formTaxRate" class="w-full" [min]="0" [max]="100" suffix="%" placeholder="Enter tax rate" [disabled]="isViewMode()" />
+      </div>
+      <div>
+        <label class="block font-medium mb-1 text-text-primary">Image URL</label>
+        <input pInputText [(ngModel)]="formImageUrl" class="w-full" placeholder="https://..." [disabled]="isViewMode()" />
+      </div>
+      <div class="flex items-center gap-3">
+        <label class="font-medium text-text-primary">Active</label>
+        <p-toggleSwitch [(ngModel)]="formActive" [disabled]="isViewMode()" />
+      </div>
+    </div>
+    <div app-modal-footer>
       <div class="flex flex-col-reverse sm:flex-row gap-2 sm:gap-2">
-        <app-button label="Cancel" variant="secondary" (onClick)="closeDialog()"></app-button>
-        <app-button label="Save" variant="primary" (onClick)="saveService()"></app-button>
+        @if (isViewMode()) {
+          <app-button label="Close" variant="primary" (onClick)="closeDialog()"></app-button>
+        } @else {
+          <app-button label="Cancel" variant="secondary" (onClick)="closeDialog()"></app-button>
+          <app-button label="Save" variant="primary" (onClick)="saveService()"></app-button>
+        }
       </div>
-    </ng-template>
-  </p-dialog>
+    </div>
+  </app-modal>
 
   <!-- Delete Confirmation Dialog -->
-  <p-dialog
-    [(visible)]="deleteDialogVisible"
+  <app-modal
+    [visible]="deleteDialogVisible()"
+    (visibleChange)="deleteDialogVisible.set($event)"
     header="Confirm Delete"
     [modal]="true"
-    [style]="{ width: '400px' }"
-    styleClass="rounded-xl"
+    [closable]="true"
+    [styleClass]="'rounded-xl w-[400px]'"
   >
-    <ng-template #content>
-      <p class="p-4 text-text-primary">Are you sure you want to delete service <strong>{{ serviceToDelete()?.name }}</strong>? This action cannot be undone.</p>
-    </ng-template>
-    <ng-template #footer>
+    <p class="p-4 text-text-primary">Are you sure you want to delete service <strong>{{ serviceToDelete()?.name }}</strong>? This action cannot be undone.</p>
+    <div app-modal-footer>
       <div class="flex flex-col-reverse sm:flex-row gap-2 sm:gap-2">
         <app-button label="Cancel" variant="secondary" (onClick)="deleteDialogVisible.set(false)"></app-button>
         <app-button label="Delete" variant="danger" (onClick)="deleteService()"></app-button>
       </div>
-    </ng-template>
-  </p-dialog>
+    </div>
+  </app-modal>
 </div>

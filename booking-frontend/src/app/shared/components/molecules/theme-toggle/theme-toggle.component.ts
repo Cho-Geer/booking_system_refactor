@@ -1,11 +1,11 @@
 import { Component, inject } from '@angular/core';
 import { ThemeService } from '../../../../core/services/theme.service';
-import { NgClass } from '@angular/common';
+
 
 @Component({
   selector: 'app-theme-toggle',
   standalone: true,
-  imports: [NgClass],
+  imports: [],
   templateUrl: './theme-toggle.component.html',
   styleUrl: './theme-toggle.component.scss',
 })

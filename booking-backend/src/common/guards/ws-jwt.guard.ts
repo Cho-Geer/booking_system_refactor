@@ -52,11 +52,14 @@ export class WsJwtGuard extends AuthGuard("jwt") {
    * Validate JWT token and extract user ID
    * @returns Decoded payload with userId
    */
-  async validateToken(token: string): Promise<{ userId: string }> {
+  async validateToken(
+    token: string,
+  ): Promise<{ userId: string; roles: string[] }> {
     try {
       const decoded = this.jwtService.verify(token);
       return {
         userId: decoded.sub || decoded.id,
+        roles: decoded.roles || [],
       };
     } catch (_error) {
       throw new UnauthorizedException("Invalid or expired token");

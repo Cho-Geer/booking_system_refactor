@@ -1,0 +1,60 @@
+<div class="block lg:hidden space-y-3">
+  @for (row of rows(); track row.user.id) {
+    <div class="border border-border-color p-4 rounded-lg">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-lg {{ row.initialsBg }} flex items-center justify-center text-white font-medium text-sm">
+            {{ row.initials }}
+          </div>
+          <div>
+            <p class="text-sm font-medium text-text-primary">{{ row.user.name }}</p>
+            <p class="text-xs text-text-secondary">{{ row.user.email }}</p>
+          </div>
+        </div>
+        <app-badge [status]="row.roleBadge" [customLabel]="row.user.role" size="md" />
+      </div>
+      <div class="flex justify-between items-center text-sm">
+        <span class="text-text-secondary">{{ row.user.createdAt | date:'MMM d, y' }}</span>
+        <app-button label="View" variant="ghost" size="sm" icon="pi pi-eye" (onClick)="rowClick.emit(row)" />
+      </div>
+    </div>
+  }
+</div>
+
+<div class="hidden lg:block overflow-x-auto">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Role</th>
+        <th>Status</th>
+        <th>Created</th>
+        <th class="text-right">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of rows(); track row.user.id) {
+        <tr>
+          <td>
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg {{ row.initialsBg }} flex items-center justify-center text-white font-medium text-sm">
+                {{ row.initials }}
+              </div>
+              <span class="text-sm text-text-primary font-medium">{{ row.user.name }}</span>
+            </div>
+          </td>
+          <td>
+            <app-badge [status]="row.roleBadge" [customLabel]="row.user.role" size="sm" />
+          </td>
+          <td>
+            <app-badge [status]="row.user.status === 'ACTIVE' ? 'confirmed' : 'cancelled'" [customLabel]="row.user.status" size="sm" />
+          </td>
+          <td class="text-sm text-text-secondary">{{ row.user.createdAt | date:'MMM d, y' }}</td>
+          <td class="text-right">
+            <app-button variant="ghost" size="sm" icon="pi pi-eye" [iconOnly]="true" (onClick)="rowClick.emit(row)" />
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

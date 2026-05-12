@@ -109,7 +109,7 @@ describe('NotificationsGateway', () => {
      */
     it('should extract token via WsJwtGuard.extractToken and pass to validateToken', async () => {
       const extractTokenSpy = jest.spyOn(WsJwtGuard, 'extractToken');
-      const validateTokenSpy = jest.spyOn(wsJwtGuard, 'validateToken').mockResolvedValue({ userId: 'test-user' });
+      const validateTokenSpy = jest.spyOn(wsJwtGuard, 'validateToken').mockResolvedValue({ userId: 'test-user', roles: [] });
       
       await gateway.handleConnection(mockSocket as any);
       
@@ -189,6 +189,62 @@ describe('NotificationsGateway', () => {
       await gateway.handleConnection(mockSocket as any);
 
       expect(gateway.getConnectedClientsCount()).toBe(1);
+    });
+  });
+
+  describe('afterInit', () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it('should start a periodic health broadcast interval', () => {
+      const setIntervalSpy = jest.spyOn(global, 'setInterval');
+      gateway.afterInit();
+      expect(setIntervalSpy).toHaveBeenCalledWith(expect.any(Function), 60000);
+      setIntervalSpy.mockRestore();
+    });
+
+    it('should emit system.health.updated when clients are connected', () => {
+      gateway.afterInit();
+      (gateway as any).connectedClients.set('test', { socket: {} as any, userId: 'u1' });
+
+      jest.advanceTimersByTime(60000);
+
+      expect(mockServer.emit).toHaveBeenCalledWith(
+        'system.health.updated',
+        expect.objectContaining({
+          server: 'Online',
+          database: 'Online',
+          api: 'Online',
+          redis: 'Online',
+        }),
+      );
+    });
+
+    it('should not emit when no clients are connected', () => {
+      gateway.afterInit();
+      jest.advanceTimersByTime(60000);
+      expect(mockServer.emit).not.toHaveBeenCalledWith('system.health.updated', expect.anything());
+    });
+
+    it('should include uptime and lastBackup in health payload', () => {
+      gateway.afterInit();
+      (gateway as any).connectedClients.set('test', { socket: {} as any, userId: 'u1' });
+      jest.advanceTimersByTime(60000);
+
+      const emitCall = mockServer.emit.mock.calls.find(
+        (call: any[]) => call[0] === 'system.health.updated',
+      );
+      expect(emitCall).toBeDefined();
+      const payload = emitCall[1];
+      expect(payload).toHaveProperty('uptime');
+      expect(payload).toHaveProperty('lastBackup');
+      expect(typeof payload.uptime).toBe('string');
+      expect(typeof payload.lastBackup).toBe('string');
     });
   });
 
@@ -508,6 +564,126 @@ describe('NotificationsGateway', () => {
       }
 
       expect(gateway.isUserConnected('any-user')).toBe(false);
+    });
+  });
+
+  describe('sendAdminBroadcast', () => {
+    it('should emit event to admin:broadcast room', () => {
+      const event = 'admin_notification';
+      const data = { message: 'Admin alert' };
+
+      gateway.sendAdminBroadcast(event, data);
+
+      expect(mockServer.to).toHaveBeenCalledWith('admin:broadcast');
+      expect(mockEmit).toHaveBeenCalledWith(
+        event,
+        expect.objectContaining({
+          event,
+          data: expect.objectContaining(data),
+        }),
+      );
+    });
+
+    it('should include timestamp in payload', () => {
+      gateway.sendAdminBroadcast('test_admin_event', { key: 'value' });
+
+      const callArgs = mockEmit.mock.calls[0];
+      const payload = callArgs[1] as NotificationPayload;
+      expect(payload.timestamp).toBeDefined();
+      expect(typeof payload.timestamp).toBe('string');
+    });
+
+    it('should log the broadcast action', () => {
+      const loggerSpy = jest.spyOn((gateway as any).logger, 'log');
+      gateway.sendAdminBroadcast('test_event', {});
+
+      expect(loggerSpy).toHaveBeenCalledWith(expect.stringContaining('Broadcasting admin event'));
+    });
+  });
+
+  describe('sendAppointmentStatusChanged', () => {
+    it('should call sendAdminBroadcast with appointment.status_changed event', () => {
+      const sendAdminBroadcastSpy = jest.spyOn(gateway, 'sendAdminBroadcast');
+      const data = { appointmentId: 'apt-123', status: 'CONFIRMED', previousStatus: 'PENDING', timestamp: '2024-01-01T00:00:00.000Z' };
+
+      gateway.sendAppointmentStatusChanged(data);
+
+      expect(sendAdminBroadcastSpy).toHaveBeenCalledWith('appointment.status_changed', data);
+    });
+
+    it('should log the broadcast action', () => {
+      const loggerSpy = jest.spyOn((gateway as any).logger, 'log');
+      gateway.sendAppointmentStatusChanged({ appointmentId: 'apt-123', status: 'CONFIRMED' });
+
+      expect(loggerSpy).toHaveBeenCalledWith(expect.stringContaining('Broadcasting appointment.status_changed'));
+    });
+  });
+
+  describe('handleJoin (admin room)', () => {
+    it('should allow ADMIN user to join admin:broadcast room', async () => {
+      jest.spyOn(wsJwtGuard, 'validateToken').mockResolvedValue({ userId: 'admin-user', roles: ['ADMIN'] });
+
+      const adminSocket = {
+        ...mockSocket,
+        id: 'admin-socket',
+        handshake: { auth: { token: 'admin-token' }, headers: {} },
+      };
+
+      await gateway.handleConnection(adminSocket as any);
+      const data = { room: 'admin:broadcast' };
+      const result = gateway.handleJoin(data, adminSocket as any);
+
+      expect(adminSocket.join).toHaveBeenCalledWith('admin:broadcast');
+      expect(result).toEqual({
+        event: 'joined',
+        data: { room: 'admin:broadcast', status: 'success' },
+      });
+    });
+
+    it('should allow SUPER_ADMIN user to join admin:broadcast room', async () => {
+      jest.spyOn(wsJwtGuard, 'validateToken').mockResolvedValue({ userId: 'super-admin-user', roles: ['SUPER_ADMIN'] });
+
+      const superAdminSocket = {
+        ...mockSocket,
+        id: 'super-admin-socket',
+        handshake: { auth: { token: 'super-admin-token' }, headers: {} },
+      };
+
+      await gateway.handleConnection(superAdminSocket as any);
+      const data = { room: 'admin:broadcast' };
+      const result = gateway.handleJoin(data, superAdminSocket as any);
+
+      expect(superAdminSocket.join).toHaveBeenCalledWith('admin:broadcast');
+      expect(result).toEqual({
+        event: 'joined',
+        data: { room: 'admin:broadcast', status: 'success' },
+      });
+    });
+
+    it('should reject non-admin user from joining admin:broadcast room', async () => {
+      jest.spyOn(wsJwtGuard, 'validateToken').mockResolvedValue({ userId: 'test-user', roles: ['CUSTOMER'] });
+
+      await gateway.handleConnection(mockSocket as any);
+      const data = { room: 'admin:broadcast' };
+      const result = gateway.handleJoin(data, mockSocket as any);
+
+      expect(result).toEqual({
+        event: 'error',
+        data: { error: 'Access denied' },
+      });
+    });
+
+    it('should reject user without roles from joining admin:broadcast room', async () => {
+      jest.spyOn(wsJwtGuard, 'validateToken').mockResolvedValue({ userId: 'test-user', roles: [] });
+
+      await gateway.handleConnection(mockSocket as any);
+      const data = { room: 'admin:broadcast' };
+      const result = gateway.handleJoin(data, mockSocket as any);
+
+      expect(result).toEqual({
+        event: 'error',
+        data: { error: 'Access denied' },
+      });
     });
   });
 

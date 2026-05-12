@@ -64,7 +64,7 @@ describe("AdminAppointmentsService", () => {
         remarks: null,
         user: { name: "John Doe" },
         service: { name: "Haircut" },
-        timeSlot: { slotTime: new Date("2025-06-15T10:00:00Z") },
+        timeSlot: { startTime: new Date("2025-06-15T10:00:00Z"), endTime: new Date("2025-06-15T10:30:00Z") },
       },
       {
         id: "apt-2",
@@ -81,7 +81,7 @@ describe("AdminAppointmentsService", () => {
         remarks: null,
         user: { name: "Jane Smith" },
         service: { name: "Manicure" },
-        timeSlot: { slotTime: new Date("2025-06-16T14:00:00Z") },
+        timeSlot: { startTime: new Date("2025-06-16T14:00:00Z"), endTime: new Date("2025-06-16T14:30:00Z") },
       },
     ];
 
@@ -234,6 +234,28 @@ describe("AdminAppointmentsService", () => {
 
       expect(result.items).toEqual([]);
       expect(result.meta.total).toBe(0);
+    });
+
+    it("should filter by search query on appointmentNumber, user name, or service name", async () => {
+      mockPrismaService.appointment.findMany.mockResolvedValue([
+        mockAppointments[0],
+      ]);
+      mockPrismaService.appointment.count.mockResolvedValue(1);
+
+      const query: AdminAppointmentsQueryDto = { search: "John" };
+      await service.findAll(query);
+
+      expect(prisma.appointment.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            OR: [
+              { appointmentNumber: { contains: "John", mode: "insensitive" } },
+              { user: { name: { contains: "John", mode: "insensitive" } } },
+              { service: { name: { contains: "John", mode: "insensitive" } } },
+            ],
+          }),
+        }),
+      );
     });
   });
 

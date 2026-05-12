@@ -1,0 +1,11 @@
+<div class="welcome-card rounded-lg p-6">
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-text-primary mb-1">Welcome back, Admin!</h1>
+      <p class="text-sm text-text-secondary">{{ today() | date:'fullDate' }}</p>
+    </div>
+    <a routerLink="/admin/appointments">
+      <app-button label="View Appointments" variant="primary" icon="pi pi-calendar" class="mt-4 sm:mt-0" />
+    </a>
+  </div>
+</div>

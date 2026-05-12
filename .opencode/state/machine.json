@@ -4,7 +4,7 @@
     "version": "2.1.0",
     "project": "appointment-booking-system",
     "description": "强制校验契约哈希 + 任务生命周期证据链。涉及角色：@Architect(定义), @Coder-BE(实现), @Coder-FE(适配), @Guardian(审查), @Orchestrator(调度)。",
-    "lastUpdated": "2026-05-03T02:50:38.328Z"
+    "lastUpdated": "2026-05-06T11:51:09.751Z"
   },
   "currentTask": {
     "id": "TIMESLOTS-PAGINATION-FIX",
@@ -15,8 +15,8 @@
   "contracts": {
     "backend-api": {
       "file": "contract.yaml",
-      "hash": "sha256-7e37df5a7d689b98c64156777a6d9bf6dce2f7b941b097e13776220908f3a622",
-      "lastValidated": "2026-05-03T02:50:38.328Z",
+      "hash": "sha256-868776037339049278b501927d2da24fd64dfbd7beaca5a5a63ef559dd1ab29a",
+      "lastValidated": "2026-05-06T11:51:09.751Z",
       "owner": "@Architect"
     },
     "prisma-schema": {
@@ -440,6 +440,132 @@
       "action": "HASH_UPDATE",
       "target": "backend-api",
       "details": "Hash updated from sha256-0502aaa61e0ed... to sha256-7e37df5a7d689..."
+    },
+    {
+      "timestamp": "2026-05-04T15:44:21.864Z",
+      "agent": "@Orchestrator",
+      "action": "HASH_UPDATE",
+      "target": "backend-api",
+      "details": "Hash updated from sha256-7e37df5a7d689... to sha256-ff657061e5567..."
+    },
+    {
+      "timestamp": "2026-05-05T08:29:31.163Z",
+      "agent": "@Orchestrator",
+      "action": "HASH_UPDATE",
+      "target": "backend-api",
+      "details": "Hash updated from sha256-ff657061e5567... to sha256-105a76c85f78c..."
+    },
+    {
+      "timestamp": "2026-05-05T08:29:59.967Z",
+      "agent": "@Orchestrator",
+      "action": "HASH_UPDATE",
+      "target": "backend-api",
+      "details": "Hash updated from sha256-105a76c85f78c... to sha256-20abc89bd2177..."
+    },
+    {
+      "timestamp": "2026-05-05T08:30:26.154Z",
+      "agent": "@Orchestrator",
+      "action": "HASH_UPDATE",
+      "target": "backend-api",
+      "details": "Hash updated from sha256-20abc89bd2177... to sha256-120f9281cc618..."
+    },
+    {
+      "timestamp": "2026-05-05T08:32:18.836Z",
+      "agent": "@Orchestrator",
+      "action": "HASH_UPDATE",
+      "target": "backend-api",
+      "details": "Hash updated from sha256-120f9281cc618... to sha256-169a8be6d1e94..."
+    },
+    {
+      "timestamp": "2026-05-05T13:05:45.074Z",
+      "agent": "@Orchestrator",
+      "action": "HASH_UPDATE",
+      "target": "backend-api",
+      "details": "Hash updated from sha256-bac3d04a5d781... to sha256-a88cb800e0d19..."
+    },
+    {
+      "timestamp": "2026-05-05T13:44:09.263Z",
+      "agent": "@Orchestrator",
+      "action": "HASH_UPDATE",
+      "target": "backend-api",
+      "details": "Hash updated from sha256-a88cb800e0d19... to sha256-efa736648d034..."
+    },
+    {
+      "timestamp": "2026-05-05T13:45:19.139Z",
+      "agent": "@Orchestrator",
+      "action": "HASH_UPDATE",
+      "target": "backend-api",
+      "details": "Hash updated from sha256-efa736648d034... to sha256-ab6729f193477..."
+    },
+    {
+      "timestamp": "2026-05-05T14:04:18.932Z",
+      "agent": "@Orchestrator",
+      "action": "HASH_UPDATE",
+      "target": "backend-api",
+      "details": "Hash updated from sha256-ab6729f193477... to sha256-1f87f17d7ce8f..."
+    },
+    {
+      "timestamp": "2026-05-05T14:05:04.742Z",
+      "agent": "@Orchestrator",
+      "action": "HASH_UPDATE",
+      "target": "backend-api",
+      "details": "Hash updated from sha256-1f87f17d7ce8f... to sha256-500c0a03c4cef..."
+    },
+    {
+      "timestamp": "2026-05-06T00:16:24.625Z",
+      "agent": "@Orchestrator",
+      "action": "HASH_UPDATE",
+      "target": "backend-api",
+      "details": "Hash updated from sha256-500c0a03c4cef... to sha256-a29cad7f68cb0..."
+    },
+    {
+      "timestamp": "2026-05-06T02:28:22.411Z",
+      "agent": "@Orchestrator",
+      "action": "HASH_UPDATE",
+      "target": "backend-api",
+      "details": "Hash updated from sha256-a29cad7f68cb0... to sha256-55bd050801930..."
+    },
+    {
+      "timestamp": "2026-05-06T02:29:06.847Z",
+      "agent": "@Orchestrator",
+      "action": "HASH_UPDATE",
+      "target": "backend-api",
+      "details": "Hash updated from sha256-55bd050801930... to sha256-1f4dc530fdda5..."
+    },
+    {
+      "timestamp": "2026-05-06T07:12:54.031Z",
+      "agent": "@Orchestrator",
+      "action": "HASH_UPDATE",
+      "target": "backend-api",
+      "details": "Hash updated from sha256-1f4dc530fdda5... to sha256-5cb5d22e56513..."
+    },
+    {
+      "timestamp": "2026-05-06T08:44:09.729Z",
+      "agent": "@Orchestrator",
+      "action": "HASH_UPDATE",
+      "target": "backend-api",
+      "details": "Hash updated from sha256-5cb5d22e56513... to sha256-394e4685c96f5..."
+    },
+    {
+      "timestamp": "2026-05-06T11:49:20.968Z",
+      "agent": "@Orchestrator",
+      "action": "HASH_UPDATE",
+      "target": "backend-api",
+      "details": "Hash updated from sha256-394e4685c96f5... to sha256-e20f39e5dd6e1..."
+    },
+    {
+      "timestamp": "2026-05-06T11:50:17.544Z",
+      "agent": "@Orchestrator",
+      "action": "HASH_UPDATE",
+      "target": "backend-api",
+      "details": "Hash updated from sha256-e20f39e5dd6e1... to sha256-f9b3f9f14eb0d..."
+    },
+    {
+      "timestamp": "2026-05-06T11:51:09.751Z",
+      "agent": "@Orchestrator",
+      "action": "HASH_UPDATE",
+      "target": "backend-api",
+      "details": "Hash updated from sha256-f9b3f9f14eb0d... to sha256-8687760373390..."
     }
   ]
 }

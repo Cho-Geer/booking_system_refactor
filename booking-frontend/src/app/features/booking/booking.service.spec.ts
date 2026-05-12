@@ -20,6 +20,8 @@ describe('BookingService', () => {
     storeMock = {
       slots: jest.fn(() => []),
       selectedServiceId: jest.fn(() => 'svc-1'),
+      selectedSlotIds: jest.fn(() => []),
+      overtimeMinutes: jest.fn(() => 0),
       reserveSlot: jest.fn().mockReturnValue(mockReservationResponse),
       confirmSlotReservation: jest.fn(),
       failedReservation: jest.fn(),
@@ -221,6 +223,69 @@ describe('BookingService', () => {
   //
   // These tests verify that the error fallback in reserveSlot() returns DTO-compatible fields.
   // After unification, the error fallback constructs { id, startTime, endTime, capacity, bookedCount, available }.
+
+  // ==========================================
+  // FINANCIAL FIELDS (v1.7.0): selectedSlotIds, overtimeMinutes in create flow
+  // ==========================================
+
+  describe('[GREEN] Financial fields (v1.7.0)', () => {
+    it('[Green] should pass selectedSlotIds when set in store state', async () => {
+      // Simulate that the store has selectedSlotIds set
+      storeMock.selectedSlotIds = jest.fn(() => ['slot-1', 'slot-2']);
+      apiServiceMock.createAppointment.mockReturnValue(of({
+        status: 'SUCCESS' as const,
+        slot: { id: 'slot-1', startTime: '2026-04-20T09:00:00', endTime: '2026-04-20T10:00:00', capacity: 5, bookedCount: 0, available: false },
+      }));
+
+      await service.reserveSlot('slot-1', 10);
+
+      expect(apiServiceMock.createAppointment).toHaveBeenCalledWith(
+        expect.objectContaining({
+          selectedSlotIds: ['slot-1', 'slot-2'],
+        })
+      );
+    });
+
+    it('[Green] should pass overtimeMinutes when set in store state', async () => {
+      storeMock.overtimeMinutes = jest.fn(() => 15);
+      apiServiceMock.createAppointment.mockReturnValue(of({
+        status: 'SUCCESS' as const,
+        slot: { id: 'slot-1', startTime: '2026-04-20T09:00:00', endTime: '2026-04-20T10:00:00', capacity: 5, bookedCount: 0, available: false },
+      }));
+
+      await service.reserveSlot('slot-1', 10);
+
+      expect(apiServiceMock.createAppointment).toHaveBeenCalledWith(
+        expect.objectContaining({
+          overtimeMinutes: 15,
+        })
+      );
+    });
+
+    it('[Green] should NOT pass selectedSlotIds when empty array', async () => {
+      apiServiceMock.createAppointment.mockReturnValue(of({
+        status: 'SUCCESS' as const,
+        slot: { id: 'slot-1', startTime: '2026-04-20T09:00:00', endTime: '2026-04-20T10:00:00', capacity: 5, bookedCount: 0, available: false },
+      }));
+
+      await service.reserveSlot('slot-1', 10);
+
+      const callArg = apiServiceMock.createAppointment.mock.calls[0][0];
+      expect(callArg.selectedSlotIds).toBeUndefined();
+    });
+
+    it('[Green] should NOT pass overtimeMinutes when 0', async () => {
+      apiServiceMock.createAppointment.mockReturnValue(of({
+        status: 'SUCCESS' as const,
+        slot: { id: 'slot-1', startTime: '2026-04-20T09:00:00', endTime: '2026-04-20T10:00:00', capacity: 5, bookedCount: 0, available: false },
+      }));
+
+      await service.reserveSlot('slot-1', 10);
+
+      const callArg = apiServiceMock.createAppointment.mock.calls[0][0];
+      expect(callArg.overtimeMinutes).toBeUndefined();
+    });
+  });
 
   describe('[TYPE-UNIFICATION] reserveSlot should return DTO-compatible TimeSlot', () => {
     it('should have DTO fields (startTime/endTime/available) in error fallback', async () => {

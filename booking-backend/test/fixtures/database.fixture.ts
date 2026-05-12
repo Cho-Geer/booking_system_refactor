@@ -24,7 +24,8 @@ export interface TestService {
 export interface TestTimeSlot {
   id: string;
   serviceId: string;
-  slotTime: string;
+  startTime: Date;
+  endTime: Date;
   capacity: number;
 }
 
@@ -138,15 +139,17 @@ export async function createTestTimeSlot(
     actualServiceId = service.id;
   }
 
+  const hour = 9 + (timestamp % 8);
+  const startTime = new Date(`2026-01-01T${String(hour).padStart(2, '0')}:00:00Z`);
+  const endTime = new Date(startTime.getTime() + 60 * 60 * 1000);
+
   return prisma.timeSlot.create({
     data: {
       serviceId: actualServiceId,
-      slotTime: `2026-01-01T${String(9 + timestamp % 8).padStart(2, '0')}:00:00`,
-      durationMinutes: 60,
+      startTime,
+      endTime,
       capacity: 5,
       currentSequence: 0,
-      isActive: true,
-      displayOrder: 0,
       ...overrides,
     },
   }) as Promise<TestTimeSlot>;
@@ -239,13 +242,16 @@ export async function seedTestData(prisma: PrismaClient): Promise<{
 
   // Create time slots
   const timeSlot1 = await createTestTimeSlot(prisma, service1.id, {
-    slotTime: '2026-01-01T09:00:00',
+    startTime: new Date('2026-01-01T09:00:00Z'),
+    endTime: new Date('2026-01-01T09:30:00Z'),
   });
   const timeSlot2 = await createTestTimeSlot(prisma, service1.id, {
-    slotTime: '2026-01-01T10:00:00',
+    startTime: new Date('2026-01-01T10:00:00Z'),
+    endTime: new Date('2026-01-01T10:30:00Z'),
   });
   const timeSlot3 = await createTestTimeSlot(prisma, service2.id, {
-    slotTime: '2026-01-01T11:00:00',
+    startTime: new Date('2026-01-01T11:00:00Z'),
+    endTime: new Date('2026-01-01T12:30:00Z'),
   });
 
   return {

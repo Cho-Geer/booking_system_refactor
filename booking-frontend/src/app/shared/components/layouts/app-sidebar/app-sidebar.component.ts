@@ -29,9 +29,15 @@ export class AppSidebarComponent {
   readonly userName = input<string>();
   readonly userRole = input<string>();
   readonly userAvatar = input<string>();
+  readonly solid = input<boolean>(false);
   readonly close = output<void>();
+  readonly logout = output<void>();
 
   onClose(): void {
     this.close.emit();
+  }
+
+  onLogout(): void {
+    this.logout.emit();
   }
 }

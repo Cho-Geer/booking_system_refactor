@@ -6,6 +6,7 @@ import { filter } from 'rxjs/operators';
 import { AuthStore } from '../../../../stores/auth/auth.store';
 import { ApiService } from '../../../../core/services/api.service';
 import { SocketService } from '../../../../core/services/socket.service';
+import { AdminStore } from '../../../../features/admin/stores/admin.store';
 import { AppHeaderComponent, NavLink } from '../app-header/app-header.component';
 import { AppSidebarComponent, SidebarItem, SidebarSection } from '../app-sidebar/app-sidebar.component';
 
@@ -21,6 +22,7 @@ export class AppLayoutComponent implements OnInit {
   private apiService = inject(ApiService);
   private router = inject(Router);
   private socketService = inject(SocketService);
+  private adminStore = inject(AdminStore);
 
   readonly user = this.authStore.currentUser;
   readonly isAuthenticated = this.authStore.isAuthenticated;
@@ -34,35 +36,61 @@ export class AppLayoutComponent implements OnInit {
   readonly currentUrl = signal(this.router.url);
   readonly isAdminRoute = computed(() => this.currentUrl().startsWith('/admin'));
 
+  readonly notificationCount = computed(() => {
+    if (!this.isAdminRoute()) return 0;
+    return this.adminStore.unreadCount();
+  });
+
   readonly navLinks = computed<NavLink[]>(() => {
     if (this.isAdmin()) {
       return [
-        { label: '我的预约', route: '/my-bookings', icon: 'pi pi-list' },
-        { label: '个人资料', route: '/profile', icon: 'pi pi-user' },
+        { label: 'Dashboard', route: '/admin/dashboard', icon: 'pi pi-chart-bar' },
+        { label: 'Booking', route: '/booking/services', icon: 'pi pi-calendar' },
+        { label: 'My Bookings', route: '/my-bookings', icon: 'pi pi-list' },
+        { label: 'Profile', route: '/profile', icon: 'pi pi-user' },
       ];
     }
     return [
-      { label: '我的预约', route: '/my-bookings', icon: 'pi pi-list' },
-      { label: '个人资料', route: '/profile', icon: 'pi pi-user' },
+      { label: 'Booking', route: '/booking/services', icon: 'pi pi-calendar' },
+      { label: 'My Bookings', route: '/my-bookings', icon: 'pi pi-list' },
+      { label: 'Profile', route: '/profile', icon: 'pi pi-user' },
     ];
   });
+
+  /** Sidebar items for customer (non-admin) users */
+  readonly customerSidebarItems: SidebarItem[] = [
+    { label: '预约服务', route: '/booking/services', icon: 'pi pi-calendar' },
+    { label: '我的预约', route: '/my-bookings', icon: 'pi pi-list' },
+    { label: '个人资料', route: '/profile', icon: 'pi pi-user' },
+  ];
+
+  /** Sidebar items for admin users */
+  readonly adminSidebarItems: SidebarItem[] = [
+    { label: 'Dashboard', route: '/admin/dashboard', icon: 'pi pi-chart-bar' },
+    { label: 'Appointments', route: '/admin/appointments', icon: 'pi pi-calendar' },
+    { label: 'Users', route: '/admin/users', icon: 'pi pi-users' },
+    { label: 'Services', route: '/admin/services', icon: 'pi pi-briefcase' },
+    { label: 'Analytics', route: '/admin/analytics', icon: 'pi pi-chart-line' },
+    { label: 'History', route: '/admin/history', icon: 'pi pi-history' },
+    { label: 'Settings', route: '/admin/settings', icon: 'pi pi-cog' },
+  ];
 
   readonly sidebarItems = computed<SidebarItem[]>(() => {
     if (this.isAdmin()) {
-      return [
-        { label: '仪表盘', route: '/admin', icon: 'pi pi-chart-bar' },
-        { label: '预约服务', route: '/booking/services', icon: 'pi pi-calendar' },
-      ];
+      return this.adminSidebarItems;
     }
-    return [
-      { label: '预约服务', route: '/booking/services', icon: 'pi pi-calendar' },
-    ];
+    return this.customerSidebarItems;
   });
 
   readonly sidebarSections = computed<SidebarSection[]>(() => {
-    // No sections - flat navigation now
     return [];
   });
+
+  /** Whether sidebar should use solid (non-transparent) background */
+  readonly sidebarSolid = computed(() => this.isAdminRoute());
+
+  /** Whether to show search bar in header */
+  readonly showSearchInHeader = computed(() => !this.isAdminRoute());
 
   readonly menuItems = computed<MenuItem[]>(() => [
     {
@@ -97,17 +125,6 @@ export class AppLayoutComponent implements OnInit {
   async onLogout(): Promise<void> {
     await this.authStore.logout();
     await this.router.navigate(['/auth/login']);
-  }
-
-  onHeaderAction(action: string): void {
-    switch (action) {
-      case 'new-booking':
-        this.router.navigate(['/booking/services']);
-        break;
-      case 'add-service':
-        this.router.navigate(['/admin/services']);
-        break;
-    }
   }
 
   async ngOnInit(): Promise<void> {

@@ -99,6 +99,7 @@ describe('ServiceManagementComponent', () => {
       { id: '3', name: 'Old Service', description: 'Old', duration: 45, price: 40, active: false, createdAt: '2026-01-03T00:00:00Z' },
     ];
     store.setServices(services, 3, 1);
+    store.setAllServicesForStats(services);
 
     expect(component.totalServices()).toBe(3);
     expect(component.activeServicesCount()).toBe(2);
@@ -149,5 +150,139 @@ describe('ServiceManagementComponent', () => {
 
     component.deleteService();
     expect(mockAdminService.deleteAdminService).toHaveBeenCalledWith('1');
+  });
+
+  // ==========================================
+  // FINANCIAL FIELDS (v1.7.0): pricePerMinute, taxRate form fields
+  // ==========================================
+
+  describe('[GREEN] Financial form fields (v1.7.0)', () => {
+    it('[Green] should have formPricePerMinute initialized to null', () => {
+      expect(component.formPricePerMinute).toBeNull();
+    });
+
+    it('[Green] should have formTaxRate initialized to null', () => {
+      expect(component.formTaxRate).toBeNull();
+    });
+
+    it('[Green] should populate pricePerMinute when editing service', () => {
+      const svc: AdminServiceItem = {
+        id: '1', name: 'Haircut', description: 'Cut', duration: 30, price: 25,
+        pricePerMinute: 0.5, taxRate: 8,
+        active: true, createdAt: '2026-01-01T00:00:00Z',
+      };
+      component.editService(svc);
+      expect(component.formPricePerMinute).toBe(0.5);
+      expect(component.formTaxRate).toBe(8);
+    });
+
+    it('[Green] should reset financial form fields on close', () => {
+      component.formPricePerMinute = 0.75;
+      component.formTaxRate = 10;
+      component.closeDialog();
+      expect(component.formPricePerMinute).toBeNull();
+      expect(component.formTaxRate).toBeNull();
+    });
+  });
+
+  // ==========================================
+  // [RED] Price Per Minute auto-computation (Option 2)
+  // ==========================================
+
+  describe('[RED] Price Per Minute auto-computation (Option 2)', () => {
+    it('[Red] should return null for computedPricePerMinute when formPrice is null', () => {
+      component.formPrice = null;
+      component.formDuration = 30;
+      expect(component.computedPricePerMinute()).toBeNull();
+    });
+
+    it('[Red] should return null for computedPricePerMinute when formDuration is null', () => {
+      component.formPrice = 25;
+      component.formDuration = null;
+      expect(component.computedPricePerMinute()).toBeNull();
+    });
+
+    it('[Red] should return null for computedPricePerMinute when formDuration is 0', () => {
+      component.formPrice = 25;
+      component.formDuration = 0;
+      expect(component.computedPricePerMinute()).toBeNull();
+    });
+
+    it('[Red] should compute pricePerMinute as price / duration', () => {
+      component.formPrice = 60;
+      component.formDuration = 30;
+      expect(component.computedPricePerMinute()).toBe(2);
+    });
+
+    it('[Red] should compute fractional pricePerMinute correctly', () => {
+      component.formPrice = 25;
+      component.formDuration = 30;
+      expect(component.computedPricePerMinute()).toBeCloseTo(0.8333, 2);
+    });
+
+    it('[Red] should NOT include pricePerMinute in create DTO', () => {
+      component.openNew();
+      component.formName = 'Test Service';
+      component.formDuration = 30;
+      component.formPrice = 60;
+      component.formPricePerMinute = 999; // should be ignored
+
+      mockAdminService.createAdminService.mockReturnValue(of({
+        id: 'new-1', name: 'Test Service', description: '', duration: 30, price: 60,
+        active: true, createdAt: '2026-01-01T00:00:00Z',
+      }));
+
+      component.saveService();
+
+      const calledDto = mockAdminService.createAdminService.mock.calls[0][0];
+      expect(calledDto.pricePerMinute).toBeUndefined();
+      expect(calledDto.price).toBe(60);
+    });
+
+    it('[Red] should NOT include pricePerMinute in update DTO', () => {
+      const svc: AdminServiceItem = {
+        id: '1', name: 'Haircut', description: 'Cut', duration: 30, price: 25,
+        pricePerMinute: 0.83, taxRate: 8, active: true, createdAt: '2026-01-01T00:00:00Z',
+      };
+      component.editService(svc);
+      component.formPricePerMinute = 999; // should be ignored
+
+      mockAdminService.updateAdminService.mockReturnValue(of({
+        id: '1', name: 'Haircut', description: 'Cut', duration: 30, price: 25,
+        pricePerMinute: 0.83, taxRate: 8, active: true, createdAt: '2026-01-01T00:00:00Z',
+      }));
+
+      component.saveService();
+
+      const calledDto = mockAdminService.updateAdminService.mock.calls[0][1];
+      expect(calledDto.pricePerMinute).toBeUndefined();
+      expect(calledDto.name).toBe('Haircut');
+    });
+
+    it('[Red] should show auto-calculated hint when computedPricePerMinute is null while creating', () => {
+      component.openNew();
+      component.formPrice = null;
+      component.formDuration = null;
+      expect(component.computedPricePerMinute()).toBeNull();
+      // In this state the template will show "Auto-calculated from Price / Duration"
+    });
+
+    it('[Red] should update computedPricePerMinute reactively when price changes', () => {
+      component.formPrice = 100;
+      component.formDuration = 50;
+      expect(component.computedPricePerMinute()).toBe(2);
+
+      component.formPrice = 200;
+      expect(component.computedPricePerMinute()).toBe(4);
+    });
+
+    it('[Red] should update computedPricePerMinute reactively when duration changes', () => {
+      component.formPrice = 100;
+      component.formDuration = 50;
+      expect(component.computedPricePerMinute()).toBe(2);
+
+      component.formDuration = 25;
+      expect(component.computedPricePerMinute()).toBe(4);
+    });
   });
 });

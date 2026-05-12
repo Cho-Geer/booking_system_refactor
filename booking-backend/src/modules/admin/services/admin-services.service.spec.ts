@@ -8,7 +8,11 @@ import {
   UpdateAdminServiceDto,
   AdminServicesQueryDto,
 } from '../dto/admin-service.dto';
-import { toAdminServiceDto, fromCreateAdminServiceDto, fromUpdateAdminServiceDto } from '../mappers/service.mapper';
+import {
+  toAdminServiceDto,
+  fromCreateAdminServiceDto,
+  fromUpdateAdminServiceDto,
+} from '../mappers/service.mapper';
 
 jest.mock('../mappers/service.mapper', () => ({
   toAdminServiceDto: jest.fn(),
@@ -39,6 +43,7 @@ const prismaServiceFixture = {
   description: 'Professional haircut service',
   durationMinutes: 30,
   price: 50.0,
+  pricePerMinute: null,
   imageUrl: null,
   isActive: true,
   displayOrder: 0,
@@ -61,6 +66,7 @@ const adminServiceDtoFixture = {
   description: 'Professional haircut service',
   duration: 30,
   price: 50,
+  pricePerMinute: undefined,
   active: true,
   imageUrl: undefined,
   createdAt: new Date('2024-01-01'),
@@ -72,6 +78,7 @@ const adminServiceDtoFixture2 = {
   description: 'Nail care service',
   duration: 30,
   price: 35,
+  pricePerMinute: undefined,
   active: true,
   imageUrl: undefined,
   createdAt: new Date('2024-01-01'),
@@ -301,31 +308,43 @@ describe('AdminServicesService', () => {
       active: true,
     };
 
-    const prismaCreateData = {
+    // Expected prisma create data including auto-calculated pricePerMinute
+    const prismaCreateDataWithPricePerMinute = {
       name: 'New Service',
       description: 'Brand new service',
       durationMinutes: 45,
       price: 80,
+      pricePerMinute: 1.78,
       isActive: true,
       imageUrl: undefined,
     };
 
     it('should map DTO, delegate to ServicesService.create, and map result', async () => {
-      (fromCreateAdminServiceDto as jest.Mock).mockReturnValue(prismaCreateData);
+      (fromCreateAdminServiceDto as jest.Mock).mockReturnValue(
+        prismaCreateDataWithPricePerMinute,
+      );
       mockServicesService.create.mockResolvedValue(prismaServiceFixture);
       (toAdminServiceDto as jest.Mock).mockReturnValue({
         ...adminServiceDtoFixture,
         name: 'New Service',
         duration: 45,
         price: 80,
+        pricePerMinute: 1.78,
       });
 
       const result = await adminService.create(createDto);
 
-      expect(fromCreateAdminServiceDto).toHaveBeenCalledWith(createDto);
-      expect(servicesService.create).toHaveBeenCalledWith(prismaCreateData);
+      // Verify the mapper was called with a DTO that has auto-calculated pricePerMinute
+      expect(fromCreateAdminServiceDto).toHaveBeenCalledWith({
+        ...createDto,
+        pricePerMinute: 1.78,
+      });
+      expect(servicesService.create).toHaveBeenCalledWith(
+        prismaCreateDataWithPricePerMinute,
+      );
       expect(toAdminServiceDto).toHaveBeenCalledWith(prismaServiceFixture);
       expect(result).toBeDefined();
+      expect(result).toHaveProperty('pricePerMinute', 1.78);
     });
 
     it('should work without optional active field (defaults to true in mapper)', async () => {
@@ -338,10 +357,15 @@ describe('AdminServicesService', () => {
         name: 'Basic Service',
         durationMinutes: 30,
         price: 50,
+        pricePerMinute: 1.67,
         isActive: true,
         imageUrl: undefined,
       };
-      const mockedPrismaResult = { ...prismaServiceFixture, id: 'svc-3', name: 'Basic Service' };
+      const mockedPrismaResult = {
+        ...prismaServiceFixture,
+        id: 'svc-3',
+        name: 'Basic Service',
+      };
 
       (fromCreateAdminServiceDto as jest.Mock).mockReturnValue(prismaData);
       mockServicesService.create.mockResolvedValue(mockedPrismaResult);
@@ -350,14 +374,76 @@ describe('AdminServicesService', () => {
         name: 'Basic Service',
         duration: 30,
         price: 50,
+        pricePerMinute: 1.67,
         active: true,
       });
 
       const result = await adminService.create(dtoWithoutActive);
 
-      expect(fromCreateAdminServiceDto).toHaveBeenCalledWith(dtoWithoutActive);
+      expect(fromCreateAdminServiceDto).toHaveBeenCalledWith({
+        ...dtoWithoutActive,
+        pricePerMinute: 1.67,
+      });
       expect(servicesService.create).toHaveBeenCalledWith(prismaData);
       expect(result).toBeDefined();
+    });
+
+    it('[RED] should auto-calculate pricePerMinute when not provided', async () => {
+      const dto: CreateAdminServiceDto = {
+        name: 'Auto Calc Service',
+        duration: 60,
+        price: 120,
+      };
+
+      (fromCreateAdminServiceDto as jest.Mock).mockReturnValue({});
+      mockServicesService.create.mockResolvedValue(prismaServiceFixture);
+      (toAdminServiceDto as jest.Mock).mockReturnValue({});
+
+      await adminService.create(dto);
+
+      // pricePerMinute should be 120/60 = 2.00
+      expect(fromCreateAdminServiceDto).toHaveBeenCalledWith(
+        expect.objectContaining({ pricePerMinute: 2.0 }),
+      );
+    });
+
+    it('[RED] should use provided pricePerMinute when explicitly set', async () => {
+      const dto: CreateAdminServiceDto = {
+        name: 'Explicit PPM',
+        duration: 60,
+        price: 120,
+        pricePerMinute: 5.0,
+      };
+
+      (fromCreateAdminServiceDto as jest.Mock).mockReturnValue({});
+      mockServicesService.create.mockResolvedValue(prismaServiceFixture);
+      (toAdminServiceDto as jest.Mock).mockReturnValue({});
+
+      await adminService.create(dto);
+
+      // Should use explicit 5.0, NOT 120/60=2.0
+      expect(fromCreateAdminServiceDto).toHaveBeenCalledWith(
+        expect.objectContaining({ pricePerMinute: 5.0 }),
+      );
+    });
+
+    it('[RED] should not divide by zero when duration is 0', async () => {
+      const dto: CreateAdminServiceDto = {
+        name: 'Zero Duration',
+        duration: 0,
+        price: 100,
+      };
+
+      (fromCreateAdminServiceDto as jest.Mock).mockReturnValue({});
+      mockServicesService.create.mockResolvedValue(prismaServiceFixture);
+      (toAdminServiceDto as jest.Mock).mockReturnValue({});
+
+      await adminService.create(dto);
+
+      // pricePerMinute should remain undefined (not computed from price/0)
+      expect(fromCreateAdminServiceDto).toHaveBeenCalledWith(
+        expect.not.objectContaining({ pricePerMinute: expect.any(Number) }),
+      );
     });
   });
 
@@ -374,8 +460,14 @@ describe('AdminServicesService', () => {
     };
 
     it('should map DTO, delegate to ServicesService.update, and map result', async () => {
-      (fromUpdateAdminServiceDto as jest.Mock).mockReturnValue(prismaUpdateData);
-      const updatedPrisma = { ...prismaServiceFixture, name: 'Updated Service', price: 100 };
+      (fromUpdateAdminServiceDto as jest.Mock).mockReturnValue(
+        prismaUpdateData,
+      );
+      const updatedPrisma = {
+        ...prismaServiceFixture,
+        name: 'Updated Service',
+        price: 100,
+      };
       mockServicesService.update.mockResolvedValue(updatedPrisma);
       (toAdminServiceDto as jest.Mock).mockReturnValue({
         ...adminServiceDtoFixture,
@@ -386,13 +478,18 @@ describe('AdminServicesService', () => {
       const result = await adminService.update('svc-1', updateDto);
 
       expect(fromUpdateAdminServiceDto).toHaveBeenCalledWith(updateDto);
-      expect(servicesService.update).toHaveBeenCalledWith('svc-1', prismaUpdateData);
+      expect(servicesService.update).toHaveBeenCalledWith(
+        'svc-1',
+        prismaUpdateData,
+      );
       expect(toAdminServiceDto).toHaveBeenCalledWith(updatedPrisma);
       expect(result).toBeDefined();
     });
 
     it('should propagate NotFoundException from ServicesService.update', async () => {
-      (fromUpdateAdminServiceDto as jest.Mock).mockReturnValue(prismaUpdateData);
+      (fromUpdateAdminServiceDto as jest.Mock).mockReturnValue(
+        prismaUpdateData,
+      );
       mockServicesService.update.mockRejectedValue(
         new NotFoundException('Service with ID invalid-id not found'),
       );
@@ -417,15 +514,74 @@ describe('AdminServicesService', () => {
       const result = await adminService.update('svc-1', deactivateDto);
 
       expect(fromUpdateAdminServiceDto).toHaveBeenCalledWith(deactivateDto);
-      expect(servicesService.update).toHaveBeenCalledWith('svc-1', prismaUpdate);
+      expect(servicesService.update).toHaveBeenCalledWith(
+        'svc-1',
+        prismaUpdate,
+      );
       expect(result).toBeDefined();
+    });
+
+    it('[RED] should auto-calculate pricePerMinute when both price and duration are in update DTO', async () => {
+      const dto: UpdateAdminServiceDto = {
+        price: 100,
+        duration: 50,
+      };
+
+      (fromUpdateAdminServiceDto as jest.Mock).mockReturnValue({});
+      mockServicesService.update.mockResolvedValue(prismaServiceFixture);
+      (toAdminServiceDto as jest.Mock).mockReturnValue({});
+
+      await adminService.update('svc-1', dto);
+
+      // pricePerMinute should be 100/50 = 2.00
+      expect(fromUpdateAdminServiceDto).toHaveBeenCalledWith(
+        expect.objectContaining({ pricePerMinute: 2.0 }),
+      );
+    });
+
+    it('[RED] should use explicitly provided pricePerMinute and not recalculate', async () => {
+      const dto: UpdateAdminServiceDto = {
+        price: 100,
+        duration: 50,
+        pricePerMinute: 10.0,
+      };
+
+      (fromUpdateAdminServiceDto as jest.Mock).mockReturnValue({});
+      mockServicesService.update.mockResolvedValue(prismaServiceFixture);
+      (toAdminServiceDto as jest.Mock).mockReturnValue({});
+
+      await adminService.update('svc-1', dto);
+
+      // Should use explicit 10.0, NOT 100/50=2.0
+      expect(fromUpdateAdminServiceDto).toHaveBeenCalledWith(
+        expect.objectContaining({ pricePerMinute: 10.0 }),
+      );
+    });
+
+    it('[RED] should not change pricePerMinute when only price is in DTO (no duration)', async () => {
+      const dto: UpdateAdminServiceDto = {
+        price: 200,
+      };
+
+      (fromUpdateAdminServiceDto as jest.Mock).mockReturnValue({});
+      mockServicesService.update.mockResolvedValue(prismaServiceFixture);
+      (toAdminServiceDto as jest.Mock).mockReturnValue({});
+
+      await adminService.update('svc-1', dto);
+
+      // Neither price nor duration both present, so no auto-calculation
+      expect(fromUpdateAdminServiceDto).toHaveBeenCalledWith(
+        expect.not.objectContaining({ pricePerMinute: expect.any(Number) }),
+      );
     });
   });
 
   // ─── remove ──────────────────────────────────────────────────────────
   describe('remove', () => {
     it('should delegate to ServicesService.remove and return void', async () => {
-      mockServicesService.remove.mockResolvedValue({ message: 'Service deleted successfully' });
+      mockServicesService.remove.mockResolvedValue({
+        message: 'Service deleted successfully',
+      });
 
       const result = await adminService.remove('svc-1');
 

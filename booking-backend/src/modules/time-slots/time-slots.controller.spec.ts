@@ -46,16 +46,18 @@ describe('TimeSlotsController', () => {
   describe('create', () => {
     const createTimeSlotDto: CreateTimeSlotDto = {
       serviceId: 'service-1',
-      slotTime: '2024-06-15T10:00:00.000Z',
-      durationMinutes: 60,
+      startTime: '2024-06-15T10:00:00.000Z',
+      endTime: '2024-06-15T11:00:00.000Z',
       capacity: 1,
-      isActive: true,
-      displayOrder: 0,
     };
 
     const mockTimeSlot = {
       id: 'slot-1',
       ...createTimeSlotDto,
+      startTime: new Date(createTimeSlotDto.startTime),
+      endTime: new Date(createTimeSlotDto.endTime),
+      serviceId: 'service-1',
+      isActive: true,
       createdAt: new Date('2024-01-01'),
       updatedAt: new Date('2024-01-01'),
     };
@@ -184,8 +186,8 @@ describe('TimeSlotsController', () => {
 
   describe('getAvailableSlots', () => {
     const mockAvailableSlots = [
-      { id: 'slot-1', slotTime: '2024-06-15T10:00:00.000Z', capacity: 5, bookedCount: 2 },
-      { id: 'slot-2', slotTime: '2024-06-15T11:00:00.000Z', capacity: 5, bookedCount: 0 },
+      { id: 'slot-1', startTime: new Date('2024-06-15T10:00:00.000Z'), endTime: new Date('2024-06-15T10:30:00.000Z'), capacity: 5, bookedCount: 2 },
+      { id: 'slot-2', startTime: new Date('2024-06-15T11:00:00.000Z'), endTime: new Date('2024-06-15T11:30:00.000Z'), capacity: 5, bookedCount: 0 },
     ];
 
     it('should call service.getAvailableSlots with correct parameters', async () => {
@@ -222,7 +224,8 @@ describe('TimeSlotsController', () => {
     const mockTimeSlot = {
       id: 'slot-1',
       serviceId: 'service-1',
-      slotTime: '2024-06-15T10:00:00.000Z',
+      startTime: new Date('2024-06-15T10:00:00.000Z'),
+      endTime: new Date('2024-06-15T10:30:00.000Z'),
       isActive: true,
     };
 

@@ -12,6 +12,8 @@ export interface Service {
   durationMinutes: number; // Alias for backward compatibility
   price: number;
   active: boolean;
+  pricePerMinute?: number;
+  taxRate?: number;
 }
 
 export type ServiceListResponse = Service[];

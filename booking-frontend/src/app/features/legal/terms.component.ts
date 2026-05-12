@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-terms',
   standalone: true,
-  imports: [RouterModule],
+  imports: [RouterLink],
   templateUrl: './terms.component.html',
   styleUrl: './terms.component.scss',
 })

@@ -100,3 +100,4 @@ export class ThemeService {
     localStorage.setItem(STORAGE_KEY, isDark ? DARK_VALUE : LIGHT_VALUE);
   }
 }
+

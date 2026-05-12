@@ -4,6 +4,7 @@ import { AdminService } from './admin.service';
 import {
   AdminStats,
   AdminUser,
+  StatCard,
   AdminServiceItem,
   AdminAppointment,
   CreateAdminUserRequest,
@@ -14,6 +15,9 @@ import {
   BatchCancelRequest,
   BatchCancelResponse,
   PaginatedResponse,
+  TimeDistributionItem,
+  StaffWorkloadItem,
+  SystemHealth,
 } from '../dto/admin.dto';
 
 describe('AdminService', () => {
@@ -40,18 +44,22 @@ describe('AdminService', () => {
 
   describe('getStats()', () => {
     it('[RED] should fetch admin stats from GET /v1/admin/stats', () => {
+      const sc = (v: number, ch = 0, pos = true, tg = 1000, pp = 0): StatCard => ({
+        value: v, changePercentage: ch, isPositive: pos, target: tg, progressPercentage: pp,
+      });
       const mockStats: AdminStats = {
-        totalBookings: 150,
-        todayBookings: 12,
-        activeUsers: 45,
-        totalRevenue: 12500.50,
+        totalBookings: sc(150),
+        todayBookings: sc(12),
+        pendingBookings: sc(0),
+        activeUsers: sc(45),
+        totalRevenue: sc(12500.50),
         bookingTrend: [
-          { date: '2026-04-24', count: 5 },
-          { date: '2026-04-25', count: 8 },
+          { date: '2026-04-24', count: 5, revenue: 250 },
+          { date: '2026-04-25', count: 8, revenue: 400 },
         ],
         servicePopularity: [
-          { serviceName: 'Haircut', count: 30 },
-          { serviceName: 'Massage', count: 20 },
+          { serviceName: 'Haircut', count: 30, percentage: 60 },
+          { serviceName: 'Massage', count: 20, percentage: 40 },
         ],
       };
 
@@ -295,6 +303,80 @@ describe('AdminService', () => {
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual(dto);
       req.flush({ successCount: 2, failedCount: 0, failedIds: [] });
+    });
+  });
+
+  // ==========================================
+  // Time Distribution
+  // ==========================================
+
+  describe('getTimeDistribution()', () => {
+    it('[RED] should fetch time distribution from GET /v1/admin/stats/time-distribution', () => {
+      const mockData: TimeDistributionItem[] = [
+        { hour: '09:00', count: 8 },
+        { hour: '10:00', count: 12 },
+        { hour: '11:00', count: 15 },
+      ];
+
+      service.getTimeDistribution().subscribe(data => {
+        expect(data).toEqual(mockData);
+        expect(data.length).toBe(3);
+        expect(data[0].hour).toBe('09:00');
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/admin/stats/time-distribution`);
+      expect(req.request.method).toBe('GET');
+      req.flush(mockData);
+    });
+
+    it('[RED] should handle error when fetching time distribution', () => {
+      service.getTimeDistribution().subscribe({
+        next: () => fail('expected error'),
+        error: (error) => {
+          expect(error).toBeTruthy();
+        },
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/admin/stats/time-distribution`);
+      req.flush({ message: 'Forbidden' }, { status: 403, statusText: 'Forbidden' });
+    });
+  });
+
+  // ==========================================
+  // System Health
+  // ==========================================
+
+  describe('getSystemStatus()', () => {
+    it('[RED] should fetch system health from GET /v1/admin/system/health', () => {
+      const mockHealth: SystemHealth = {
+        server: 'Online',
+        database: 'Online',
+        api: 'Online',
+        lastBackup: '2026-05-06T02:15:00Z',
+        uptime: '99.9%',
+      };
+
+      service.getSystemStatus().subscribe(data => {
+        expect(data).toEqual(mockHealth);
+        expect(data.server).toBe('Online');
+        expect(data.uptime).toBe('99.9%');
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/admin/system/health`);
+      expect(req.request.method).toBe('GET');
+      req.flush(mockHealth);
+    });
+
+    it('[RED] should handle error when fetching system health', () => {
+      service.getSystemStatus().subscribe({
+        next: () => fail('expected error'),
+        error: (error) => {
+          expect(error).toBeTruthy();
+        },
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/admin/system/health`);
+      req.flush({ message: 'Unauthorized' }, { status: 401, statusText: 'Unauthorized' });
     });
   });
 

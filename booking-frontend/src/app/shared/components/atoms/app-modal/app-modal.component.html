@@ -8,7 +8,7 @@
   [modal]="modal() ?? false"
   [position]="position()"
   [styleClass]="combinedStyleClass"
-  [appendTo]="appendTo() || 'body'"
+  [appendTo]="appendTo()"
   (visibleChange)="visibleChange.emit($event)"
 >
   <!-- Header slot -->

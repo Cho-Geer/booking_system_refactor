@@ -8,3 +8,17 @@
 .app-chart-container ::ng-deep canvas {
   max-width: 100%;
 }
+
+.app-chart-container canvas.hidden {
+  display: none;
+}
+
+.app-chart-no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  gap: 0.5rem;
+}

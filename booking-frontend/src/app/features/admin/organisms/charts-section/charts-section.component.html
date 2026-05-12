@@ -1,0 +1,18 @@
+@defer (on viewport) {
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+    <app-booking-trends-chart [data]="bookingTrendData()" [options]="bookingTrendOptions()" (periodChange)="periodChange.emit($event)" />
+    <app-booking-distribution-panel
+      [doughnutData]="doughnutData()"
+      [barData]="barData()"
+      [doughnutOptions]="doughnutOptions()"
+      [barOptions]="barOptions()"
+      [selectedTimeRange]="timeRange()"
+      (timeRangeChange)="timeRangeChange.emit($event)"
+    />
+  </div>
+} @placeholder {
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+    <div class="sharp-card p-5 bg-card-bg"><div class="skeleton h-72 w-full rounded-lg"></div></div>
+    <div class="sharp-card p-5 bg-card-bg"><div class="skeleton h-72 w-full rounded-lg"></div></div>
+  </div>
+}

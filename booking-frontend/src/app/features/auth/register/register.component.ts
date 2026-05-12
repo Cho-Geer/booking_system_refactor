@@ -7,7 +7,7 @@ import {
   ValidationErrors,
   ValidatorFn,
 } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthStore } from '../../../stores/auth/auth.store';
 import { ApiService } from '../../../core/services/api.service';
 import { SocketService } from '../../../core/services/socket.service';
@@ -51,7 +51,7 @@ const passwordStrengthValidator: ValidatorFn = (control: AbstractControl): Valid
   standalone: true,
   imports: [
     ReactiveFormsModule,
-    RouterModule,
+    RouterLink,
     CommonModule,
     FormsModule,
     AppCardComponent,

@@ -72,9 +72,8 @@ export class AppModalComponent {
 
   get combinedStyleClass(): string {
     const base = this.styleClass() || '';
-    const animClass = 'animate-fade-in sharp-card';
     const sizeClass = this.getSizeClass();
-    return [base, animClass, sizeClass].filter(Boolean).join(' ');
+    return [base, 'sharp-card', sizeClass].filter(Boolean).join(' ');
   }
 
   /** Get style class for modal size. */

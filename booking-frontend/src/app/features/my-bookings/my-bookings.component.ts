@@ -1,5 +1,4 @@
 import { Component, inject, OnInit, signal, computed, HostListener } from '@angular/core';
-import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../core/services/api.service';
 import { AuthStore } from '../../stores/auth/auth.store';
@@ -28,7 +27,6 @@ type FilterValue = 'all' | string;
   standalone: true,
   imports: [
     CommonModule,
-    RouterModule,
     AppBadgeComponent,
     AppEmptyStateComponent,
     AppCardComponent,

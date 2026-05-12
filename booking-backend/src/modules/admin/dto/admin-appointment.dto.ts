@@ -1,4 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { IsOptional, IsNumber, IsString, IsNotEmpty } from "class-validator";
+import { Type } from "class-transformer";
 
 export class AdminAppointmentDto {
   @ApiProperty()
@@ -59,25 +61,73 @@ export class BatchCancelResponseDto {
   failedIds!: string[];
 }
 
+export class CreateAdminAppointmentDto {
+  @ApiProperty({ description: "Customer user ID" })
+  @IsString()
+  @IsNotEmpty()
+  userId!: string;
+
+  @ApiProperty({ description: "Service ID" })
+  @IsString()
+  @IsNotEmpty()
+  serviceId!: string;
+
+  @ApiProperty({ format: "date-time", description: "Appointment date and time" })
+  @IsString()
+  @IsNotEmpty()
+  appointmentDate!: string;
+
+  @ApiProperty({ description: "Time slot ID. If not provided, the first available slot for the service and date will be auto-assigned." })
+  @IsOptional()
+  @IsString()
+  timeSlotId?: string;
+
+  @ApiPropertyOptional({ description: "Additional notes" })
+  @IsOptional()
+  @IsString()
+  notes?: string;
+}
+
 export class AdminAppointmentsQueryDto {
   @ApiPropertyOptional({ default: 1 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
   page?: number = 1;
 
   @ApiPropertyOptional({ default: 20 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
   limit?: number = 20;
 
   @ApiPropertyOptional({ enum: ["PENDING", "CONFIRMED", "COMPLETED", "CANCELLED", "EXPIRED"] })
+  @IsOptional()
+  @IsString()
   status?: string;
 
   @ApiPropertyOptional({ format: "date" })
+  @IsOptional()
+  @IsString()
   startDate?: string;
 
   @ApiPropertyOptional({ format: "date" })
+  @IsOptional()
+  @IsString()
   endDate?: string;
 
   @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
   serviceId?: string;
 
   @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
   userId?: string;
+
+  @ApiPropertyOptional({ description: "Search by appointment number, customer name, or service name" })
+  @IsOptional()
+  @IsString()
+  search?: string;
 }

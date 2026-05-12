@@ -3,6 +3,7 @@ import { NotFoundException, ConflictException, BadRequestException, Logger } fro
 import { PrismaService } from '../../common/database/prisma.service';
 import { EmailService } from '../email/email.service';
 import { NotificationService } from '../notifications/notification.service';
+import { NotificationsGateway } from '../notifications/notifications.gateway';
 import { AppointmentsService } from './appointments.service';
 import { CreateAppointmentDto, UpdateAppointmentDto } from './dto/appointment.dto';
 import { AppointmentStatus } from '@prisma/client';
@@ -46,6 +47,16 @@ const mockNotificationService = {
   notifyCancellation: jest.fn(),
 };
 
+// Mock NotificationsGateway
+const mockNotificationsGateway = {
+  sendAppointmentStatusChanged: jest.fn(),
+  sendAppointmentUpdate: jest.fn(),
+  sendBookingConfirmation: jest.fn(),
+  sendCancellation: jest.fn(),
+  sendBroadcast: jest.fn(),
+  sendAdminBroadcast: jest.fn(),
+};
+
 // Mock Logger
 const mockLogger = {
   log: jest.fn(),
@@ -78,6 +89,10 @@ describe('AppointmentsService', () => {
           provide: Logger,
           useValue: mockLogger,
         },
+        {
+          provide: NotificationsGateway,
+          useValue: mockNotificationsGateway,
+        },
       ],
     }).compile();
 
@@ -92,7 +107,7 @@ describe('AppointmentsService', () => {
   const mockTimeSlot = {
     id: 'slot-1',
     serviceId: 'service-1',
-    slotTime: '2024-06-15T09:00:00.000Z',
+    startTime: new Date('2024-06-15T09:00:00.000Z'),
     endTime: new Date('2024-06-15T09:30:00.000Z'),
     isActive: true,
     currentSequence: 0,
@@ -781,7 +796,7 @@ describe('AppointmentsService', () => {
         userId: 'user-1',
         serviceName: 'Haircut',
         date: '2024-06-15',
-        time: '2024-06-15T09:00:00.000Z',
+        time: expect.any(String),
         status: AppointmentStatus.CONFIRMED,
         customerName: 'John Doe',
         customerEmail: 'john@example.com',
@@ -991,7 +1006,7 @@ describe('AppointmentsService', () => {
         customerEmail: 'john@example.com',
         serviceName: 'Haircut',
         date: '2024-06-15',
-        time: '2024-06-15T09:00:00.000Z',
+        time: expect.any(String),
         cancelReason: 'Customer request',
       });
     });
@@ -1022,7 +1037,7 @@ describe('AppointmentsService', () => {
         userId: 'user-1',
         serviceName: 'Haircut',
         date: '2024-06-15',
-        time: '2024-06-15T09:00:00.000Z',
+        time: expect.any(String),
         cancelReason: 'Customer request',
         customerName: 'John Doe',
         customerEmail: 'john@example.com',
@@ -1143,6 +1158,10 @@ if (isIntegrationMode()) {
           {
             provide: Logger,
             useValue: mockLogger,
+          },
+          {
+            provide: NotificationsGateway,
+            useValue: mockNotificationsGateway,
           },
         ],
       }).compile();

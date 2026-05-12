@@ -1,6 +1,6 @@
 import { Component, input, output } from '@angular/core';
 import { ReactiveFormsModule, FormGroup } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -15,7 +15,7 @@ export interface PasswordRequirements {
 @Component({
   selector: 'app-register-form',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterModule, CommonModule, FormsModule],
+  imports: [ReactiveFormsModule, RouterLink, CommonModule, FormsModule],
   templateUrl: './register-form.component.html',
   styleUrl: './register-form.component.scss',
 })

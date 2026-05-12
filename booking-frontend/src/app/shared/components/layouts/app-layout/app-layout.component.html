@@ -1,25 +1,32 @@
 <div data-testid="layout-container" class="layout-container">
-  <div data-testid="layout-wrapper" class="layout-wrapper">
+  <div data-testid="layout-wrapper"
+       class="layout-wrapper transition-colors duration-300"
+       [class.gradient-page-bg]="!isAdminRoute()">
     <app-header [navLinks]="navLinks()"
                 [userName]="userName()"
                 [userRole]="userRole()"
                 [isAdmin]="isAdmin()"
                 [menuItems]="menuItems()"
+                [showSearch]="showSearchInHeader()"
+                [notificationCount]="notificationCount()"
                 (menuToggle)="onMenuToggle()"
-                (logout)="onLogout()"
-                (actionClick)="onHeaderAction($event)" />
+                (logout)="onLogout()" />
 
     <div class="layout-content">
-      <app-sidebar [items]="sidebarItems()"
-                   [sections]="sidebarSections()"
-                   [navLinks]="navLinks()"
-                   [isOpen]="sidebarOpen"
-                   [userName]="userName()"
-                   [userRole]="userRole()"
-                   (close)="sidebarOpen = false" />
+    <app-sidebar [items]="sidebarItems()"
+                 [sections]="sidebarSections()"
+                 [navLinks]="navLinks()"
+                 [isOpen]="sidebarOpen"
+                 [userName]="userName()"
+                 [userRole]="userRole()"
+                 [solid]="sidebarSolid()"
+                 (close)="sidebarOpen = false"
+                 (logout)="onLogout()" />
 
-      <main class="main-content">
-        <div class="content-wrapper">
+      <!-- Main content area -->
+      <main class="main-content transition-all duration-300 z-[1] relative w-full"
+            [class.bg-grid]="isAdminRoute()">
+        <div class="w-full p-4 lg:p-6 animate-page-enter">
           <router-outlet />
         </div>
       </main>

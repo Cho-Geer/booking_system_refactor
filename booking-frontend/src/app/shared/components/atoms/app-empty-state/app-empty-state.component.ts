@@ -14,7 +14,7 @@ import { CommonModule } from '@angular/common';
       <h3 class="text-lg font-bold text-text-primary mb-2">{{ title }}</h3>
       <p class="text-sm text-text-secondary mb-6 max-w-sm" *ngIf="description">{{ description }}</p>
       <button *ngIf="actionLabel"
-              class="px-6 py-2.5 rounded-lg bg-accent-blue hover:bg-accent-blue-dark text-white font-medium text-sm transition-colors active:scale-[0.98]"
+              class="px-6 py-2.5 rounded-lg bg-accent-green hover:bg-accent-green-dark text-white font-medium text-sm transition-colors active:scale-[0.98]"
               (click)="action.emit()">
         {{ actionLabel }}
       </button>

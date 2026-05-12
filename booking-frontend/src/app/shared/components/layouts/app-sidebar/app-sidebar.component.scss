@@ -1,3 +1,8 @@
+:host {
+  display: flex;
+  height: 100%;
+}
+
 .sidebar {
   background: var(--color-bg-secondary, #162032);
 }

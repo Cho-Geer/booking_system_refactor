@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { SocketService, SlotUpdateEvent } from './socket.service';
+import { SocketService, SlotUpdateEvent, AppointmentStatusEvent } from './socket.service';
 
 // Mock socket.io-client
 const mockSocketInstance = {
@@ -283,6 +283,78 @@ describe('SocketService', () => {
         slotUpdateCallback({ slotId: 'slot-2', isActive: false, timestamp: Date.now() });
         slotUpdateCallback({ slotId: 'slot-3', isActive: true, timestamp: Date.now() });
       }
+    });
+  });
+
+  describe('AppointmentStatusEvent', () => {
+    it('should have the correct structure', () => {
+      const event: AppointmentStatusEvent = {
+        appointmentId: 'apt-1',
+        status: 'confirmed',
+        previousStatus: 'pending',
+        timestamp: '2026-05-08T10:00:00Z',
+      };
+
+      expect(event.appointmentId).toBe('apt-1');
+      expect(event.status).toBe('confirmed');
+      expect(event.previousStatus).toBe('pending');
+      expect(event.timestamp).toBe('2026-05-08T10:00:00Z');
+    });
+  });
+
+  describe('subscribeToAppointmentStatusChanges()', () => {
+    it('should return an Observable that emits on appointment.status_changed', (done) => {
+      service.connect();
+
+      const mockEvent: AppointmentStatusEvent = {
+        appointmentId: 'apt-1',
+        status: 'confirmed',
+        previousStatus: 'pending',
+        timestamp: '2026-05-08T10:00:00Z',
+      };
+
+      service.subscribeToAppointmentStatusChanges().subscribe((event) => {
+        expect(event).toEqual(mockEvent);
+        done();
+      });
+
+      const connectCallback = mockOnCallbacks['connect'];
+      if (connectCallback) {
+        connectCallback();
+      }
+
+      const callback = mockOnCallbacks['appointment.status_changed'];
+      if (callback) {
+        callback(mockEvent);
+      }
+    });
+
+    it('should call connect() when subscribing', () => {
+      service.subscribeToAppointmentStatusChanges().subscribe();
+
+      expect(mockSocketInstance.connect).toHaveBeenCalled();
+    });
+
+    it('should register socket event listener for appointment.status_changed', () => {
+      service.subscribeToAppointmentStatusChanges().subscribe();
+
+      expect(mockSocketInstance.on).toHaveBeenCalledWith('appointment.status_changed', expect.any(Function));
+    });
+
+    it('should clean up socket listener on unsubscribe', () => {
+      const subscription = service.subscribeToAppointmentStatusChanges().subscribe();
+
+      subscription.unsubscribe();
+
+      expect(mockSocketInstance.off).toHaveBeenCalledWith('appointment.status_changed');
+    });
+  });
+
+  describe('joinAdminRoom()', () => {
+    it('should emit join event with admin:broadcast room', () => {
+      service.joinAdminRoom();
+
+      expect(mockSocketInstance.emit).toHaveBeenCalledWith('join', { room: 'admin:broadcast' });
     });
   });
 });
