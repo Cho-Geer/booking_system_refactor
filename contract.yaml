@@ -337,13 +337,15 @@ api:
               properties:
                   user:
                     type: "object"
-                    properties:
-                      id: { type: "string" }
-                      email: { type: "string", description: "脱敏展示，如 us***@example.com" }
-                      name: { type: "string" }
-                      role: { type: "string", enum: ["CUSTOMER", "ADMIN", "SUPER_ADMIN"] }
-                      preferredTimezone: { type: "string", description: "用户偏好时区（IANA 字符串，可空）" }
-                    created_at: { type: "string", format: "date-time" }
+                     properties:
+                       id: { type: "string" }
+                       email: { type: "string", description: "脱敏展示，如 us***@example.com" }
+                       name: { type: "string" }
+                       phone: { type: "string", description: "脱敏展示，如 138****5678" }
+                       role: { type: "string", enum: ["CUSTOMER", "ADMIN", "SUPER_ADMIN"] }
+                       status: { type: "string", enum: ["ACTIVE", "INACTIVE", "BLOCKED"] }
+                       preferredTimezone: { type: "string", description: "用户偏好时区（IANA 字符串，可空）" }
+                     created_at: { type: "string", format: "date-time" }
 
       update_profile:
         method: "PUT"
@@ -358,16 +360,19 @@ api:
         response:
           success:
             status: 200
-            body:
-              type: "object"
-              properties:
-                user:
-                  type: "object"
-                  properties:
-                    id: { type: "string" }
-                    email: { type: "string", description: "脱敏展示，如 us***@example.com" }
-                    name: { type: "string" }
-                    role: { type: "string", enum: ["CUSTOMER", "ADMIN", "SUPER_ADMIN"] }
+               body:
+               type: "object"
+               properties:
+                 user:
+                   type: "object"
+                   properties:
+                     id: { type: "string" }
+                     email: { type: "string", description: "脱敏展示，如 us***@example.com" }
+                     name: { type: "string" }
+                     phone: { type: "string", description: "脱敏展示，如 138****5678" }
+                     role: { type: "string", enum: ["CUSTOMER", "ADMIN", "SUPER_ADMIN"] }
+                     status: { type: "string", enum: ["ACTIVE", "INACTIVE", "BLOCKED"] }
+                     created_at: { type: "string", format: "date-time" }
 
       update_password:
         method: "PUT"
@@ -598,15 +603,7 @@ api:
             body:
               type: "object"
               properties:
-                total_bookings:
-                  type: "object"
-                  properties:
-                    value: { type: "integer" }
-                    changePercentage: { type: "number" }
-                    isPositive: { type: "boolean" }
-                    target: { type: "integer" }
-                    progressPercentage: { type: "number" }
-                today_bookings:
+                 today_bookings:
                   type: "object"
                   properties:
                     value: { type: "integer" }
@@ -846,23 +843,40 @@ api:
               status: 200
               body:
                 type: "object"
-                properties:
-                  timezone:
-                    type: "string"
-                    description: "诊所默认时区（IANA，如 Asia/Shanghai）"
-                    example: "Asia/Shanghai"
-                  schedule:
-                    type: "object"
-                    description: "每周营业时间，key 为英文星期（monday~sunday），value 为营业时段数组。空数组表示休息"
-                    properties:
-                      monday:    { type: "array", items: { type: "object", properties: { open: { type: "string", example: "09:00" }, close: { type: "string", example: "17:00" } } } }
-                      tuesday:   { type: "array", items: { type: "object", properties: { open: { type: "string" }, close: { type: "string" } } } }
-                      wednesday: { type: "array", items: { type: "object", properties: { open: { type: "string" }, close: { type: "string" } } } }
-                      thursday:  { type: "array", items: { type: "object", properties: { open: { type: "string" }, close: { type: "string" } } } }
-                      friday:    { type: "array", items: { type: "object", properties: { open: { type: "string" }, close: { type: "string" } } } }
-                      saturday:  { type: "array", items: { type: "object", properties: { open: { type: "string" }, close: { type: "string" } } } }
-                      sunday:    { type: "array", items: { type: "object", properties: { open: { type: "string" }, close: { type: "string" } } } }
-                  updatedAt:
+                 properties:
+                   timezone:
+                     type: "string"
+                     description: "诊所默认时区（IANA，如 Asia/Shanghai）"
+                     example: "Asia/Shanghai"
+                   monday:
+                     type: "array"
+                     description: "星期一营业时段。空数组表示休息"
+                     items: { type: "object", properties: { open: { type: "string", example: "09:00" }, close: { type: "string", example: "17:00" } } }
+                   tuesday:
+                     type: "array"
+                     description: "星期二营业时段"
+                     items: { type: "object", properties: { open: { type: "string" }, close: { type: "string" } } }
+                   wednesday:
+                     type: "array"
+                     description: "星期三营业时段"
+                     items: { type: "object", properties: { open: { type: "string" }, close: { type: "string" } } }
+                   thursday:
+                     type: "array"
+                     description: "星期四营业时段"
+                     items: { type: "object", properties: { open: { type: "string" }, close: { type: "string" } } }
+                   friday:
+                     type: "array"
+                     description: "星期五营业时段"
+                     items: { type: "object", properties: { open: { type: "string" }, close: { type: "string" } } }
+                   saturday:
+                     type: "array"
+                     description: "星期六营业时段"
+                     items: { type: "object", properties: { open: { type: "string" }, close: { type: "string" } } }
+                   sunday:
+                     type: "array"
+                     description: "星期日营业时段。空数组表示休息"
+                     items: { type: "object", properties: { open: { type: "string" }, close: { type: "string" } } }
+                   updatedAt:
                     type: "string"
                     format: "date-time"
                     description: "最后更新时间"
@@ -1387,11 +1401,11 @@ data_models:
         description: "AES-256-GCM 密文"
         sensitive: true
       
-      passwordHash:
-        type: "string"
-        required: true
-        sensitive: true
-        description: "bcrypt 哈希（rounds=12）"
+       passwordHash:
+         type: "string"
+         nullable: true
+         sensitive: true
+         description: "bcrypt 哈希（rounds=12）。验证码登录用户可能为 null（仅密码登录用户有值）"
       
       userType:
         type: "string"
@@ -1470,11 +1484,12 @@ data_models:
         precision: 5
         scale: 4
         description: "Default tax rate for this service"
-      categoryId:
-        type: "string"
-        format: "uuid"
-        nullable: true
-        description: "Service category ID (ServiceCategory)"
+       categoryId:
+         type: "string"
+         format: "uuid"
+         nullable: true
+         description: "Service category ID (ServiceCategory)"
+         note: "⚠️ Contract defines nullable:true, but Prisma schema has categoryId as required (String). Must change to String? to align with contract."
       imageUrl:
         type: "string"
         nullable: true
@@ -2007,8 +2022,12 @@ api_field_mapping:
     - wire_field: "overtime_minutes"
       frontend_field: "overtimeMinutes"
       db_field: "overtime_minutes"
-  
-  # PII 字段（禁止暴露给前端）
+    - wire_field: "role"
+      frontend_field: "userType"
+      db_field: "user_type"
+      note: "API/前端使用role，数据库字段为user_type"
+   
+   # PII 字段（禁止暴露给前端）
   pii_fields_excluded:
     - "emailHash"
     - "phoneHash"
@@ -2563,6 +2582,10 @@ metadata:
   generation_date: "2026-04-15"
   last_updated: "2026-05-12"
   based_on_documents:
+    - "contract.yaml v1.7.5"
+    - ".opencode/context/requirements/数据架构设计文档.md v2.6.0"
+    - ".opencode/context/requirements/系统架构设计文档（SAD）.md v2.5.0"
+    - ".opencode/context/requirements/接口设计规范文档.md v2.9.0"
 
   change_log:
     - date: "2026-05-11"

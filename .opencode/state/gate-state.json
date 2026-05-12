@@ -3672,12 +3672,29 @@
       "session_id": "cg_ses_1778591654911",
       "created_at": "2026-05-12T13:14:14.912Z",
       "task_description": "Sync 4 baseline documents (contract.yaml, 数据架构设计文档, 系统架构设计文档, 接口设计规范文档) with system-timezone-architecture.md — add X-Timezone header, timezone params, User.preferredTimezone, BusinessHours config, new endpoints, and response format updates.",
-      "gate_status": "armed",
+      "gate_status": "completed",
       "last_check_failed_items": [],
       "plan_summary": "Sync 4 baseline docs with timezone architecture: contract.yaml v1.7.5 (X-Timezone header, timezone params, User.preferredTimezone, new endpoints, response offset), 数据架构设计文档 (User field + BusinessHours), 系统架构设计文档 (TimezoneModule ref), 接口设计规范文档 (timezone params sync).",
       "confirmed_at": "2026-05-12T13:14:20.596Z",
-      "consumed_at": null,
-      "audit": null
+      "consumed_at": "2026-05-12T13:18:24.074Z",
+      "audit": {
+        "execution_summary": "Synced 4 baseline documents with timezone architecture: (1) contract.yaml v1.7.5 — added global_request_headers X-Timezone, response_envelope offset support, User.preferredTimezone, timezone params on time-slots/stats, PATCH /v1/users/profile/timezone endpoint, GET/PUT /v1/admin/settings/business-hours endpoints; (2) 数据架构设计文档 — User.preferredTimezone in ERD + Prisma, SystemSetting business_hours/default_timezone keys; (3) 系统架构设计文档 — TimezoneModule added to module table; (4) 接口设计规范文档 — X-Timezone header added to request headers.",
+        "completed_at": "2026-05-12T13:18:24.074Z"
+      }
+    },
+    "cg_ses_1778592953595": {
+      "session_id": "cg_ses_1778592953595",
+      "created_at": "2026-05-12T13:35:53.595Z",
+      "task_description": "Fix cross-document consistency issues from review report: align role/userType naming, fix service.categoryId nullable, fix passwordHash nullable, fix admin.stats total_bookings field, flatten business hours response, align /profile response fields, update document version references",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "FIX-1: Add role↔userType field mapping in contract.yaml §10. FIX-2: Add categoryId nullable note in contract.yaml + fix Prisma schema in 数据架构设计文档. FIX-3: Change passwordHash required→nullable in contract.yaml. FIX-4: Remove total_bookings stat card from admin.stats. FIX-5: Flatten business hours response (remove schedule wrapper). FIX-6: Add phone/status/createdAt to profile responses. FIX-7: Update based_on_documents version references in all 4 files.",
+      "confirmed_at": "2026-05-12T13:38:07.949Z",
+      "consumed_at": "2026-05-12T13:44:44.179Z",
+      "audit": {
+        "execution_summary": "Applied 7 cross-document consistency fixes across 4 files: contract.yaml (FIX-1: role↔userType mapping, FIX-2: categoryId nullable note, FIX-3: passwordHash→nullable, FIX-4: removed total_bookings stat card, FIX-5: flattened business hours response, FIX-6: added phone/status/createdAt to profile responses, FIX-7: updated based_on_documents references) + 数据架构设计文档.md (categoryId String→String?, version 2.6.0→2.6.1) + 系统架构设计文档 SAD.md (version 2.5.0→2.5.1) + 接口设计规范文档.md (version 2.9.0→2.9.1). Ran keystone:hash to update machine.json.",
+        "completed_at": "2026-05-12T13:44:44.179Z"
+      }
     }
   }
 }
