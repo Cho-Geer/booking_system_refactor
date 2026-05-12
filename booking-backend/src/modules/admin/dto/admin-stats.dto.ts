@@ -8,7 +8,7 @@ import {
 } from "class-validator";
 
 export interface TimeDistributionItem {
-  hour: string;
+  hour: number;
   count: number;
 }
 
@@ -16,12 +16,6 @@ export interface ServiceDistributionItem {
   serviceName: string;
   count: number;
   percentage: number;
-}
-
-export interface StaffWorkloadItem {
-  serviceName: string;
-  workloadPercentage: number;
-  appointmentCount: number;
 }
 
 export class StatCardDto {
@@ -82,8 +76,6 @@ export class AdminStatsDto {
   })
   timeDistribution!: TimeDistributionItem[];
 
-  @ApiProperty({ description: "Staff workload distribution by service" })
-  staffWorkload!: StaffWorkloadItem[];
 }
 
 export class SystemStatusDto {

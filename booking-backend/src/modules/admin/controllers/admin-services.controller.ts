@@ -20,6 +20,7 @@ import {
 import { JwtAuthGuard } from "../../../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../../../common/guards/roles.guard";
 import { Roles } from "../../../common/decorators/roles.decorator";
+import { RateLimit } from "../../rate-limiter/rate-limiter.decorator";
 import { AdminServicesService } from "../services/admin-services.service";
 import {
   AdminServiceDto,
@@ -49,6 +50,18 @@ export class AdminServicesController {
     @Query() query: AdminServicesQueryDto,
   ): Promise<{ items: AdminServiceDto[]; meta: MetaDto }> {
     return this.adminServicesService.findAll(query);
+  }
+
+  @Get("summary")
+  @Roles("ADMIN", "SUPER_ADMIN")
+  @RateLimit({ tier: "api", key: "ip", limit: 60 })
+  @ApiOperation({ summary: "Get services summary statistics" })
+  @ApiResponse({
+    status: 200,
+    description: "Services summary statistics",
+  })
+  async getSummary() {
+    return this.adminServicesService.getSummary();
   }
 
   @Get(":id")
@@ -84,7 +97,7 @@ export class AdminServicesController {
   }
 
   @Delete(":id")
-  @Roles("SUPER_ADMIN")
+  @Roles("ADMIN", "SUPER_ADMIN")
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: "Delete a service (SUPER_ADMIN only)" })
   @ApiResponse({ status: 204, description: "Service deleted (no content)" })

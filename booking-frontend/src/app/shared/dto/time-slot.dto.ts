@@ -11,6 +11,7 @@ export interface TimeSlot {
   capacity: number;
   bookedCount: number;
   available: boolean;
+  maxOvertimeMinutes?: number;
 }
 
 export interface AvailableTimeSlotsQuery {

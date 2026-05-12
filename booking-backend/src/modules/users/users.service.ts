@@ -8,6 +8,7 @@ import { PrismaService } from "../../common/database/prisma.service";
 import { CreateUserDto, UpdateUserDto } from "./dto/user.dto";
 import { UserType, UserStatus } from "@prisma/client";
 import { HashService } from "../encryption/hash.service";
+import { PasswordUtil } from "../../common/utils/password.util";
 
 @Injectable()
 export class UsersService {
@@ -169,9 +170,24 @@ export class UsersService {
   }
 
   async updatePassword(id: string, oldPassword: string, newPassword: string) {
-    throw new BadRequestException(
-      "Password management is not supported in the current user model. Please use the authentication service.",
-    );
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
+    const isPasswordValid = await PasswordUtil.compare(oldPassword, user.passwordHash ?? "");
+    if (!isPasswordValid) {
+      throw new BadRequestException("Current password is incorrect");
+    }
+
+    const passwordHash = await PasswordUtil.hash(newPassword);
+
+    await this.prisma.user.update({
+      where: { id },
+      data: { passwordHash },
+    });
+
+    return { message: "Password updated successfully" };
   }
 
   /**

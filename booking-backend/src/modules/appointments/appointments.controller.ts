@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   Req,
+  Headers,
   UseGuards,
 } from "@nestjs/common";
 import { OptionalParseIntPipe } from "../../common/pipes/optional-parse-int.pipe";
@@ -26,27 +27,48 @@ import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
 import { Roles } from "../../common/decorators/roles.decorator";
 import { UserType, AppointmentStatus } from "@prisma/client";
 import { RateLimit } from "../rate-limiter/rate-limiter.decorator";
+import { CacheService } from "../cache/cache.service";
 
 @ApiTags("Appointments")
 @Controller("appointments")
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth("JWT-auth")
 export class AppointmentsController {
-  constructor(private readonly appointmentsService: AppointmentsService) {}
+  constructor(
+    private readonly appointmentsService: AppointmentsService,
+    private readonly cacheService: CacheService,
+  ) {}
 
   @Post()
-  @RateLimit({ tier: "strict", key: "user" })
+  @Roles(UserType.CUSTOMER)
+  @RateLimit({ tier: "api", key: "ip", limit: 30 })
   @ApiOperation({ summary: "Create a new appointment" })
   @ApiResponse({ status: 201, description: "Appointment created" })
   @ApiResponse({ status: 409, description: "Time slot not available" })
-  async create(@Body() createAppointmentDto: CreateAppointmentDto, @Req() req) {
+  async create(
+    @Body() createAppointmentDto: CreateAppointmentDto,
+    @Req() req,
+    @Headers("idempotency-key") idempotencyKey?: string,
+  ) {
     const userId = req?.user?.id;
+
+    if (idempotencyKey) {
+      const cacheKey = `idempotent:apt:${idempotencyKey}`;
+      const cached = await this.cacheService.get(cacheKey);
+      if (cached) {
+        return cached;
+      }
+      const result = await this.appointmentsService.create(createAppointmentDto, userId);
+      await this.cacheService.set(cacheKey, result, 60);
+      return result;
+    }
+
     return this.appointmentsService.create(createAppointmentDto, userId);
   }
 
   @Get()
   @RateLimit({ tier: "api", key: "user" })
-  @Roles(UserType.ADMIN)
+  @Roles(UserType.CUSTOMER)
   @ApiOperation({ summary: "Get all appointments" })
   @ApiResponse({ status: 200, description: "List of appointments" })
   async findAll(
@@ -72,6 +94,7 @@ export class AppointmentsController {
   }
 
   @Get(":id")
+  @Roles(UserType.CUSTOMER)
   @RateLimit({ tier: "api", key: "user" })
   @ApiOperation({ summary: "Get appointment by ID" })
   @ApiResponse({ status: 200, description: "Appointment found" })
@@ -81,6 +104,7 @@ export class AppointmentsController {
   }
 
   @Patch(":id")
+  @Roles(UserType.CUSTOMER)
   @RateLimit({ tier: "strict", key: "user" })
   @ApiOperation({ summary: "Update appointment" })
   @ApiResponse({ status: 200, description: "Appointment updated" })
@@ -92,6 +116,7 @@ export class AppointmentsController {
   }
 
   @Post(":id/cancel")
+  @Roles(UserType.CUSTOMER)
   @RateLimit({ tier: "strict", key: "user" })
   @ApiOperation({ summary: "Cancel appointment" })
   @ApiResponse({ status: 200, description: "Appointment cancelled" })

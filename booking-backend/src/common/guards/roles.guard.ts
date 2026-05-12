@@ -101,8 +101,9 @@ export class RolesGuard implements CanActivate {
   private getRoleHierarchy(): Map<string, string[]> {
     // Define role hierarchy (higher roles inherit lower role permissions)
     return new Map([
-      ["ADMIN", ["USER", "ADMIN"]],
-      ["USER", ["USER"]],
+      ["ADMIN", ["CUSTOMER", "ADMIN"]],
+      ["CUSTOMER", ["CUSTOMER"]],
+      ["SUPER_ADMIN", ["CUSTOMER", "ADMIN", "SUPER_ADMIN"]],
     ]);
   }
 

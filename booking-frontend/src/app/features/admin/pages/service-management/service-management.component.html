@@ -275,6 +275,15 @@
         <label class="block font-medium mb-1 text-text-primary">Image URL</label>
         <input pInputText [(ngModel)]="formImageUrl" class="w-full" placeholder="https://..." [disabled]="isViewMode()" />
       </div>
+      @if (!isViewMode()) {
+        <div>
+          <label class="block font-medium mb-1 text-text-primary">Upload Image</label>
+          <input type="file" accept="image/*" (change)="onFileSelected($event)" [disabled]="imageUploading()" class="w-full text-sm text-text-secondary file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-accent-green/10 file:text-accent-green hover:file:bg-accent-green/20" />
+          @if (imageUploading()) {
+            <p class="text-xs text-text-secondary mt-1">Uploading...</p>
+          }
+        </div>
+      }
       <div class="flex items-center gap-3">
         <label class="font-medium text-text-primary">Active</label>
         <p-toggleSwitch [(ngModel)]="formActive" [disabled]="isViewMode()" />

@@ -42,19 +42,19 @@ export const Roles = (...roles: string[]) => SetMetadata("roles", roles);
 export const AdminOnly = () => Roles("ADMIN");
 
 /**
- * UserOnly Decorator (convenience decorator)
+ * CustomerOnly Decorator (convenience decorator)
  *
- * Convenience decorator for routes that require USER role.
+ * Convenience decorator for routes that require CUSTOMER role.
  *
  * @example
  * ```typescript
  * @UseGuards(JwtAuthGuard, RolesGuard)
- * @UserOnly()
- * @Get('user-only')
- * getUserOnlyData() {}
+ * @CustomerOnly()
+ * @Get('customer-only')
+ * getCustomerOnlyData() {}
  * ```
  */
-export const UserOnly = () => Roles("USER");
+export const CustomerOnly = () => Roles("CUSTOMER");
 
 /**
  * AuthenticatedOnly Decorator (convenience decorator)
@@ -69,4 +69,4 @@ export const UserOnly = () => Roles("USER");
  * getAuthenticatedData() {}
  * ```
  */
-export const AuthenticatedOnly = () => Roles("USER", "ADMIN");
+export const AuthenticatedOnly = () => Roles("CUSTOMER", "ADMIN");

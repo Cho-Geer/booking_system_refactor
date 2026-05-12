@@ -8,8 +8,8 @@
 export const PERMISSIONS_MATRIX = {
   // Role definitions with associated permissions
   roles: {
-    USER: {
-      name: "Regular User",
+    CUSTOMER: {
+      name: "Customer",
       description:
         "Customer who can book appointments and manage their profile",
       permissions: [
@@ -129,7 +129,7 @@ export const PERMISSIONS_MATRIX = {
 
   // Role hierarchy (higher roles inherit permissions of lower roles)
   roleHierarchy: {
-    ADMIN: ["USER"],
+    ADMIN: ["CUSTOMER"],
   },
 
   // API endpoint to permission mapping (for reference)
@@ -267,7 +267,7 @@ export function requiresDataScope(permission: string): boolean {
  * Default permissions for new users
  */
 export const DEFAULT_USER_PERMISSIONS =
-  PERMISSIONS_MATRIX.roles.USER.permissions;
+  PERMISSIONS_MATRIX.roles.CUSTOMER.permissions;
 
 /**
  * Admin permissions (all permissions)

@@ -22,6 +22,10 @@ import { LoginSendCodeDto } from "./dto/login-send-code.dto";
 import { LoginVerifyCodeDto } from "./dto/login-verify-code.dto";
 import { LoginPasswordDto } from "./dto/login-password.dto";
 import {
+  ResetPasswordSendCodeDto,
+  ResetPasswordVerifyDto,
+} from "./dto/reset-password.dto";
+import {
   SendVerificationCodeDto,
   VerifyVerificationCodeDto,
 } from "./dto/email-verification.dto";
@@ -319,6 +323,8 @@ export class AuthService {
    */
   async loginVerifyCode(
     verifyDto: LoginVerifyCodeDto,
+    ip?: string,
+    userAgent?: string,
   ): Promise<AuthResponseDto & { refreshToken: string }> {
     const { contact, contactType, code } = verifyDto;
 
@@ -355,6 +361,19 @@ export class AuthService {
     // 4. 生成 Token
     const tokens = await this.generateTokens(user);
 
+    // Audit log
+    await this.prisma.activityLog.create({
+      data: {
+        userId: user.id,
+        action: "LOGIN",
+        resourceType: "AUTH",
+        resourceId: user.id,
+        ipAddress: ip,
+        userAgent,
+        metadata: { method: "verify_code" },
+      },
+    });
+
     return tokens;
   }
 
@@ -375,7 +394,11 @@ export class AuthService {
    * 密码登录
    * POST /v1/auth/login/password
    */
-  async loginPassword(loginDto: LoginPasswordDto): Promise<AuthResponseDto & { refreshToken: string }> {
+  async loginPassword(
+    loginDto: LoginPasswordDto,
+    ip?: string,
+    userAgent?: string,
+  ): Promise<AuthResponseDto & { refreshToken: string }> {
     const { contact, contactType, password } = loginDto;
 
     // 1. 计算 hash 查找用户
@@ -409,7 +432,135 @@ export class AuthService {
     // 4. 生成 Token
     const tokens = await this.generateTokens(user);
 
+    // Audit log
+    await this.prisma.activityLog.create({
+      data: {
+        userId: user.id,
+        action: "LOGIN",
+        resourceType: "AUTH",
+        resourceId: user.id,
+        ipAddress: ip,
+        userAgent,
+        metadata: { method: "password" },
+      },
+    });
+
     return tokens;
+  }
+
+  // ==================== 重置密码流程 ====================
+
+  /**
+   * 重置密码第一步：发送验证码
+   * POST /v1/auth/reset-password/send-code
+   *
+   * 防枚举: 用户不存在时也返回 200
+   */
+  async resetPasswordSendCode(
+    sendDto: ResetPasswordSendCodeDto,
+  ): Promise<SendCodeResponseDto> {
+    const { contact, contactType } = sendDto;
+
+    const contactHash = this.hashService.hashWithPepper(contact);
+    const whereClause = this.buildContactWhere(contactType, contactHash);
+
+    const user = await this.prisma.user.findFirst({
+      where: whereClause,
+    });
+
+    // 防枚举：无论用户是否存在，都返回成功
+    if (!user) {
+      this.logger.warn(
+        `Reset password code requested for non-existent ${contactType}: ${contact}`,
+      );
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      return { expiresIn: VERIFICATION_CODE_TTL };
+    }
+
+    if (user.status !== "ACTIVE") {
+      throw new BadRequestException("用户账户已被禁用");
+    }
+
+    // 生成验证码并存入 Redis
+    const redisKey = `verify:reset:${contactType}:${contactHash}`;
+    const code = await this.verificationService.generateCode(redisKey, "RESET");
+
+    // 发送验证码
+    if (contactType === ContactType.EMAIL) {
+      const subject = "您的密码重置验证码";
+      const html = this.generateVerificationCodeHtml(code);
+      const text = `您的密码重置验证码是: ${code}，5分钟内有效。`;
+
+      try {
+        await this.emailService.sendEmail({
+          to: contact,
+          subject,
+          html,
+          text,
+        });
+      } catch (_error) {
+        await this.verificationService.deleteCode(redisKey, "RESET");
+        throw new BadRequestException("发送验证码失败，请稍后重试");
+      }
+    } else {
+      // TODO: 集成短信服务
+      this.logger.warn(`SMS not integrated yet. Code for ${contact}: ${code}`);
+    }
+
+    return {
+      maskedContact:
+        contactType === ContactType.PHONE
+          ? maskPhone(contact)
+          : maskEmail(contact),
+      expiresIn: VERIFICATION_CODE_TTL,
+    };
+  }
+
+  /**
+   * 重置密码第二步：验证码校验并更新密码
+   * POST /v1/auth/reset-password/verify
+   */
+  async resetPasswordVerify(
+    verifyDto: ResetPasswordVerifyDto,
+  ): Promise<{ message: string }> {
+    const { contact, contactType, code, newPassword } = verifyDto;
+
+    // 1. 计算 hash 查找用户
+    const contactHash = this.hashService.hashWithPepper(contact);
+    const whereClause = this.buildContactWhere(contactType, contactHash);
+
+    const user = await this.prisma.user.findFirst({
+      where: whereClause,
+    });
+
+    if (!user || user.status !== "ACTIVE") {
+      throw new BadRequestException("用户不存在或账户已禁用");
+    }
+
+    // 2. 验证码校验
+    const redisKey = `verify:reset:${contactType}:${contactHash}`;
+    const verificationResult = await this.verificationService.verifyCode(
+      redisKey,
+      code,
+      "RESET",
+    );
+
+    if (!verificationResult.success) {
+      throw new BadRequestException("验证码无效或已过期");
+    }
+
+    // 3. 密码哈希 (bcrypt rounds=12)
+    const passwordHash = await bcrypt.hash(newPassword, BCRYPT_SALT_ROUNDS);
+
+    // 4. 更新密码
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { passwordHash },
+    });
+
+    this.logger.log(`Password reset completed for user: ${user.id}`);
+
+    return { message: "密码重置成功" };
   }
 
   // ==================== Token 管理 ====================
@@ -516,10 +667,12 @@ export class AuthService {
     const jti = crypto.randomUUID();
 
     // Access Token Payload（移除 email，符合 NIST SP 800-63B 最小化原则）
+    const permissions = this.getPermissionsForRole(user.userType);
     const accessToken = this.jwtService.sign(
       {
         sub: user.id,
         roles: [this.mapUserTypeToRole(user.userType)],
+        permissions,
         jti,
       },
       {
@@ -639,6 +792,39 @@ export class AuthService {
         return "SUPER_ADMIN";
       default:
         return "CUSTOMER";
+    }
+  }
+
+  /**
+   * Get permissions array for a role (from contract §5 security.authorization).
+   * Included in JWT payload for client-side permission checks.
+   */
+  private getPermissionsForRole(role: UserType): string[] {
+    switch (role) {
+      case "CUSTOMER":
+        return [
+          "view_own_profile",
+          "create_appointment",
+          "view_own_appointments",
+          "cancel_own_appointment",
+        ];
+      case "ADMIN":
+        return [
+          "manage_users",
+          "manage_services",
+          "manage_time_slots",
+          "view_all_appointments",
+          "manage_appointments",
+        ];
+      case "SUPER_ADMIN":
+        return [
+          "all_admin_permissions",
+          "system_settings",
+          "view_audit_logs",
+          "manage_admins",
+        ];
+      default:
+        return [];
     }
   }
 

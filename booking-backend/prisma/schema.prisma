@@ -3,8 +3,9 @@
 // Version: 2.0.0
 
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "debian-openssl-3.0.x"]
+  provider        = "prisma-client-js"
+  binaryTargets   = ["native", "debian-openssl-3.0.x"]
+  previewFeatures = ["partialIndexes"]
 }
 
 datasource db {
@@ -161,7 +162,7 @@ model Service {
   createdAt        DateTime @default(now()) @map("created_at")
   updatedAt        DateTime @updatedAt @map("updated_at")
 
-  category     ServiceCategory @relation(fields: [categoryId], references: [id])
+  category     ServiceCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   appointments Appointment[]
   timeSlots    TimeSlot[]
 
@@ -189,7 +190,7 @@ model TimeSlot {
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
 
-  service      Service       @relation(fields: [serviceId], references: [id])
+  service      Service       @relation(fields: [serviceId], references: [id], onDelete: Restrict)
   appointments Appointment[]
 
   @@map("time_slots")
@@ -217,49 +218,34 @@ model Appointment {
   price             Decimal?          @db.Decimal(10, 2)
   taxRate           Decimal?          @db.Decimal(5, 4) @map("tax_rate")
   taxIncludedAmount Decimal?          @db.Decimal(10, 2) @map("tax_included_amount")
-  bookingGroupId    String?           @map("booking_group_id")
+
   status            AppointmentStatus @default(PENDING)
   customerInfo      Json              @map("customer_info")
   remarks           String?           @db.Text
   createdAt         DateTime          @default(now()) @map("created_at")
   updatedAt         DateTime          @updatedAt @map("updated_at")
 
-  user          User               @relation(fields: [userId], references: [id])
-  timeSlot      TimeSlot           @relation(fields: [timeSlotId], references: [id])
-  service       Service            @relation(fields: [serviceId], references: [id])
-  bookingGroup  BookingGroup?      @relation(fields: [bookingGroupId], references: [id])
+  user          User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  timeSlot      TimeSlot           @relation(fields: [timeSlotId], references: [id], onDelete: Restrict)
+  service       Service            @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+
   histories     AppointmentHistory[]
   notifications Notification[]
 
   // 部分唯一索引 - 高并发核心 (通过 SQL 迁移实现部分索引)
-  @@unique([timeSlotId, appointmentDate, slotSequence], map: "appointment_slot_occupied")
+  @@unique([timeSlotId, appointmentDate, slotSequence],
+           map: "appointment_slot_occupied",
+           where: raw("\"status\" IN ('PENDING', 'CONFIRMED', 'COMPLETED')"))
 
   @@map("appointments")
   @@index([userId, appointmentDate])
   @@index([timeSlotId, appointmentDate, status])
   @@index([appointmentNumber])
   @@index([status, appointmentDate])
-  @@index([bookingGroupId])
   // 包含索引 - 高频查询优化 (需要通过 SQL 迁移实现)
   // CREATE INDEX appointments_pending_include ON appointments (appointment_date, time_slot_id, status) 
   // INCLUDE (user_id, customer_info) 
   // WHERE status IN ('PENDING', 'CONFIRMED');
-}
-
-// ============================================
-// BookingGroup Model
-// ============================================
-
-model BookingGroup {
-  id             String        @id @default(uuid())
-  totalDuration  Int           @map("total_duration")
-  totalPrice     Decimal?      @db.Decimal(10, 2) @map("total_price")
-  createdAt      DateTime      @default(now()) @map("created_at")
-
-  appointments Appointment[]
-
-  @@map("booking_groups")
-  @@index([createdAt])
 }
 
 // ============================================
@@ -318,6 +304,47 @@ model Notification {
   @@index([type])
   @@index([createdAt])
   @@index([appointmentId])
+}
+
+// ============================================
+// InAppNotification Model (§2.2.6)
+// ============================================
+
+model InAppNotification {
+  id        String    @id @default(uuid())
+  userId    String
+  type      String    // info, warning, error, success
+  title     String
+  body      String
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+  @@index([createdAt])
+  @@map("in_app_notifications")
+}
+
+// ============================================
+// Message Model (§2.2.6)
+// ============================================
+
+model Message {
+  id          String    @id @default(uuid())
+  senderId    String
+  recipientId String
+  subject     String
+  body        String
+  readAt      DateTime?
+  createdAt   DateTime  @default(now())
+
+  sender      User      @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  recipient   User      @relation("ReceivedMessages", fields: [recipientId], references: [id], onDelete: Cascade)
+
+  @@index([recipientId, readAt])
+  @@index([senderId])
+  @@map("messages")
 }
 
 // ============================================

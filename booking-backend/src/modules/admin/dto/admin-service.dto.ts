@@ -101,3 +101,20 @@ export class AdminServicesQueryDto {
   @IsBoolean()
   active?: boolean;
 }
+
+export class AdminServiceSummaryDto {
+  @ApiProperty({ description: "Total number of services" })
+  totalServices!: number;
+
+  @ApiProperty({ description: "Number of active services" })
+  activeServicesCount!: number;
+
+  @ApiProperty({ description: "Number of inactive services" })
+  inactiveServicesCount!: number;
+
+  @ApiProperty({ description: "Average price across all services" })
+  averagePrice!: number;
+
+  @ApiProperty({ description: "Service count grouped by category" })
+  categories!: { category: string; count: number }[];
+}

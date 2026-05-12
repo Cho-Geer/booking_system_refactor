@@ -3558,6 +3558,70 @@
         "execution_summary": "Fixed 12 cross-document consistency issues: (1) Added 4 WebSocket events to contract.yaml §12; (2) Added rate_limit to all 22 admin endpoints; (3) Added condition field to appointment_slot_occupied index; (4) Added price type deviation Tech Debt annotations; (5) Moved deprecated --accent-blue to appendix in global-ui-spec.md; (6) Added appointment_state_machine section; (7) Added verification constraint note to register_complete; (8) Added max_overtime_minutes computed field note; (9) Fixed user stats card data source docs in 11-admin-users.md; (10) Added image_upload endpoint to contract.yaml; (11) Cleaned residual row in 数据架构设计文档 §3.2; (12) Added response envelope notes to 5 page specs.",
         "completed_at": "2026-05-12T05:46:37.272Z"
       }
+    },
+    "cg_ses_1778569748095": {
+      "session_id": "cg_ses_1778569748095",
+      "created_at": "2026-05-12T07:09:08.096Z",
+      "task_description": "READ-ONLY audit: strict cross-reference of all current source code against contract.yaml, design specs, and detailed design documents to identify inconsistencies, potential problems, and omissions. No code modifications.",
+      "gate_status": "checked",
+      "last_check_failed_items": [],
+      "plan_summary": null,
+      "confirmed_at": null,
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1778571396016": {
+      "session_id": "cg_ses_1778571396016",
+      "created_at": "2026-05-12T07:36:36.017Z",
+      "task_description": "Execute full cross-reference audit fix plan: Phase 0 (Architect contract updates), Phase 1 (P0 critical backend/frontend fixes - WebSocket, Prisma, missing endpoints, DTO alignment, forgot-password FE), Phase 2 (P1 security hardening), Phase 3 (P2 medium backend fixes), Phase 4 (P3 frontend completion), Phase 5 (deprecated code cleanup). ~52 tasks across 6 phases.",
+      "gate_status": "armed",
+      "last_check_failed_items": [],
+      "plan_summary": "Execute full 6-phase cross-reference audit fix plan: Phase 0 Architect contract updates, Phase 1 P0 critical (WebSocket, Prisma, missing endpoints, DTO, forgot-password), Phase 2 P1 security, Phase 3 P2 medium, Phase 4 P3 frontend, Phase 5 cleanup. ~52 tasks total.",
+      "confirmed_at": "2026-05-12T07:44:35.128Z",
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1778572019041": {
+      "session_id": "cg_ses_1778572019041",
+      "created_at": "2026-05-12T07:46:59.041Z",
+      "task_description": "Implement missing backend endpoints: POST /v1/auth/reset-password/send-code, /verify, GET /v1/admin/services/summary, and fix POST /v1/appointments DTO alignment",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Implement reset-password/send-code + verify endpoints, admin/services/summary, fix appointments DTO and idempotency",
+      "confirmed_at": "2026-05-12T07:55:42.218Z",
+      "consumed_at": "2026-05-12T07:55:47.202Z",
+      "audit": {
+        "execution_summary": "Part 1: Created ResetPasswordSendCodeDto/ResetPasswordVerifyDto, added reset-password/send-code and /verify endpoints to auth controller and service (anti-enumeration, bcrypt hash, Redis verification). Part 2: Added GET /admin/services/summary endpoint with AdminServiceSummaryDto, groupBy category with name lookup. Part 3: Fixed CreateAppointmentDto - replaced flat customerName/customerEmail/customerPhone with customerInfo object, added preferredSequence/overtimeMinutes/appointmentDate; added Idempotency-Key header handling in appointments controller; updated service for new DTO; fixed spec files.",
+        "completed_at": "2026-05-12T07:55:47.202Z"
+      }
+    },
+    "cg_ses_1778572601757": {
+      "session_id": "cg_ses_1778572601757",
+      "created_at": "2026-05-12T07:56:41.757Z",
+      "task_description": "Implement security hardening fixes across the backend - CSP/HSTS/CSRF middleware, audit logging, JWT+RBAC fixes, admin stats alignment",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Implement all security hardening: middleware, audit logs, JWT+RBAC, admin stats alignment",
+      "confirmed_at": "2026-05-12T08:08:02.389Z",
+      "consumed_at": "2026-05-12T08:08:20.084Z",
+      "audit": {
+        "execution_summary": "Security hardening: deployed HelmetMiddleware + CsrfMiddleware; added audit logs to auth and appointments services; added permissions to JWT payload; migrated USER→CUSTOMER in RBAC; added @Roles to appointments controller; removed staffWorkload, added timeRange params to admin stats; fixed TimeDistributionItem hour type",
+        "completed_at": "2026-05-12T08:08:20.084Z"
+      }
+    },
+    "cg_ses_1778572659437": {
+      "session_id": "cg_ses_1778572659437",
+      "created_at": "2026-05-12T07:57:39.437Z",
+      "task_description": "Clean up deprecated/extra code from audit - remove deprecated admin reports endpoint, comment convenience endpoints, check for dead code",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Remove deprecated admin reports endpoint and associated files, add comments to convenience endpoints, check for dead code",
+      "confirmed_at": "2026-05-12T07:59:26.798Z",
+      "consumed_at": "2026-05-12T07:59:30.623Z",
+      "audit": {
+        "execution_summary": "Removed deprecated admin reports module (controller, service, DTO, spec files, module registration). Added contract-annotation comments to GET /services/:id and GET /time-slots/:id. No other dead code (staff/booking_group references) found in active source files.",
+        "completed_at": "2026-05-12T07:59:30.623Z"
+      }
     }
   }
 }

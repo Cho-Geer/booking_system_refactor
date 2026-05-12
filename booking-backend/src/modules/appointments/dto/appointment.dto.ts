@@ -2,8 +2,11 @@ import {
   IsString,
   IsEnum,
   IsOptional,
-  IsEmail,
+  IsObject,
   IsNotEmpty,
+  IsInt,
+  Min,
+  Max,
   MaxLength,
   IsUUID,
 } from "class-validator";
@@ -19,28 +22,33 @@ export class CreateAppointmentDto {
   @IsUUID("4", { message: "serviceId must be a valid UUID" })
   serviceId: string;
 
-  @ApiProperty({ description: "Customer name" })
-  @IsString()
-  @IsNotEmpty({ message: "Customer name is required" })
-  @MaxLength(100, { message: "Customer name must not exceed 100 characters" })
-  customerName: string;
-
-  @ApiProperty({ description: "Customer email" })
-  @IsEmail({}, { message: "Invalid email format" })
-  @MaxLength(255, { message: "Email must not exceed 255 characters" })
-  customerEmail: string;
-
-  @ApiProperty({ description: "Customer phone" })
-  @IsString()
-  @IsNotEmpty({ message: "Customer phone is required" })
-  @MaxLength(20, { message: "Phone must not exceed 20 characters" })
-  customerPhone: string;
+  @ApiProperty({ description: "Customer info (name, email, phone)" })
+  @IsOptional()
+  @IsObject()
+  customerInfo?: Record<string, unknown>;
 
   @ApiPropertyOptional({ description: "Notes" })
   @IsOptional()
   @IsString()
   @MaxLength(500, { message: "Notes must not exceed 500 characters" })
   notes?: string;
+
+  @ApiPropertyOptional({ description: "Preferred sequence number", minimum: 0, maximum: 99 })
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(99)
+  preferredSequence?: number;
+
+  @ApiPropertyOptional({ description: "Overtime minutes" })
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  overtimeMinutes?: number;
+
+  @ApiProperty({ description: "Appointment date-time string" })
+  @IsString()
+  appointmentDate: string;
 }
 
 export class UpdateAppointmentDto {

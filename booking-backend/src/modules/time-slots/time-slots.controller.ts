@@ -59,16 +59,18 @@ export class TimeSlotsController {
     @Query("serviceId") serviceId: string,
     @Query("startDate") startDate: string,
     @Query("endDate") endDate: string,
+    @Query("overtimeMinutes") overtimeMinutes?: number,
   ) {
     return this.timeSlotsService.getAvailableSlots(
       serviceId,
       new Date(startDate),
       new Date(endDate),
+      overtimeMinutes,
     );
   }
 
   @Get(":id")
-  @ApiOperation({ summary: "Get time slot by ID" })
+  @ApiOperation({ summary: "Get time slot by ID (convenience endpoint, not explicitly in contract)" })
   @ApiResponse({ status: 200, description: "Time slot found" })
   @ApiResponse({ status: 404, description: "Time slot not found" })
   async findOne(@Param("id") id: string) {

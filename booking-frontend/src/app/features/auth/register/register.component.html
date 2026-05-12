@@ -37,7 +37,7 @@
               type="button"
               class="type-btn min-touch-target"
               [class.active]="contactType() === ContactType.EMAIL"
-              (click)="contactType.set(ContactType.EMAIL)"
+              (click)="setContactType(ContactType.EMAIL)"
             >
               邮箱
             </button>
@@ -45,7 +45,7 @@
               type="button"
               class="type-btn min-touch-target"
               [class.active]="contactType() === ContactType.PHONE"
-              (click)="contactType.set(ContactType.PHONE)"
+              (click)="setContactType(ContactType.PHONE)"
             >
               手机号
             </button>
@@ -67,6 +67,12 @@
               @if (step1Form.get('contact')?.errors?.['required']) {
                 <span>{{ contactType() === ContactType.EMAIL ? 'Email is required' : 'Phone number is required' }}</span>
               }
+              @if (step1Form.get('contact')?.errors?.['emailFormat']) {
+                <span>Please enter a valid email address</span>
+              }
+              @if (step1Form.get('contact')?.errors?.['phoneFormat']) {
+                <span>Please enter a valid 11-digit phone number</span>
+              }
             </div>
           }
         </div>
@@ -84,6 +90,12 @@
 
     <!-- Step 2: Complete Registration -->
     @if (currentStep() === 2) {
+      @if (maskedContact()) {
+        <div class="sharp-card p-3 mb-4 text-sm text-text-secondary bg-bg-secondary rounded-lg">
+          Verification code sent to <strong class="text-text-primary">{{ maskedContact() }}</strong>
+        </div>
+      }
+
       <form [formGroup]="step2Form" (ngSubmit)="onCompleteRegistration()">
         <div class="form-group">
           <label for="code">验证码</label>

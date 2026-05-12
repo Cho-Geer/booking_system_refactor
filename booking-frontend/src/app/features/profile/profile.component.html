@@ -157,13 +157,63 @@
   [dismissableMask]="true"
   (visibleChange)="closePasswordDialog()"
 >
-  <p class="text-sm text-gray-500 mb-6">密码功能开发中，敬请期待</p>
-  <div class="flex justify-end">
-    <app-button
-      label="关闭"
-      variant="secondary"
-      class="w-full sm:w-auto"
-      (onClick)="closePasswordDialog()"
-    />
+  <div class="space-y-4 p-2">
+    @if (passwordSuccess()) {
+      <div class="text-sm text-accent-green bg-accent-green/5 rounded-lg px-3 py-2 text-center">
+        Password updated successfully!
+      </div>
+    }
+
+    <div>
+      <label class="block text-sm font-medium text-text-primary mb-1">Current Password</label>
+      <input
+        type="password"
+        class="sharp-input w-full"
+        [ngModel]="currentPassword()"
+        (ngModelChange)="currentPassword.set($event)"
+        placeholder="Enter current password"
+      />
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-text-primary mb-1">New Password</label>
+      <input
+        type="password"
+        class="sharp-input w-full"
+        [ngModel]="newPassword()"
+        (ngModelChange)="newPassword.set($event)"
+        placeholder="Enter new password"
+      />
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-text-primary mb-1">Confirm New Password</label>
+      <input
+        type="password"
+        class="sharp-input w-full"
+        [ngModel]="confirmNewPassword()"
+        (ngModelChange)="confirmNewPassword.set($event)"
+        placeholder="Confirm new password"
+      />
+    </div>
+
+    @if (passwordError()) {
+      <div class="text-sm text-accent-red bg-accent-red/5 rounded-lg px-3 py-2">{{ passwordError() }}</div>
+    }
+
+    <div class="flex flex-col-reverse sm:flex-row gap-3 justify-end pt-2">
+      <app-button
+        label="Cancel"
+        variant="secondary"
+        class="w-full sm:w-auto"
+        (onClick)="closePasswordDialog()"
+      />
+      <app-button
+        label="Update Password"
+        variant="primary"
+        class="w-full sm:w-auto"
+        [disabled]="isPasswordSaving() || passwordSuccess()"
+        [loading]="isPasswordSaving()"
+        (onClick)="onChangePassword()"
+      />
+    </div>
   </div>
 </app-modal>

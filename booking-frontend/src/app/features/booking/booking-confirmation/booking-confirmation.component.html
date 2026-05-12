@@ -43,10 +43,24 @@
             <span class="detail-label">服务时长</span>
             <span class="detail-value">{{ serviceDuration() }} 分钟</span>
           </div>
-          <div class="detail-row detail-row-price">
+          <div class="detail-row">
             <span class="detail-label">费用</span>
             <span class="detail-value price">{{ servicePrice() | currency }}</span>
           </div>
+          @if (taxRate() > 0) {
+            <div class="detail-row">
+              <span class="detail-label">税率</span>
+              <span class="detail-value">{{ taxRate() }}%</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">税额</span>
+              <span class="detail-value">{{ estTaxAmount() | currency }}</span>
+            </div>
+            <div class="detail-row detail-row-price">
+              <span class="detail-label">含税总计</span>
+              <span class="detail-value price">{{ estTaxIncludedTotal() | currency }}</span>
+            </div>
+          }
         </div>
       </app-card>
 
@@ -103,6 +117,16 @@
           [loading]="isProcessing()"
           (onClick)="confirmBooking()"
         />
+      </div>
+    </div>
+  }
+
+  <!-- Loading Modal -->
+  @if (isProcessing()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <div class="sharp-card p-6 bg-card-bg rounded-xl text-center">
+        <div class="loading-spinner mx-auto mb-4"></div>
+        <p class="text-sm text-text-secondary">Processing your booking...</p>
       </div>
     </div>
   }

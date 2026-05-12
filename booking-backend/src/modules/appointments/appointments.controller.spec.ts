@@ -5,6 +5,7 @@ import { AppointmentsService } from './appointments.service';
 import { CreateAppointmentDto, UpdateAppointmentDto } from './dto/appointment.dto';
 import { AppointmentStatus } from '@prisma/client';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { CacheService, REDIS_CONFIG_TOKEN } from '../cache/cache.service';
 
 // Mock the JwtAuthGuard to always pass, but we can inspect what it attaches to req
 const mockJwtAuthGuard = {
@@ -26,6 +27,13 @@ const mockAppointmentsService = {
   remove: jest.fn(),
 };
 
+// Mock CacheService
+const mockCacheService = {
+  get: jest.fn().mockResolvedValue(null),
+  set: jest.fn().mockResolvedValue(undefined),
+  isAvailable: jest.fn().mockReturnValue(true),
+};
+
 describe('AppointmentsController', () => {
   let controller: AppointmentsController;
   let service: typeof mockAppointmentsService;
@@ -38,6 +46,14 @@ describe('AppointmentsController', () => {
         {
           provide: AppointmentsService,
           useValue: mockAppointmentsService,
+        },
+        {
+          provide: REDIS_CONFIG_TOKEN,
+          useValue: { host: 'localhost', port: 6379, keyPrefix: 'test:', ttlDefault: 300, ttlSession: 604800 },
+        },
+        {
+          provide: CacheService,
+          useValue: mockCacheService,
         },
       ],
     })
@@ -68,10 +84,9 @@ describe('AppointmentsController', () => {
       const maliciousDto: CreateAppointmentDto = {
         timeSlotId: 'slot-1',
         serviceId: 'service-1',
-        customerName: 'John Doe',
-        customerEmail: 'john@example.com',
-        customerPhone: '1234567890',
+        customerInfo: { name: 'John Doe', email: 'john@example.com', phone: '1234567890' },
         notes: 'Test appointment',
+        appointmentDate: '2024-01-15T10:00:00Z',
       };
 
       const mockAppointment = {
@@ -90,7 +105,7 @@ describe('AppointmentsController', () => {
       mockAppointmentsService.create.mockResolvedValue(mockAppointment);
 
       // Act: Call controller with the malicious DTO (no userId in DTO)
-      const result = await controller.create(maliciousDto, mockReq);
+      const result = await controller.create(maliciousDto, mockReq, undefined);
 
       // Assert: Verify service was called with the JWT userId as second argument
       const actualUserId = mockAppointmentsService.create.mock.calls[0][1];
@@ -102,10 +117,9 @@ describe('AppointmentsController', () => {
       const createAppointmentDto: CreateAppointmentDto = {
         timeSlotId: 'slot-1',
         serviceId: 'service-1',
-        customerName: 'John Doe',
-        customerEmail: 'john@example.com',
-        customerPhone: '1234567890',
+        customerInfo: { name: 'John Doe', email: 'john@example.com', phone: '1234567890' },
         notes: 'Test appointment',
+        appointmentDate: '2024-01-15T10:00:00Z',
       };
 
       const mockAppointment = {
@@ -123,7 +137,7 @@ describe('AppointmentsController', () => {
 
       mockAppointmentsService.create.mockResolvedValue(mockAppointment);
 
-      const result = await controller.create(createAppointmentDto, mockReq);
+      const result = await controller.create(createAppointmentDto, mockReq, undefined);
 
       expect(service.create).toHaveBeenCalledWith(createAppointmentDto, 'jwt-user-id');
       expect(result).toEqual(mockAppointment);
@@ -133,28 +147,26 @@ describe('AppointmentsController', () => {
       const createAppointmentDto: CreateAppointmentDto = {
         timeSlotId: 'slot-1',
         serviceId: 'service-1',
-        customerName: 'John Doe',
-        customerEmail: 'john@example.com',
-        customerPhone: '1234567890',
+        customerInfo: { name: 'John Doe', email: 'john@example.com', phone: '1234567890' },
         notes: 'Test appointment',
+        appointmentDate: '2024-01-15T10:00:00Z',
       };
 
       mockAppointmentsService.create.mockRejectedValue(
         new NotFoundException('Time slot not found'),
       );
 
-      await expect(controller.create(createAppointmentDto, mockReq)).rejects.toThrow(NotFoundException);
-      await expect(controller.create(createAppointmentDto, mockReq)).rejects.toThrow('Time slot not found');
+      await expect(controller.create(createAppointmentDto, mockReq, undefined)).rejects.toThrow(NotFoundException);
+      await expect(controller.create(createAppointmentDto, mockReq, undefined)).rejects.toThrow('Time slot not found');
     });
 
     it('should propagate ConflictException from service.create', async () => {
       const createAppointmentDto: CreateAppointmentDto = {
         timeSlotId: 'slot-1',
         serviceId: 'service-1',
-        customerName: 'John Doe',
-        customerEmail: 'john@example.com',
-        customerPhone: '1234567890',
+        customerInfo: { name: 'John Doe', email: 'john@example.com', phone: '1234567890' },
         notes: 'Test appointment',
+        appointmentDate: '2024-01-15T10:00:00Z',
       };
 
       mockAppointmentsService.create.mockRejectedValue(
@@ -164,7 +176,7 @@ describe('AppointmentsController', () => {
         })(),
       );
 
-      await expect(controller.create(createAppointmentDto, mockReq)).rejects.toThrow('Time slot is not available');
+      await expect(controller.create(createAppointmentDto, mockReq, undefined)).rejects.toThrow('Time slot is not available');
     });
   });
 

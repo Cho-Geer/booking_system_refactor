@@ -94,7 +94,12 @@
           [attr.aria-label]="'Slot at ' + (slot.startTime | date:'shortTime')"
         >
           <div class="flex items-center justify-between w-full">
-            <span class="slot-time font-semibold">{{ slot.startTime | date:'shortTime' }}</span>
+            <div class="flex flex-col items-start">
+              <span class="slot-time font-semibold">{{ slot.startTime | date:'shortTime' }}</span>
+              @if (slot.maxOvertimeMinutes) {
+                <span class="text-[10px] text-text-secondary/60">+{{ slot.maxOvertimeMinutes }}min OT</span>
+              }
+            </div>
             @if (availability === 'available' && !isSelected(slot)) {
               <span class="relative flex h-2.5 w-2.5">
                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>

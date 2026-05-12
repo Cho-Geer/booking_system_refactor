@@ -5,7 +5,6 @@ import {
   AdminStatsDto,
   StatCardDto,
   TimeDistributionItem,
-  StaffWorkloadItem,
   SystemStatusDto,
 } from '../dto/admin-stats.dto';
 import {
@@ -94,17 +93,17 @@ const mockRawTimeDistribution: { hour: number; count: number }[] = [
   { hour: 17, count: 8 },
 ];
 
-// Formatted time distribution returned by AdminStatsService (hour is string)
+// Formatted time distribution returned by AdminStatsService (hour is number)
 const mockFormattedTimeDistribution: TimeDistributionItem[] = [
-  { hour: '09:00', count: 15 },
-  { hour: '10:00', count: 25 },
-  { hour: '11:00', count: 20 },
-  { hour: '12:00', count: 5 },
-  { hour: '13:00', count: 10 },
-  { hour: '14:00', count: 30 },
-  { hour: '15:00', count: 22 },
-  { hour: '16:00', count: 18 },
-  { hour: '17:00', count: 8 },
+  { hour: 9, count: 15 },
+  { hour: 10, count: 25 },
+  { hour: 11, count: 20 },
+  { hour: 5, count: 5 },
+  { hour: 10, count: 10 },
+  { hour: 30, count: 30 },
+  { hour: 22, count: 22 },
+  { hour: 18, count: 18 },
+  { hour: 8, count: 8 },
 ];
 
 describe('AdminStatsService', () => {
@@ -182,26 +181,6 @@ describe('AdminStatsService', () => {
       expect(result.timeDistribution).toBeDefined();
       expect(result.timeDistribution).toEqual(mockFormattedTimeDistribution);
 
-      // ── P2.2/P2.3: staffWorkload ────────────────────────────────
-      expect(result.staffWorkload).toBeDefined();
-      expect(result.staffWorkload).toHaveLength(3);
-      // Total bookings from popular services: 200 + 150 + 100 = 450
-      expect(result.staffWorkload[0]).toEqual({
-        serviceName: 'Haircut',
-        workloadPercentage: expect.closeTo(44.44, 1),
-        appointmentCount: 200,
-      });
-      expect(result.staffWorkload[1]).toEqual({
-        serviceName: 'Manicure',
-        workloadPercentage: expect.closeTo(33.33, 1),
-        appointmentCount: 150,
-      });
-      expect(result.staffWorkload[2]).toEqual({
-        serviceName: 'Facial',
-        workloadPercentage: expect.closeTo(22.22, 1),
-        appointmentCount: 100,
-      });
-
       jest.useRealTimers();
     });
 
@@ -228,8 +207,6 @@ describe('AdminStatsService', () => {
       expect(result).toHaveProperty('bookingTrend');
       expect(result).toHaveProperty('servicePopularity');
       expect(result).toHaveProperty('timeDistribution');
-      expect(result).toHaveProperty('staffWorkload');
-
       // Type checks — stat card fields are StatCardDto objects
       expect(typeof result.totalBookings).toBe('object');
       expect(typeof result.todayBookings).toBe('object');
@@ -244,7 +221,6 @@ describe('AdminStatsService', () => {
       expect(Array.isArray(result.bookingTrend)).toBe(true);
       expect(Array.isArray(result.servicePopularity)).toBe(true);
       expect(Array.isArray(result.timeDistribution)).toBe(true);
-      expect(Array.isArray(result.staffWorkload)).toBe(true);
     });
 
     it('should handle empty daily bookings and popular services gracefully', async () => {
@@ -260,7 +236,6 @@ describe('AdminStatsService', () => {
       expect(result.bookingTrend).toEqual([]);
       expect(result.servicePopularity).toEqual([]);
       expect(result.timeDistribution).toEqual([]);
-      expect(result.staffWorkload).toEqual([]);
 
       jest.useRealTimers();
     });
@@ -275,28 +250,6 @@ describe('AdminStatsService', () => {
       jest.useRealTimers();
     });
 
-    it('should return 0% staffWorkload when popular services list is empty', async () => {
-      mockStatsService.getPopularServices.mockResolvedValue([]);
-
-      const result: AdminStatsDto = await service.getDashboard();
-
-      expect(result.staffWorkload).toEqual([]);
-    });
-
-    it('should handle single service workload being 100%', async () => {
-      mockStatsService.getPopularServices.mockResolvedValue([
-        { serviceId: 'svc-1', serviceName: 'Only Service', bookingCount: 50, revenue: 2500 },
-      ]);
-
-      const result: AdminStatsDto = await service.getDashboard();
-
-      expect(result.staffWorkload).toHaveLength(1);
-      expect(result.staffWorkload[0]).toEqual({
-        serviceName: 'Only Service',
-        workloadPercentage: 100,
-        appointmentCount: 50,
-      });
-    });
   });
 
   // ─── getServiceDistribution (DASH-003) ────────────────────────────
@@ -353,9 +306,9 @@ describe('AdminStatsService', () => {
 
       expect(statsService.getTimeDistribution).toHaveBeenCalledTimes(1);
       expect(result).toEqual([
-        { hour: '09:00', count: 15 },
-        { hour: '10:00', count: 25 },
-        { hour: '14:00', count: 30 },
+        { hour: 9, count: 15 },
+        { hour: 10, count: 25 },
+        { hour: 14, count: 30 },
       ]);
     });
 
@@ -369,9 +322,9 @@ describe('AdminStatsService', () => {
 
       const result = await service.getTimeDistribution();
 
-      expect(result[0].hour).toBe('00:00');
-      expect(result[1].hour).toBe('07:00');
-      expect(result[2].hour).toBe('23:00');
+      expect(result[0].hour).toBe(0);
+      expect(result[1].hour).toBe(7);
+      expect(result[2].hour).toBe(23);
     });
 
     it('should return empty array when no distribution data', async () => {
@@ -423,29 +376,12 @@ describe('AdminStatsService', () => {
 
   // ─── TimeDistributionItem type shape ────────────────────────────
   describe('TimeDistributionItem', () => {
-    it('should have correct shape with hour (string) and count', () => {
-      const item: TimeDistributionItem = { hour: '10:00', count: 25 };
-      expect(item.hour).toBe('10:00');
+    it('should have correct shape with hour (number) and count', () => {
+      const item: TimeDistributionItem = { hour: 10, count: 25 };
+      expect(item.hour).toBe(10);
       expect(item.count).toBe(25);
-      expect(typeof item.hour).toBe('string');
+      expect(typeof item.hour).toBe('number');
       expect(typeof item.count).toBe('number');
-    });
-  });
-
-  // ─── StaffWorkloadItem type shape ───────────────────────────────
-  describe('StaffWorkloadItem', () => {
-    it('should have correct shape with serviceName, workloadPercentage and appointmentCount', () => {
-      const item: StaffWorkloadItem = {
-        serviceName: 'Haircut',
-        workloadPercentage: 44.44,
-        appointmentCount: 200,
-      };
-      expect(item.serviceName).toBe('Haircut');
-      expect(item.workloadPercentage).toBe(44.44);
-      expect(item.appointmentCount).toBe(200);
-      expect(typeof item.serviceName).toBe('string');
-      expect(typeof item.workloadPercentage).toBe('number');
-      expect(typeof item.appointmentCount).toBe('number');
     });
   });
 

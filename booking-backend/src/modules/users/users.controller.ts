@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Put,
   Body,
   Patch,
   Param,
@@ -21,6 +22,7 @@ import {
 import { UsersService } from "./users.service";
 import { CreateUserDto, UpdateUserDto, UserResponseDto } from "./dto/user.dto";
 import { ProfileResponseDto } from "./dto/profile-response.dto";
+import { UpdatePasswordDto } from "./dto/update-password.dto";
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../../common/guards/roles.guard";
 import { Roles } from "../../common/decorators/roles.decorator";
@@ -159,21 +161,22 @@ export class UsersController {
     return this.usersService.remove(id);
   }
 
-  @Post(":id/change-password")
-  @ApiOperation({ summary: "Change user password" })
+  @Put("profile/password")
+  @ApiOperation({ summary: "Change current user password" })
   @ApiResponse({ status: 200, description: "Password changed" })
   @ApiResponse({ status: 400, description: "Current password is incorrect" })
   async changePassword(
-    @Param("id") id: string,
-    @Body() body: { oldPassword: string; newPassword: string },
+    @Body() dto: UpdatePasswordDto,
     @Req() req: Request,
   ) {
-    // FIX-P0-003 REFACTOR: 使用统一的所有权检查函数
-    enforceOwnership(req.user as JwtUser | undefined, id, "change");
+    const user = req.user as JwtUser | undefined;
+    if (!user) {
+      throw new ForbiddenException("User not authenticated");
+    }
     return this.usersService.updatePassword(
-      id,
-      body.oldPassword,
-      body.newPassword,
+      user.id,
+      dto.currentPassword,
+      dto.newPassword,
     );
   }
 }

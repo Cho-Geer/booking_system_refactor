@@ -1,47 +1,103 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { AdminService } from '../../services/admin.service';
+import { ApiService } from '../../../../core/services/api.service';
+import { AdminUser, AdminServiceItem } from '../../dto/admin.dto';
+import { TimeSlot } from '../../../../shared/dto/time-slot.dto';
 import { AppButtonComponent } from '../../../../shared/components/atoms/app-button/app-button.component';
 
 @Component({
   selector: 'app-quick-booking-form',
   standalone: true,
-  imports: [AppButtonComponent],
-  template: `
-    <div class="sharp-card p-5 bg-card-bg">
-      <h3 class="text-base font-bold text-text-primary mb-5">Quick Booking</h3>
-      <form class="space-y-4">
-        <div>
-          <label class="block text-xs font-medium text-text-secondary mb-1.5">Service</label>
-          <select class="w-full px-3 py-2 rounded-lg border border-border-color bg-bg-primary text-text-primary text-sm focus:outline-none focus:border-accent-green focus:ring-1 focus:ring-accent-green/30 transition-colors">
-            <option value="">Select a service</option>
-            <option value="haircut">Haircut</option>
-            <option value="manicure">Manicure</option>
-            <option value="pedicure">Pedicure</option>
-            <option value="massage">Massage</option>
-            <option value="facial">Facial</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-text-secondary mb-1.5">Customer Name</label>
-          <input type="text" class="w-full px-3 py-2 rounded-lg border border-border-color bg-bg-primary text-text-primary text-sm focus:outline-none focus:border-accent-green focus:ring-1 focus:ring-accent-green/30 transition-colors" placeholder="Enter customer name">
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-text-secondary mb-1.5">Phone Number</label>
-          <input type="tel" class="w-full px-3 py-2 rounded-lg border border-border-color bg-bg-primary text-text-primary text-sm focus:outline-none focus:border-accent-green focus:ring-1 focus:ring-accent-green/30 transition-colors" placeholder="Enter phone number">
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-text-secondary mb-1.5">Date</label>
-          <input type="date" class="w-full px-3 py-2 rounded-lg border border-border-color bg-bg-primary text-text-primary text-sm focus:outline-none focus:border-accent-green focus:ring-1 focus:ring-accent-green/30 transition-colors">
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-text-secondary mb-1.5">Time</label>
-          <input type="time" class="w-full px-3 py-2 rounded-lg border border-border-color bg-bg-primary text-text-primary text-sm focus:outline-none focus:border-accent-green focus:ring-1 focus:ring-accent-green/30 transition-colors">
-        </div>
-        <app-button type="submit" label="Create Booking" variant="primary" styleClass="w-full" />
-
-      </form>
-    </div>
-  `,
+  imports: [CommonModule, FormsModule, AppButtonComponent],
+  templateUrl: './quick-booking-form.component.html',
   styles: [':host { display: block; }'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class QuickBookingFormComponent {}
+export class QuickBookingFormComponent implements OnInit {
+  private adminService = inject(AdminService);
+  private apiService = inject(ApiService);
+  private router = inject(Router);
+
+  readonly users = signal<AdminUser[]>([]);
+  readonly services = signal<AdminServiceItem[]>([]);
+  readonly timeSlots = signal<TimeSlot[]>([]);
+
+  readonly selectedUser = signal<string | null>(null);
+  readonly selectedService = signal<string | null>(null);
+  readonly selectedDate = signal<string>(new Date().toISOString().split('T')[0]);
+  readonly selectedSlot = signal<string | null>(null);
+  readonly notes = signal('');
+  readonly overtimeMinutes = signal(0);
+
+  readonly isSubmitting = signal(false);
+  readonly error = signal<string | null>(null);
+  readonly success = signal<string | null>(null);
+
+  ngOnInit(): void {
+    this.loadUsers();
+    this.loadServices();
+  }
+
+  onSubmit(): void {
+    const userId = this.selectedUser();
+    const serviceId = this.selectedService();
+    const slotId = this.selectedSlot();
+    const date = this.selectedDate();
+
+    if (!userId || !serviceId || !slotId) return;
+
+    this.isSubmitting.set(true);
+    this.error.set(null);
+    this.success.set(null);
+
+    this.adminService.createAdminAppointment({
+      userId,
+      serviceId,
+      appointmentDate: date,
+      timeSlotId: slotId,
+      notes: this.notes() || undefined,
+      overtimeMinutes: this.overtimeMinutes() > 0 ? this.overtimeMinutes() : undefined,
+    }).subscribe({
+      next: () => {
+        this.isSubmitting.set(false);
+        this.success.set('Booking created successfully!');
+        this.resetForm();
+      },
+      error: (err) => {
+        this.isSubmitting.set(false);
+        this.error.set(err.message ?? 'Failed to create booking');
+      },
+    });
+  }
+
+  loadSlots(): void {
+    const serviceId = this.selectedService();
+    const date = this.selectedDate();
+    if (!serviceId || !date) return;
+    this.apiService.getAvailableSlots(serviceId, date, date, this.overtimeMinutes() || undefined).subscribe({
+      next: slots => this.timeSlots.set(slots),
+      error: () => this.timeSlots.set([]),
+    });
+  }
+
+  private resetForm(): void {
+    this.selectedUser.set(null);
+    this.selectedSlot.set(null);
+    this.notes.set('');
+    this.overtimeMinutes.set(0);
+  }
+
+  private loadUsers(): void {
+    this.adminService.getUsers({ limit: 100, page: 1 }).subscribe({
+      next: result => this.users.set(result.items),
+    });
+  }
+
+  private loadServices(): void {
+    this.adminService.getAdminServices({ limit: 100, page: 1 }).subscribe({
+      next: result => this.services.set(result.items),
+    });
+  }
+}

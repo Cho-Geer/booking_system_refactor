@@ -96,7 +96,14 @@ export interface AdminServiceItem {
   imageUrl?: string;
   pricePerMinute?: number;
   taxRate?: number;
+  category?: string;
   createdAt: string;
+}
+
+export interface ServicesSummary {
+  total: number;
+  active: number;
+  averagePrice: number;
 }
 
 export interface CreateAdminServiceRequest {

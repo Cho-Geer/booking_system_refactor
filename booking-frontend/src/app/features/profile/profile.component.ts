@@ -38,6 +38,12 @@ export class ProfileComponent {
 
   // Password dialog
   passwordDialogVisible = signal(false);
+  currentPassword = signal('');
+  newPassword = signal('');
+  confirmNewPassword = signal('');
+  passwordError = signal<string | null>(null);
+  isPasswordSaving = signal(false);
+  passwordSuccess = signal(false);
 
   // Avatar initials
   avatarInitials = computed(() => {
@@ -99,10 +105,52 @@ export class ProfileComponent {
 
   showPasswordDialog(): void {
     this.passwordDialogVisible.set(true);
+    this.passwordError.set(null);
+    this.passwordSuccess.set(false);
+    this.currentPassword.set('');
+    this.newPassword.set('');
+    this.confirmNewPassword.set('');
   }
 
   closePasswordDialog(): void {
     this.passwordDialogVisible.set(false);
+    this.passwordError.set(null);
+    this.passwordSuccess.set(false);
+  }
+
+  onChangePassword(): void {
+    const current = this.currentPassword();
+    const newPw = this.newPassword();
+    const confirm = this.confirmNewPassword();
+
+    if (!current || !newPw) {
+      this.passwordError.set('Please fill in all fields');
+      return;
+    }
+    if (newPw !== confirm) {
+      this.passwordError.set('New passwords do not match');
+      return;
+    }
+    if (newPw.length < 8) {
+      this.passwordError.set('New password must be at least 8 characters');
+      return;
+    }
+
+    this.isPasswordSaving.set(true);
+    this.passwordError.set(null);
+    this.passwordSuccess.set(false);
+
+    this.api.updatePassword({ currentPassword: current, newPassword: newPw }).subscribe({
+      next: () => {
+        this.isPasswordSaving.set(false);
+        this.passwordSuccess.set(true);
+        setTimeout(() => this.closePasswordDialog(), 1500);
+      },
+      error: (err) => {
+        this.isPasswordSaving.set(false);
+        this.passwordError.set(err.message || 'Failed to update password');
+      },
+    });
   }
 
   formatDate(iso: string): string {

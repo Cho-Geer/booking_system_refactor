@@ -30,6 +30,8 @@ function createMockRes(): any {
 function createMockReq(cookies: Record<string, string> = {}): any {
   return {
     cookies: { ...cookies },
+    ip: '127.0.0.1',
+    headers: { 'user-agent': 'test-agent' },
     user: { id: 'test-user-id' },
   };
 }
@@ -181,10 +183,11 @@ describe('AuthController', () => {
       });
 
       const mockRes = createMockRes();
+      const mockReq = createMockReq();
 
-      const result = await controller.loginPassword(dto, mockRes);
+      const result = await controller.loginPassword(dto, mockRes, mockReq);
 
-      expect(authService.loginPassword).toHaveBeenCalledWith(dto);
+      expect(authService.loginPassword).toHaveBeenCalledWith(dto, '127.0.0.1', 'test-agent');
       expect(mockRes.cookie).toHaveBeenCalledWith(
         'refreshToken',
         'refresh-token',
@@ -213,8 +216,9 @@ describe('AuthController', () => {
       );
 
       const mockRes = createMockRes();
-      await expect(controller.loginPassword(dto, mockRes)).rejects.toThrow('凭证无效');
-      expect(authService.loginPassword).toHaveBeenCalledWith(dto);
+      const mockReq = createMockReq();
+      await expect(controller.loginPassword(dto, mockRes, mockReq)).rejects.toThrow('凭证无效');
+      expect(authService.loginPassword).toHaveBeenCalledWith(dto, '127.0.0.1', 'test-agent');
     });
   });
 
@@ -233,10 +237,11 @@ describe('AuthController', () => {
       });
 
       const mockRes = createMockRes();
+      const mockReq = createMockReq();
 
-      const result = await controller.loginVerifyCode(dto, mockRes);
+      const result = await controller.loginVerifyCode(dto, mockRes, mockReq);
 
-      expect(authService.loginVerifyCode).toHaveBeenCalledWith(dto);
+      expect(authService.loginVerifyCode).toHaveBeenCalledWith(dto, '127.0.0.1', 'test-agent');
       expect(mockRes.cookie).toHaveBeenCalledWith(
         'refreshToken',
         'refresh-token',
@@ -265,10 +270,11 @@ describe('AuthController', () => {
       );
 
       const mockRes = createMockRes();
-      await expect(controller.loginVerifyCode(dto, mockRes)).rejects.toThrow(
+      const mockReq = createMockReq();
+      await expect(controller.loginVerifyCode(dto, mockRes, mockReq)).rejects.toThrow(
         '验证码无效或已过期',
       );
-      expect(authService.loginVerifyCode).toHaveBeenCalledWith(dto);
+      expect(authService.loginVerifyCode).toHaveBeenCalledWith(dto, '127.0.0.1', 'test-agent');
     });
   });
 

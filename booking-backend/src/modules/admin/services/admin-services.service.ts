@@ -121,4 +121,46 @@ export class AdminServicesService {
   async remove(id: string): Promise<void> {
     await this.servicesService.remove(id);
   }
+
+  async getSummary(): Promise<{
+    totalServices: number;
+    activeServicesCount: number;
+    inactiveServicesCount: number;
+    averagePrice: number;
+    categories: { category: string; count: number }[];
+  }> {
+    const [totalServices, activeServicesCount, priceAgg, categoryGroups] =
+      await Promise.all([
+        this.prisma.service.count(),
+        this.prisma.service.count({ where: { isActive: true } }),
+        this.prisma.service.aggregate({
+          _avg: { price: true },
+        }),
+        this.prisma.service.groupBy({
+          by: ["categoryId"],
+          _count: { id: true },
+        }),
+      ]);
+
+    const categoryIds = categoryGroups.map((g) => g.categoryId);
+    const categoryNames =
+      categoryIds.length > 0
+        ? await this.prisma.serviceCategory.findMany({
+            where: { id: { in: categoryIds } },
+            select: { id: true, name: true },
+          })
+        : [];
+    const categoryMap = new Map(categoryNames.map((c) => [c.id, c.name]));
+
+    return {
+      totalServices,
+      activeServicesCount,
+      inactiveServicesCount: totalServices - activeServicesCount,
+      averagePrice: Number(priceAgg._avg.price) || 0,
+      categories: categoryGroups.map((g) => ({
+        category: categoryMap.get(g.categoryId) || g.categoryId,
+        count: g._count.id,
+      })),
+    };
+  }
 }

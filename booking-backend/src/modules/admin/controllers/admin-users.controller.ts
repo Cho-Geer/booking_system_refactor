@@ -73,7 +73,7 @@ export class AdminUsersController {
   }
 
   @Delete(":id")
-  @Roles("ADMIN", "SUPER_ADMIN")
+  @Roles("SUPER_ADMIN")
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: "Delete a user" })
   @ApiResponse({

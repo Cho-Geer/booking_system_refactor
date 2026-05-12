@@ -124,7 +124,12 @@ export class TimeSlotsService {
     return { message: "Time slot deleted successfully" };
   }
 
-  async getAvailableSlots(serviceId: string, startDate: Date, endDate: Date) {
+  async getAvailableSlots(
+    serviceId: string,
+    startDate: Date,
+    endDate: Date,
+    overtimeMinutes?: number,
+  ) {
     const service = await this.prisma.service.findUnique({
       where: { id: serviceId },
     });
@@ -157,14 +162,37 @@ export class TimeSlotsService {
       orderBy: { startTime: "asc" },
     });
 
-    return slots.map((slot) => ({
-      id: slot.id,
-      startTime: slot.startTime,
-      endTime: slot.endTime,
-      capacity: slot.capacity,
-      bookedCount: slot._count.appointments,
-      available: slot.capacity > slot._count.appointments,
-    }));
+    return slots.map((slot, index, arr) => {
+      const nextSlot = arr[index + 1];
+      let maxOvertimeMinutes: number | undefined;
+      if (nextSlot) {
+        maxOvertimeMinutes = Math.max(
+          0,
+          Math.round(
+            (nextSlot.startTime.getTime() - slot.endTime.getTime()) / 60000,
+          ),
+        );
+      }
+
+      let available = slot.capacity > slot._count.appointments;
+      if (
+        overtimeMinutes !== undefined &&
+        maxOvertimeMinutes !== undefined &&
+        overtimeMinutes > maxOvertimeMinutes
+      ) {
+        available = false;
+      }
+
+      return {
+        id: slot.id,
+        startTime: slot.startTime,
+        endTime: slot.endTime,
+        capacity: slot.capacity,
+        bookedCount: slot._count.appointments,
+        available,
+        maxOvertimeMinutes,
+      };
+    });
   }
 
   private async generateTimeSlotsForDateRange(

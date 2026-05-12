@@ -2,7 +2,8 @@ import { NestFactory } from "@nestjs/core";
 import { ValidationPipe } from "@nestjs/common";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
 import { AppModule } from "./app.module";
-import helmet from "helmet";
+import { HelmetMiddleware } from "./common/middleware/helmet.middleware";
+import { CsrfMiddleware } from "./common/middleware/csrf.middleware";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const cookieParser = require("cookie-parser");
 
@@ -11,8 +12,11 @@ async function bootstrap() {
     logger: ["error", "warn", "log", "debug", "verbose"],
   });
 
-  // Security
-  app.use(helmet());
+  // Security: Helmet (CSP, HSTS, X-Frame-Options, etc.) + CSRF
+  const helmetInstance = new HelmetMiddleware();
+  app.use(helmetInstance.use.bind(helmetInstance));
+  const csrfInstance = new CsrfMiddleware();
+  app.use(csrfInstance.use.bind(csrfInstance));
   app.use(cookieParser());
 
   // FIX-P2-004: 严格 CORS 配置

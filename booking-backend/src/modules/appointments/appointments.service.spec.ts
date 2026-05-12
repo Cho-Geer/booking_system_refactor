@@ -145,10 +145,9 @@ describe('AppointmentsService', () => {
     const createAppointmentDto: CreateAppointmentDto = {
       timeSlotId: 'slot-1',
       serviceId: 'service-1',
-      customerName: 'John Doe',
-      customerEmail: 'john@example.com',
-      customerPhone: '1234567890',
+      customerInfo: { name: 'John Doe', email: 'john@example.com', phone: '1234567890' },
       notes: 'Test notes',
+      appointmentDate: '2024-01-15T10:00:00Z',
     };
 
     it('should throw NotFoundException if time slot does not exist', async () => {
@@ -195,11 +194,7 @@ describe('AppointmentsService', () => {
           userId: 'user-1',
           timeSlotId: createAppointmentDto.timeSlotId,
           serviceId: createAppointmentDto.serviceId,
-          customerInfo: {
-            name: createAppointmentDto.customerName,
-            email: createAppointmentDto.customerEmail,
-            phone: createAppointmentDto.customerPhone,
-          },
+          customerInfo: createAppointmentDto.customerInfo,
           remarks: createAppointmentDto.notes,
           status: AppointmentStatus.PENDING,
           appointmentDate: expect.any(Date),
@@ -263,9 +258,8 @@ describe('AppointmentsService', () => {
       const dtoWithoutNotes: CreateAppointmentDto = {
         timeSlotId: 'slot-1',
         serviceId: 'service-1',
-        customerName: 'John Doe',
-        customerEmail: 'john@example.com',
-        customerPhone: '1234567890',
+        customerInfo: { name: 'John Doe', email: 'john@example.com', phone: '1234567890' },
+        appointmentDate: '2024-01-15T10:00:00Z',
       };
       prisma.timeSlot.findUnique.mockResolvedValue(mockTimeSlot);
       const mockTx = {
@@ -1186,9 +1180,8 @@ if (isIntegrationMode()) {
         const result = await appointmentsService.create({
           serviceId: service.id,
           timeSlotId: timeSlot.id,
-          customerName: user.name,
-          customerEmail: user.email || 'test@example.com',
-          customerPhone: user.phone || '1234567890',
+          customerInfo: { name: user.name, email: user.email || 'test@example.com', phone: user.phone || '1234567890' },
+          appointmentDate: '2024-01-15T10:00:00Z',
         }, user.id);
 
         expect(result).toHaveProperty('id');

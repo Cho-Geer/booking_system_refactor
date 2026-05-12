@@ -24,6 +24,7 @@ import {
   TimeDistributionItem,
   SystemHealth,
   SystemHealthDetail,
+  ServicesSummary,
   TimeRange,
   NotificationList,
   UnreadCount,
@@ -201,6 +202,26 @@ export class AdminService {
 
   getUnreadCount(): Observable<UnreadCount> {
     return this.http.get<ApiResponse<UnreadCount>>(`${this.apiUrl}/admin/messages/unread-count`)
+      .pipe(map(response => response.data), catchError(this.handleError));
+  }
+
+  // ==========================================
+  // Services Summary
+  // ==========================================
+
+  getServicesSummary(): Observable<ServicesSummary> {
+    return this.http.get<ApiResponse<ServicesSummary>>(`${this.apiUrl}/admin/services/summary`)
+      .pipe(map(response => response.data), catchError(this.handleError));
+  }
+
+  // ==========================================
+  // Service Image Upload
+  // ==========================================
+
+  uploadServiceImage(id: string, file: File): Observable<{ imageUrl: string }> {
+    const formData = new FormData();
+    formData.append('image', file);
+    return this.http.post<ApiResponse<{ imageUrl: string }>>(`${this.apiUrl}/admin/services/${id}/image`, formData)
       .pipe(map(response => response.data), catchError(this.handleError));
   }
 

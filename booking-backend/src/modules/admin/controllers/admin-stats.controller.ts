@@ -27,8 +27,19 @@ export class AdminStatsController {
   @Get("stats")
   @Roles("ADMIN", "SUPER_ADMIN")
   @ApiOperation({ summary: "Get admin dashboard stats" })
-  async getStats(): Promise<AdminStatsDto> {
-    return this.adminStatsService.getDashboard();
+  @ApiQuery({
+    name: "timeRange",
+    required: false,
+    enum: ["last24h", "last7d", "last30d", "thisMonth", "lastMonth", "custom"],
+  })
+  @ApiQuery({ name: "startDate", required: false })
+  @ApiQuery({ name: "endDate", required: false })
+  async getStats(
+    @Query("timeRange") timeRange?: string,
+    @Query("startDate") startDate?: string,
+    @Query("endDate") endDate?: string,
+  ): Promise<AdminStatsDto> {
+    return this.adminStatsService.getDashboard(timeRange, startDate, endDate);
   }
 
   @Get("stats/booking-trends")

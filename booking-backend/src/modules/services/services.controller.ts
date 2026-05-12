@@ -51,7 +51,7 @@ export class ServicesController {
   }
 
   @Get(":id")
-  @ApiOperation({ summary: "Get service by ID" })
+  @ApiOperation({ summary: "Get service by ID (convenience endpoint, not explicitly in contract)" })
   @ApiResponse({ status: 200, description: "Service found" })
   @ApiResponse({ status: 404, description: "Service not found" })
   async findOne(@Param("id") id: string) {

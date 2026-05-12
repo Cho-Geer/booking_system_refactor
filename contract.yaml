@@ -1369,6 +1369,7 @@ data_models:
     relationships:
       category: { type: "belongs_to", target: "service_category" }
       time_slots: { type: "has_many", target: "time_slot" }
+      appointments: { type: "has_many", target: "appointment" }
   
   # Time slot model
   time_slot:
@@ -2047,6 +2048,84 @@ websocket_events:
             type: "number"
             description: "总收入"
 
+    # ---- Extra events (implemented but not in original v1.7 scope) ----
+
+    appointment_updated:
+      event: "appointment_updated"
+      direction: "Server → Client"
+      description: "预约信息被修改时推送给特定用户（发往 user:<userId> room）"
+      channel: "user:<userId>"
+      payload:
+        type: "object"
+        properties:
+          appointmentId:
+            type: "string"
+            description: "预约 ID"
+          changes:
+            type: "object"
+            description: "变更的字段和值"
+          timestamp:
+            type: "string"
+            format: "date-time"
+            description: "更新时间 (ISO 8601)"
+
+    booking_confirmed:
+      event: "booking_confirmed"
+      direction: "Server → Client"
+      description: "预约确认成功时推送给特定用户（发往 user:<userId> room）"
+      channel: "user:<userId>"
+      payload:
+        type: "object"
+        properties:
+          appointmentId:
+            type: "string"
+            description: "预约 ID"
+          appointmentNumber:
+            type: "string"
+            description: "预约编号"
+          timestamp:
+            type: "string"
+            format: "date-time"
+
+    booking_cancelled:
+      event: "booking_cancelled"
+      direction: "Server → Client"
+      description: "预约取消时推送给特定用户（发往 user:<userId> room）"
+      channel: "user:<userId>"
+      payload:
+        type: "object"
+        properties:
+          appointmentId:
+            type: "string"
+            description: "预约 ID"
+          reason:
+            type: "string"
+            description: "取消原因"
+          timestamp:
+            type: "string"
+            format: "date-time"
+
+    slot_update:
+      event: "slot-update"
+      direction: "Server → Client"
+      description: "时间段可用性变更时推送（前端 time-slot-picker 监听此事件实时更新 UI）"
+      payload:
+        type: "object"
+        properties:
+          slotId:
+            type: "string"
+            description: "时间段 ID"
+          isActive:
+            type: "boolean"
+            description: "时间段是否仍可用"
+          bookedBy:
+            type: "string"
+            description: "预订者（如果有）"
+          timestamp:
+            type: "string"
+            format: "date-time"
+            description: "变更时间 (ISO 8601)"
+
 # ============================================
 # End of Contract
 # ============================================
@@ -2260,6 +2339,7 @@ pii_encryption_contract:
       error_responses:
         401: "Refresh Token 无效或已过期"
       note: "实现 Token 旋转（Rotation）：每次刷新废弃旧 Refresh Token，签发新的"
+      deviation: "实际实现使用 HttpOnly cookie（res.cookie('refreshToken', ...)）接收 Refresh Token，而非契约定义的请求体字段。此为安全性增强（防 XSS 窃取 token），但移动端客户端需确保支持 cookie。见 §5 security.authentication.refresh_token_storage。"
 
     reset_password_send_code:
       method: POST

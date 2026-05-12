@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { AuthStore } from '../../stores/auth/auth.store';
 
 /** Socket reconnection delay in milliseconds */
 const SOCKET_RECONNECT_DELAY_MS = 1000;
@@ -35,9 +36,10 @@ export interface AppointmentStatusEvent {
 export class SocketService {
   private socket: Socket;
   private connected = false;
+  private readonly authStore = inject(AuthStore);
 
   constructor() {
-    this.socket = io(environment.socketUrl, {
+    this.socket = io(`${environment.socketUrl}/notifications`, {
       autoConnect: false,
       reconnection: true,
       reconnectionDelay: SOCKET_RECONNECT_DELAY_MS,
@@ -55,6 +57,10 @@ export class SocketService {
 
   connect(): void {
     if (!this.connected) {
+      const token = this.authStore.token();
+      if (token) {
+        this.socket.auth = { token };
+      }
       this.socket.connect();
     }
   }
@@ -112,11 +118,11 @@ export class SocketService {
   }
 
   joinRoom(room: string): void {
-    this.socket.emit('join-room', room);
+    this.socket.emit('join', { room });
   }
 
   leaveRoom(room: string): void {
-    this.socket.emit('leave-room', room);
+    this.socket.emit('leave', { room });
   }
 
   isConnected(): boolean {

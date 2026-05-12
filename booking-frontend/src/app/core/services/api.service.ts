@@ -12,6 +12,9 @@ import {
   AuthResponseDto,
   RegisterSendCodeResponse,
   LoginSendCodeResponse,
+  ResetPasswordSendCodeDto,
+  ResetPasswordSendCodeResponse,
+  ResetPasswordVerifyDto,
   LogoutResponse,
 } from '../../features/auth/dto/auth.dto';
 import { Service, TimeSlot, ReservationResponse, BookingListItem } from '../../shared/dto';
@@ -53,6 +56,9 @@ export type {
   LoginVerifyCodeDto,
   LoginPasswordDto,
   AuthResponseDto,
+  ResetPasswordSendCodeDto,
+  ResetPasswordSendCodeResponse,
+  ResetPasswordVerifyDto,
   Service,
   TimeSlot,
   ReservationResponse,
@@ -129,6 +135,26 @@ export class ApiService {
   }
 
   /**
+   * Reset Password Step 1: Send verification code
+   * POST /v1/auth/reset-password/send-code
+   */
+  resetPasswordSendCode(dto: ResetPasswordSendCodeDto): Observable<ResetPasswordSendCodeResponse> {
+    return this.http
+      .post<ApiResponse<ResetPasswordSendCodeResponse>>(`${this.apiUrl}/auth/reset-password/send-code`, dto, { withCredentials: true })
+      .pipe(map(response => response.data), catchError(this.handleError));
+  }
+
+  /**
+   * Reset Password Step 2: Verify code and reset password
+   * POST /v1/auth/reset-password/verify
+   */
+  resetPasswordVerify(dto: ResetPasswordVerifyDto): Observable<{ message: string }> {
+    return this.http
+      .post<ApiResponse<{ message: string }>>(`${this.apiUrl}/auth/reset-password/verify`, dto, { withCredentials: true })
+      .pipe(map(response => response.data), catchError(this.handleError));
+  }
+
+  /**
    * Logout (notify backend to blacklist token)
    * POST /v1/auth/logout
    */
@@ -196,10 +222,11 @@ export class ApiService {
       );
   }
 
-  getAvailableSlots(serviceId: string, startDate?: string, endDate?: string): Observable<TimeSlot[]> {
+  getAvailableSlots(serviceId: string, startDate?: string, endDate?: string, overtimeMinutes?: number): Observable<TimeSlot[]> {
     let params = new HttpParams().set('serviceId', serviceId);
     if (startDate) params = params.set('startDate', startDate);
     if (endDate) params = params.set('endDate', endDate);
+    if (overtimeMinutes !== undefined) params = params.set('overtimeMinutes', overtimeMinutes.toString());
     return this.http
       .get<ApiResponse<TimeSlot[]>>(`${this.apiUrl}/time-slots/available`, { params })
       .pipe(
@@ -267,6 +294,49 @@ export class ApiService {
   updateProfile(dto: { name?: string }): Observable<{ user: { id: string; name: string; email?: string; phone?: string; userType: string; createdAt?: string } }> {
     return this.http
       .put<ApiResponse<{ user: { id: string; name: string; email?: string; phone?: string; userType: string; createdAt?: string } }>>(`${this.apiUrl}/users/profile`, dto)
+      .pipe(
+        map(response => response.data),
+        catchError(this.handleError)
+      );
+  }
+
+  // ==========================================
+  // Password endpoints
+  // ==========================================
+
+  /**
+   * Update password
+   * PUT /v1/users/profile/password
+   */
+  updatePassword(dto: { currentPassword: string; newPassword: string }): Observable<{ message: string }> {
+    return this.http
+      .put<ApiResponse<{ message: string }>>(`${this.apiUrl}/users/profile/password`, dto)
+      .pipe(
+        map(response => response.data),
+        catchError(this.handleError)
+      );
+  }
+
+  /**
+   * Get my appointments with pagination meta
+   * GET /v1/appointments
+   */
+  getMyAppointmentsPaginated(query?: {
+    page?: number;
+    limit?: number;
+    startDate?: string;
+    endDate?: string;
+    status?: string;
+  }): Observable<PaginatedResponse<BookingListItem>> {
+    let params = new HttpParams();
+    if (query?.page) params = params.set('page', query.page.toString());
+    if (query?.limit) params = params.set('limit', query.limit.toString());
+    if (query?.startDate) params = params.set('startDate', query.startDate);
+    if (query?.endDate) params = params.set('endDate', query.endDate);
+    if (query?.status) params = params.set('status', query.status);
+
+    return this.http
+      .get<ApiResponse<PaginatedResponse<BookingListItem>>>(`${this.apiUrl}/appointments`, { params })
       .pipe(
         map(response => response.data),
         catchError(this.handleError)

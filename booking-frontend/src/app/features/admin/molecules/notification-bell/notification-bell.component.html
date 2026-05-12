@@ -1,0 +1,41 @@
+<div class="notification-bell" (click)="toggleDropdown()" (keydown.escape)="closeDropdown()">
+  <button class="bell-button" aria-label="Notifications">
+    <i class="pi pi-bell text-lg text-text-primary"></i>
+    @if (unreadCount() > 0) {
+      <span class="badge">{{ unreadCount() > 99 ? '99+' : unreadCount() }}</span>
+    }
+  </button>
+
+  @if (dropdownOpen()) {
+    <div class="dropdown-overlay" (click)="closeDropdown()"></div>
+    <div class="dropdown-panel">
+      <div class="dropdown-header">
+        <h3 class="text-sm font-bold text-text-primary">Notifications</h3>
+        <button class="close-btn" (click)="closeDropdown()" aria-label="Close">&times;</button>
+      </div>
+      <div class="notifications-list">
+        @for (notif of notifications(); track notif.id) {
+          <div
+            class="notification-item"
+            [class.unread]="!notif.read"
+            (click)="markAsRead(notif.id)"
+          >
+            <div class="flex items-start gap-3">
+              <i [class]="getTypeIcon(notif.type) + ' text-base mt-0.5 flex-shrink-0'"></i>
+              <div class="min-w-0 flex-1">
+                <p class="text-xs font-semibold text-text-primary truncate">{{ notif.title }}</p>
+                <p class="text-xs text-text-secondary mt-0.5 line-clamp-2">{{ notif.body }}</p>
+                <p class="text-[10px] text-text-secondary/60 mt-1">{{ formatTime(notif.created_at) }}</p>
+              </div>
+            </div>
+          </div>
+        } @empty {
+          <div class="empty-state">
+            <i class="pi pi-inbox text-text-secondary/40 text-2xl"></i>
+            <p class="text-xs text-text-secondary/60 mt-2">No notifications</p>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

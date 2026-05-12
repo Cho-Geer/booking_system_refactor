@@ -14,4 +14,10 @@ export const AUTH_ROUTES: Routes = [
     component: RegisterComponent,
     canActivate: [guestGuard],
   },
+  {
+    path: 'forgot-password',
+    loadComponent: () => import('./forgot-password/forgot-password.component')
+      .then(m => m.ForgotPasswordComponent),
+    canActivate: [guestGuard],
+  },
 ];

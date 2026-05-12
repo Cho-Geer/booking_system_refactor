@@ -35,12 +35,15 @@ export class RegisterCompleteDto {
   code!: string;
 
   @ApiProperty({
-    description: "密码（至少8个字符）",
+    description: "密码（至少8个字符，需包含大写字母、小写字母、数字和特殊字符）",
     example: "SecurePass123!",
     minLength: 8,
   })
   @IsString()
   @MinLength(8, { message: "Password must be at least 8 characters" })
+  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/, {
+    message: "Password must contain uppercase, lowercase, digit, and special character",
+  })
   password!: string;
 
   @ApiProperty({

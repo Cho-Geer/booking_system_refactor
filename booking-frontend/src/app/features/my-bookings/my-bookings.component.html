@@ -111,16 +111,34 @@
                   <h3 class="font-bold text-gray-900 text-sm sm:text-base truncate">{{ booking.serviceName }}</h3>
                   <app-badge [status]="toBadgeStatus(booking.status)"></app-badge>
                 </div>
-                <div class="space-y-1 text-sm text-gray-600">
-                  <div class="flex items-center gap-2">
-                    <span>📅</span>
-                    <span>{{ formatDate(booking.appointmentDate) }}</span>
+                  <div class="space-y-1 text-sm text-gray-600">
+                    <div class="flex items-center gap-2">
+                      <span>📅</span>
+                      <span>{{ formatDate(booking.appointmentDate) }}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span>🕐</span>
+                      <span>{{ formatTimeRange(booking.timeSlotStart, booking.timeSlotEnd) }}</span>
+                    </div>
+                    @if (booking.durationMinutes) {
+                      <div class="flex items-center gap-2">
+                        <span>⏱</span>
+                        <span>{{ booking.durationMinutes }} min</span>
+                      </div>
+                    }
+                    @if (booking.price !== undefined) {
+                      <div class="flex items-center gap-2">
+                        <span>💰</span>
+                        <span>{{ booking.price | currency }} @if (booking.taxRate) { (tax: {{ booking.taxRate }}%) }</span>
+                      </div>
+                    }
+                    @if (booking.taxIncludedAmount !== undefined) {
+                      <div class="flex items-center gap-2 font-semibold text-text-primary">
+                        <span>💵</span>
+                        <span>Total: {{ booking.taxIncludedAmount | currency }}</span>
+                      </div>
+                    }
                   </div>
-                  <div class="flex items-center gap-2">
-                    <span>🕐</span>
-                    <span>{{ formatTimeRange(booking.timeSlotStart, booking.timeSlotEnd) }}</span>
-                  </div>
-                </div>
 
                 <!-- Actions -->
                 <div class="flex gap-3 mt-4">
@@ -146,6 +164,43 @@
           </app-card>
         }
       </div>
+    }
+
+    <!-- Pagination -->
+    @if (totalPages() > 1) {
+      <div class="flex items-center justify-center gap-2 mt-6">
+        <app-button
+          label="Prev"
+          variant="secondary"
+          size="sm"
+          [disabled]="page() <= 1"
+          (onClick)="goToPage(page() - 1)"
+        />
+        <div class="flex items-center gap-1">
+          @for (p of [].constructor(totalPages()); track $index) {
+            <button
+              class="w-8 h-8 rounded-lg text-sm font-medium transition-colors"
+              [class.bg-primary-start]="page() === $index + 1"
+              [class.text-white]="page() === $index + 1"
+              [class.text-gray-600]="page() !== $index + 1"
+              [class.hover:bg-gray-100]="page() !== $index + 1"
+              (click)="goToPage($index + 1)"
+            >
+              {{ $index + 1 }}
+            </button>
+          }
+        </div>
+        <app-button
+          label="Next"
+          variant="secondary"
+          size="sm"
+          [disabled]="page() >= totalPages()"
+          (onClick)="goToPage(page() + 1)"
+        />
+      </div>
+      <p class="text-xs text-center text-gray-400 mt-2">
+        Showing page {{ page() }} of {{ totalPages() }} ({{ total() }} total)
+      </p>
     }
   }
 

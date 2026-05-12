@@ -77,10 +77,10 @@ export class CreateAdminAppointmentDto {
   @IsNotEmpty()
   appointmentDate!: string;
 
-  @ApiProperty({ description: "Time slot ID. If not provided, the first available slot for the service and date will be auto-assigned." })
-  @IsOptional()
+  @ApiProperty({ description: "Time slot ID" })
   @IsString()
-  timeSlotId?: string;
+  @IsNotEmpty()
+  timeSlotId!: string;
 
   @ApiPropertyOptional({ description: "Additional notes" })
   @IsOptional()

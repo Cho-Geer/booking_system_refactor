@@ -136,6 +136,17 @@ export class AppointmentsService {
       );
     }
 
+    // Audit log
+    await this.prisma.activityLog.create({
+      data: {
+        userId: appointment.userId,
+        action: "BOOKING_CREATE",
+        resourceType: "APPOINTMENT",
+        resourceId: appointment.id,
+        metadata: { serviceId: appointment.serviceId, timeSlotId: appointment.timeSlotId },
+      },
+    });
+
     return appointment;
   }
 
@@ -180,14 +191,12 @@ export class AppointmentsService {
               userId,
               timeSlotId: createAppointmentDto.timeSlotId,
               serviceId: createAppointmentDto.serviceId,
-              customerInfo: {
-                name: createAppointmentDto.customerName,
-                email: createAppointmentDto.customerEmail,
-                phone: createAppointmentDto.customerPhone,
-              },
+              customerInfo: (createAppointmentDto.customerInfo ?? {}) as Prisma.InputJsonValue,
               remarks: createAppointmentDto.notes,
               status: AppointmentStatus.PENDING,
-              appointmentDate: new Date(),
+              appointmentDate: createAppointmentDto.appointmentDate
+                ? new Date(createAppointmentDto.appointmentDate)
+                : new Date(),
               slotSequence: targetSeq,
               appointmentNumber: `APT-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             },
@@ -340,6 +349,17 @@ export class AppointmentsService {
           error,
         );
       }
+
+      // Audit log for status change
+      await this.prisma.activityLog.create({
+        data: {
+          userId: updated.userId,
+          action: "STATUS_CHANGE",
+          resourceType: "APPOINTMENT",
+          resourceId: updated.id,
+          metadata: { previousStatus: appointment.status, newStatus: updated.status, cancelReason: updateAppointmentDto.cancelReason },
+        },
+      });
     }
 
     return updated;
@@ -408,6 +428,17 @@ export class AppointmentsService {
     } catch (error) {
       this.logger.error("Failed to send cancellation notification:", error);
     }
+
+    // Audit log
+    await this.prisma.activityLog.create({
+      data: {
+        userId: updated.userId,
+        action: "BOOKING_CANCEL",
+        resourceType: "APPOINTMENT",
+        resourceId: updated.id,
+        metadata: { reason },
+      },
+    });
 
     return updated;
   }

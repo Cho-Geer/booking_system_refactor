@@ -257,8 +257,8 @@ describe('UsersController', () => {
     it('should call service.updatePassword with correct parameters', async () => {
       mockUsersService.updatePassword.mockResolvedValue({ message: 'Password changed successfully' });
 
-      const result = await controller.changePassword('user-1', {
-        oldPassword: 'OldPass123!',
+      const result = await controller.changePassword({
+        currentPassword: 'OldPass123!',
         newPassword: 'NewPass456!',
       }, mockReq as unknown as Request);
 
@@ -271,11 +271,12 @@ describe('UsersController', () => {
         new BadRequestException('Current password is incorrect'),
       );
 
+      mockReq.user = { id: 'user-1', roles: [] };
       await expect(
-        controller.changePassword('user-1', { oldPassword: 'WrongPass!', newPassword: 'NewPass!' }, mockReq as unknown as Request)
+        controller.changePassword({ oldPassword: 'WrongPass!', newPassword: 'NewPass!', currentPassword: 'WrongPass!' } as any, mockReq as unknown as Request)
       ).rejects.toThrow(BadRequestException);
       await expect(
-        controller.changePassword('user-1', { oldPassword: 'WrongPass!', newPassword: 'NewPass!' }, mockReq as unknown as Request)
+        controller.changePassword({ oldPassword: 'WrongPass!', newPassword: 'NewPass!', currentPassword: 'WrongPass!' } as any, mockReq as unknown as Request)
       ).rejects.toThrow('Current password is incorrect');
     });
 
@@ -285,10 +286,10 @@ describe('UsersController', () => {
       );
 
       await expect(
-        controller.changePassword('user-1', { oldPassword: 'OldPass!', newPassword: 'NewPass!' }, mockReq as unknown as Request)
+        controller.changePassword({ currentPassword: 'OldPass!', newPassword: 'NewPass!' }, mockReq as unknown as Request)
       ).rejects.toThrow(BadRequestException);
       await expect(
-        controller.changePassword('user-1', { oldPassword: 'OldPass!', newPassword: 'NewPass!' }, mockReq as unknown as Request)
+        controller.changePassword({ currentPassword: 'OldPass!', newPassword: 'NewPass!' }, mockReq as unknown as Request)
       ).rejects.toThrow('Password management is not supported');
     });
   });
@@ -363,14 +364,17 @@ describe('UsersController', () => {
 
       const controller = module.get<UsersController>(UsersController);
 
-      await expect(controller.changePassword(targetUserId, {
+      mockReq.user = { id: 'different-user', roles: [] };
+      await expect(controller.changePassword({
         oldPassword: 'OldPass123!',
         newPassword: 'HackedPass456!',
-      }, mockReq as unknown as Request)).rejects.toThrow(ForbiddenException);
-      await expect(controller.changePassword(targetUserId, {
+        currentPassword: 'OldPass123!',
+      } as any, mockReq as unknown as Request)).rejects.toThrow(ForbiddenException);
+      await expect(controller.changePassword({
         oldPassword: 'OldPass123!',
         newPassword: 'HackedPass456!',
-      }, mockReq as unknown as Request)).rejects.toThrow('You can only change your own profile');
+        currentPassword: 'OldPass123!',
+      } as any, mockReq as unknown as Request)).rejects.toThrow('You can only change your own profile');
     });
 
     it('should allow GET /users/:id when requester IS the resource owner', async () => {

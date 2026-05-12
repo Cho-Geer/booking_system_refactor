@@ -4,7 +4,6 @@ import {
   AdminStatsDto,
   StatCardDto,
   ServiceDistributionItem,
-  StaffWorkloadItem,
   SystemStatusDto,
   SystemMetricsDto,
   TimeDistributionItem,
@@ -36,7 +35,11 @@ export class AdminStatsService {
     };
   }
 
-  async getDashboard(): Promise<AdminStatsDto> {
+  async getDashboard(
+    timeRange?: string,
+    startDate?: string,
+    endDate?: string,
+  ): Promise<AdminStatsDto> {
     const [
       overview,
       revenue,
@@ -82,9 +85,6 @@ export class AdminStatsService {
             100
           : 0,
     }));
-
-    // Compute staff workload as percentage distribution of appointments across services
-    const staffWorkload = this.computeStaffWorkload(popularServices);
 
     // totalBookings: sum of last 7 days vs sum of 7-14 days ago
     const last7Sum = dailyBookings
@@ -137,10 +137,9 @@ export class AdminStatsService {
       bookingTrend,
       servicePopularity,
       timeDistribution: timeDistribution.map((item) => ({
-        hour: String(item.hour).padStart(2, "0") + ":00",
+        hour: Number(item.hour),
         count: item.count,
       })),
-      staffWorkload,
     };
   }
 
@@ -224,7 +223,7 @@ export class AdminStatsService {
   ): Promise<TimeDistributionItem[]> {
     const raw = await this.statsService.getTimeDistribution();
     return raw.map((item) => ({
-      hour: String(item.hour).padStart(2, "0") + ":00",
+      hour: Number(item.hour),
       count: item.count,
     }));
   }
@@ -284,26 +283,4 @@ export class AdminStatsService {
     };
   }
 
-  private computeStaffWorkload(
-    popularServices: Array<{
-      serviceName: string;
-      bookingCount: number;
-    }>,
-  ): StaffWorkloadItem[] {
-    const totalBookings = popularServices.reduce(
-      (sum, s) => sum + s.bookingCount,
-      0,
-    );
-
-    if (totalBookings === 0) {
-      return [];
-    }
-
-    return popularServices.map((s) => ({
-      serviceName: s.serviceName,
-      workloadPercentage:
-        Math.round((s.bookingCount / totalBookings) * 10000) / 100,
-      appointmentCount: s.bookingCount,
-    }));
-  }
 }
