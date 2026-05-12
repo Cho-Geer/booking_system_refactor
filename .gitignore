@@ -92,6 +92,9 @@ playwright/.auth/
 # Prisma generated client
 **/prisma/generated/
 
+# Runtime-generated multi-instance deployment configs
+instances/
+
 
 
 
