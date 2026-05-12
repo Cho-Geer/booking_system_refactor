@@ -393,21 +393,6 @@
         }
       </div>
       <div>
-        <label class="block font-medium mb-1 text-text-primary">Additional Time Slots (optional)</label>
-        <p-multiSelect
-          [(ngModel)]="formSelectedSlotIds"
-          [options]="availableTimeSlots()"
-          placeholder="Select additional slots..."
-          display="chip"
-          class="w-full"
-          appendTo="body"
-          [disabled]="!formServiceId()"
-        />
-        @if (!formServiceId()) {
-          <p class="text-xs text-text-secondary mt-1">Please select a service first.</p>
-        }
-      </div>
-      <div>
         <label class="block font-medium mb-1 text-text-primary">Overtime Minutes</label>
         <p-inputNumber
           [(ngModel)]="formOvertimeMinutes"

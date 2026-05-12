@@ -52,7 +52,6 @@ export class BookingService {
 
     try {
       // Call the backend API to create the appointment
-      const selectedSlotIds = this.store.selectedSlotIds();
       const overtimeMinutes = this.store.overtimeMinutes();
       const response = await lastValueFrom(
         this.apiService.createAppointment({
@@ -61,7 +60,6 @@ export class BookingService {
           appointmentDate: new Date().toISOString(),
           preferredSequence: preferSeq,
           notes: undefined,
-          selectedSlotIds: selectedSlotIds.length > 0 ? selectedSlotIds : undefined,
           overtimeMinutes: overtimeMinutes > 0 ? overtimeMinutes : undefined,
         })
       );

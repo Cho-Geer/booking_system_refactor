@@ -192,7 +192,6 @@ export class ApiService {
     preferredSequence: number;
     customerInfo?: Record<string, unknown>;
     notes?: string;
-    selectedSlotIds?: string[];
     overtimeMinutes?: number;
   }): Observable<ReservationResponse> {
     return this.http

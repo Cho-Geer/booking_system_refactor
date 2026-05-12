@@ -15,7 +15,6 @@ export interface BookingState {
   activeBookings: string[];
   services: Service[];
   bookings: BookingListItem[];
-  selectedSlotIds: string[];
   overtimeMinutes: number;
 }
 
@@ -28,7 +27,6 @@ export const initialBookingState: BookingState = {
   activeBookings: [],
   services: [],
   bookings: [],
-  selectedSlotIds: [],
   overtimeMinutes: 0,
 };
 

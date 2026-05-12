@@ -211,7 +211,6 @@ export class AppointmentManagementComponent implements OnInit {
   // Raw service items with pricing for cost estimation
   readonly rawServiceItems = signal<AdminServiceItem[]>([]);
   readonly formOvertimeMinutes = signal<number>(0);
-  readonly formSelectedSlotIds = signal<string[]>([]);
   readonly formSelectedServiceData = signal<AdminServiceItem | null>(null);
 
   /** Estimate total cost: pricePerMinute × (duration + overtime) × (1 + taxRate) */
@@ -293,7 +292,6 @@ export class AppointmentManagementComponent implements OnInit {
     this.timeSlotUnavailable.set(false);
     this.formSubmitted.set(false);
     this.formOvertimeMinutes.set(0);
-    this.formSelectedSlotIds.set([]);
     this.formSelectedServiceData.set(null);
     this.bookingDialogVisible.set(true);
   }
@@ -326,7 +324,6 @@ export class AppointmentManagementComponent implements OnInit {
       timeSlotId,
       appointmentDate: appointmentDate.toISOString(),
       notes: this.formNotes() || undefined,
-      selectedSlotIds: this.formSelectedSlotIds().length > 0 ? this.formSelectedSlotIds() : undefined,
       overtimeMinutes: this.formOvertimeMinutes() > 0 ? this.formOvertimeMinutes() : undefined,
     };
 
@@ -372,7 +369,6 @@ export class AppointmentManagementComponent implements OnInit {
     this.availableTimeSlots.set([]);
     this.formTimeSlotId.set('');
     this.timeSlotUnavailable.set(false);
-    this.formSelectedSlotIds.set([]);
     this.formOvertimeMinutes.set(0);
     // Look up full service data for cost estimation
     const service = this.rawServiceItems().find(s => s.id === serviceId) ?? null;

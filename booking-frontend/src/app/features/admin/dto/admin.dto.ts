@@ -155,7 +155,6 @@ export interface AdminAppointment {
   price?: number;
   taxRate?: number;
   taxIncludedAmount?: number;
-  bookingGroupId?: string;
   createdAt: string;
 }
 
@@ -192,7 +191,6 @@ export interface CreateAdminAppointmentRequest {
   appointmentDate: string;
   timeSlotId?: string;
   notes?: string;
-  selectedSlotIds?: string[];
   overtimeMinutes?: number;
 }
 
