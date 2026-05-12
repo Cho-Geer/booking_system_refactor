@@ -3625,6 +3625,59 @@
         "execution_summary": "Removed deprecated admin reports module (controller, service, DTO, spec files, module registration). Added contract-annotation comments to GET /services/:id and GET /time-slots/:id. No other dead code (staff/booking_group references) found in active source files.",
         "completed_at": "2026-05-12T07:59:30.623Z"
       }
+    },
+    "cg_ses_1778581137198": {
+      "session_id": "cg_ses_1778581137198",
+      "created_at": "2026-05-12T10:18:57.199Z",
+      "task_description": "Admin Quick Booking Time Slot selector architectural fix: format ISO datetime to hh:mm, filter by selected appointment date, add reactivity to date changes",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Architectural fix plan for Admin Quick Booking Time Slot selector: format ISO->hh:mm, filter by selected appointment date, add date reactivity via Option A (client-side caching + computed signals)",
+      "confirmed_at": "2026-05-12T10:20:21.011Z",
+      "consumed_at": "2026-05-12T10:20:59.650Z",
+      "audit": {
+        "execution_summary": "Produced read-only architectural fix plan for Admin Quick Booking Time Slot selector: selected Option A (client-side caching with computed signals), defined 6 exact code changes across 2 files with line numbers, format strategy (ISO slice(11,16) for hh:mm), risk assessment (contract compatibility, timezone edge case, test impact), and execution order for @Coder-FE.",
+        "completed_at": "2026-05-12T10:20:59.650Z"
+      }
+    },
+    "cg_ses_1778585848343": {
+      "session_id": "cg_ses_1778585848343",
+      "created_at": "2026-05-12T11:37:28.344Z",
+      "task_description": "Design architecture for automatic timezone adaptation across the full-stack booking system - storage strategy, detection, conversion layer, API contract changes, and frontend display considerations.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Design full-stack timezone architecture for booking system: storage strategy, detection, conversion layer, API contract changes, business hours config, migration path.",
+      "confirmed_at": "2026-05-12T11:40:48.571Z",
+      "consumed_at": "2026-05-12T11:44:41.807Z",
+      "audit": {
+        "execution_summary": "Produced system-timezone-architecture.md (1032 lines) covering: 6 design principles, 3-tier timezone detection strategy, frontend TimezoneService + interceptor + DateFormatService architecture, backend TimezoneInterceptor + ClinicTimezoneProvider + business hours config model, contract.yaml changes with X-Timezone header, data migration plan for User.preferredTimezone, 50+ affected files list, and 5-phase 11-day implementation roadmap with risk assessment.",
+        "completed_at": "2026-05-12T11:44:41.807Z"
+      }
+    },
+    "cg_ses_1778586088722": {
+      "session_id": "cg_ses_1778586088722",
+      "created_at": "2026-05-12T11:41:28.723Z",
+      "task_description": "Design comprehensive system timezone architecture document for full-stack booking system",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Design comprehensive system timezone architecture document for full-stack booking system covering detection strategy, frontend/backend architecture, API contract changes, business hours config, data migration, and implementation phasing",
+      "confirmed_at": "2026-05-12T11:41:53.672Z",
+      "consumed_at": "2026-05-12T11:44:19.668Z",
+      "audit": {
+        "execution_summary": "Produced system-timezone-architecture.md with 10 sections: Design Principles, Detection Strategy, Frontend/Backend Architecture, API Contract Changes, Business Hours Configuration, Data Migration, Affected Files (50+), Risks, Implementation Phasing (5 phases over 11 days). Document follows existing mixed CN/EN style with tables, code snippets, and structured headings.",
+        "completed_at": "2026-05-12T11:44:19.668Z"
+      }
+    },
+    "cg_ses_1778591654911": {
+      "session_id": "cg_ses_1778591654911",
+      "created_at": "2026-05-12T13:14:14.912Z",
+      "task_description": "Sync 4 baseline documents (contract.yaml, 数据架构设计文档, 系统架构设计文档, 接口设计规范文档) with system-timezone-architecture.md — add X-Timezone header, timezone params, User.preferredTimezone, BusinessHours config, new endpoints, and response format updates.",
+      "gate_status": "armed",
+      "last_check_failed_items": [],
+      "plan_summary": "Sync 4 baseline docs with timezone architecture: contract.yaml v1.7.5 (X-Timezone header, timezone params, User.preferredTimezone, new endpoints, response offset), 数据架构设计文档 (User field + BusinessHours), 系统架构设计文档 (TimezoneModule ref), 接口设计规范文档 (timezone params sync).",
+      "confirmed_at": "2026-05-12T13:14:20.596Z",
+      "consumed_at": null,
+      "audit": null
     }
   }
 }
