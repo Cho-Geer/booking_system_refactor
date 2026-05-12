@@ -332,12 +332,12 @@ describe('RegisterFormComponent', () => {
       });
     });
 
-    it('[RED] should have bg-accent-blue class on submit button', () => {
+    it('[RED] should have bg-accent-green class on submit button', () => {
       const buttons = fixture.nativeElement.querySelectorAll('button');
       const submitBtn = Array.from(buttons).find(
         (btn: HTMLButtonElement) => btn.textContent?.includes('完成注册')
       ) as HTMLButtonElement;
-      expect(submitBtn.classList.contains('bg-accent-blue')).toBe(true);
+      expect(submitBtn.classList.contains('bg-accent-green')).toBe(true);
     });
 
     it('[RED] should have border-border-color class on back button', () => {

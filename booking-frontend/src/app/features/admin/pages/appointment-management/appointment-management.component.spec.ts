@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AppointmentManagementComponent } from './appointment-management.component';
 import { AdminStore } from '../../stores/admin.store';
 import { AdminService } from '../../services/admin.service';
+import { ApiService } from '../../../../core/services/api.service';
 import { AdminAppointment } from '../../dto/admin.dto';
 import { of } from 'rxjs';
 
@@ -14,17 +15,18 @@ describe('AppointmentManagementComponent', () => {
   beforeEach(async () => {
     mockAdminService = {
       getStats: jest.fn(),
-      getUsers: jest.fn(),
+      getUsers: jest.fn().mockReturnValue(of({ items: [], total: 0, page: 1, limit: 10 })),
       createUser: jest.fn(),
       updateUser: jest.fn(),
       deleteUser: jest.fn(),
-      getAdminServices: jest.fn(),
+      getAdminServices: jest.fn().mockReturnValue(of({ items: [], total: 0, page: 1, limit: 10 })),
       createAdminService: jest.fn(),
       updateAdminService: jest.fn(),
       deleteAdminService: jest.fn(),
       getAdminAppointments: jest.fn().mockReturnValue(of({ items: [], total: 0, page: 1, limit: 10 })),
       updateAppointmentStatus: jest.fn(),
       batchCancelAppointments: jest.fn(),
+      createAdminAppointment: jest.fn(),
     } as unknown as jest.Mocked<AdminService>;
 
     TestBed.configureTestingModule({
@@ -32,6 +34,7 @@ describe('AppointmentManagementComponent', () => {
       providers: [
         AdminStore,
         { provide: AdminService, useValue: mockAdminService },
+        { provide: ApiService, useValue: { getAvailableSlots: jest.fn().mockReturnValue(of([])) } },
       ],
     });
 
@@ -105,6 +108,7 @@ describe('AppointmentManagementComponent', () => {
       },
     ];
     store.setAppointments(appointments, 3, 1);
+    store.setAllAppointmentsForStats(appointments);
 
     expect(component.todayCount()).toBe(2);
     expect(component.pendingCount()).toBe(1);
@@ -189,6 +193,7 @@ describe('AppointmentManagementComponent', () => {
       },
     ];
     store.setAppointments(appointments, 1, 1);
+    store.setAllAppointmentsForStats(appointments);
 
     const events = component.calendarEvents();
     expect(events.length).toBe(1);

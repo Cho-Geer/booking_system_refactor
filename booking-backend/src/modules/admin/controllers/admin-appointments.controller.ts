@@ -20,6 +20,7 @@ import {
   AdminAppointmentsQueryDto,
   UpdateAppointmentStatusDto,
   BatchCancelDto,
+  CreateAdminAppointmentDto,
 } from "../dto/admin-appointment.dto";
 import { JwtAuthGuard } from "../../../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../../../common/guards/roles.guard";
@@ -54,6 +55,15 @@ export class AdminAppointmentsController {
   ) {
     const performedBy = req?.user?.id;
     return this.adminAppointmentsService.updateStatus(id, dto, performedBy);
+  }
+
+  @Post()
+  @ApiOperation({ summary: "Create appointment on behalf of a customer" })
+  @ApiResponse({ status: 201, description: "Appointment created" })
+  @ApiResponse({ status: 404, description: "User or service not found" })
+  async create(@Body() dto: CreateAdminAppointmentDto, @Req() req: any) {
+    const performedBy = req?.user?.id;
+    return this.adminAppointmentsService.create(dto, performedBy);
   }
 
   @Post("batch-cancel")

@@ -1,0 +1,5 @@
+:host { display: block; height: 100%; }
+.no-click-feedback .app-button-click-feedback,
+.no-click-feedback .app-button-click-feedback:active {
+  transform: none !important;
+}

@@ -3,10 +3,12 @@
   [optionLabel]="optionLabel()"
   [optionValue]="optionValue()"
   [placeholder]="placeholder()"
-  [disabled]="disabled()"
+  [disabled]="disabled() || false"
   [class.ng-invalid]="invalid()"
   [variant]="variant()"
   [filter]="filter()"
   [styleClass]="styleClass()"
+  [ngModel]="value()"
+  appendTo="body"
   (onChange)="onModelChange($event.value)"
 />

@@ -16,6 +16,7 @@ class StubAppHeaderComponent {
   userRole = input<string>();
   isAdmin = input<boolean>(false);
   menuItems = input<any[]>([]);
+  showSearch = input<boolean>(true);
   menuToggle = output<void>();
   logout = output<void>();
 }

@@ -10,12 +10,12 @@ interface PrismaAppointment {
   createdAt: Date;
   user?: { name: string };
   service?: { name: string };
-  timeSlot?: { slotTime: string };
+  timeSlot?: { startTime: Date; endTime: Date };
 }
 
 let appointmentCounter = 0;
 
-function generateAppointmentNumber(): string {
+export function generateAppointmentNumber(): string {
   appointmentCounter += 1;
   const ts = Date.now().toString(36).toUpperCase();
   return `APT-${ts}-${appointmentCounter.toString().padStart(4, "0")}`;

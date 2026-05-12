@@ -166,6 +166,8 @@ export class ApiService {
     preferredSequence: number;
     customerInfo?: Record<string, unknown>;
     notes?: string;
+    selectedSlotIds?: string[];
+    overtimeMinutes?: number;
   }): Observable<ReservationResponse> {
     return this.http
       .post<ReservationResponse>(`${this.apiUrl}/appointments`, dto)
@@ -194,8 +196,10 @@ export class ApiService {
       );
   }
 
-  getAvailableSlots(serviceId: string): Observable<TimeSlot[]> {
-    const params = new HttpParams().set('serviceId', serviceId);
+  getAvailableSlots(serviceId: string, startDate?: string, endDate?: string): Observable<TimeSlot[]> {
+    let params = new HttpParams().set('serviceId', serviceId);
+    if (startDate) params = params.set('startDate', startDate);
+    if (endDate) params = params.set('endDate', endDate);
     return this.http
       .get<ApiResponse<TimeSlot[]>>(`${this.apiUrl}/time-slots/available`, { params })
       .pipe(

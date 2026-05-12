@@ -47,6 +47,11 @@ export interface DailyBooking {
   revenue: number;
 }
 
+export interface TimeDistribution {
+  hour: number;
+  count: number;
+}
+
 @Injectable()
 export class StatsService {
   constructor(private readonly prisma: PrismaService) {}
@@ -274,6 +279,28 @@ export class StatsService {
       date: row.date,
       bookings: row.count,
       revenue: Number(row.revenue),
+    }));
+  }
+
+  /**
+   * Get hourly time distribution of appointments
+   */
+  async getTimeDistribution(): Promise<TimeDistribution[]> {
+    const result = await this.prisma.$queryRaw<
+      Array<{ hour: number; count: number }>
+    >(Prisma.sql`
+      SELECT 
+        EXTRACT(HOUR FROM a.appointment_date)::int as hour,
+        COUNT(a.id)::int as count
+      FROM appointments a
+      WHERE a.created_at >= NOW() - INTERVAL '30 days'
+      GROUP BY EXTRACT(HOUR FROM a.appointment_date)
+      ORDER BY hour ASC
+    `);
+
+    return result.map((row) => ({
+      hour: Number(row.hour),
+      count: Number(row.count),
     }));
   }
 }

@@ -2,7 +2,7 @@
   display: flex;
   gap: 2rem;
   margin-bottom: 1.5rem;
-  border-bottom: 2px solid var(--border-color, #e0e0e0);
+  border-bottom: 2px solid var(--border-color, #2a3a50);
 }
 
 .tab-button {
@@ -11,13 +11,13 @@
   padding: 0.75rem 0;
   font-size: 1rem;
   font-weight: 500;
-  color: var(--text-secondary, #666);
+  color: var(--text-secondary, #94a3b8);
   cursor: pointer;
   position: relative;
   transition: color 0.2s ease;
 
   &.active {
-    color: var(--color-primary, #667eea);
+    color: var(--color-primary, #2ecc71);
 
     &::after {
       content: '';
@@ -26,12 +26,12 @@
       left: 0;
       right: 0;
       height: 2px;
-      background-color: var(--color-primary, #667eea);
+      background-color: var(--color-primary, #2ecc71);
     }
   }
 
   &:hover {
-    color: var(--color-primary, #667eea);
+    color: var(--color-primary, #2ecc71);
   }
 }
 
@@ -42,27 +42,56 @@
 label {
   display: block;
   margin-bottom: 0.5rem;
-  color: var(--text-secondary, #666);
+  color: var(--text-secondary, #94a3b8);
   font-weight: 500;
 }
 
 input, select {
   width: 100%;
   padding: 0.75rem;
-  border: 2px solid var(--border-color, #e0e0e0);
-  border-radius: 12px;
+  border: 1px solid var(--color-border, #2a3a50);
+  border-radius: 6px;
   font-size: 1rem;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+.sharp-input {
+  background: var(--color-bg-primary, #0c1220);
+  border: 1px solid var(--color-border, #2a3a50);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  color: var(--color-text-primary, #e2e8f0);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  outline: none;
+  width: 100%;
+
+  &:focus {
+    border-color: #2ecc71;
+    box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.15);
+  }
+
+  &:hover:not(:focus) {
+    border-color: rgba(46, 204, 113, 0.3);
+  }
+
+  &.error {
+    border-color: #e74c3c;
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.15);
+  }
+}
+
+.sharp-input::placeholder {
+  color: var(--color-text-disabled, #475569);
+}
+
 input:focus, select:focus {
   outline: none;
-  border-color: var(--color-primary, #667eea);
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+  border-color: var(--color-primary, #2ecc71);
+  box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.15);
 }
 
 input.error, select.error {
-  border-color: var(--error-color, #f44336);
+  border-color: var(--error-color, #e74c3c);
 }
 
 .verify-input-wrapper {
@@ -78,7 +107,7 @@ input.error, select.error {
   padding: 0.75rem 1rem;
   background: none;
   border: none;
-  color: var(--color-primary, #667eea);
+  color: var(--color-primary, #2ecc71);
   font-size: 0.9rem;
   cursor: pointer;
   white-space: nowrap;
@@ -95,7 +124,7 @@ input.error, select.error {
 }
 
 .error-message {
-  color: var(--error-color, #f44336);
+  color: var(--error-color, #e74c3c);
   font-size: 0.85rem;
   margin-top: 0.5rem;
 }
@@ -103,7 +132,7 @@ input.error, select.error {
 .btn-primary {
   width: 100%;
   padding: 0.75rem;
-  background: linear-gradient(135deg, var(--color-primary, #667eea), #764ba2);
+  background: var(--color-primary, #2ecc71);
   color: white;
   border: none;
   border-radius: 12px;
@@ -113,7 +142,7 @@ input.error, select.error {
 
   &:hover:not(:disabled) {
     opacity: 0.9;
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+    box-shadow: 0 6px 20px rgba(46, 204, 113, 0.5);
   }
 
   &:disabled {
@@ -130,7 +159,7 @@ input.error, select.error {
     align-items: center;
     gap: 0.5rem;
     font-size: 0.85rem;
-    color: var(--text-secondary, #666);
+    color: var(--text-secondary, #94a3b8);
     cursor: pointer;
 
     input[type="checkbox"] {
@@ -139,7 +168,7 @@ input.error, select.error {
     }
 
     a {
-      color: var(--color-primary, #667eea);
+      color: var(--color-primary, #2ecc71);
       text-decoration: none;
 
       &:hover {
@@ -168,8 +197,8 @@ input.error, select.error {
     width: 28px;
     height: 28px;
     border-radius: 50%;
-    background: var(--border-color, #e0e0e0);
-    color: var(--text-secondary, #666);
+    background: var(--border-color, #2a3a50);
+    color: var(--text-secondary, #94a3b8);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -186,7 +215,7 @@ input.error, select.error {
 
   &.active {
     .step-number {
-      background: var(--color-primary, #667eea);
+      background: var(--color-primary, #2ecc71);
       color: white;
     }
     .step-label {
@@ -209,7 +238,7 @@ input.error, select.error {
 .step-connector {
   width: 40px;
   height: 2px;
-  background: var(--border-color, #e0e0e0);
+  background: var(--border-color, #2a3a50);
   transition: background 0.2s ease;
 
   &.completed {
@@ -227,21 +256,21 @@ input.error, select.error {
 .type-btn {
   flex: 1;
   padding: 0.5rem 1rem;
-  border: 2px solid var(--border-color, #e0e0e0);
+  border: 2px solid var(--border-color, #2a3a50);
   border-radius: 8px;
   background: transparent;
-  color: var(--text-secondary, #666);
+  color: var(--text-secondary, #94a3b8);
   font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
-    border-color: var(--color-primary, #667eea);
+    border-color: var(--color-primary, #2ecc71);
   }
 
   &.active {
-    border-color: var(--color-primary, #667eea);
-    background: linear-gradient(135deg, var(--color-primary, #667eea), #764ba2);
+    border-color: var(--color-primary, #2ecc71);
+    background: var(--color-primary, #2ecc71);
     color: white;
   }
 }
@@ -256,8 +285,8 @@ input.error, select.error {
     flex: 1;
     padding: 0.75rem;
     background: transparent;
-    color: var(--text-secondary, #666);
-    border: 2px solid var(--border-color, #e0e0e0);
+    color: var(--text-secondary, #94a3b8);
+    border: 2px solid var(--border-color, #2a3a50);
     border-radius: 8px;
     font-size: 1rem;
     font-weight: 500;
@@ -265,8 +294,8 @@ input.error, select.error {
     transition: all 0.2s ease;
 
     &:hover {
-      border-color: var(--color-primary, #667eea);
-      color: var(--color-primary, #667eea);
+      border-color: var(--color-primary, #2ecc71);
+      color: var(--color-primary, #2ecc71);
     }
   }
 

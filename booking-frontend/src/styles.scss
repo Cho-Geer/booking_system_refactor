@@ -2,18 +2,26 @@
 @plugin "tailwindcss-primeui";
 
 @theme {
+  /* ========================================
+     Design Tokens – extracted from prototype
+     ======================================== */
   --color-bg-primary: #0c1220;
   --color-bg-secondary: #162032;
   --color-bg-tertiary: #1e293b;
+  --color-dark-bg: #0c1220;
+  --color-card-bg: #162032;
+  --color-card-bg-light: #1e293b;
   --color-border: #2a3a50;
+  --color-border-color: #2a3a50;
   --color-border-light: rgba(42, 58, 80, 0.3);
-  --color-primary: #00c6ff;
-  --color-primary-start: #00c6ff;
-  --color-primary-end: #0072ff;
-  --color-primary-solid: #00c6ff;
-  --color-accent-blue: #00c6ff;
-  --color-accent-blue-dark: #0072ff;
+  --color-primary: #2ecc71;
+  --color-primary-start: #2ecc71;
+  --color-primary-end: #27ae60;
+  --color-primary-solid: #2ecc71;
+  --color-accent-blue: #2ecc71;
+  --color-accent-blue-dark: #27ae60;
   --color-accent-green: #2ecc71;
+	--color-accent-green-dark: #27ae60;
   --color-accent-red: #e74c3c;
   --color-accent-yellow: #f39c12;
   --color-accent-purple: #9b59b6;
@@ -22,18 +30,22 @@
   --color-success: #2ecc71;
   --color-warning: #f39c12;
   --color-danger: #e74c3c;
-  --color-info: #00c6ff;
+  --color-info: #2ecc71;
   --color-text-primary: #e2e8f0;
   --color-text-secondary: #94a3b8;
   --color-text-disabled: #475569;
+
+  /* Shadows */
   --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-  --shadow-card-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.25), 0 0 15px rgba(0, 198, 255, 0.2);
-  --shadow-glow-blue: 0 0 15px rgba(0, 198, 255, 0.3);
+  --shadow-card-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.25), 0 0 15px rgba(46, 204, 113, 0.2);
+  --shadow-glow-green: 0 0 15px rgba(46, 204, 113, 0.3);
   --shadow-glow-green: 0 0 15px rgba(46, 204, 113, 0.3);
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.2);
   --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.3);
+
+  /* Animations */
   --animate-fade-in: fadeIn 0.3s ease-in-out;
   --animate-slide-in: slideIn 0.3s ease-in-out;
   --animate-shimmer: shimmer 1.5s infinite;
@@ -58,8 +70,15 @@
   }
 }
 
+/* ========================================
+   Global resets & base
+   ======================================== */
 html, body {
   height: 100%;
+}
+
+html {
+  scrollbar-gutter: stable;
 }
 
 body {
@@ -67,9 +86,17 @@ body {
   background: var(--color-bg-primary, #0c1220);
   color: var(--color-text-primary, #e2e8f0);
   min-height: 100vh;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
+::selection {
+  background: rgba(46, 204, 113, 0.2);
+  color: var(--color-text-primary, #e2e8f0);
+}
+
+/* ========================================
+   Scrollbar (prototype style)
+   ======================================== */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -88,83 +115,108 @@ body {
   background: var(--color-bg-tertiary, #1e293b);
 }
 
-::selection {
-  background: rgba(0, 198, 255, 0.2);
-  color: var(--color-text-primary, #e2e8f0);
+/* ========================================
+   Utility classes (from prototype)
+   ======================================== */
+
+/* Glass effect – subtle, can be used for dropdowns / modals */
+.glass-effect {
+  background: rgba(22, 32, 50, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(42, 58, 80, 0.5);
 }
 
-[data-theme="light"] {
-  --color-bg-primary: rgba(248, 250, 252, 1);
-  --color-bg-secondary: rgba(255, 255, 255, 1);
-  --color-bg-tertiary: rgba(241, 245, 249, 1);
-  --color-border: rgba(226, 232, 240, 1);
-  --color-border-light: rgba(226, 232, 240, 0.5);
-  --color-text-primary: rgba(30, 41, 59, 1);
-  --color-text-secondary: rgba(100, 116, 139, 1);
-  --color-text-disabled: rgba(148, 163, 184, 1);
-  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-card-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05), 0 0 15px rgba(2, 132, 199, 0.2);
-  --shadow-glow-blue: 0 0 15px rgba(2, 132, 199, 0.3);
+/* Text shadow for legibility on dark backgrounds */
+.text-shadow {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-[data-theme="light"] body {
-  background: var(--color-bg-primary, rgba(248, 250, 252, 1));
-  color: var(--color-text-primary, rgba(30, 41, 59, 1));
+/* Smooth all-property transition */
+.transition-all-300 {
+  transition: all 0.3s ease;
 }
 
-[data-theme="light"] ::selection {
-  background: rgba(2, 132, 199, 0.2);
-  color: rgba(30, 41, 59, 1);
+/* Hide scrollbar but keep scrollability */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Gradient border (applied via border-image) */
+.border-gradient {
+  border-image: linear-gradient(to right, var(--color-accent-blue, #2ecc71), var(--color-accent-purple, #9b59b6)) 1;
+}
+
+/* Subtle grid background */
+.bg-grid {
+  background-size: 20px 20px;
+  background-image:
+    linear-gradient(to right, rgba(42, 58, 80, 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(42, 58, 80, 0.1) 1px, transparent 1px);
+}
+
+/* Mini chart container (30px high, full width) */
+.mini-chart {
+  height: 30px;
+  width: 100%;
+}
+
+/* ========================================
+   Card styles
+   ======================================== */
 .sharp-card {
   border-radius: 8px !important;
   border: 1px solid var(--color-border, #2a3a50);
   box-shadow: var(--shadow-card);
-  transition: all 0.3s ease;
 }
 
-.sharp-card:hover {
-  border-color: rgba(0, 198, 255, 0.5);
-  box-shadow: var(--shadow-card-hover);
+.card-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.card-lift:hover {
   transform: translateY(-3px);
+  box-shadow: var(--shadow-card-hover);
+  border-color: var(--color-accent-green, #2ecc71);
 }
 
-[data-theme="light"] .sharp-card {
-  border-color: rgba(226, 232, 240, 0.5) !important;
-}
-
-[data-theme="light"] .sharp-card:hover {
-  border-color: rgba(2, 132, 199, 0.5) !important;
-}
-
+/* ========================================
+   Button styles
+   ======================================== */
 .sharp-button {
   border-radius: 6px !important;
-  border: 1px solid rgba(0, 198, 255, 0.3);
+  border: 1px solid rgba(46, 204, 113, 0.3);
   transition: all 0.3s ease;
   box-shadow: var(--shadow-card);
 }
 
 .sharp-button:hover {
-  border-color: rgba(0, 198, 255, 0.6);
-  box-shadow: 0 8px 15px -3px rgba(0, 0, 0, 0.4), 0 0 10px rgba(0, 198, 255, 0.4);
+  border-color: rgba(46, 204, 113, 0.6);
+  box-shadow: 0 8px 15px -3px rgba(0, 0, 0, 0.4), 0 0 10px rgba(46, 204, 113, 0.4);
   transform: translateY(-2px);
 }
 
-.progress-bar {
-  height: 4px;
-  background: rgba(42, 58, 80, 0.5);
-  border-radius: 2px;
-  overflow: hidden;
+.btn-hover {
+  transition: all 0.2s ease;
 }
 
-.progress-bar-fill {
-  height: 100%;
-  background-image: linear-gradient(to right, #00c6ff, #0072ff);
-  border-radius: 2px;
-  transition: width 0.5s ease;
+.btn-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card);
 }
 
+.btn-hover:active {
+  transform: translateY(0);
+}
+
+/* ========================================
+   Table styles
+   ======================================== */
 .data-table {
   width: 100%;
   border-collapse: collapse;
@@ -191,6 +243,31 @@ body {
   background: rgba(42, 58, 80, 0.2);
 }
 
+.table-scroll-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ========================================
+   Progress bar
+   ======================================== */
+.progress-bar {
+  height: 4px;
+  background: rgba(42, 58, 80, 0.5);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background-image: linear-gradient(to right, #2ecc71, #27ae60);
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
+/* ========================================
+   Change indicators (trend arrows)
+   ======================================== */
 .change-indicator {
   display: inline-flex;
   align-items: center;
@@ -206,18 +283,37 @@ body {
   color: #e74c3c;
 }
 
-.bg-grid {
-  background-size: 20px 20px;
-  background-image:
-    linear-gradient(to right, rgba(42, 58, 80, 0.1) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(42, 58, 80, 0.1) 1px, transparent 1px);
+/* ========================================
+   Status indicators (colored dots / badges)
+   ======================================== */
+.status-active {
+  background: rgba(46, 204, 113, 0.15) !important;
+  color: rgba(46, 204, 113, 0.9) !important;
 }
 
+.status-pending {
+  background: rgba(243, 156, 18, 0.15) !important;
+  color: rgba(243, 156, 18, 0.9) !important;
+}
+
+.status-cancelled {
+  background: rgba(231, 76, 60, 0.15) !important;
+  color: rgba(231, 76, 60, 0.9) !important;
+}
+
+.status-inactive {
+  background: rgba(148, 163, 184, 0.15) !important;
+  color: rgba(148, 163, 184, 0.9) !important;
+}
+
+/* ========================================
+   Gradient text utilities
+   ======================================== */
 .gradient-text {
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
-  background-image: linear-gradient(to right, #00c6ff, #0072ff);
+  background-image: linear-gradient(to right, #2ecc71, #27ae60);
 }
 
 .gradient-text-green {
@@ -234,6 +330,9 @@ body {
   background-image: linear-gradient(to right, #e74c3c, #c0392b);
 }
 
+/* ========================================
+   Loading states
+   ======================================== */
 .skeleton {
   background: linear-gradient(
     90deg,
@@ -248,64 +347,109 @@ body {
 .loading-spinner {
   border: 3px solid rgba(42, 58, 80, 0.3);
   border-radius: 50%;
-  border-top: 3px solid #00c6ff;
+  border-top: 3px solid #2ecc71;
   width: 24px;
   height: 24px;
   animation: spin 1s linear infinite;
 }
 
-.card-hover {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+/* ========================================
+   Welcome card (dashboard banner)
+   ======================================== */
+.welcome-card {
+  background: linear-gradient(to right, var(--color-bg-secondary, #162032), var(--color-bg-tertiary, #1e293b));
+  border-left: 4px solid var(--color-accent-green, #2ecc71);
 }
 
-.card-hover:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-card-hover);
-  border-color: rgba(0, 198, 255, 0.5);
+/* ========================================
+   Brand / logo gradient (reusable)
+   ======================================== */
+.brand-logo {
+  background: linear-gradient(to right, #2ecc71, #27ae60) !important;
 }
 
-.btn-hover {
-  transition: all 0.2s ease;
-}
-
-.btn-hover:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-card);
-}
-
-.btn-hover:active {
-  transform: translateY(0);
-}
-
+/* ========================================
+   Page transitions
+   ======================================== */
 .page-enter {
   animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.table-scroll-container {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
+/* ========================================
+   Touch target minimum
+   ======================================== */
 .min-touch-target {
   min-height: 44px;
   min-width: 44px;
 }
 
-.welcome-card {
-  background: linear-gradient(to right, var(--color-bg-secondary, #162032), var(--color-bg-tertiary, #1e293b));
-  border-left: 4px solid var(--color-primary-start, #00c6ff);
+/* ========================================
+   Tooltip base (dark)
+   ======================================== */
+.tooltip {
+  background: rgba(15, 23, 42, 0.9) !important;
+  color: rgba(255, 255, 255, 0.95) !important;
 }
 
-[data-theme="light"] .welcome-card {
-  background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(241, 245, 249, 1));
-  border-left-color: rgba(2, 132, 199, 1);
+/* ========================================
+   Badge base
+   ======================================== */
+.badge {
+  background: rgba(42, 58, 80, 0.4) !important;
+  color: var(--color-text-secondary, #94a3b8) !important;
+  border: 1px solid rgba(42, 58, 80, 0.5) !important;
 }
 
-[data-theme="light"] .bg-accent-blue {
-  background-color: rgba(2, 132, 199, 1) !important;
+/* ========================================
+   Input / select / textarea base
+   ======================================== */
+input,
+select,
+textarea {
+  background: var(--color-bg-primary, #0c1220);
+  border: 1px solid var(--color-border, #2a3a50);
+  color: var(--color-text-primary, #e2e8f0);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--color-accent-green, #2ecc71);
+  box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.15);
+}
+
+
+
+/* ========================================
+   Light theme overrides
+   ======================================== */
+[data-theme="light"] {
+  --color-bg-primary: rgba(248, 250, 252, 1);
+  --color-bg-secondary: rgba(255, 255, 255, 1);
+  --color-bg-tertiary: rgba(241, 245, 249, 1);
+  --color-border: rgba(226, 232, 240, 1);
+  --color-border-light: rgba(226, 232, 240, 0.5);
+  --color-text-primary: rgba(30, 41, 59, 1);
+  --color-text-secondary: rgba(100, 116, 139, 1);
+  --color-text-disabled: rgba(148, 163, 184, 1);
+  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-card-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05), 0 0 15px rgba(39, 174, 96, 0.2);
+  --shadow-glow-green: 0 0 15px rgba(39, 174, 96, 0.3);
+  /* Alias tokens */
+  --color-card-bg: rgba(255, 255, 255, 1);
+  --color-card-bg-light: rgba(241, 245, 249, 1);
+  --color-dark-bg: rgba(248, 250, 252, 1);
+  --color-border-color: rgba(226, 232, 240, 1);
 }
 
 [data-theme="light"] body {
+  background: var(--color-bg-primary, rgba(248, 250, 252, 1));
+  color: var(--color-text-primary, rgba(30, 41, 59, 1));
+}
+
+[data-theme="light"] ::selection {
+  background: rgba(46, 204, 113, 0.2);
   color: rgba(30, 41, 59, 1);
 }
 
@@ -321,12 +465,186 @@ body {
   background: rgba(100, 116, 139, 1);
 }
 
+[data-theme="light"] .sharp-card {
+  border-color: rgba(226, 232, 240, 0.5) !important;
+}
+
+[data-theme="light"] .card-lift:hover {
+  border-color: var(--color-accent-green, #2ecc71) !important;
+}
+
+[data-theme="light"] .welcome-card {
+  background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(241, 245, 249, 1));
+  border-left-color: var(--color-accent-green, #2ecc71);
+}
+
+[data-theme="light"] .bg-accent-blue {
+  background-color: rgba(46, 204, 113, 1) !important;
+}
+
+[data-theme="light"] .brand-logo {
+  background: #2ecc71 !important;
+  background-image: linear-gradient(to right, #2ecc71, #27ae60) !important;
+}
+
+
+
+[data-theme="light"] .data-table th {
+  background: rgba(241, 245, 249, 0.8) !important;
+  color: rgba(71, 85, 105, 0.9) !important;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8) !important;
+}
+
+[data-theme="light"] .data-table td {
+  border-bottom: 1px solid rgba(226, 232, 240, 0.5) !important;
+  color: rgba(15, 23, 42, 0.9) !important;
+}
+
+[data-theme="light"] .data-table tr:hover {
+  background: rgba(241, 245, 249, 0.6) !important;
+}
+
+[data-theme="light"] .progress-bar {
+  background: rgba(226, 232, 240, 0.8) !important;
+}
+
+[data-theme="light"] input,
+[data-theme="light"] select,
+[data-theme="light"] textarea {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  color: rgba(15, 23, 42, 0.9) !important;
+}
+
+[data-theme="light"] input:focus,
+[data-theme="light"] select:focus,
+[data-theme="light"] textarea:focus {
+  border-color: rgba(5, 150, 105, 0.6) !important;
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1) !important;
+}
+
+[data-theme="light"] .sharp-button {
+  border: 1px solid rgba(39, 174, 96, 0.3) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+[data-theme="light"] .sharp-button:hover {
+  border-color: rgba(5, 150, 105, 0.6) !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15), 0 0 10px rgba(39, 174, 96, 0.3) !important;
+}
+
+[data-theme="light"] .gradient-text {
+  background-image: linear-gradient(to right, #059669, #047857) !important;
+}
+
+[data-theme="light"] .gradient-text-green {
+  background-image: linear-gradient(to right, #059669, #047857) !important;
+}
+
+[data-theme="light"] .gradient-text-red {
+  background-image: linear-gradient(to right, #dc2626, #b91c1c) !important;
+}
+
+[data-theme="light"] .change-indicator.positive {
+  color: #059669 !important;
+}
+
+[data-theme="light"] .change-indicator.negative {
+  color: #dc2626 !important;
+}
+
+[data-theme="light"] .bg-grid {
+  background-image:
+    linear-gradient(to right, rgba(226, 232, 240, 0.3) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(226, 232, 240, 0.3) 1px, transparent 1px) !important;
+}
+
+[data-theme="light"] .tooltip {
+  background: rgba(15, 23, 42, 0.9) !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+
+[data-theme="light"] .badge {
+  background: rgba(241, 245, 249, 0.8) !important;
+  color: rgba(71, 85, 105, 0.9) !important;
+  border: 1px solid rgba(226, 232, 240, 0.5) !important;
+}
+
+[data-theme="light"] .status-active {
+  background: rgba(5, 150, 105, 0.15) !important;
+  color: rgba(5, 150, 105, 0.9) !important;
+}
+
+[data-theme="light"] .status-pending {
+  background: rgba(245, 158, 11, 0.15) !important;
+  color: rgba(245, 158, 11, 0.9) !important;
+}
+
+[data-theme="light"] .status-cancelled {
+  background: rgba(220, 38, 38, 0.15) !important;
+  color: rgba(220, 38, 38, 0.9) !important;
+}
+
+[data-theme="light"] .card-icon {
+  background: linear-gradient(135deg, rgba(5, 150, 105, 0.1), rgba(39, 174, 96, 0.2)) !important;
+  color: rgba(5, 150, 105, 0.9) !important;
+}
+
+/* ========================================
+   Sidebar active link styles
+   ======================================== */
+.sidebar-link-active {
+  background-color: rgba(52, 211, 153, 0.1) !important;
+  color: #34d399 !important;
+  border-left-color: #34d399 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.sidebar-link-active:hover {
+  background-color: rgba(52, 211, 153, 0.2) !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="light"] .sidebar-link-active {
+  background-color: rgba(16, 185, 129, 0.15) !important;
+  color: #10b981 !important;
+  border-left-color: #10b981 !important;
+}
+
+[data-theme="light"] .sidebar-link-active:hover {
+  background-color: rgba(16, 185, 129, 0.2) !important;
+}
+
+[data-theme="light"] .sidebar-link-inactive:hover {
+  background-color: rgba(241, 245, 249, 1) !important;
+  color: #10b981 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transform: translateX(2px);
+}
+
+/* ========================================
+   Stat card icon background
+   ======================================== */
+.stat-card-icon-bg {
+  background-color: #34d399;
+}
+
+[data-theme="light"] .stat-card-icon-bg {
+  background-color: #10b981;
+}
+
+/* ========================================
+   Responsive utilities
+   ======================================== */
 @media (max-width: 640px) {
   .mobile-full-width {
     width: 100% !important;
   }
 }
 
+/* ========================================
+   Accessibility – reduced motion
+   ======================================== */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

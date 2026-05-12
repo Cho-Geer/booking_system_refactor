@@ -1,0 +1,23 @@
+<div class="app-search-input-wrapper" (click)="$event.stopPropagation()">
+  <input
+    pInputText
+    [ngModel]="inputValue()"
+    (ngModelChange)="onValueChange($event)"
+    [placeholder]="placeholder()"
+    [class]="styleClass()"
+    (focus)="onFocus()"
+    autocomplete="off"
+  />
+  @if (showDropdown() && filteredSuggestions().length > 0) {
+    <div class="suggestions-dropdown">
+      @for (item of filteredSuggestions(); track item.value) {
+        <div
+          class="suggestion-item"
+          (mousedown)="selectSuggestion(item)"
+        >
+          <span class="suggestion-label">{{ item.label }}</span>
+        </div>
+      }
+    </div>
+  }
+</div>

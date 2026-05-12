@@ -1,5 +1,14 @@
-import { Component, input, computed } from '@angular/core';
-import { ChartModule } from 'primeng/chart';
+import {
+  Component,
+  input,
+  computed,
+  ElementRef,
+  ViewChild,
+  AfterViewInit,
+  OnDestroy,
+  DoCheck,
+} from '@angular/core';
+import Chart from 'chart.js/auto';
 import type { ChartData, ChartOptions } from 'chart.js';
 
 export type AppChartType = 'line' | 'bar' | 'doughnut' | 'pie';
@@ -7,11 +16,25 @@ export type AppChartType = 'line' | 'bar' | 'doughnut' | 'pie';
 @Component({
   selector: 'app-chart',
   standalone: true,
-  imports: [ChartModule],
+  imports: [],
   templateUrl: './app-chart.component.html',
   styleUrl: './app-chart.component.scss',
 })
-export class AppChartComponent {
+export class AppChartComponent implements AfterViewInit, OnDestroy, DoCheck {
+  @ViewChild('chartCanvas', { static: true })
+  canvasRef!: ElementRef<HTMLCanvasElement>;
+
+  private chart: Chart | null = null;
+  private themeObserver: MutationObserver | null = null;
+  private _isViewInit = false;
+
+  /** Previous input values for DoCheck change detection. */
+  private _prevType: AppChartType = 'line';
+  private _prevData: ChartData = { labels: [], datasets: [] };
+  private _prevOptions: ChartOptions = {};
+  private _prevResponsive = true;
+  private _prevShowLegend = true;
+
   /** Type of the chart. */
   readonly type = input<AppChartType>('line');
 
@@ -33,15 +56,21 @@ export class AppChartComponent {
   /** Height of the chart container. */
   readonly height = input<string>('300px');
 
-  /** Default theme colors matching the design system. */
+  /**
+   * Default theme colors matching the design system.
+   * NOTE: These are fallback defaults. Chart factories (dashboard-chart-factories.ts)
+   * override these with proper design tokens. When adding new Chart instances,
+   * prefer referencing --color-accent-* design tokens via hex values with
+    * token-comment comments (e.g. /* --color-accent-green *​/).
+   */
   readonly defaultColors: string[] = [
-    '#667eea',
-    '#00B42A',
-    '#FF7D00',
-    '#F53F3F',
-    '#1677FF',
-    '#764ba2',
-    '#86909C',
+    '#2ecc71',  // legacy – kept for backward compatibility
+    '#00B42A',  // legacy
+    '#FF7D00',  // legacy
+    '#F53F3F',  // legacy
+    '#27ae60',  // legacy
+    '#764ba2',  // legacy
+    '#86909C',  // legacy – ~ --color-text-secondary
   ];
 
   /** Data with default colors applied to datasets without colors. */
@@ -93,7 +122,7 @@ export class AppChartComponent {
           },
         },
         tooltip: {
-          backgroundColor: 'rgba(29, 33, 41, 0.9)',
+          backgroundColor: 'rgba(29, 33, 41, 0.9)', // ~ --color-bg-primary @ 0.9
           titleFont: {
             size: 13,
             family: "'Inter', 'Microsoft YaHei', sans-serif",
@@ -123,12 +152,12 @@ export class AppChartComponent {
                     size: 11,
                     family: "'Inter', 'Microsoft YaHei', sans-serif",
                   },
-                  color: '#86909C',
+                  color: '#86909C', // --color-text-secondary (legacy fallback)
                 },
               },
               y: {
                 grid: {
-                  color: 'rgba(0, 0, 0, 0.04)',
+                  color: 'rgba(0, 0, 0, 0.04)', // subtle grid line
                 },
                 border: {
                   display: false,
@@ -138,7 +167,7 @@ export class AppChartComponent {
                     size: 11,
                     family: "'Inter', 'Microsoft YaHei', sans-serif",
                   },
-                  color: '#86909C',
+                  color: '#86909C', // --color-text-secondary (legacy fallback)
                 },
               },
             },
@@ -148,8 +177,90 @@ export class AppChartComponent {
     return this.mergeOptions(defaults, custom);
   }
 
+  ngAfterViewInit(): void {
+    this.initChart();
+    this.initThemeObserver();
+
+    // Store initial input values so ngDoCheck can detect changes
+    this._prevType = this.type();
+    this._prevData = this.data();
+    this._prevOptions = this.options();
+    this._prevResponsive = this.responsive();
+    this._prevShowLegend = this.showLegend();
+
+    this._isViewInit = true;
+  }
+
+  ngDoCheck(): void {
+    if (!this._isViewInit || !this.chart) {
+      return;
+    }
+
+    // Detect input signal changes by reference comparison
+    if (
+      this.type() !== this._prevType ||
+      this.data() !== this._prevData ||
+      this.options() !== this._prevOptions ||
+      this.responsive() !== this._prevResponsive ||
+      this.showLegend() !== this._prevShowLegend
+    ) {
+      this._prevType = this.type();
+      this._prevData = this.data();
+      this._prevOptions = this.options();
+      this._prevResponsive = this.responsive();
+      this._prevShowLegend = this.showLegend();
+      this.recreateChart();
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.themeObserver?.disconnect();
+    this.themeObserver = null;
+    this.chart?.destroy();
+    this.chart = null;
+  }
+
+  /** Create the Chart instance from the canvas element. */
+  private initChart(): void {
+    const canvas = this.canvasRef.nativeElement;
+
+    this.chart = new Chart(canvas, {
+      type: this.type(),
+      data: this.chartData(),
+      options: this.chartOptions,
+    });
+  }
+
+  /** Destroy the existing chart and re-create it with current inputs. */
+  private recreateChart(): void {
+    this.chart?.destroy();
+    this.initChart();
+  }
+
+  /** Set up MutationObserver to watch for theme attribute changes. */
+  private initThemeObserver(): void {
+    this.themeObserver = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        if (
+          mutation.type === 'attributes' &&
+          mutation.attributeName === 'data-theme'
+        ) {
+          this.chart?.update('none');
+        }
+      }
+    });
+
+    this.themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+  }
+
   /** Merge custom ChartOptions into defaults. */
-  private mergeOptions(defaults: ChartOptions, custom: ChartOptions): ChartOptions {
+  private mergeOptions(
+    defaults: ChartOptions,
+    custom: ChartOptions,
+  ): ChartOptions {
     const result: ChartOptions = { ...defaults };
 
     if (custom.responsive !== undefined) {

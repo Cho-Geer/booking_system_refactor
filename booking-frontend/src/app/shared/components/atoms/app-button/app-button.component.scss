@@ -7,39 +7,43 @@
 }
 
 .app-button--primary ::ng-deep .p-button {
-  background: #00c6ff;
-  border: none;
-  color: #ffffff;
+  background: var(--color-accent-green, #2ecc71);
+  border: 1px solid rgba(46,204,113,0.3);
+  border-radius: 6px;
+  color: #0c1220;
 }
 
 .app-button--primary ::ng-deep .p-button:not(:disabled):hover {
-  background: #0072ff;
+  background: var(--color-accent-green-dark, #27ae60);
 }
 
 .app-button--secondary ::ng-deep .p-button {
-  background: var(--color-bg-tertiary, #1e293b);
+  background: transparent;
   border: 1px solid var(--color-border, #2a3a50);
-  color: var(--color-text-primary, #e2e8f0);
+  border-radius: 6px;
+  color: var(--color-text-secondary, #94a3b8);
 }
 
 .app-button--secondary ::ng-deep .p-button:not(:disabled):hover {
   background: var(--color-bg-secondary, #162032);
-  border-color: #00c6ff;
+  border-color: var(--color-accent-green, #2ecc71);
 }
 
 .app-button--ghost ::ng-deep .p-button {
   background: transparent;
   border: none;
-  color: #00c6ff;
+  border-radius: 6px;
+  color: var(--color-accent-green, #2ecc71);
 }
 
 .app-button--ghost ::ng-deep .p-button:not(:disabled):hover {
-  background: rgba(0, 198, 255, 0.1);
+  background: color-mix(in srgb, var(--color-accent-green, #2ecc71) 10%, transparent);
 }
 
 .app-button--danger ::ng-deep .p-button {
   background: #e74c3c;
   border: none;
+  border-radius: 6px;
   color: #ffffff;
 }
 

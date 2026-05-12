@@ -1,6 +1,6 @@
 import { Component, input, output, inject } from '@angular/core';
 import { ReactiveFormsModule, FormGroup } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ContactType } from '../../../../features/auth/dto/auth.dto';
@@ -8,7 +8,7 @@ import { ContactType } from '../../../../features/auth/dto/auth.dto';
 @Component({
   selector: 'app-auth-form',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterModule, CommonModule, FormsModule],
+  imports: [ReactiveFormsModule, RouterLink, CommonModule, FormsModule],
   templateUrl: './auth-form.component.html',
   styleUrl: './auth-form.component.scss',
 })

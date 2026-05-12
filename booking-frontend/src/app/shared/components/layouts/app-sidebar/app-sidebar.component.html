@@ -1,25 +1,39 @@
-<aside class="hidden lg:flex flex-col w-60 flex-shrink-0 bg-card-bg border-r border-border-color sidebar">
-  <!-- Brand -->
-  <div class="flex items-center gap-3 px-5 py-5 border-b border-border-color">
-    <div class="w-9 h-9 rounded-lg bg-gradient-to-r from-accent-blue to-accent-blue-dark flex items-center justify-center shadow-glow-blue">
-      <i class="pi pi-calendar text-white text-sm"></i>
-    </div>
-    <h1 class="text-lg font-bold gradient-text">BookSys</h1>
-  </div>
-
-  <!-- Navigation -->
+<aside class="hidden lg:flex flex-col w-60 flex-shrink-0 bg-card-bg border-r border-border-color sidebar z-40 h-full"
+       [class.bg-card-bg]="!solid()"
+       [class.bg-[#162032]]="solid()">
+   <!-- Navigation -->
   <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
-    @for (item of items(); track item.route) {
-      <a [routerLink]="item.route"
-         routerLinkActive="bg-accent-blue/10 text-accent-blue font-medium border-l-2 border-accent-blue"
-         [routerLinkActiveOptions]="{exact: item.route === '/'}"
-         class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-text-secondary hover:bg-card-bg-light hover:text-text-primary hover:translate-x-[2px] transition-all duration-200">
-        <i [class]="item.icon + ' w-5 text-center text-base'"></i>
-        <span class="truncate">{{ item.label }}</span>
-        @if (item.badge && item.badge > 0) {
-          <span data-testid="sidebar-badge" class="ml-auto px-2 py-0.5 rounded-full text-xs font-medium bg-accent-blue/20 text-accent-blue">{{ item.badge }}</span>
-        }
-      </a>
+    @if (sections().length > 0) {
+      @for (section of sections(); track section.title) {
+        <div class="mb-4">
+          <p data-testid="section-title" class="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-text-secondary">{{ section.title }}</p>
+          @for (item of section.items; track item.route) {
+            <a [routerLink]="item.route"
+               routerLinkActive="sidebar-link-active"
+               [routerLinkActiveOptions]="{exact: item.route === '/'}"
+                class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-text-secondary hover:bg-card-bg-light hover:text-text-primary border-l-2 border-transparent transition-colors duration-200">
+              <i [class]="item.icon + ' w-5 text-center text-base'"></i>
+              <span class="truncate">{{ item.label }}</span>
+              @if (item.badge && item.badge > 0) {
+                <span data-testid="sidebar-badge" class="ml-auto px-2 py-0.5 rounded-full text-xs font-medium bg-accent-green/20 text-accent-green">{{ item.badge }}</span>
+              }
+            </a>
+          }
+        </div>
+      }
+    } @else {
+      @for (item of items(); track item.route) {
+         <a [routerLink]="item.route"
+            routerLinkActive="sidebar-link-active"
+            [routerLinkActiveOptions]="{exact: item.route === '/'}"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-text-secondary hover:bg-card-bg-light hover:text-text-primary border-l-2 border-transparent transition-colors duration-200">
+          <i [class]="item.icon + ' w-5 text-center text-base'"></i>
+          <span class="truncate">{{ item.label }}</span>
+          @if (item.badge && item.badge > 0) {
+            <span data-testid="sidebar-badge" class="ml-auto px-2 py-0.5 rounded-full text-xs font-medium bg-accent-green/20 text-accent-green">{{ item.badge }}</span>
+          }
+        </a>
+      }
     }
   </nav>
 
@@ -27,7 +41,7 @@
   @if (userName()) {
     <div data-testid="sidebar-profile" class="p-4 border-t border-border-color">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-lg bg-gradient-to-r from-accent-blue to-accent-blue-dark flex items-center justify-center text-white font-bold text-sm">
+        <div class="w-10 h-10 rounded-lg bg-gradient-to-r from-accent-green to-accent-green-dark flex items-center justify-center text-white font-bold text-sm">
           {{ userName()!.charAt(0).toUpperCase() }}
         </div>
         <div class="flex-1 min-w-0">
@@ -36,7 +50,7 @@
             <p class="text-xs text-text-secondary truncate">{{ userRole() }}</p>
           }
         </div>
-        <button class="text-text-secondary hover:text-accent-blue transition-colors" aria-label="Logout">
+        <button class="text-text-secondary hover:text-accent-green transition-colors" aria-label="Logout" (click)="onLogout()">
           <i class="pi pi-sign-out"></i>
         </button>
       </div>
@@ -53,13 +67,7 @@
 <div data-testid="mobile-drawer" class="fixed top-0 left-0 bottom-0 w-64 bg-card-bg border-r border-border-color z-50 transition-transform duration-300 lg:hidden shadow-lg"
      [class.translate-x-0]="isOpen()"
      [class.-translate-x-full]="!isOpen()">
-  <div class="flex items-center justify-between h-16 px-4 border-b border-border-color">
-    <div class="flex items-center gap-2">
-      <div class="w-8 h-8 rounded-lg bg-gradient-to-r from-accent-blue to-accent-blue-dark flex items-center justify-center">
-        <i class="pi pi-calendar text-white text-xs"></i>
-      </div>
-      <span class="text-lg font-bold gradient-text">BookSys</span>
-    </div>
+  <div class="flex items-center justify-end h-16 px-4 border-b border-border-color">
     <button (click)="onClose()" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-card-bg-light transition-colors">
       <i class="pi pi-times text-text-secondary"></i>
     </button>
@@ -67,10 +75,10 @@
   <div class="flex-1 overflow-y-auto py-4">
     <nav class="px-3 space-y-1">
       @for (item of items(); track item.route) {
-        <a [routerLink]="item.route"
-           routerLinkActive="bg-accent-blue/10 text-accent-blue font-medium border-l-2 border-accent-blue"
-           (click)="onClose()"
-           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-text-secondary hover:bg-card-bg-light hover:text-text-primary transition-all duration-200">
+         <a [routerLink]="item.route"
+            routerLinkActive="sidebar-link-active"
+            (click)="onClose()"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-text-secondary hover:bg-card-bg-light hover:text-text-primary border-l-2 border-transparent transition-colors duration-200">
           <i [class]="item.icon + ' w-5 text-center text-base'"></i>
           <span>{{ item.label }}</span>
         </a>

@@ -9,13 +9,18 @@ import { createTestService, createTestTimeSlot } from '../../../test/fixtures/da
 
 // Mock PrismaService
 const mockPrismaService = {
+  service: {
+    findUnique: jest.fn(),
+  },
   timeSlot: {
     findUnique: jest.fn(),
+    findFirst: jest.fn(),
     findMany: jest.fn(),
     create: jest.fn(),
     update: jest.fn(),
     delete: jest.fn(),
     count: jest.fn(),
+    upsert: jest.fn(),
   },
 };
 
@@ -56,40 +61,42 @@ describe('TimeSlotsService', () => {
   const mockTimeSlot = {
     id: 'slot-1',
     serviceId: 'service-1',
-    slotTime: '2024-06-15T09:00:00.000Z',
-    durationMinutes: 30,
+    startTime: new Date('2024-06-15T09:00:00.000Z'),
+    endTime: new Date('2024-06-15T09:30:00.000Z'),
     capacity: 1,
     isActive: true,
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-01'),
     service: mockService,
+    _count: { appointments: 0 },
   };
 
   describe('create', () => {
     const createTimeSlotDto: CreateTimeSlotDto = {
       serviceId: 'service-1',
-      slotTime: '2024-06-15T09:00:00.000Z',
-      durationMinutes: 30,
+      startTime: '2024-06-15T09:00:00.000Z',
+      endTime: '2024-06-15T09:30:00.000Z',
       capacity: 1,
-      isActive: true,
     };
 
-    it('should throw ConflictException if time slot already exists for same time', async () => {
-      prisma.timeSlot.findUnique.mockResolvedValue(mockTimeSlot);
+    it('should throw ConflictException if time slot already exists for same time and service', async () => {
+      prisma.timeSlot.findFirst.mockResolvedValue(mockTimeSlot);
 
       await expect(service.create(createTimeSlotDto)).rejects.toThrow(ConflictException);
-      await expect(service.create(createTimeSlotDto)).rejects.toThrow('Time slot already exists for this time');
+      await expect(service.create(createTimeSlotDto)).rejects.toThrow('Time slot already exists for this service and time range');
 
-      expect(prisma.timeSlot.findUnique).toHaveBeenCalledWith({
+      expect(prisma.timeSlot.findFirst).toHaveBeenCalledWith({
         where: {
-          slotTime: createTimeSlotDto.slotTime,
+          serviceId: createTimeSlotDto.serviceId,
+          startTime: new Date(createTimeSlotDto.startTime),
+          endTime: new Date(createTimeSlotDto.endTime),
         },
       });
       expect(prisma.timeSlot.create).not.toHaveBeenCalled();
     });
 
     it('should create time slot when no duplicate exists', async () => {
-      prisma.timeSlot.findUnique.mockResolvedValue(null);
+      prisma.timeSlot.findFirst.mockResolvedValue(null);
       prisma.timeSlot.create.mockResolvedValue(mockTimeSlot);
 
       const result = await service.create(createTimeSlotDto);
@@ -97,11 +104,10 @@ describe('TimeSlotsService', () => {
       expect(prisma.timeSlot.create).toHaveBeenCalledWith({
         data: {
           serviceId: createTimeSlotDto.serviceId,
-          slotTime: createTimeSlotDto.slotTime,
-          durationMinutes: createTimeSlotDto.durationMinutes,
+          startTime: new Date(createTimeSlotDto.startTime),
+          endTime: new Date(createTimeSlotDto.endTime),
           capacity: createTimeSlotDto.capacity,
-          isActive: createTimeSlotDto.isActive,
-          displayOrder: 0,
+          isActive: true,
         },
         include: {
           service: true,
@@ -111,7 +117,7 @@ describe('TimeSlotsService', () => {
     });
 
     it('should include service in created time slot', async () => {
-      prisma.timeSlot.findUnique.mockResolvedValue(null);
+      prisma.timeSlot.findFirst.mockResolvedValue(null);
       prisma.timeSlot.create.mockResolvedValue(mockTimeSlot);
 
       const result = await service.create(createTimeSlotDto);
@@ -120,15 +126,17 @@ describe('TimeSlotsService', () => {
       expect(result.service).toEqual(mockService);
     });
 
-    it('should check duplicate using slotTime', async () => {
-      prisma.timeSlot.findUnique.mockResolvedValue(null);
+    it('should check duplicate using serviceId, startTime and endTime', async () => {
+      prisma.timeSlot.findFirst.mockResolvedValue(null);
       prisma.timeSlot.create.mockResolvedValue(mockTimeSlot);
 
       await service.create(createTimeSlotDto);
 
-      expect(prisma.timeSlot.findUnique).toHaveBeenCalledWith({
+      expect(prisma.timeSlot.findFirst).toHaveBeenCalledWith({
         where: {
-          slotTime: '2024-06-15T09:00:00.000Z',
+          serviceId: 'service-1',
+          startTime: new Date('2024-06-15T09:00:00.000Z'),
+          endTime: new Date('2024-06-15T09:30:00.000Z'),
         },
       });
     });
@@ -136,12 +144,11 @@ describe('TimeSlotsService', () => {
     it('should allow creating multiple slots for different services at same time', async () => {
       const differentServiceDto: CreateTimeSlotDto = {
         serviceId: 'service-2',
-        slotTime: '2024-06-15T09:00:00.000Z',
-        durationMinutes: 30,
+        startTime: '2024-06-15T09:00:00.000Z',
+        endTime: '2024-06-15T09:30:00.000Z',
         capacity: 1,
-        isActive: true,
       };
-      prisma.timeSlot.findUnique.mockResolvedValue(null);
+      prisma.timeSlot.findFirst.mockResolvedValue(null);
       prisma.timeSlot.create.mockResolvedValue({ ...mockTimeSlot, serviceId: 'service-2' });
 
       const result = await service.create(differentServiceDto);
@@ -152,27 +159,28 @@ describe('TimeSlotsService', () => {
     it('should allow creating different time slots for same service', async () => {
       const differentTimeDto: CreateTimeSlotDto = {
         serviceId: 'service-1',
-        slotTime: '2024-06-15T10:00:00.000Z',
-        durationMinutes: 30,
+        startTime: '2024-06-15T10:00:00.000Z',
+        endTime: '2024-06-15T10:30:00.000Z',
         capacity: 1,
-        isActive: true,
       };
-      prisma.timeSlot.findUnique.mockResolvedValue(null);
+      prisma.timeSlot.findFirst.mockResolvedValue(null);
       prisma.timeSlot.create.mockResolvedValue({
         ...mockTimeSlot,
-        slotTime: differentTimeDto.slotTime,
+        startTime: new Date(differentTimeDto.startTime),
+        endTime: new Date(differentTimeDto.endTime),
       });
 
       const result = await service.create(differentTimeDto);
 
-      expect(result.slotTime).toEqual(differentTimeDto.slotTime);
+      expect(result.startTime).toEqual(new Date(differentTimeDto.startTime));
+      expect(result.endTime).toEqual(new Date(differentTimeDto.endTime));
     });
   });
 
   describe('findAll', () => {
     const mockTimeSlots = [
       { ...mockTimeSlot, id: 'slot-1' },
-      { ...mockTimeSlot, id: 'slot-2', slotTime: '2024-06-15T10:00:00.000Z' },
+      { ...mockTimeSlot, id: 'slot-2', startTime: new Date('2024-06-15T10:00:00.000Z'), endTime: new Date('2024-06-15T10:30:00.000Z') },
     ];
 
     it('should return paginated time slots with default pagination', async () => {
@@ -188,7 +196,7 @@ describe('TimeSlotsService', () => {
         include: {
           service: true,
         },
-        orderBy: { slotTime: 'asc' },
+        orderBy: { startTime: 'asc' },
       });
       expect(prisma.timeSlot.count).toHaveBeenCalledWith({ where: {} });
       expect(result).toEqual({
@@ -297,7 +305,7 @@ describe('TimeSlotsService', () => {
       });
     });
 
-    it('should order results by slotTime ascending', async () => {
+    it('should order results by startTime ascending', async () => {
       prisma.timeSlot.findMany.mockResolvedValue(mockTimeSlots);
       prisma.timeSlot.count.mockResolvedValue(2);
 
@@ -305,7 +313,7 @@ describe('TimeSlotsService', () => {
 
       expect(prisma.timeSlot.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
-          orderBy: { slotTime: 'asc' },
+          orderBy: { startTime: 'asc' },
         }),
       );
     });
@@ -448,31 +456,92 @@ describe('TimeSlotsService', () => {
     const endDate = new Date('2024-06-15T23:59:59.000Z');
 
     const availableSlots = [
-      { ...mockTimeSlot, id: 'slot-1', slotTime: '2024-06-15T09:00:00.000Z' },
-      { ...mockTimeSlot, id: 'slot-2', slotTime: '2024-06-15T10:00:00.000Z' },
-      { ...mockTimeSlot, id: 'slot-3', slotTime: '2024-06-15T11:00:00.000Z' },
+      { ...mockTimeSlot, id: 'slot-1', startTime: new Date('2024-06-15T09:00:00.000Z'), endTime: new Date('2024-06-15T09:30:00.000Z') },
+      { ...mockTimeSlot, id: 'slot-2', startTime: new Date('2024-06-15T10:00:00.000Z'), endTime: new Date('2024-06-15T10:30:00.000Z') },
+      { ...mockTimeSlot, id: 'slot-3', startTime: new Date('2024-06-15T11:00:00.000Z'), endTime: new Date('2024-06-15T11:30:00.000Z') },
     ];
+
+    beforeEach(() => {
+      prisma.service.findUnique.mockResolvedValue(mockService);
+      prisma.timeSlot.findFirst.mockResolvedValue(null);
+      prisma.timeSlot.create.mockResolvedValue(mockTimeSlot);
+    });
 
     it('should return available time slots for given service and date range', async () => {
       prisma.timeSlot.findMany.mockResolvedValue(availableSlots);
 
       const result = await service.getAvailableSlots('service-1', startDate, endDate);
 
+      expect(prisma.service.findUnique).toHaveBeenCalledWith({
+        where: { id: 'service-1' },
+      });
       expect(prisma.timeSlot.findMany).toHaveBeenCalledWith({
         where: {
           serviceId: 'service-1',
           isActive: true,
-          slotTime: {
-            gte: startDate.toISOString(),
-            lte: endDate.toISOString(),
+          startTime: {
+            gte: startDate,
+            lte: endDate,
           },
         },
         include: {
           service: true,
+          _count: {
+            select: { appointments: true },
+          },
         },
-        orderBy: { slotTime: 'asc' },
+        orderBy: { startTime: 'asc' },
       });
-      expect(result).toEqual(availableSlots);
+      expect(result).toHaveLength(3);
+      expect(result[0]).toMatchObject({
+        id: 'slot-1',
+        startTime: expect.any(Date),
+        endTime: expect.any(Date),
+        capacity: 1,
+        bookedCount: 0,
+        available: true,
+      });
+    });
+
+    it('should fetch service to get durationMinutes', async () => {
+      prisma.timeSlot.findMany.mockResolvedValue(availableSlots);
+
+      await service.getAvailableSlots('service-1', startDate, endDate);
+
+      expect(prisma.service.findUnique).toHaveBeenCalledWith({
+        where: { id: 'service-1' },
+      });
+    });
+
+    it('should find or create generated time slots', async () => {
+      prisma.timeSlot.findMany.mockResolvedValue(availableSlots);
+      prisma.timeSlot.findFirst.mockResolvedValue(null);
+      prisma.timeSlot.create.mockResolvedValue(mockTimeSlot);
+
+      await service.getAvailableSlots('service-1', startDate, endDate);
+
+      // Should check for existing slot first
+      expect(prisma.timeSlot.findFirst).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {
+            serviceId: 'service-1',
+            startTime: expect.any(Date),
+            endTime: expect.any(Date),
+          },
+        }),
+      );
+      // Should create new slots since none exist
+      expect(prisma.timeSlot.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            serviceId: 'service-1',
+            startTime: expect.any(Date),
+            endTime: expect.any(Date),
+            capacity: 1,
+            isActive: true,
+          }),
+        }),
+      );
     });
 
     it('should only return available slots (isActive: true)', async () => {
@@ -503,7 +572,7 @@ describe('TimeSlotsService', () => {
       );
     });
 
-    it('should filter by date range using gte and lte', async () => {
+    it('should filter by date range using gte and lte on startTime', async () => {
       prisma.timeSlot.findMany.mockResolvedValue(availableSlots);
 
       await service.getAvailableSlots('service-1', startDate, endDate);
@@ -511,33 +580,40 @@ describe('TimeSlotsService', () => {
       expect(prisma.timeSlot.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
-            slotTime: {
-              gte: startDate.toISOString(),
-              lte: endDate.toISOString(),
+            startTime: {
+              gte: startDate,
+              lte: endDate,
             },
           }),
         }),
       );
     });
 
-    it('should order results by slotTime ascending', async () => {
+    it('should order results by startTime ascending', async () => {
       prisma.timeSlot.findMany.mockResolvedValue(availableSlots);
 
       await service.getAvailableSlots('service-1', startDate, endDate);
 
       expect(prisma.timeSlot.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
-          orderBy: { slotTime: 'asc' },
+          orderBy: { startTime: 'asc' },
         }),
       );
     });
 
-    it('should include service in returned slots', async () => {
+    it('should return slots with mapped fields', async () => {
       prisma.timeSlot.findMany.mockResolvedValue(availableSlots);
 
       const result = await service.getAvailableSlots('service-1', startDate, endDate);
 
-      expect(result[0]).toHaveProperty('service');
+      expect(result[0]).toMatchObject({
+        id: expect.any(String),
+        startTime: expect.any(Date),
+        endTime: expect.any(Date),
+        capacity: expect.any(Number),
+        bookedCount: expect.any(Number),
+        available: expect.any(Boolean),
+      });
     });
 
     it('should return empty array when no slots available', async () => {
@@ -558,9 +634,9 @@ describe('TimeSlotsService', () => {
       expect(prisma.timeSlot.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
-            slotTime: {
-              gte: singleDayStart.toISOString(),
-              lte: singleDayEnd.toISOString(),
+            startTime: {
+              gte: singleDayStart,
+              lte: singleDayEnd,
             },
           }),
         }),
@@ -577,13 +653,23 @@ describe('TimeSlotsService', () => {
       expect(prisma.timeSlot.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
-            slotTime: {
-              gte: weekStart.toISOString(),
-              lte: weekEnd.toISOString(),
+            startTime: {
+              gte: weekStart,
+              lte: weekEnd,
             },
           }),
         }),
       );
+    });
+
+    it('should throw NotFoundException when service does not exist', async () => {
+      prisma.service.findUnique.mockResolvedValue(null);
+
+      await expect(
+        service.getAvailableSlots('nonexistent-id', startDate, endDate),
+      ).rejects.toThrow(NotFoundException);
+
+      expect(prisma.timeSlot.findMany).not.toHaveBeenCalled();
     });
   });
 });
@@ -626,14 +712,15 @@ if (isIntegrationMode()) {
 
         const result = await timeSlotsService.create({
           serviceId: service.id,
-          slotTime: '2026-02-01T09:00:00Z',
-          durationMinutes: 60,
+          startTime: '2026-02-01T09:00:00Z',
+          endTime: '2026-02-01T10:00:00Z',
           capacity: 10,
         });
 
         expect(result).toHaveProperty('id');
         expect(result.serviceId).toBe(service.id);
-        expect(result.slotTime).toBe('2026-02-01T09:00:00Z');
+        expect(result.startTime).toEqual(new Date('2026-02-01T09:00:00Z'));
+        expect(result.endTime).toEqual(new Date('2026-02-01T10:00:00Z'));
       });
     });
 
@@ -641,10 +728,12 @@ if (isIntegrationMode()) {
       it('should return paginated time slots from real database', async () => {
         const service = await createTestService(testModule.prisma);
         await createTestTimeSlot(testModule.prisma, service.id, {
-          slotTime: '2026-03-01T09:00:00Z',
+          startTime: new Date('2026-03-01T09:00:00Z'),
+          endTime: new Date('2026-03-01T10:00:00Z'),
         });
         await createTestTimeSlot(testModule.prisma, service.id, {
-          slotTime: '2026-03-01T10:00:00Z',
+          startTime: new Date('2026-03-01T10:00:00Z'),
+          endTime: new Date('2026-03-01T11:00:00Z'),
         });
 
         const result = await timeSlotsService.findAll();

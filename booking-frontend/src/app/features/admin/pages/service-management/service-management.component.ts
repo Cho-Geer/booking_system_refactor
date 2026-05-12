@@ -1,7 +1,6 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, OnDestroy, signal } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import { TableModule } from 'primeng/table';
-import { Dialog } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
@@ -19,9 +18,13 @@ import {
 import { AppCardComponent } from '../../../../shared/components/atoms/app-card/app-card.component';
 import { AppButtonComponent } from '../../../../shared/components/atoms/app-button/app-button.component';
 import { AppBadgeComponent, BadgeStatus } from '../../../../shared/components/atoms/app-badge/app-badge.component';
-import { AppInputComponent } from '../../../../shared/components/atoms/app-input/app-input.component';
+import { AppSearchInputComponent } from '../../../../shared/components/atoms/app-search-input/app-search-input.component';
 import { AppDropdownComponent } from '../../../../shared/components/atoms/app-dropdown/app-dropdown.component';
 import { AppSpinnerComponent } from '../../../../shared/components/atoms/app-spinner/app-spinner.component';
+import { AppFilterBarComponent } from '../../../../shared/components/molecules/app-filter-bar/app-filter-bar.component';
+import { AppTableWrapperComponent } from '../../../../shared/components/molecules/app-table-wrapper/app-table-wrapper.component';
+import { AppModalComponent } from '../../../../shared/components/atoms/app-modal/app-modal.component';
+import { Subscription, interval } from 'rxjs';
 
 export type ViewMode = 'grid' | 'list';
 
@@ -29,17 +32,19 @@ export type ViewMode = 'grid' | 'list';
   selector: 'app-service-management',
   standalone: true,
   imports: [
-    TableModule, Dialog, ButtonModule, InputTextModule, InputNumberModule,
+    TableModule, ButtonModule, InputTextModule, InputNumberModule,
     Textarea, SelectModule, ToggleSwitch, FormsModule, CurrencyPipe,
     AppCardComponent, AppButtonComponent, AppBadgeComponent,
-    AppInputComponent, AppDropdownComponent, AppSpinnerComponent,
+    AppSearchInputComponent, AppDropdownComponent, AppSpinnerComponent,
+    AppFilterBarComponent, AppTableWrapperComponent, AppModalComponent,
   ],
   templateUrl: './service-management.component.html',
   styleUrl: './service-management.component.scss',
 })
-export class ServiceManagementComponent implements OnInit {
+export class ServiceManagementComponent implements OnInit, OnDestroy {
   private readonly store = inject(AdminStore);
   private readonly adminService = inject(AdminService);
+  private statsPollInterval?: Subscription;
 
   readonly vm = this.store.vm;
 
@@ -52,10 +57,12 @@ export class ServiceManagementComponent implements OnInit {
   readonly selectedService = signal<AdminServiceItem | null>(null);
   readonly serviceToDelete = signal<AdminServiceItem | null>(null);
   readonly isEdit = signal(false);
+  readonly isViewMode = signal(false);
   readonly submitted = signal(false);
 
   // Search/filter
   readonly searchQuery = signal('');
+  readonly isFiltering = signal(false);
   readonly categoryFilter = signal('');
   readonly statusFilter = signal<string>('');
 
@@ -66,19 +73,31 @@ export class ServiceManagementComponent implements OnInit {
   formPrice: number | null = null;
   formActive = true;
   formImageUrl = '';
+  formPricePerMinute: number | null = null;
+  formTaxRate: number | null = null;
 
   // Form validation
-  formErrors: { name?: string; duration?: string } = {};
+  formErrors: { name?: string; duration?: string; price?: string } = {};
 
-  // Stats computed from services list
-  readonly totalServices = computed(() => this.vm().services.length);
-  readonly activeServicesCount = computed(() => this.vm().services.filter(s => s.active).length);
+  // Stats computed from full dataset (not paginated page)
+  readonly computedPricePerMinute = (): number | null => {
+    const p = this.formPrice;
+    const d = this.formDuration;
+    return p !== null && d !== null && d > 0 ? p / d : null;
+  };
+
+  readonly totalServices = computed(() => this.vm().servicesTotal);
+  readonly activeServicesCount = computed(() => this.vm().allServicesForStats.filter(s => s.active).length);
   readonly averagePrice = computed(() => {
-    const services = this.vm().services;
+    const services = this.vm().allServicesForStats;
     if (services.length === 0) return 0;
     const total = services.reduce((sum, s) => sum + s.price, 0);
     return Math.round(total / services.length * 100) / 100;
   });
+
+  readonly searchSuggestions = computed(() =>
+    this.vm().allServicesForStats.map(s => ({ label: s.name, value: s.id }))
+  );
 
   readonly filterStatusOptions = [
     { label: 'All', value: '' },
@@ -93,11 +112,22 @@ export class ServiceManagementComponent implements OnInit {
   ];
 
   ngOnInit(): void {
+    this.store.clearError();
     this.loadServices();
+    this.loadAllServicesForStats();
+    this.setupStatsPolling();
   }
 
-  loadServices(): void {
-    this.store.setLoading(true);
+  ngOnDestroy(): void {
+    this.statsPollInterval?.unsubscribe();
+  }
+
+  loadServices(isFilterOperation = false): void {
+    if (isFilterOperation) {
+      this.isFiltering.set(true);
+    } else {
+      this.store.setLoading(true);
+    }
     this.adminService.getAdminServices({
       page: 1,
       limit: 10,
@@ -108,9 +138,29 @@ export class ServiceManagementComponent implements OnInit {
     }).subscribe({
       next: (response) => {
         this.store.setServices(response.items, response.total, response.page);
-        this.store.setLoading(false);
+        if (isFilterOperation) {
+          this.isFiltering.set(false);
+        } else {
+          this.store.setLoading(false);
+        }
       },
       error: (err) => this.store.setError(err.message ?? 'Failed to load services'),
+    });
+  }
+
+  private loadAllServicesForStats(): void {
+    this.adminService.getAdminServices({ limit: 999, page: 1 }).subscribe({
+      next: response => {
+        const items = response.items.map(s => ({ ...s, price: Number(s.price) }));
+        this.store.setAllServicesForStats(items);
+      },
+      error: () => {},
+    });
+  }
+
+  private setupStatsPolling(): void {
+    this.statsPollInterval = interval(60000).subscribe(() => {
+      this.loadAllServicesForStats();
     });
   }
 
@@ -118,9 +168,27 @@ export class ServiceManagementComponent implements OnInit {
     this.viewMode.set(mode);
   }
 
+  viewService(svc: AdminServiceItem): void {
+    this.isViewMode.set(true);
+    this.isEdit.set(false);
+    this.selectedService.set(svc);
+    this.formName = svc.name;
+    this.formDescription = svc.description;
+    this.formDuration = svc.duration;
+    this.formPrice = svc.price;
+    this.formActive = svc.active;
+    this.formImageUrl = svc.imageUrl ?? '';
+    this.formPricePerMinute = svc.pricePerMinute ?? null;
+    this.formTaxRate = svc.taxRate ?? null;
+    this.submitted.set(false);
+    this.formErrors = {};
+    this.serviceDialogVisible.set(true);
+  }
+
   openNew(): void {
     this.resetForm();
     this.isEdit.set(false);
+    this.isViewMode.set(false);
     this.selectedService.set(null);
     this.submitted.set(false);
     this.formErrors = {};
@@ -129,6 +197,7 @@ export class ServiceManagementComponent implements OnInit {
 
   editService(svc: AdminServiceItem): void {
     this.isEdit.set(true);
+    this.isViewMode.set(false);
     this.selectedService.set(svc);
     this.formName = svc.name;
     this.formDescription = svc.description;
@@ -136,6 +205,8 @@ export class ServiceManagementComponent implements OnInit {
     this.formPrice = svc.price;
     this.formActive = svc.active;
     this.formImageUrl = svc.imageUrl ?? '';
+    this.formPricePerMinute = svc.pricePerMinute ?? null;
+    this.formTaxRate = svc.taxRate ?? null;
     this.submitted.set(false);
     this.formErrors = {};
     this.serviceDialogVisible.set(true);
@@ -163,6 +234,9 @@ export class ServiceManagementComponent implements OnInit {
     if (this.formDuration === null || this.formDuration <= 0) {
       this.formErrors.duration = 'Duration is required and must be positive';
     }
+    if (this.formPrice === null || this.formPrice <= 0) {
+      this.formErrors.price = 'Price is required and must be positive';
+    }
 
     if (Object.keys(this.formErrors).length > 0) {
       return;
@@ -176,10 +250,12 @@ export class ServiceManagementComponent implements OnInit {
         price: this.formPrice ?? undefined,
         active: this.formActive,
         imageUrl: this.formImageUrl || undefined,
+        taxRate: this.formTaxRate ?? undefined,
       };
       this.adminService.updateAdminService(this.selectedService()!.id, updates).subscribe({
         next: () => {
           this.store.updateServiceInList(this.selectedService()!.id, updates);
+          this.loadAllServicesForStats();
           this.closeDialog();
         },
         error: (err) => this.store.setError(err.message ?? 'Failed to update service'),
@@ -192,10 +268,12 @@ export class ServiceManagementComponent implements OnInit {
         price: this.formPrice ?? undefined,
         active: this.formActive,
         imageUrl: this.formImageUrl || undefined,
+        taxRate: this.formTaxRate ?? undefined,
       };
       this.adminService.createAdminService(dto).subscribe({
         next: (svc) => {
           this.store.setServices([...this.store.services(), svc], this.store.servicesTotal() + 1, this.store.servicesPage());
+          this.loadAllServicesForStats();
           this.closeDialog();
         },
         error: (err) => this.store.setError(err.message ?? 'Failed to create service'),
@@ -209,6 +287,7 @@ export class ServiceManagementComponent implements OnInit {
     this.adminService.deleteAdminService(id).subscribe({
       next: () => {
         this.store.removeServiceFromList(id);
+        this.loadAllServicesForStats();
         this.deleteDialogVisible.set(false);
         this.serviceToDelete.set(null);
       },
@@ -217,14 +296,19 @@ export class ServiceManagementComponent implements OnInit {
   }
 
   applyFilter(): void {
-    this.loadServices();
+    this.loadServices(true);
+  }
+
+  onSearchChange(value: string): void {
+    this.searchQuery.set(value);
+    this.applyFilter();
   }
 
   clearFilters(): void {
     this.searchQuery.set('');
     this.categoryFilter.set('');
     this.statusFilter.set('');
-    this.loadServices();
+    this.loadServices(true);
   }
 
   onCategoryFilterChange(value: unknown): void {
@@ -248,6 +332,8 @@ export class ServiceManagementComponent implements OnInit {
     this.formPrice = null;
     this.formActive = true;
     this.formImageUrl = '';
+    this.formPricePerMinute = null;
+    this.formTaxRate = null;
     this.formErrors = {};
   }
 }

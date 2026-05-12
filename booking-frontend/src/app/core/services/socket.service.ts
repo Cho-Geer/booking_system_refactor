@@ -15,6 +15,22 @@ export interface SlotUpdateEvent {
   timestamp: number;
 }
 
+export interface SystemHealthEvent {
+  server: string;
+  database: string;
+  api: string;
+  redis: string;
+  lastBackup: string;
+  uptime: string;
+}
+
+export interface AppointmentStatusEvent {
+  appointmentId: string;
+  status: string;
+  previousStatus: string;
+  timestamp: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class SocketService {
   private socket: Socket;
@@ -61,6 +77,38 @@ export class SocketService {
         this.socket.off('slot-update');
       };
     });
+  }
+
+  subscribeToSystemHealthUpdates(): Observable<SystemHealthEvent> {
+    return new Observable<SystemHealthEvent>((observer) => {
+      this.connect();
+
+      this.socket.on('system.health.updated', (data: SystemHealthEvent) => {
+        observer.next(data);
+      });
+
+      return () => {
+        this.socket.off('system.health.updated');
+      };
+    });
+  }
+
+  subscribeToAppointmentStatusChanges(): Observable<AppointmentStatusEvent> {
+    return new Observable<AppointmentStatusEvent>((observer) => {
+      this.connect();
+
+      this.socket.on('appointment.status_changed', (data: AppointmentStatusEvent) => {
+        observer.next(data);
+      });
+
+      return () => {
+        this.socket.off('appointment.status_changed');
+      };
+    });
+  }
+
+  joinAdminRoom(): void {
+    this.socket.emit('join', { room: 'admin:broadcast' });
   }
 
   joinRoom(room: string): void {

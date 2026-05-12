@@ -15,6 +15,8 @@ export interface BookingState {
   activeBookings: string[];
   services: Service[];
   bookings: BookingListItem[];
+  selectedSlotIds: string[];
+  overtimeMinutes: number;
 }
 
 export const initialBookingState: BookingState = {
@@ -26,6 +28,8 @@ export const initialBookingState: BookingState = {
   activeBookings: [],
   services: [],
   bookings: [],
+  selectedSlotIds: [],
+  overtimeMinutes: 0,
 };
 
 export const BookingStore = signalStore(
@@ -204,6 +208,8 @@ export const BookingStore = signalStore(
       preferredSequence: number;
       customerInfo?: Record<string, unknown>;
       notes?: string;
+      selectedSlotIds?: string[];
+      overtimeMinutes?: number;
     }): Promise<ReservationResponse> {
       patchState(store, { isLoading: true, error: null });
       try {

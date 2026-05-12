@@ -1,0 +1,18 @@
+<div class="border border-border-color p-4 rounded-lg">
+  <div class="flex items-center justify-between mb-3">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-lg {{ initialsBg() }} flex items-center justify-center text-white font-medium text-sm">
+        {{ initials() }}
+      </div>
+      <div>
+        <p class="text-sm font-medium text-text-primary">{{ booking().userName }}</p>
+        <p class="text-xs text-text-secondary">{{ booking().serviceName }}</p>
+      </div>
+    </div>
+    <app-badge [status]="statusBadge()" size="sm" />
+  </div>
+  <div class="flex justify-between items-center text-sm">
+    <span class="text-text-secondary">{{ booking().appointmentDate | date:'MMM d, y' }}</span>
+    <app-button label="View" variant="ghost" size="sm" icon="pi pi-eye" />
+  </div>
+</div>

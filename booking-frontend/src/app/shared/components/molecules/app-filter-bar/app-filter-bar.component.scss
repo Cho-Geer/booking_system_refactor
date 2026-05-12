@@ -1,0 +1,45 @@
+:host {
+  display: block;
+}
+
+.app-filter-bar-wrapper {
+  overflow: visible !important;
+}
+
+::ng-deep .app-filter-bar-wrapper .p-inputtext,
+::ng-deep .app-filter-bar-wrapper .p-select {
+  border: 1px solid var(--color-border, #d1d5db) !important;
+  border-radius: 6px;
+  height: 38px;
+  background: var(--color-bg-primary, #ffffff);
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+/* Hover: match PrimeNG's exact pseudo-selectors */
+::ng-deep .app-filter-bar-wrapper .p-inputtext:enabled:hover,
+::ng-deep .app-filter-bar-wrapper .p-select:not(.p-disabled):hover {
+  border-color: var(--color-accent-green, #00b42a) !important;
+}
+
+/* Focus: p-inputtext uses :focus, p-select uses .p-focus class */
+::ng-deep .app-filter-bar-wrapper .p-inputtext:enabled:focus {
+  border-color: var(--color-accent-green, #00b42a) !important;
+  box-shadow: 0 0 0 2px rgba(0, 180, 42, 0.2) !important;
+}
+
+::ng-deep .app-filter-bar-wrapper .p-select:not(.p-disabled).p-focus {
+  border-color: var(--color-accent-green, #00b42a) !important;
+  box-shadow: 0 0 0 2px rgba(0, 180, 42, 0.2) !important;
+}
+
+/* DatePicker: input inherits .p-inputtext styling;
+   dropdown button gets its own hover/focus */
+::ng-deep .app-filter-bar-wrapper .p-datepicker .p-datepicker-dropdown:not(:disabled):hover {
+  border-color: var(--color-accent-green, #00b42a) !important;
+}
+
+::ng-deep .app-filter-bar-wrapper .p-datepicker .p-datepicker-dropdown:focus-visible {
+  border-color: var(--color-accent-green, #00b42a) !important;
+  box-shadow: 0 0 0 2px rgba(0, 180, 42, 0.2) !important;
+}

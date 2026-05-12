@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { UserManagementComponent } from './user-management.component';
 import { AdminStore } from '../../stores/admin.store';
 import { AdminService } from '../../services/admin.service';
-import { AdminUser } from '../../dto/admin.dto';
+import { AdminUser, StatCard } from '../../dto/admin.dto';
 import { of } from 'rxjs';
 
 describe('UserManagementComponent', () => {
@@ -14,7 +14,11 @@ describe('UserManagementComponent', () => {
   beforeEach(async () => {
     mockAdminService = {
       getStats: jest.fn().mockReturnValue(of({
-        totalBookings: 100, todayBookings: 10, activeUsers: 50, totalRevenue: 5000,
+        totalBookings: { value: 100, changePercentage: 0, isPositive: true, target: 1000, progressPercentage: 10 },
+        todayBookings: { value: 10, changePercentage: 0, isPositive: true, target: 100, progressPercentage: 10 },
+        pendingBookings: { value: 0, changePercentage: 0, isPositive: true, target: 50, progressPercentage: 0 },
+        activeUsers: { value: 50, changePercentage: 0, isPositive: true, target: 1500, progressPercentage: 3 },
+        totalRevenue: { value: 5000, changePercentage: 0, isPositive: true, target: 10000, progressPercentage: 50 },
         bookingTrend: [], servicePopularity: [],
       })),
       getUsers: jest.fn().mockReturnValue(of({ items: [], total: 0, page: 1, limit: 10 })),
@@ -102,6 +106,7 @@ describe('UserManagementComponent', () => {
       { id: '3', name: 'Carol', email: 'carol@test.com', role: 'CUSTOMER', status: 'INACTIVE', createdAt: '2026-05-02T00:00:00Z' },
     ];
     store.setUsers(users, 3, 1);
+    store.setAllUsersForStats(users);
 
     expect(component.totalUsers()).toBe(3);
     expect(component.activeUsers()).toBe(2);
@@ -131,9 +136,15 @@ describe('UserManagementComponent', () => {
   });
 
   it('[RED] should map role to badge status correctly', () => {
-    expect(component.mapRoleToBadge('CUSTOMER')).toBe('completed');
-    expect(component.mapRoleToBadge('ADMIN')).toBe('processing');
-    expect(component.mapRoleToBadge('SUPER_ADMIN')).toBe('confirmed');
+    expect(component.mapRoleToBadge('CUSTOMER')).toBe('confirmed');
+    expect(component.mapRoleToBadge('ADMIN')).toBe('pending');
+    expect(component.mapRoleToBadge('SUPER_ADMIN')).toBe('pending');
+  });
+
+  it('[RED] should map status to badge correctly', () => {
+    expect(component.mapStatusToBadge('ACTIVE')).toBe('confirmed');
+    expect(component.mapStatusToBadge('INACTIVE')).toBe('pending');
+    expect(component.mapStatusToBadge('BLOCKED')).toBe('cancelled');
   });
 
   it('[RED] should show confirm delete dialog and delete user', () => {

@@ -153,6 +153,8 @@ model Service {
   description      String?  @db.Text
   durationMinutes  Int      @default(60) @map("duration_minutes")
   price            Decimal? @db.Decimal(10, 2)
+  pricePerMinute   Decimal? @db.Decimal(10, 2) @map("price_per_minute")
+  taxRate          Decimal? @db.Decimal(5, 4) @map("tax_rate")
   imageUrl         String?  @map("image_url")
   isActive         Boolean  @default(true) @map("is_active")
   displayOrder     Int      @default(0) @map("display_order")
@@ -177,24 +179,23 @@ model Service {
 // ============================================
 
 model TimeSlot {
-  id               String   @id @default(uuid())
-  serviceId        String   @map("service_id")
-  slotTime         String   @map("slot_time") @unique
-  durationMinutes  Int      @default(60) @map("duration_minutes")
-  capacity         Int      @default(1)
-  currentSequence  Int      @default(0) @map("current_sequence")
-  isActive         Boolean  @default(true) @map("is_active")
-  displayOrder     Int      @default(0) @map("display_order")
-  createdAt        DateTime @default(now()) @map("created_at")
-  updatedAt        DateTime @updatedAt @map("updated_at")
+  id              String   @id @default(uuid())
+  serviceId       String   @map("service_id")
+  startTime       DateTime @map("start_time")
+  endTime         DateTime @map("end_time")
+  capacity        Int      @default(1)
+  currentSequence Int      @default(0) @map("current_sequence")
+  isActive        Boolean  @default(true) @map("is_active")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
 
   service      Service       @relation(fields: [serviceId], references: [id])
   appointments Appointment[]
 
   @@map("time_slots")
-  @@index([slotTime])
+  @@index([serviceId, startTime, endTime])
+  @@index([startTime])
   @@index([isActive])
-  @@index([displayOrder])
   @@index([capacity, currentSequence], map: "timeslots_capacity_seq_idx")
   // 注意: Prisma 6.x 不支持 WHERE 子句的部分索引，需要通过 SQL 迁移实现
   // 迁移 SQL: CREATE INDEX timeslots_active_capacity_seq ON time_slots (capacity, current_sequence) WHERE is_active = true;
@@ -212,16 +213,22 @@ model Appointment {
   appointmentNumber String            @unique @map("appointment_number")
   appointmentDate   DateTime          @map("appointment_date")
   slotSequence      Int               @default(0) @map("slot_sequence")
+  durationMinutes   Int               @default(30) @map("duration_minutes")
+  price             Decimal?          @db.Decimal(10, 2)
+  taxRate           Decimal?          @db.Decimal(5, 4) @map("tax_rate")
+  taxIncludedAmount Decimal?          @db.Decimal(10, 2) @map("tax_included_amount")
+  bookingGroupId    String?           @map("booking_group_id")
   status            AppointmentStatus @default(PENDING)
   customerInfo      Json              @map("customer_info")
   remarks           String?           @db.Text
   createdAt         DateTime          @default(now()) @map("created_at")
   updatedAt         DateTime          @updatedAt @map("updated_at")
 
-  user      User               @relation(fields: [userId], references: [id])
-  timeSlot  TimeSlot           @relation(fields: [timeSlotId], references: [id])
-  service   Service            @relation(fields: [serviceId], references: [id])
-  histories AppointmentHistory[]
+  user          User               @relation(fields: [userId], references: [id])
+  timeSlot      TimeSlot           @relation(fields: [timeSlotId], references: [id])
+  service       Service            @relation(fields: [serviceId], references: [id])
+  bookingGroup  BookingGroup?      @relation(fields: [bookingGroupId], references: [id])
+  histories     AppointmentHistory[]
   notifications Notification[]
 
   // 部分唯一索引 - 高并发核心 (通过 SQL 迁移实现部分索引)
@@ -232,10 +239,27 @@ model Appointment {
   @@index([timeSlotId, appointmentDate, status])
   @@index([appointmentNumber])
   @@index([status, appointmentDate])
+  @@index([bookingGroupId])
   // 包含索引 - 高频查询优化 (需要通过 SQL 迁移实现)
   // CREATE INDEX appointments_pending_include ON appointments (appointment_date, time_slot_id, status) 
   // INCLUDE (user_id, customer_info) 
   // WHERE status IN ('PENDING', 'CONFIRMED');
+}
+
+// ============================================
+// BookingGroup Model
+// ============================================
+
+model BookingGroup {
+  id             String        @id @default(uuid())
+  totalDuration  Int           @map("total_duration")
+  totalPrice     Decimal?      @db.Decimal(10, 2) @map("total_price")
+  createdAt      DateTime      @default(now()) @map("created_at")
+
+  appointments Appointment[]
+
+  @@map("booking_groups")
+  @@index([createdAt])
 }
 
 // ============================================

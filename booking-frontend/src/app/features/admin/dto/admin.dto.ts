@@ -1,6 +1,6 @@
 /**
  * Admin DTOs
- * Aligned with contract.yaml v1.3.0 — Admin API definitions
+ * Aligned with contract.yaml v1.7.1 — Admin API definitions
  * @see contract.yaml -> api.admin
  */
 
@@ -11,22 +11,38 @@
 export interface BookingTrendItem {
   date: string;
   count: number;
+  revenue: number;
 }
 
 export interface ServicePopularityItem {
   serviceName: string;
   count: number;
+  percentage: number;
+}
+
+export interface TimeDistributionItem {
+  hour: string;
+  count: number;
+}
+
+export interface StatCard {
+  value: number;
+  changePercentage: number;
+  isPositive: boolean;
+  target: number;
+  progressPercentage: number;
 }
 
 export interface AdminStats {
-  totalBookings: number;
-  todayBookings: number;
-  activeUsers: number;
-  totalRevenue: number;
+  totalBookings: StatCard;
+  todayBookings: StatCard;
+  pendingBookings: StatCard;
+  activeUsers: StatCard;
+  totalRevenue: StatCard;
   bookingTrend: BookingTrendItem[];
   servicePopularity: ServicePopularityItem[];
+  timeDistribution: TimeDistributionItem[];
 }
-
 // ==========================================
 // Users
 // ==========================================
@@ -78,6 +94,8 @@ export interface AdminServiceItem {
   price: number;
   active: boolean;
   imageUrl?: string;
+  pricePerMinute?: number;
+  taxRate?: number;
   createdAt: string;
 }
 
@@ -88,6 +106,8 @@ export interface CreateAdminServiceRequest {
   price?: number;
   active?: boolean;
   imageUrl?: string;
+  pricePerMinute?: number;
+  taxRate?: number;
 }
 
 export interface UpdateAdminServiceRequest {
@@ -97,6 +117,8 @@ export interface UpdateAdminServiceRequest {
   price?: number;
   active?: boolean;
   imageUrl?: string;
+  pricePerMinute?: number;
+  taxRate?: number;
 }
 
 export interface AdminServicesQuery {
@@ -122,6 +144,11 @@ export interface AdminAppointment {
   timeSlotId: string;
   appointmentDate: string;
   status: AppointmentStatus;
+  durationMinutes?: number;
+  price?: number;
+  taxRate?: number;
+  taxIncludedAmount?: number;
+  bookingGroupId?: string;
   createdAt: string;
 }
 
@@ -144,11 +171,124 @@ export interface BatchCancelResponse {
 export interface AdminAppointmentsQuery {
   page?: number;
   limit?: number;
+  search?: string;
   status?: AppointmentStatus;
   startDate?: string;
   endDate?: string;
   serviceId?: string;
   userId?: string;
+}
+
+export interface CreateAdminAppointmentRequest {
+  userId: string;
+  serviceId: string;
+  appointmentDate: string;
+  timeSlotId?: string;
+  notes?: string;
+  selectedSlotIds?: string[];
+  overtimeMinutes?: number;
+}
+
+// ==========================================
+// System Health
+// ==========================================
+
+export interface SystemHealth {
+  server: string;
+  database: string;
+  api: string;
+  redis: string;
+  lastBackup: string;
+  uptime: string;
+}
+
+export interface SystemHealthDetail {
+  cpuUsage: number;
+  memoryUsage: number;
+  diskUsage: number;
+}
+
+// ==========================================
+// Time Range Filter
+// ==========================================
+
+export type TimeRange = 'last24h' | 'last7d' | 'last30d' | 'thisMonth' | 'lastMonth' | 'custom';
+
+export interface TimeRangeOption {
+  value: TimeRange;
+  label: string;
+}
+
+export const TIME_RANGE_OPTIONS: TimeRangeOption[] = [
+  { value: 'last24h', label: 'Last 24 Hours' },
+  { value: 'last7d', label: 'Last 7 Days' },
+  { value: 'last30d', label: 'Last 30 Days' },
+  { value: 'thisMonth', label: 'This Month' },
+  { value: 'lastMonth', label: 'Last Month' },
+  { value: 'custom', label: 'Custom Range' },
+];
+
+export interface TimeRangeSelection {
+  timeRange: TimeRange;
+  startDate?: string;
+  endDate?: string;
+}
+
+// ==========================================
+// Recent Bookings
+// ==========================================
+
+import { BadgeStatus } from '../../../shared/components/atoms/app-badge/app-badge.component';
+
+export interface BookingTableRow {
+  booking: AdminAppointment;
+  initials: string;
+  initialsBg: string;
+  statusBadge: BadgeStatus;
+}
+
+// ==========================================
+// Recent Users
+// ==========================================
+
+export interface RecentUserRow {
+  user: AdminUser;
+  initials: string;
+  initialsBg: string;
+  roleBadge: BadgeStatus;
+}
+
+// ==========================================
+// Recent Services
+// ==========================================
+
+export interface RecentServiceRow {
+  service: AdminServiceItem;
+  statusBadge: BadgeStatus;
+}
+
+// ==========================================
+// Notifications
+// ==========================================
+
+export interface NotificationItem {
+  id: string;
+  type: 'info' | 'warning' | 'error' | 'success';
+  title: string;
+  body: string;
+  read: boolean;
+  created_at: string;
+}
+
+export interface NotificationList {
+  items: NotificationItem[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface UnreadCount {
+  count: number;
 }
 
 // ==========================================

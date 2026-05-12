@@ -1,4 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { IsOptional, IsNumber, IsString } from "class-validator";
+import { Type } from "class-transformer";
 
 export class AdminUserDto {
   @ApiProperty()
@@ -53,17 +55,29 @@ export class UpdateAdminUserDto {
 
 export class AdminUsersQueryDto {
   @ApiPropertyOptional({ default: 1 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
   page?: number = 1;
 
   @ApiPropertyOptional({ default: 20 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
   limit?: number = 20;
 
   @ApiPropertyOptional({ description: "Search by name, email, or phone" })
+  @IsOptional()
+  @IsString()
   search?: string;
 
   @ApiPropertyOptional({ enum: ["CUSTOMER", "ADMIN", "SUPER_ADMIN"] })
+  @IsOptional()
+  @IsString()
   role?: string;
 
   @ApiPropertyOptional({ enum: ["ACTIVE", "INACTIVE", "BLOCKED"] })
+  @IsOptional()
+  @IsString()
   status?: string;
 }

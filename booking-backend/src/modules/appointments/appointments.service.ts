@@ -8,6 +8,7 @@ import {
 import { PrismaService } from "../../common/database/prisma.service";
 import { EmailService } from "../email/email.service";
 import { NotificationService } from "../notifications/notification.service";
+import { NotificationsGateway } from "../notifications/notifications.gateway";
 import {
   CreateAppointmentDto,
   UpdateAppointmentDto,
@@ -34,6 +35,7 @@ export class AppointmentsService {
     private readonly prisma: PrismaService,
     private readonly emailService: EmailService,
     private readonly notificationService: NotificationService,
+    private readonly notificationsGateway: NotificationsGateway,
   ) {}
 
   /**
@@ -105,8 +107,8 @@ export class AppointmentsService {
         customerName: customerInfo.name,
         customerEmail: customerInfo.email,
         serviceName: appointment.service.name,
-        date: appointment.timeSlot.slotTime.split("T")[0],
-        time: appointment.timeSlot.slotTime,
+        date: appointment.timeSlot.startTime.toISOString().split("T")[0],
+        time: appointment.timeSlot.startTime.toISOString(),
       });
     } catch (error) {
       this.logger.error(
@@ -121,8 +123,8 @@ export class AppointmentsService {
         appointmentId: appointment.id,
         userId: appointment.userId,
         serviceName: appointment.service.name,
-        date: appointment.timeSlot.slotTime.split("T")[0],
-        time: appointment.timeSlot.slotTime,
+        date: appointment.timeSlot.startTime.toISOString().split("T")[0],
+        time: appointment.timeSlot.startTime.toISOString(),
         status: appointment.status,
         customerName: customerInfo.name,
         customerEmail: customerInfo.email,
@@ -259,7 +261,7 @@ export class AppointmentsService {
         totalPages,
         hasNext: page < totalPages,
         hasPrev: page > 1,
-      }
+      },
     };
   }
 
@@ -312,8 +314,8 @@ export class AppointmentsService {
           appointmentId: updated.id,
           userId: updated.userId,
           serviceName: updated.service.name,
-          date: updated.timeSlot.slotTime.split("T")[0],
-          time: updated.timeSlot.slotTime,
+          date: updated.timeSlot.startTime.toISOString().split("T")[0],
+          time: updated.timeSlot.startTime.toISOString(),
           status: updated.status,
           customerName: customerInfo.name,
           customerEmail: customerInfo.email,
@@ -321,6 +323,20 @@ export class AppointmentsService {
       } catch (error) {
         this.logger.error(
           "Failed to send appointment update notification:",
+          error,
+        );
+      }
+
+      try {
+        this.notificationsGateway.sendAppointmentStatusChanged({
+          appointmentId: updated.id,
+          status: updated.status,
+          previousStatus: appointment.status,
+          timestamp: new Date().toISOString(),
+        });
+      } catch (error) {
+        this.logger.error(
+          "Failed to broadcast appointment status change:",
           error,
         );
       }
@@ -367,8 +383,8 @@ export class AppointmentsService {
         customerName: customerInfo.name,
         customerEmail: customerInfo.email,
         serviceName: updated.service.name,
-        date: updated.timeSlot.slotTime.split("T")[0],
-        time: updated.timeSlot.slotTime,
+        date: updated.timeSlot.startTime.toISOString().split("T")[0],
+        time: updated.timeSlot.startTime.toISOString(),
         cancelReason: reason,
       });
     } catch (error) {
@@ -383,8 +399,8 @@ export class AppointmentsService {
         appointmentId: updated.id,
         userId: updated.userId,
         serviceName: updated.service.name,
-        date: updated.timeSlot.slotTime.split("T")[0],
-        time: updated.timeSlot.slotTime,
+        date: updated.timeSlot.startTime.toISOString().split("T")[0],
+        time: updated.timeSlot.startTime.toISOString(),
         cancelReason: reason,
         customerName: customerInfo.name,
         customerEmail: customerInfo.email,

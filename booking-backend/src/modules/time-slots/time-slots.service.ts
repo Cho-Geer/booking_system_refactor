@@ -12,28 +12,28 @@ export class TimeSlotsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createTimeSlotDto: CreateTimeSlotDto) {
-    // Check for duplicate time slot (slotTime is unique)
-    const existingSlot = await this.prisma.timeSlot.findUnique({
+    // Check for duplicate time slot (serviceId + startTime + endTime)
+    const existingSlot = await this.prisma.timeSlot.findFirst({
       where: {
-        slotTime: createTimeSlotDto.slotTime,
+        serviceId: createTimeSlotDto.serviceId,
+        startTime: new Date(createTimeSlotDto.startTime),
+        endTime: new Date(createTimeSlotDto.endTime),
       },
     });
 
     if (existingSlot) {
-      throw new ConflictException("Time slot already exists for this time");
+      throw new ConflictException(
+        "Time slot already exists for this service and time range",
+      );
     }
 
     return this.prisma.timeSlot.create({
       data: {
         serviceId: createTimeSlotDto.serviceId,
-        slotTime: createTimeSlotDto.slotTime,
-        durationMinutes: createTimeSlotDto.durationMinutes || 60,
+        startTime: new Date(createTimeSlotDto.startTime),
+        endTime: new Date(createTimeSlotDto.endTime),
         capacity: createTimeSlotDto.capacity || 1,
-        isActive:
-          createTimeSlotDto.isActive !== undefined
-            ? createTimeSlotDto.isActive
-            : true,
-        displayOrder: createTimeSlotDto.displayOrder || 0,
+        isActive: true,
       },
       include: {
         service: true,
@@ -65,7 +65,7 @@ export class TimeSlotsService {
         include: {
           service: true,
         },
-        orderBy: { slotTime: "asc" },
+        orderBy: { startTime: "asc" },
       }),
       this.prisma.timeSlot.count({ where }),
     ]);
@@ -125,19 +125,107 @@ export class TimeSlotsService {
   }
 
   async getAvailableSlots(serviceId: string, startDate: Date, endDate: Date) {
-    return this.prisma.timeSlot.findMany({
+    const service = await this.prisma.service.findUnique({
+      where: { id: serviceId },
+    });
+
+    if (!service) {
+      throw new NotFoundException(`Service with ID ${serviceId} not found`);
+    }
+
+    await this.generateTimeSlotsForDateRange(
+      { id: service.id, durationMinutes: service.durationMinutes },
+      startDate,
+      endDate,
+    );
+
+    const slots = await this.prisma.timeSlot.findMany({
       where: {
         serviceId,
         isActive: true,
-        slotTime: {
-          gte: startDate.toISOString(),
-          lte: endDate.toISOString(),
+        startTime: {
+          gte: startDate,
+          lte: endDate,
         },
       },
       include: {
         service: true,
+        _count: {
+          select: { appointments: true },
+        },
       },
-      orderBy: { slotTime: "asc" },
+      orderBy: { startTime: "asc" },
     });
+
+    return slots.map((slot) => ({
+      id: slot.id,
+      startTime: slot.startTime,
+      endTime: slot.endTime,
+      capacity: slot.capacity,
+      bookedCount: slot._count.appointments,
+      available: slot.capacity > slot._count.appointments,
+    }));
+  }
+
+  private async generateTimeSlotsForDateRange(
+    service: { id: string; durationMinutes: number },
+    startDate: Date,
+    endDate: Date,
+  ) {
+    const { id: serviceId, durationMinutes } = service;
+    const currentDate = new Date(startDate);
+    currentDate.setUTCHours(0, 0, 0, 0);
+
+    const endDateEnd = new Date(endDate);
+    endDateEnd.setUTCHours(23, 59, 59, 999);
+
+    while (currentDate <= endDateEnd) {
+      let slotStart = new Date(currentDate);
+      slotStart.setUTCHours(9, 0, 0, 0);
+      const dayEnd = new Date(currentDate);
+      dayEnd.setUTCHours(17, 0, 0, 0);
+
+      while (slotStart < dayEnd) {
+        const slotEnd = new Date(
+          slotStart.getTime() + durationMinutes * 60 * 1000,
+        );
+
+        // Use upsert with the compound unique identifier (using a composite key approach)
+        // Since we removed @unique from slotTime, we use findFirst + create as a workaround
+        // for the upsert since Prisma's upsert requires a unique constraint.
+        const existingSlot = await this.prisma.timeSlot.findFirst({
+          where: {
+            serviceId,
+            startTime: slotStart,
+            endTime: slotEnd,
+          },
+        });
+
+        if (existingSlot) {
+          await this.prisma.timeSlot.update({
+            where: { id: existingSlot.id },
+            data: {
+              serviceId,
+              capacity: 1,
+              isActive: true,
+            },
+          });
+        } else {
+          await this.prisma.timeSlot.create({
+            data: {
+              serviceId,
+              startTime: slotStart,
+              endTime: slotEnd,
+              capacity: 1,
+              isActive: true,
+            },
+          });
+        }
+
+        slotStart = new Date(slotStart.getTime() + durationMinutes * 60 * 1000);
+      }
+
+      currentDate.setUTCDate(currentDate.getUTCDate() + 1);
+    }
   }
 }

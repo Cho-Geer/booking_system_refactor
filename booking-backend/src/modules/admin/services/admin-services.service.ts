@@ -80,6 +80,18 @@ export class AdminServicesService {
   }
 
   async create(dto: CreateAdminServiceDto): Promise<AdminServiceDto> {
+    // Auto-calculate pricePerMinute if not explicitly provided
+    if (
+      dto.pricePerMinute === undefined &&
+      dto.price !== undefined &&
+      dto.duration !== undefined &&
+      dto.duration > 0
+    ) {
+      dto = {
+        ...dto,
+        pricePerMinute: Math.round((dto.price / dto.duration) * 100) / 100,
+      };
+    }
     const prismaData = fromCreateAdminServiceDto(dto);
     const service = await this.servicesService.create(prismaData as any);
     return mapToDto(service as any);
@@ -89,6 +101,18 @@ export class AdminServicesService {
     id: string,
     dto: UpdateAdminServiceDto,
   ): Promise<AdminServiceDto> {
+    // Auto-calculate pricePerMinute only when both price AND duration present in DTO
+    if (
+      dto.pricePerMinute === undefined &&
+      dto.price !== undefined &&
+      dto.duration !== undefined &&
+      dto.duration > 0
+    ) {
+      dto = {
+        ...dto,
+        pricePerMinute: Math.round((dto.price / dto.duration) * 100) / 100,
+      };
+    }
     const prismaData = fromUpdateAdminServiceDto(dto);
     const service = await this.servicesService.update(id, prismaData as any);
     return mapToDto(service as any);

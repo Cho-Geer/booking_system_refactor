@@ -1537,6 +1537,2027 @@
         "execution_summary": "Implemented auth page dark mode fixes: added p-6 lg:p-8 padding wrappers inside glass cards for login/register components, and added [data-theme=\"dark\"] CSS overrides for tab buttons, type buttons, step indicators, labels, and terms text. TypeScript typecheck passed with 0 errors. Tests show 6 pre-existing failures unrelated to UI changes. Committed as [Green] auth-dark-mode-fix.",
         "completed_at": "2026-05-02T16:40:32.059Z"
       }
+    },
+    "cg_ses_1777895257110": {
+      "session_id": "cg_ses_1777895257110",
+      "created_at": "2026-05-04T11:47:37.111Z",
+      "task_description": "Revise project requirements/design documents to incorporate Admin Dashboard API contract (DASH-001 through DASH-004) - update contract.yaml, interface design spec, data architecture doc, and SAD",
+      "gate_status": "checked",
+      "last_check_failed_items": [],
+      "plan_summary": null,
+      "confirmed_at": null,
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1777895805722": {
+      "session_id": "cg_ses_1777895805722",
+      "created_at": "2026-05-04T11:56:45.722Z",
+      "task_description": "Orchestrate remaining project phases (5-8) for booking system refactor: Phase 5 - Page-by-Page Theme Migration, Phase 6 - Theme Service Finalization, Phase 7 - Design System Documentation Update, Phase 8 - Testing & Validation",
+      "gate_status": "armed",
+      "last_check_failed_items": [],
+      "plan_summary": "Orchestrate Phases 5-8: Switch to develop branch, finalize requirements docs first, then proceed with page theme migration, theme service finalization, design doc update, and testing validation",
+      "confirmed_at": "2026-05-04T12:13:15.720Z",
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1777897448783": {
+      "session_id": "cg_ses_1777897448783",
+      "created_at": "2026-05-04T12:24:08.784Z",
+      "task_description": "Revise project requirements documents to add Admin Dashboard API contracts DASH-001 through DASH-004 to contract.yaml, 接口设计规范文档.md, 数据架构设计文档.md, and 系统架构设计文档（SAD）.md",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Add DASH-001-004 contracts to 接口设计规范文档.md §2.8, data architecture note, SAD admin module table",
+      "confirmed_at": "2026-05-04T12:27:24.764Z",
+      "consumed_at": "2026-05-04T12:30:03.749Z",
+      "audit": {
+        "execution_summary": "Updated 3 requirements documents for DASH-001~004 admin dashboard API contracts. 接口设计规范文档.md → v2.3.0: added §2.8 Admin Dashboard statistics API with 4 endpoints, DTOs, and JSON examples. 数据架构设计文档.md → v2.2.0: added §11.1.1 Dashboard Statistics data source note (Prisma aggregation). 系统架构设计文档（SAD）.md → v2.1.0: added StatsModule to core business modules table. contract.yaml was already complete at v1.5.0 with all DASH fields.",
+        "completed_at": "2026-05-04T12:30:03.749Z"
+      }
+    },
+    "cg_ses_1777898307987": {
+      "session_id": "cg_ses_1777898307987",
+      "created_at": "2026-05-04T12:38:27.987Z",
+      "task_description": "Architect: Review all requirements documents for completeness, consistency, and correctness — Admin Dashboard (DASH-001~004) API contracts, contract.yaml, data architecture, system architecture, security, testing, operations, and code standards documents.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Architect: Review all requirements documents for Admin Dashboard DASH-001~004 consistency - including API spec §2.8, contract.yaml admin stats, data architecture, SAD, security, testing, ops, and code standards",
+      "confirmed_at": "2026-05-04T12:39:44.172Z",
+      "consumed_at": "2026-05-04T12:41:43.359Z",
+      "audit": {
+        "execution_summary": "Architect reviewed 12 documents (~11K lines) for Admin Dashboard DASH-001~004 consistency. Found 10 issues: 1 CRITICAL (extra total_bookings in contract.yaml), 3 MAJOR (incomplete example, no rate limiting, no error responses), 6 MINOR. 6 documents verified clean.",
+        "completed_at": "2026-05-04T12:41:43.359Z"
+      }
+    },
+    "cg_ses_1777903063523": {
+      "session_id": "cg_ses_1777903063523",
+      "created_at": "2026-05-04T13:57:43.523Z",
+      "task_description": "Execute Phase 1 of requirements documents fix plan: Deprecate or rewrite 5 obsolete design documents under docs/design/ to reflect new dark-first design system (#0c1220 bg, #162032 cards, #00c6ff accent, sharp 8px borders), replacing all glassmorphism references. Documents: admin-ui-spec.md (full rewrite), glassmorphism-design-system.md (deprecation notice), global-ui-spec.md (v2→v3), ui-implementation-plan.md (remove glassmorphism), customer-ui-spec.md (audit+update).",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Phase 1 design documents fix: rewrite admin-ui-spec.md v2.0.0 with dark-first design system, deprecate glassmorphism-design-system.md, update global-ui-spec.md to v3.0.0, remove glassmorphism from ui-implementation-plan.md, audit/update customer-ui-spec.md. All 5 docs under docs/design/.",
+      "confirmed_at": "2026-05-04T14:00:12.496Z",
+      "consumed_at": "2026-05-04T14:18:36.337Z",
+      "audit": {
+        "execution_summary": "Phase 1 design documents fix: Rewrote admin-ui-spec.md (v2.0.0, 884 lines dark-first), added deprecation notice to glassmorphism-design-system.md, updated global-ui-spec.md (v3.0.0, 430 lines), removed glassmorphism from ui-implementation-plan.md (v2.0.0), fully rewrote customer-ui-spec.md (v2.0.0, 570 lines sharp design). All 5 documents under docs/design/ updated to dark-first design system.",
+        "completed_at": "2026-05-04T14:18:36.337Z"
+      }
+    },
+    "cg_ses_1777906288138": {
+      "session_id": "cg_ses_1777906288138",
+      "created_at": "2026-05-04T14:51:28.139Z",
+      "task_description": "Execute Phase 2 of the requirements documents fix plan: Add 5 missing API endpoint definitions (STAFF-003 staff workload, SVC-006 service popularity, SYS-002 notifications list, SYS-003 mark notification read, MSG-004 unread message count) to contract.yaml under the api.admin section. These endpoints support the prototype dashboard and are currently absent from the canonical contract.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Phase 2 contract.yaml fix: Insert 5 missing admin API endpoint definitions (STAFF-003 staff workload, SVC-006 dashboard service-popularity, SYS-002 notifications list, SYS-003 mark notification read, MSG-004 unread message count) after time_distribution at line 515. Match existing YAML format/style. No code files modified.",
+      "confirmed_at": "2026-05-04T14:54:04.093Z",
+      "consumed_at": "2026-05-04T14:56:01.113Z",
+      "audit": {
+        "execution_summary": "Phase 2 contract.yaml completed: Added 5 missing admin API endpoint definitions (STAFF-003 staff workload, SVC-006 dashboard service-popularity, SYS-002 notifications list, SYS-003 mark notification read, MSG-004 unread message count). Version updated to 1.6.0. File grew from 1735 to 1840 lines. YAML format matches existing admin endpoint style.",
+        "completed_at": "2026-05-04T14:56:01.113Z"
+      }
+    },
+    "cg_ses_1777906954390": {
+      "session_id": "cg_ses_1777906954390",
+      "created_at": "2026-05-04T15:02:34.390Z",
+      "task_description": "Add 5 new subsections (2.9 through 2.13) to 接口设计规范文档.md covering Schedule, Analytics, History, System, and Messages API modules. Reference mapping report and contract.yaml for endpoint definitions.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Add 5 new subsections (2.9-2.13) to 接口设计规范文档.md: Schedule (SCH), Analytics (AN), History (HIST), System (SYS), Messages (MSG) API specs. Read references (existing doc section 2.8, mapping report, contract.yaml), write new sections following section 2.8 format, cross-reference contract.yaml for already-defined endpoints.",
+      "confirmed_at": "2026-05-04T15:04:41.935Z",
+      "consumed_at": "2026-05-04T15:10:56.268Z",
+      "audit": {
+        "execution_summary": "Phase 3 complete: Added 5 new subsections (2.9-2.13) to 接口设计规范文档.md covering Schedule (SCH), Analytics (AN), History (HIST), System (SYS), and Messages (MSG) API modules with full endpoint specs following section 2.8 format. Cross-referenced contract.yaml v1.6.0 for SYS-002/003 and MSG-004. All 13 subsections (2.1-2.13) now present.",
+        "completed_at": "2026-05-04T15:10:56.268Z"
+      }
+    },
+    "cg_ses_1777908597466": {
+      "session_id": "cg_ses_1777908597466",
+      "created_at": "2026-05-04T15:29:57.466Z",
+      "task_description": "Phase 4 Architecture Document Update: Add Staff/Notification/Message data models to 数据架构设计文档.md, and expand AdminModule sub-modules in 系统架构设计文档（SAD）.md with Schedule/Analytics/History/Settings modules",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Phase 4 Architecture Document Update: (1) Add Staff/Notification/Message data models to 数据架构设计文档.md v2.2.0->v2.3.0 including §11.1.1 dashboard notes; (2) Expand AdminModule with Schedule/Analytics/History/Settings sub-modules in 系统架构设计文档（SAD）.md v2.1.0->v2.2.0. Documentation-only, no code changes.",
+      "confirmed_at": "2026-05-04T15:39:35.380Z",
+      "consumed_at": "2026-05-04T15:44:43.917Z",
+      "audit": {
+        "execution_summary": "Phase 4 complete: (1) Added Staff model (§2.2.6), Notification+Message models (§2.2.7) to 数据架构设计文档.md v2.3.0, updated §2.3 stats table and §11.1.1 dashboard notes; (2) Added AdminModule sub-module architecture (§2.2.1.1) to SAD v2.2.0 with 9 sub-modules (4 future-phase); (3) Ran keystone:hash to update machine.json. No code files modified.",
+        "completed_at": "2026-05-04T15:44:43.917Z"
+      }
+    },
+    "cg_ses_1777914499897": {
+      "session_id": "cg_ses_1777914499897",
+      "created_at": "2026-05-04T17:08:19.897Z",
+      "task_description": "Phase 5 requirements documents fix plan: Cross-cutting consistency updates across 3 documents (安全架构设计文档.md, 接口设计规范文档.md, 测试策略与计划.md). Small targeted edits: role enum unification, field naming convention clarification, WebSocket event definitions, dashboard test coverage, version number updates.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Phase 5 document consistency fixes: (5a) Role enum unification in 安全架构设计文档.md, (5b) Field naming convention in 接口设计规范文档.md, (5c) WebSocket events table in 接口设计规范文档.md, (5d) Dashboard test coverage in 测试策略与计划.md, (5e) Version updates across all 3 documents. Read→Edit→Verify workflow.",
+      "confirmed_at": "2026-05-04T17:49:46.275Z",
+      "consumed_at": "2026-05-04T17:55:13.615Z",
+      "audit": {
+        "execution_summary": "Phase 5 complete: Cross-consistency updates across 3 requirements documents. (5a) Role enum unification in 安全架构设计文档.md v2.2.0→v2.3.0: canonical roles CUSTOMER/ADMIN/SUPER_ADMIN clarified, USER deprecated. (5b) Field naming convention note in 接口设计规范文档.md: wire format snake_case vs TypeScript camelCase with interceptor auto-conversion. (5c) WebSocket event definitions table added to §2.6: slot.booked, appointment.status_changed, notification.new, stats.updated. (5d) Admin Dashboard integration tests added to 测试策略与计划.md §5.2.6: DASH-001~004 backend + DASH-FE-001~003 frontend, coverage ≥70%. (5e) Version bumps and changelog entries across all 3 documents.",
+        "completed_at": "2026-05-04T17:55:13.615Z"
+      }
+    },
+    "cg_ses_1777955903700": {
+      "session_id": "cg_ses_1777955903700",
+      "created_at": "2026-05-05T04:38:23.701Z",
+      "task_description": "Fix 5 remaining requirements document issues: (1) Update interaction-patterns.md to replace glassmorphism with Sharp Design terminology, (2) Rewrite README.md to reflect unified Sharp Design system, (3) Add missing dashboard cards to admin-ui-spec.md, (4) Update frontend-coding-standard.md color variables to dark-theme tokens, (5) Add WebSocket event definitions to mapping report. Documentation-only changes; no code modifications.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix 5 remaining requirements document issues: (1) interaction-patterns.md - replace glassmorphism with Sharp Design terminology, (2) docs/design/README.md - rewrite to unified dark-first Sharp Design, (3) admin-ui-spec.md - add Staff Workload/Service Popularity/System Status dashboard cards, (4) frontend-coding-standard.md §5.4 - update CSS variables to dark-theme tokens, (5) mapping report - add WebSocket event definitions section",
+      "confirmed_at": "2026-05-05T04:47:04.040Z",
+      "consumed_at": "2026-05-05T04:56:09.218Z",
+      "audit": {
+        "execution_summary": "Fixed 5 documentation gaps: (1) interaction-patterns.md v2.0.0 — replaced all glassmorphism terminology with Sharp Design equivalents + deprecation notice; (2) docs/design/README.md v3.0.0 — rewrote to unified dark-first Sharp Design system, removed dual-system promotion; (3) admin-ui-spec.md v2.1.0 — added Staff Workload/Service Popularity/System Status dashboard cards with styling specs; (4) frontend-coding-standard.md v1.1.0 §5.4 — updated CSS variables to dark-first tokens matching styles.scss; (5) mapping report v2.1.0 — added §13 WebSocket Real-Time Events section with 4 events + connection specs",
+        "completed_at": "2026-05-05T04:56:09.218Z"
+      }
+    },
+    "cg_ses_1777969198001": {
+      "session_id": "cg_ses_1777969198001",
+      "created_at": "2026-05-05T08:19:58.001Z",
+      "task_description": "Fix 2 documentation inconsistencies: (1) Update docs/design/README.md stale customer-ui-spec.md status from '待统一升级' to 'Sharp Design v2.0.0' since it was already upgraded; (2) Mark admin.reports.summary endpoint in contract.yaml as DEPRECATED with reference to replacement Analytics endpoints.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix 2 docs: (1) README.md 3-line edits updating stale customer-ui-spec status from '待统一升级' to 'Sharp Design v2.0.0'; (2) contract.yaml deprecate admin.reports.summary with replacement reference to Analytics AN-001/AN-002",
+      "confirmed_at": "2026-05-05T08:27:00.859Z",
+      "consumed_at": "2026-05-05T08:33:23.380Z",
+      "audit": {
+        "execution_summary": "Fixed 2 doc inconsistencies: (1) README.md 3-line edits updating stale customer-ui-spec status from '待统一升级' to 'Sharp Design v2.0.0'; (2) contract.yaml deprecated admin.reports.summary endpoint, updated changelog to v1.6.1, synced keystone hashes (body hash + machine.json)",
+        "completed_at": "2026-05-05T08:33:23.380Z"
+      }
+    },
+    "cg_ses_1777973318998": {
+      "session_id": "cg_ses_1777973318998",
+      "created_at": "2026-05-05T09:28:38.998Z",
+      "task_description": "Fix 2 residual documentation issues: (1) Remove DEPRECATED label from interaction-patterns.md header since the document body has been fully rewritten to Sharp Design terminology; (2) Rename section 2.2.7 model from Notification to InAppNotification in 数据架构设计文档.md to avoid conflict with section 2.2.4's BullMQ Notification model, and update all dependent references in the same document.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix 2 residual documentation issues: (1) Remove DEPRECATED label from interaction-patterns.md header (Sharp Design reframe), (2) Rename 2.2.7 model from Notification to InAppNotification in 数据架构设计文档.md (5 reference updates), run keystone:hash after edits.",
+      "confirmed_at": "2026-05-05T09:33:48.046Z",
+      "consumed_at": "2026-05-05T09:36:45.539Z",
+      "audit": {
+        "execution_summary": "Fixed 2 residual documentation issues: (1) interaction-patterns.md: removed DEPRECATED label from header, reframed deprecation notice to historical migration context, now clearly states document is authoritative Sharp Design v2.0.0; (2) 数据架构设计文档.md: renamed section 2.2.7 model from Notification to InAppNotification (6 reference updates across model definition, explanatory note, Dashboard stats table, Prisma code example) to resolve collision with section 2.2.4's BullMQ Notification model. keystone:hash not run because script missing and data architecture doc not in machine.json contracts.",
+        "completed_at": "2026-05-05T09:36:45.539Z"
+      }
+    },
+    "cg_ses_1777974836579": {
+      "session_id": "cg_ses_1777974836579",
+      "created_at": "2026-05-05T09:53:56.580Z",
+      "task_description": "Fix 2 minor inconsistencies in admin-ui-spec.md section 2.1 page inventory table: (1) Update Analytics page API dependency from deprecated /v1/admin/stats/reports to AN-001/AN-002 endpoints (/v1/admin/analytics/overview, /v1/admin/analytics/filtered), (2) Update Schedule page API dependency from /v1/admin/time-slots to /v1/admin/schedule matching SCH-001. No code changes, no contract.yaml changes.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix 2 minor API dependency inconsistencies in admin-ui-spec.md section 2.1 page inventory table: (1) Analytics page: /v1/admin/stats/reports → /v1/admin/analytics/overview and /v1/admin/analytics/filtered (AN-001/AN-002), (2) Schedule page: /v1/admin/time-slots → /v1/admin/schedule (SCH-001). Pure documentation fix, no code or contract.yaml changes.",
+      "confirmed_at": "2026-05-05T09:54:29.905Z",
+      "consumed_at": "2026-05-05T09:55:27.977Z",
+      "audit": {
+        "execution_summary": "Fixed 2 API dependency inconsistencies in admin-ui-spec.md section 2.1: (1) Analytics page changed from deprecated /v1/admin/stats/reports to AN-001/AN-002 endpoints: /v1/admin/analytics/overview and /v1/admin/analytics/filtered, (2) Schedule page changed from /v1/admin/time-slots to /v1/admin/schedule matching SCH-001 in interface design doc section 2.9. Pure documentation fix, no code or contract.yaml changes.",
+        "completed_at": "2026-05-05T09:55:27.977Z"
+      }
+    },
+    "cg_ses_1777975936994": {
+      "session_id": "cg_ses_1777975936994",
+      "created_at": "2026-05-05T10:12:16.994Z",
+      "task_description": "Fix 2 minor inconsistencies in admin-ui-spec.md: (1) Update outdated customer theme status label in section 1.2 from '暗色主题（待升级）' to '暗色主题（Sharp Design v2.0.0）', (2) Fix incorrect Dashboard API path in section 2.1 from '/v1/admin/stats/overview' to 'GET /v1/admin/stats' to match contract.yaml DASH-001 endpoint. No code changes, no contract.yaml modifications.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix 2 minor inconsistencies in admin-ui-spec.md: (1) Section 1.2 Customer theme label from '暗色主题（待升级）' to '暗色主题（Sharp Design v2.0.0）', (2) Section 2.1 Dashboard API path from '/v1/admin/stats/overview' to 'GET /v1/admin/stats'. No code or contract.yaml changes.",
+      "confirmed_at": "2026-05-05T10:12:56.741Z",
+      "consumed_at": "2026-05-05T10:14:06.877Z",
+      "audit": {
+        "execution_summary": "Fixed 3 occurrences in admin-ui-spec.md: (1) §1.2 Customer theme label updated from '暗色主题（待升级）' to '暗色主题（Sharp Design v2.0.0）', (2) §2.1 Dashboard API path corrected from '/v1/admin/stats/overview' to 'GET /v1/admin/stats' (DASH-001) matching contract.yaml, (3) §4.2 stat cards API reference also corrected for consistency. No code or contract.yaml modified.",
+        "completed_at": "2026-05-05T10:14:06.877Z"
+      }
+    },
+    "cg_ses_1777977442245": {
+      "session_id": "cg_ses_1777977442245",
+      "created_at": "2026-05-05T10:37:22.245Z",
+      "task_description": "Fix 2 cosmetic inconsistencies in admin-ui-spec.md: (1) Change /v1/admin/audit-log to GET /v1/admin/history (HIST-001) in the History page API dependency column, (2) Change contract.yaml version reference from v1.5.0 to v1.6.1. No code changes. Verification against HIST-001 in 接口设计规范文档 §2.11.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix 2 cosmetic inconsistencies in docs/design/admin-ui-spec.md: (1) Line 101: change /v1/admin/audit-log to GET /v1/admin/history (HIST-001), (2) Line 105: change contract v1.5.0 to v1.6.1. Doc-only, zero risk.",
+      "confirmed_at": "2026-05-05T10:37:55.771Z",
+      "consumed_at": "2026-05-05T10:38:24.561Z",
+      "audit": {
+        "execution_summary": "Fixed 2 cosmetic inconsistencies in docs/design/admin-ui-spec.md: (1) Line 101 History page API dependency changed from /v1/admin/audit-log to GET /v1/admin/history (HIST-001) per 接口设计规范文档 §2.11. (2) Line 105 contract version reference updated from v1.5.0 to v1.6.1. Both verified successfully.",
+        "completed_at": "2026-05-05T10:38:24.561Z"
+      }
+    },
+    "cg_ses_1777978260155": {
+      "session_id": "cg_ses_1777978260155",
+      "created_at": "2026-05-05T10:51:00.155Z",
+      "task_description": "Fix 3 API endpoint path mismatches in admin-ui-spec.md dashboard cards section. Documentation-only change - updating endpoint paths from wrong paths (e.g., /v1/admin/stats/*) to correct paths per contract v1.6.1 (e.g., /v1/admin/staff/workload, /v1/admin/dashboard/service-popularity, /v1/admin/system/health)",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix 3 API endpoint path mismatches in admin-ui-spec.md Section 4.2: (1) staff-workload path /v1/admin/stats/staff-workload → /v1/admin/staff/workload, (2) service-popularity path /v1/admin/stats/service-popularity → /v1/admin/dashboard/service-popularity, (3) system-status path /v1/admin/stats/system-status → /v1/admin/system/health. Documentation-only change, no code or contract modifications.",
+      "confirmed_at": "2026-05-05T10:52:51.219Z",
+      "consumed_at": "2026-05-05T10:53:14.174Z",
+      "audit": {
+        "execution_summary": "Fixed 3 API endpoint path mismatches in admin-ui-spec.md Section 4.2 Dashboard Cards: (1) staff-workload: /v1/admin/stats/staff-workload → /v1/admin/staff/workload, (2) service-popularity: /v1/admin/stats/service-popularity → /v1/admin/dashboard/service-popularity, (3) system-status: /v1/admin/stats/system-status → /v1/admin/system/health. All 3 paths now align with contract.yaml v1.6.1. No code or contract files modified.",
+        "completed_at": "2026-05-05T10:53:14.174Z"
+      }
+    },
+    "cg_ses_1777980169016": {
+      "session_id": "cg_ses_1777980169016",
+      "created_at": "2026-05-05T11:22:49.016Z",
+      "task_description": "Fix 4 remaining documentation and contract issues identified in final cross-reference: (1) Add SYS-001 system health endpoint to contract.yaml, (2) Expand Dashboard API dependency list in admin-ui-spec.md, (3) Fix System Status uptime description in admin-ui-spec.md to match prototype, (4) Verify contract version reference is v1.6.1, (5) Add STAFF-003 and SVC-006 to the mapping report.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix 4 documentation/contract issues: (1) Add SYS-001 system health endpoint to contract.yaml v1.6.2, (2) Expand Dashboard API dependency cell in admin-ui-spec.md §2.1, (3) Simplify uptime description in admin-ui-spec.md §4.2, (4) Issue already resolved — skip, (5) Add STAFF-003 & SVC-006 to mapping report. No business logic code modified.",
+      "confirmed_at": "2026-05-05T11:23:33.766Z",
+      "consumed_at": "2026-05-05T11:26:56.130Z",
+      "audit": {
+        "execution_summary": "Fixed 4 documentation/contract issues: (1) Added SYS-001 GET /v1/admin/system/health to contract.yaml v1.6.2 with 5 response fields (server, database, api, lastBackup, uptime); (2) Expanded Dashboard API dependency cell in admin-ui-spec.md §2.1 to reference DASH-001~004, STAFF-003, SVC-006, SYS-001, notifications, messages; (3) Simplified uptime description in §4.2 to match prototype (single line: Uptime: 99.9%); (4) Issue 4 already resolved (v1.5.0→v1.6.1 pre-existing) — updated to v1.6.2 for consistency; (5) Added STAFF-003 and SVC-006 entries to mapping report. Keystone hash updated in machine.json. No business logic code modified.",
+        "completed_at": "2026-05-05T11:26:56.130Z"
+      }
+    },
+    "cg_ses_1777983652493": {
+      "session_id": "cg_ses_1777983652493",
+      "created_at": "2026-05-05T12:20:52.493Z",
+      "task_description": "Update 系统页面全景图.md to align with current requirements baseline - documentation-only fix: correct routes, add missing pages, replace deprecated pages, expand admin dashboard description, remove standalone home page, update summary numbers. No code changes.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Update 系统页面全景图.md: fix 4 incorrect routes, add 8 missing pages, replace 2 deprecated pages, expand admin dashboard description, note home page redirect, recalculate summary count (13→19). Documentation-only, no code changes.",
+      "confirmed_at": "2026-05-05T12:23:07.548Z",
+      "consumed_at": "2026-05-05T12:26:08.952Z",
+      "audit": {
+        "execution_summary": "Updated 系统页面全景图.md with 6 categories of fixes: (1) corrected 4 routes (auth prefix, my-bookings, 4-step booking flow), (2) added 8 missing pages (legal terms/privacy, 404, admin schedule/analytics/history/settings, booking/success), (3) replaced deprecated reports and time-slots pages, (4) expanded admin dashboard description with STAFF-003/SVC-006/SYS-001/SYS-002/MSG-004, (5) noted home page as non-standalone redirect, (6) updated summary count from 13 to 19. No code or contract.yaml files modified.",
+        "completed_at": "2026-05-05T12:26:08.952Z"
+      }
+    },
+    "cg_ses_1777985981565": {
+      "session_id": "cg_ses_1777985981565",
+      "created_at": "2026-05-05T12:59:41.565Z",
+      "task_description": "Execute the removal of Staff Workload (STAFF-003) and Service Popularity (SVC-006) related parts across all requirements/design documents (contract.yaml, admin-ui-spec.md, 系统页面全景图.md, Mapping Report, 数据架构设计文档.md, 系统架构设计文档（SAD）.md) — no codebase changes, document-only edits.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Remove STAFF-003 (Staff Workload) and SVC-006 (Service Popularity) from 6 design/contract documents. File-only edits: contract.yaml, admin-ui-spec.md, 系统页面全景图.md, Mapping Report, 数据架构设计文档.md, 系统架构设计文档（SAD）.md. No code changes. Run keystone:hash after contract edits.",
+      "confirmed_at": "2026-05-05T13:00:56.549Z",
+      "consumed_at": "2026-05-05T13:05:56.115Z",
+      "audit": {
+        "execution_summary": "Removed STAFF-003 (Staff Workload) and SVC-006 (Service Popularity) from 6 design documents: contract.yaml (v1.6.2→v1.6.3, removed 2 endpoint blocks), admin-ui-spec.md (removed 2 card subsections), 系统页面全景图.md (removed references), Mapping Report (removed section 12), 数据架构设计文档.md (removed stats row), 系统架构设计文档（SAD）.md (removed mention). Ran keystone:hash to update machine.json. No code changes.",
+        "completed_at": "2026-05-05T13:05:56.115Z"
+      }
+    },
+    "cg_ses_1777987358706": {
+      "session_id": "cg_ses_1777987358706",
+      "created_at": "2026-05-05T13:22:38.706Z",
+      "task_description": "Fix 4 post-removal documentation inconsistencies: Remove stale STAFF-003/SVC-006 endpoint definitions from 接口设计规范文档.md, handle Staff model in 数据架构设计文档.md, remove stale references from Mapping Report, update version/changelog. No code changes, no contract.yaml modifications.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix 4 post-removal doc inconsistencies: P0 remove STAFF-003/SVC-006 from 接口设计规范文档.md §2.8; P1 mark Staff model as FUTURE-PHASE in 数据架构设计文档.md §2.2.6 and remove STAFF-003 row from §11.1.1; P2 remove residual STAFF-003/SVC-006 from Mapping Report; update versions/changelogs. No code or contract.yaml changes.",
+      "confirmed_at": "2026-05-05T13:23:25.748Z",
+      "consumed_at": "2026-05-05T13:28:58.291Z",
+      "audit": {
+        "execution_summary": "P0: Updated 接口设计规范文档.md v2.3.0→v2.4.0 — verified no STAFF-003/SVC-006 references in section 2.8, added changelog documenting removal. P1: Updated 数据架构设计文档.md v2.3.0→v2.4.0 — marked Staff model §2.2.6 as FUTURE-PHASE for SCH-001, verified §11.1.1 has no STAFF-003 row, added changelog. P2: Mapping Report already clean — no STAFF-003/SVC-006 references found in any section. Total 7 edits across 2 files, 0 code or contract.yaml changes.",
+        "completed_at": "2026-05-05T13:28:58.291Z"
+      }
+    },
+    "cg_ses_1777988344479": {
+      "session_id": "cg_ses_1777988344479",
+      "created_at": "2026-05-05T13:39:04.479Z",
+      "task_description": "Architect: Add SCH-001 admin/schedule endpoint to contract.yaml v1.6.4, clean residual STAFF-003/SVC-006 references from mapping report",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Add SCH-001 admin/schedule endpoint to contract.yaml v1.6.4, bump version, run keystone:hash. Mapping report already clean (zero STAFF-003/SVC-006 residuals found). No code files modified.",
+      "confirmed_at": "2026-05-05T13:41:54.516Z",
+      "consumed_at": "2026-05-05T13:46:36.285Z",
+      "audit": {
+        "execution_summary": "Architect task: Added SCH-001 GET /v1/admin/schedule endpoint to contract.yaml v1.6.4 with staff availability calendar schema. Updated changelog and metadata. Ran keystone:hash to sync machine.json. Mapping report verified clean (zero STAFF-003/SVC-006 residuals). No code files modified.",
+        "completed_at": "2026-05-05T13:46:36.285Z"
+      }
+    },
+    "cg_ses_1777989528694": {
+      "session_id": "cg_ses_1777989528694",
+      "created_at": "2026-05-05T13:58:48.694Z",
+      "task_description": "Architect: Fix 3 documentation inconsistencies - (1) Add forgot-password endpoints to contract.yaml, (2) Add Legal module mention to SAD, (3) Verify mapping report STAFF-003/SVC-006 references are clean. No code changes, documentation only.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix 3 documentation inconsistencies: (1) Add forgot-password endpoints (send-code + verify) to contract.yaml, bump to v1.6.5; (2) Add Legal module mention to SAD section 2.3.1; (3) Verify MISS-3 mapping report is clean (already confirmed zero STAFF-003/SVC-006 matches). No code changes.",
+      "confirmed_at": "2026-05-05T14:01:06.568Z",
+      "consumed_at": "2026-05-05T14:06:23.053Z",
+      "audit": {
+        "execution_summary": "Fixed 3 documentation inconsistencies: (1) Added forgot-password endpoints (send-code + verify) to contract.yaml v1.6.5, removed TODO comments, ran keystone:hash; (2) Added Legal module mention to SAD v2.2.1; (3) Verified MISS-3 mapping report is clean (zero STAFF-003/SVC-006 matches). No code files modified.",
+        "completed_at": "2026-05-05T14:06:23.053Z"
+      }
+    },
+    "cg_ses_1777991159377": {
+      "session_id": "cg_ses_1777991159377",
+      "created_at": "2026-05-05T14:25:59.377Z",
+      "task_description": "Fix contract.yaml version string in 系统页面全景图.md from v1.6.2 to v1.6.4. Single string change in supplementary notes paragraph 4.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Single string edit: change v1.6.2 to v1.6.4 in 系统页面全景图.md supplementary notes paragraph 4. No code or contract.yaml modifications.",
+      "confirmed_at": "2026-05-05T14:26:51.400Z",
+      "consumed_at": "2026-05-05T14:27:22.106Z",
+      "audit": {
+        "execution_summary": "Edited single string in .opencode/context/detailed_design/系统页面全景图.md: changed v1.6.2 to v1.6.4 in supplementary notes paragraph 4 (document consistency section). No code or contract.yaml modified.",
+        "completed_at": "2026-05-05T14:27:22.106Z"
+      }
+    },
+    "cg_ses_1777993647063": {
+      "session_id": "cg_ses_1777993647063",
+      "created_at": "2026-05-05T15:07:27.063Z",
+      "task_description": "Fix 16 page design documents under .opencode/context/detailed_design/pages/ with contract version updates from 1.5.0 to 1.6.4, content fixes for API endpoints, transaction isolation level, booking references, and dashboard content. No code changes - documentation only edits across 12 files.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix 16 page design documents: Phase A - update contract.yaml 1.5.0 to 1.6.4 across 12 files, remove stale x-keystone-state-hash; Phase B - fix preferredSequence range 0-9 to 0-99 in 2 files; Phase C - fix transaction isolation Serializable to READ COMMITTED; Phase D - fix cancellation endpoint DELETE to POST /appointments/:id/cancel; Phase E - fix dashboard content, remove mock rows; Phase F - fix profile endpoint PUT to PATCH; Phase G - fix booking reference from Date.now() to BookingStore.lastAppointment",
+      "confirmed_at": "2026-05-05T15:09:24.246Z",
+      "consumed_at": "2026-05-05T15:13:27.782Z",
+      "audit": {
+        "execution_summary": "Fixed 16 page design documents: Phase A - updated contract.yaml 1.5.0 to 1.6.4 across 12 files, removed stale x-keystone-state-hash from 01-login.md; Phase B - fixed preferredSequence range 0-9 to 0-99 in 08-booking-confirmation.md and 07-booking-time-slot.md; Phase C - fixed transaction isolation Serializable to READ COMMITTED in 07-booking-time-slot.md; Phase D - fixed cancellation endpoint DELETE to POST /v1/appointments/:id/cancel in 05-my-bookings.md; Phase E - fixed dashboard content, removed mock service/person rows, added DASH-003/004 API refs in 10-admin-dashboard.md; Phase F - fixed profile endpoint PUT to PATCH /v1/users/:id in 04-profile.md; Phase G - fixed booking reference Date.now() to BookingStore.lastAppointment?.appointmentNumber in 09-booking-success.md. No code changes. All verifications passed.",
+        "completed_at": "2026-05-05T15:13:27.782Z"
+      }
+    },
+    "cg_ses_1777994996463": {
+      "session_id": "cg_ses_1777994996463",
+      "created_at": "2026-05-05T15:29:56.463Z",
+      "task_description": "Fix 3 remaining critical inconsistencies in page design documents: (1) preferredSequence range 0-9 to 0-99 in service-selection page, (2) Dashboard DASH-code misallocation for DASH-003/DASH-004, (3) System health still marked as static mock. No codebase changes - documentation-only fixes.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix 3 documentation inconsistencies in page design docs: (1) preferredSequence 0-9 to 0-99 in service-selection page, (2) DASH-003/DASH-004 code misallocation in admin dashboard, (3) system health endpoint reference in admin dashboard. No code or contract changes.",
+      "confirmed_at": "2026-05-05T15:30:26.284Z",
+      "consumed_at": "2026-05-05T15:32:17.085Z",
+      "audit": {
+        "execution_summary": "Fixed 3 documentation inconsistencies: (1) preferredSequence range 0-9 to 0-99 in service-selection page line 81, (2) removed DASH-003/DASH-004 codes from non-stat-card rows (time-distribution, recent-appointments) in admin dashboard lines 94-95 and 105-106, (3) replaced static mock data with GET /v1/admin/system/health (SYS-001) with response fields server/database/api/lastBackup/uptime in admin dashboard line 96. No code or contract.yaml changes.",
+        "completed_at": "2026-05-05T15:32:17.085Z"
+      }
+    },
+    "cg_ses_1778024231382": {
+      "session_id": "cg_ses_1778024231382",
+      "created_at": "2026-05-05T23:37:11.383Z",
+      "task_description": "Fix the dashboard recent-appointments page design document issue: change non-existent endpoint reference GET /v1/admin/stats/recent-appointments to GET /v1/admin/appointments?limit=5 in .opencode/context/detailed_design/pages/10-admin-dashboard.md line 95. No codebase changes. No contract.yaml changes.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix non-existent endpoint reference in 10-admin-dashboard.md line 95: change GET /v1/admin/stats/recent-appointments to GET /v1/admin/appointments?limit=5 with clarifying note. No code changes. No contract.yaml changes. Single-file doc edit.",
+      "confirmed_at": "2026-05-05T23:37:52.874Z",
+      "consumed_at": "2026-05-05T23:38:31.082Z",
+      "audit": {
+        "execution_summary": "Fixed non-existent endpoint reference in 10-admin-dashboard.md line 95: changed GET /v1/admin/stats/recent-appointments to GET /v1/admin/appointments?limit=5 with clarifying note. Verified endpoint exists at contract.yaml L808 with limit query parameter. No code or contract.yaml modifications.",
+        "completed_at": "2026-05-05T23:38:31.082Z"
+      }
+    },
+    "cg_ses_1778025845975": {
+      "session_id": "cg_ses_1778025845975",
+      "created_at": "2026-05-06T00:04:05.975Z",
+      "task_description": "Architect task: Remove Staff model and all Staff-related references from 7 requirements/design documents (数据架构设计文档.md, contract.yaml, 接口设计规范文档.md, admin-ui-spec.md, 系统页面全景图.md, 系统架构设计文档(SAD).md, 测试策略与计划.md). No codebase changes. Bump version numbers and update changelogs. Run keystone:hash after contract.yaml changes.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Remove Staff model from all 7 requirements/design documents: 数据架构设计文档(v2.5.0), contract.yaml(v1.6.6), 接口设计规范文档(v2.5.0), admin-ui-spec(v2.2.0), 系统页面全景图, 系统架构设计文档(SAD), 测试策略与计划. No code changes. Run keystone:hash after contract.yaml edits.",
+      "confirmed_at": "2026-05-06T00:04:54.307Z",
+      "consumed_at": "2026-05-06T00:16:44.033Z",
+      "audit": {
+        "execution_summary": "Removed Staff model from all 7 requirements/design documents: 数据架构设计文档(v2.5.0) removed §2.2.6 Staff model + stats table row, contract.yaml(v1.6.6) removed schedule section + SCH-001 changelog, 接口设计规范文档(v2.5.0) removed §2.9 SCH-001~003 + renumbered sections, admin-ui-spec(v2.2.0) removed Schedule page + sidebar + checklist, 系统页面全景图 removed schedule row + updated counts, SAD(v2.3.0) removed ScheduleModule + updated changelog, 测试策略与计划 confirmed clean. Ran keystone:hash successfully.",
+        "completed_at": "2026-05-06T00:16:44.033Z"
+      }
+    },
+    "cg_ses_1778026128451": {
+      "session_id": "cg_ses_1778026128451",
+      "created_at": "2026-05-06T00:08:48.452Z",
+      "task_description": "修复 .opencode/context/detailed_design/ 中的 4 个 discrepancies：04-profile.md 的 PATCH /users/:id → PUT /users/profile；10-admin-dashboard.md 移除三个子端点改为单一 GET /admin/stats；11-admin-users.md 澄清 DELETE RBAC；06-booking-service-selection.md 修正 preferredSequence 时序描述",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "修复 4 个 detailed design 文件：profile endpoint 对齐契约、dashboard 移除子端点、users RBAC 统一、preferredSequence 时序更正",
+      "confirmed_at": "2026-05-06T00:12:15.568Z",
+      "consumed_at": "2026-05-06T00:14:35.402Z",
+      "audit": {
+        "execution_summary": "通过 @Architect sub-agent dispatch 修复 4 个 detailed design 文件：04-profile.md endpoint 从 PATCH /users/:id 对齐为 PUT /users/profile；10-admin-dashboard.md 移除 3 个不存在子端点改为单一 GET /admin/stats；11-admin-users.md 统一 DELETE 权限为 SUPER_ADMIN only；06-booking-service-selection.md 修正 preferredSequence 时序为确认提交时生成",
+        "completed_at": "2026-05-06T00:14:35.402Z"
+      }
+    },
+    "cg_ses_1778027425062": {
+      "session_id": "cg_ses_1778027425062",
+      "created_at": "2026-05-06T00:30:25.062Z",
+      "task_description": "Fix 4 documentation inconsistencies: (1) Add reset-password endpoints to interface design spec, (2) Remove residual schedule row from admin permissions matrix, (3) Update customer forgot-password page status to reference contract.yaml, (4) Add reset-password test scenarios to test plan. No codebase changes.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix 4 documentation inconsistencies: (1) Add reset-password endpoints (send-code+verify) to interface design spec §2 Auth section with DTOs, JSON examples, and 2-step flow; bump to v2.6.0. (2) Remove residual 排班管理 row from admin-ui-spec §13.1 permissions matrix; bump to v2.3.0. (3) Add forgot-password page status note in customer-ui-spec referencing contract.yaml v1.6.5 API readiness; bump to v2.0.1. (4) Add reset-password test scenarios (send-code rate limiting, verify code validation) to test strategy doc; bump to v2.2.0. No code file modifications.",
+      "confirmed_at": "2026-05-06T00:32:29.176Z",
+      "consumed_at": "2026-05-06T00:37:20.792Z",
+      "audit": {
+        "execution_summary": "Fixed 4 documentation inconsistencies across 4 files: (1) Added reset-password endpoints (send-code+verify) to 接口设计规范文档.md §2 Auth section (v2.6.0) with DTOs, JSON examples, and 2-step flow. (2) Removed residual 排班管理 row from admin-ui-spec.md §13.1 permissions matrix (v2.3.0). (3) Added forgot-password page entry and login note to customer-ui-spec.md (v2.0.1), documenting API readiness per contract.yaml v1.6.5. (4) Added reset-password test scenarios (§5.2.7) to 测试策略与计划.md (v2.2.0) with integration test cases for send-code rate limiting and verify code/password validation. Zero code files modified.",
+        "completed_at": "2026-05-06T00:37:20.792Z"
+      }
+    },
+    "cg_ses_1778028535254": {
+      "session_id": "cg_ses_1778028535254",
+      "created_at": "2026-05-06T00:48:55.254Z",
+      "task_description": "Fix 2 minor version number inconsistencies in requirements documents: (1) interface spec footer v2.5.0->v2.6.0, (2) admin-ui-spec appendix v2.0->v2.3.0. No code changes, no contract.yaml changes.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix 2 version number typos in docs: interface spec footer v2.5.0->v2.6.0, admin-ui-spec appendix v2.0->v2.3.0. No code changes.",
+      "confirmed_at": "2026-05-06T00:49:28.882Z",
+      "consumed_at": "2026-05-06T00:50:26.434Z",
+      "audit": {
+        "execution_summary": "Fixed 2 version typos: interface spec footer 2.5.0->2.6.0, admin-ui-spec appendix v2.0->v2.3.0. No code or contract.yaml changes.",
+        "completed_at": "2026-05-06T00:50:26.434Z"
+      }
+    },
+    "cg_ses_1778029294041": {
+      "session_id": "cg_ses_1778029294041",
+      "created_at": "2026-05-06T01:01:34.042Z",
+      "task_description": "修复 12-admin-services.md 中 DELETE 权限矛盾：API 表写 ADMIN/SUPER_ADMIN，权限控制表写仅 SUPER_ADMIN，统一为仅 SUPER_ADMIN",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "修复 12-admin-services.md DELETE 权限：API 表从 ADMIN/SUPER_ADMIN 统一为 SUPER_ADMIN only",
+      "confirmed_at": "2026-05-06T01:06:11.152Z",
+      "consumed_at": "2026-05-06T01:06:47.312Z",
+      "audit": {
+        "execution_summary": "修复 12-admin-services.md：API 表中 DELETE 鉴权从 ADMIN/SUPER_ADMIN 统一为 **SUPER_ADMIN only**，与权限控制表一致；交互流程添加仅 SUPER_ADMIN 可见删除按钮说明",
+        "completed_at": "2026-05-06T01:06:47.312Z"
+      }
+    },
+    "cg_ses_1778034088693": {
+      "session_id": "cg_ses_1778034088693",
+      "created_at": "2026-05-06T02:21:28.694Z",
+      "task_description": "Fix 6 remaining documentation-only issues: (1) Update prototype dashboard.html sidebar - remove Schedule item, rename Bookings to Appointments, (2) Remove stale SCH-001~003 entries from mapping report, (3) Update interface spec and test plan to replace generic verification-codes endpoints with per-purpose endpoints, (4) Add permissions to JWT payload in contract.yaml, (5) Add service_id to create appointment response in contract.yaml, (6) Prototype naming fix (same file as issue 1).",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix 6 documentation issues: (1) dashboard.html - remove Schedule li, rename Bookings-&gt;Appointments; (2) Mapping Report - remove SCH-001~003 entries; (3) Interface spec - replace generic verification-codes endpoints with per-purpose refs, bump to v2.7.0; (4) Test plan - update verification-codes test snippets to per-purpose endpoints, bump to v2.3.0; (5-6) contract.yaml - add permissions to JWT payload, add service_id to create appointment response, bump to v1.6.7, run keystone:hash",
+      "confirmed_at": "2026-05-06T02:22:55.635Z",
+      "consumed_at": "2026-05-06T02:29:22.126Z",
+      "audit": {
+        "execution_summary": "Fixed 6 documentation issues: (1) dashboard.html sidebar - removed Schedule li, renamed Bookings to Appointments; (2) Mapping Report - removed SCH-001~003 entries permanently, bumped to v2.2.0; (3) Interface spec - replaced generic /v1/auth/verification-codes/* endpoints with per-purpose endpoints, bumped to v2.7.0; (4) Test plan - updated verification-codes test snippets to per-purpose endpoints, bumped to v2.3.0; (5) contract.yaml - added permissions to JWT payload required_fields; (6) contract.yaml - added service_id to create appointment response body, bumped to v1.6.7, ran keystone:hash",
+        "completed_at": "2026-05-06T02:29:22.126Z"
+      }
+    },
+    "cg_ses_1778037469874": {
+      "session_id": "cg_ses_1778037469874",
+      "created_at": "2026-05-06T03:17:49.874Z",
+      "task_description": "Remove staffId from slot.booked WebSocket event payload in 2 design documents (接口设计规范文档.md and API Contract Mapping Report). No codebase changes.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Remove staffId from slot.booked WebSocket event payload in 2 documents: (1) 接口设计规范文档.md v2.7→v2.8 — remove staffId from table row line 1896 and JSON example lines 1903-1915; (2) Mapping Report.md v2.2→v2.3 — remove staffId from table row line 162. No code files or contract.yaml modified.",
+      "confirmed_at": "2026-05-06T03:19:07.227Z",
+      "consumed_at": "2026-05-06T03:21:43.262Z",
+      "audit": {
+        "execution_summary": "Removed staffId from slot.booked WebSocket event payload in 2 documents: (1) 接口设计规范文档.md v2.7→v2.8 — removed staffId from table row and JSON example, added v2.8.0 changelog; (2) Mapping Report v2.2→v2.3 — removed staffId from table row, added v2.3.0 changelog. No code files or contract.yaml modified. All 6 edits verified correct.",
+        "completed_at": "2026-05-06T03:21:43.262Z"
+      }
+    },
+    "cg_ses_1778038946185": {
+      "session_id": "cg_ses_1778038946185",
+      "created_at": "2026-05-06T03:42:26.185Z",
+      "task_description": "修复3个不一致问题：1) contract.yaml 缺少 POST /v1/appointments/:id/cancel 端点；2) contract.yaml 中 GET /v1/appointments 缺少分页支持；3) 安全架构文档中取消预约方法误写为 PUT 需改为 POST",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "修复 contract.yaml 缺少取消端点/分页支持，及安全架构文档中 PUT→POST 方法不一致",
+      "confirmed_at": "2026-05-06T03:46:54.413Z",
+      "consumed_at": "2026-05-06T03:55:54.730Z",
+      "audit": {
+        "execution_summary": "修复3项：1) contract.yaml 新增 POST /v1/appointments/:id/cancel 端点；2) contract.yaml 中 GET /v1/appointments 增加 page/limit 分页查询参数，响应改为分页结构；3) 安全架构设计文档.md 将取消预约方法从 PUT 修正为 POST",
+        "completed_at": "2026-05-06T03:55:54.730Z"
+      }
+    },
+    "cg_ses_1778042166102": {
+      "session_id": "cg_ses_1778042166102",
+      "created_at": "2026-05-06T04:36:06.102Z",
+      "task_description": "修复 12-admin-services.md 中 DELETE 权限从仅 SUPER_ADMIN 恢复为 ADMIN/SUPER_ADMIN，与 contract.yaml 和 安全架构设计文档一致",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "修复 12-admin-services.md DELETE 权限从仅 SUPER_ADMIN 恢复为 ADMIN/SUPER_ADMIN，与 contract.yaml 一致",
+      "confirmed_at": "2026-05-06T04:36:23.700Z",
+      "consumed_at": "2026-05-06T04:37:01.170Z",
+      "audit": {
+        "execution_summary": "修复 12-admin-services.md 三处：API 表 DELETE 鉴权从 SUPER_ADMIN only 恢复为 ADMIN/SUPER_ADMIN；权限控制表最低角色从 SUPER_ADMIN 恢复为 ADMIN；移除交互流程中仅 SUPER_ADMIN 可见删除按钮的说明。与 contract.yaml 及安全架构文档完全对齐",
+        "completed_at": "2026-05-06T04:37:01.170Z"
+      }
+    },
+    "cg_ses_1778043540195": {
+      "session_id": "cg_ses_1778043540195",
+      "created_at": "2026-05-06T04:59:00.196Z",
+      "task_description": "修复 contract.yaml 中 GET /v1/users/profile 授权从仅 CUSTOMER 放宽为 CUSTOMER/ADMIN/SUPER_ADMIN，与 update_profile 和 04-profile.md 页面设计一致",
+      "gate_status": "armed",
+      "last_check_failed_items": [],
+      "plan_summary": "修复 contract.yaml get_profile 授权从仅CUSTOMER放宽为全角色，安全架构文档补充ADMIN的view_own_profile权限",
+      "confirmed_at": "2026-05-06T04:59:19.953Z",
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1778043629626": {
+      "session_id": "cg_ses_1778043629626",
+      "created_at": "2026-05-06T05:00:29.626Z",
+      "task_description": "修复 GET /v1/users/profile 授权矛盾：contract.yaml 仅允许 CUSTOMER，但 04-profile.md 对所有角色开放。放宽契约为 [\"CUSTOMER\", \"ADMIN\", \"SUPER_ADMIN\"] 并去除 excludeRoles",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "方案A：放宽 contract.yaml 中 GET /v1/users/profile 授权为 CUSTOMER/ADMIN/SUPER_ADMIN，去除 excludeRoles",
+      "confirmed_at": "2026-05-06T05:00:57.528Z",
+      "consumed_at": "2026-05-06T05:01:30.748Z",
+      "audit": {
+        "execution_summary": "fix: GET /v1/users/profile 授权从 [\"CUSTOMER\"] 放宽为 [\"CUSTOMER\", \"ADMIN\", \"SUPER_ADMIN\"]，移除 excludeRoles 和旧备注，与页面设计 /profile 对所有角色开放一致",
+        "completed_at": "2026-05-06T05:01:30.748Z"
+      }
+    },
+    "cg_ses_1778044630222": {
+      "session_id": "cg_ses_1778044630222",
+      "created_at": "2026-05-06T05:17:10.222Z",
+      "task_description": "Fix 7 cross-reference audit issues (C-1, C-2, H-1, H-2, H-3, M-1, M-2) in documentation without touching codebase - @Architect dispatch",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Dispatch @Architect to analyze and produce fix plans for 7 documentation audit issues (C-1, C-2, H-1, H-2, H-3, M-1, M-2) without touching codebase",
+      "confirmed_at": "2026-05-06T06:05:58.853Z",
+      "consumed_at": "2026-05-06T06:20:30.451Z",
+      "audit": {
+        "execution_summary": "Dispatched @Architect to analyze 7 cross-reference audit issues (C-1 TimeSlot model, C-2 STAFF role, H-1 stale section, H-2 fake endpoint, H-3 ReportModule status, M-1 WebSocket event, M-2 readAt mapping). Produced detailed fix plan with 16 edits across 4 files. Plan saved to .task_temp/architect-fix-plan.md.",
+        "completed_at": "2026-05-06T06:20:30.451Z"
+      }
+    },
+    "cg_ses_1778047654529": {
+      "session_id": "cg_ses_1778047654529",
+      "created_at": "2026-05-06T06:07:34.529Z",
+      "task_description": "Fix 7 cross-reference audit issues in documentation files (Data Architecture doc, backend-coding-standard.md, SAD v2.3.0, 07-booking-time-slot.md) by reading each document, cross-referencing against contract.yaml, and producing a detailed fix plan with exact file paths, line numbers, old content and new content for each issue. No codebase changes.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix 7 cross-reference audit issues in 4 documentation files (Data Architecture doc, backend-coding-standard.md, SAD v2.3.0, 07-booking-time-slot.md). 3 phases: (1) Read contract.yaml + all affected docs, (2) Cross-reference each against contract.yaml for exact mismatches, (3) Produce detailed fix plan report with file paths, line numbers, old content and new content. No code changes.",
+      "confirmed_at": "2026-05-06T06:08:36.013Z",
+      "consumed_at": "2026-05-06T06:15:52.863Z",
+      "audit": {
+        "execution_summary": "Executed cross-reference audit fix plan for 7 issues across 4 documentation files. Phase 1: Read contract.yaml (1933 lines) + all 4 affected docs. Phase 2: Cross-referenced each against contract.yaml, identified exact mismatches. Phase 3: Produced detailed fix plan with 16 precise edits (file:line → old → new) for: C-1 TimeSlot model mismatch (5 edits in Data Architecture doc), C-2 STAFF role (1 edit in backend-coding-standard.md), H-1 stale baseline §12 (1 edit in SAD), H-2 fake SlotPreemptionController (2 edits in 07-booking-time-slot.md), H-3 ReportModule status (2 edits in SAD), M-1 slot-update→slot.booked (2 edits in 07-booking-time-slot.md), M-2 readAt→read mapping (3 edits in Data Architecture doc). Zero code changes.",
+        "completed_at": "2026-05-06T06:15:52.863Z"
+      }
+    },
+    "cg_ses_1778050920765": {
+      "session_id": "cg_ses_1778050920765",
+      "created_at": "2026-05-06T07:02:00.765Z",
+      "task_description": "Delegate @Architect to execute 16 precise edits across 4 documentation files to fix 7 cross-reference audit issues (C-1, C-2, H-1, H-2, H-3, M-1, M-2)",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Delegate @Architect to execute 16 edits across 4 documentation files fixing 7 cross-reference audit issues: C-1 (TimeSlot model 5 edits), C-2 (STAFF removal 1 edit), H-1 (stale section 1 edit), H-2 (fake endpoint 2 edits), H-3 (ReportModule status 2 edits), M-1 (WebSocket event 2 edits), M-2 (readAt mapping 3 edits). Documentation-only, no business code changes.",
+      "confirmed_at": "2026-05-06T07:02:09.392Z",
+      "consumed_at": "2026-05-06T07:14:34.375Z",
+      "audit": {
+        "execution_summary": "Architect successfully executed all 16 precise edits across 4 documentation files to fix 7 cross-reference audit issues (C-1, C-2, H-1, H-2, H-3, M-1, M-2). All validation checks passed. Keystone hash updated for machine.json.",
+        "completed_at": "2026-05-06T07:14:34.375Z"
+      }
+    },
+    "cg_ses_1778051058404": {
+      "session_id": "cg_ses_1778051058404",
+      "created_at": "2026-05-06T07:04:18.404Z",
+      "task_description": "Architect: Apply 16 documentation-only edits from fix plan (.task_temp/architect-fix-plan.md) to fix 7 cross-reference audit issues across 4 files (数据架构设计文档.md, backend-coding-standard.md, 系统架构设计文档（SAD）.md, 07-booking-time-slot.md). Zero business code changes. Purely documentation alignment with contract.yaml ground truth.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Apply 16 documentation-only edits from the fix plan across 4 files: 数据架构设计文档.md (8 edits: C-1 + M-2), backend-coding-standard.md (1 edit: C-2), 系统架构设计文档SAD.md (3 edits: H-1 + H-3), 07-booking-time-slot.md (4 edits: H-2 + M-1). Zero business code changes. Then run keystone:hash.",
+      "confirmed_at": "2026-05-06T07:05:00.524Z",
+      "consumed_at": "2026-05-06T07:13:07.802Z",
+      "audit": {
+        "execution_summary": "Applied all 16 documentation-only edits from fix plan across 4 files: 数据架构设计文档.md (8 edits - C-1a through C-1e + M-2a through M-2c), backend-coding-standard.md (1 edit - C-2a), 系统架构设计文档SAD.md (3 edits - H-1a, H-3a, H-3b), 07-booking-time-slot.md (4 edits - H-2a, H-2b, M-1a, M-1b). Zero business code changes. Keystone hash updated (backend-api). All edits verified.",
+        "completed_at": "2026-05-06T07:13:07.802Z"
+      }
+    },
+    "cg_ses_1778052683653": {
+      "session_id": "cg_ses_1778052683653",
+      "created_at": "2026-05-06T07:31:23.654Z",
+      "task_description": "Delegate @Architect to update document version numbers for 4 fixed docs and remove stale §12 from Project Context Baseline",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Dispatch @Architect to update version numbers for 4 fixed documents (数据架构设计文档.md, 系统架构设计文档（SAD）.md, backend-coding-standard.md, 07-booking-time-slot.md) and remove stale §12 from Project Context Baseline. Documentation-only changes.",
+      "confirmed_at": "2026-05-06T07:32:20.591Z",
+      "consumed_at": "2026-05-06T07:44:18.186Z",
+      "audit": {
+        "execution_summary": "Architect completed version bump and baseline cleanup: 4 documents updated to -fixed suffix, stale §12 verified as removed (handled in previous H-1 fix), keystone:hash run with 0 updates needed. Documentation-only changes, 0 business code modified.",
+        "completed_at": "2026-05-06T07:44:18.186Z"
+      }
+    },
+    "cg_ses_1778052885058": {
+      "session_id": "cg_ses_1778052885058",
+      "created_at": "2026-05-06T07:34:45.058Z",
+      "task_description": "Based on cross-reference audit verification report, perform two documentation-only tasks: 1) Update document version numbers in headers/footers of affected documents (数据架构设计文档.md, backend-coding-standard.md, 系统架构设计文档（SAD）.md, 07-booking-time-slot.md) to reflect fixed state. 2) Locate and remove stale §12 (profile authorization known gap) from Project Context Baseline document. No business code modifications.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Documentation-only task: 1) Update version numbers in headers/footers of 4 documents (数据架构设计文档.md, backend-coding-standard.md, 系统架构设计文档（SAD）.md, 07-booking-time-slot.md) with -fixed suffix. 2) Locate and remove stale §12 (profile authorization known gap) from Project Context Baseline document. No business code changes.",
+      "confirmed_at": "2026-05-06T07:35:25.304Z",
+      "consumed_at": "2026-05-06T07:43:17.788Z",
+      "audit": {
+        "execution_summary": "Task 1: Updated version numbers to -fixed for 4 documents (数据架构设计文档.md v2.5.0-fixed, backend-coding-standard.md v1.0.0-fixed, SAD v2.3.0-fixed, 07-booking-time-slot.md v1.0.0-fixed). Task 2: Verified SAD §12 stale cross-references already fixed (hard-coded section numbers replaced with descriptive refs per H-1 fix). Ran keystone:hash (0 hash updates needed, docs not tracked as code contracts). 4 files modified, zero code changes.",
+        "completed_at": "2026-05-06T07:43:17.788Z"
+      }
+    },
+    "cg_ses_1778056608860": {
+      "session_id": "cg_ses_1778056608860",
+      "created_at": "2026-05-06T08:36:48.861Z",
+      "task_description": "Apply 6 documentation/contract fixes: 1) Add category field to admin.services.list in contract.yaml and update 12-admin-services.md filter binding; 2) Add GET /v1/admin/services/summary endpoint to contract.yaml and update 12-admin-services.md computed signals; 3) Add PUT /v1/users/profile/password endpoint to contract.yaml and note in 04-profile.md; 4) Create new 03-forgot-password.md page spec following 01-login.md template; 5) Add Idempotency-Key header specification to POST /v1/appointments in contract.yaml and update 08-booking-confirmation.md; 6) Add minor category derivation note to 12-admin-services.md. Documentation/contract changes only.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Apply 6 documentation/contract fixes: (1) Add category field to admin.services.list in contract.yaml + update 12-admin-services.md filter binding; (2) Add GET /v1/admin/services/summary endpoint to contract.yaml + update 12-admin-services.md computed signals; (3) Add PUT /v1/users/profile/password endpoint to contract.yaml + note in 04-profile.md; (4) Create new 03-forgot-password.md page spec following 01-login.md template; (5) Add Idempotency-Key header to POST /v1/appointments in contract.yaml + update 08-booking-confirmation.md; (6) Add category derivation note to 12-admin-services.md. Documentation/contract changes only.",
+      "confirmed_at": "2026-05-06T08:38:31.681Z",
+      "consumed_at": "2026-05-06T08:45:01.811Z",
+      "audit": {
+        "execution_summary": "Applied 6 documentation/contract fixes: (1) Added category field to admin.services.list in contract.yaml + updated 12-admin-services.md filter binding; (2) Added GET /v1/admin/services/summary endpoint + updated 12-admin-services.md computed signals; (3) Added PUT /v1/users/profile/password endpoint + note in 04-profile.md; (4) Created 03-forgot-password.md page spec following 01-login.md template (RESET-PW-001/002); (5) Added Idempotency-Key header to POST /v1/appointments + updated 08-booking-confirmation.md; (6) Added category derivation note to 12-admin-services.md. Contract version bumped to 1.6.8. Keystone hash updated. Zero business logic code generated.",
+        "completed_at": "2026-05-06T08:45:01.811Z"
+      }
+    },
+    "cg_ses_1778057892748": {
+      "session_id": "cg_ses_1778057892748",
+      "created_at": "2026-05-06T08:58:12.748Z",
+      "task_description": "Fix 2 minor consistency issues in documentation: update 04-profile.md step 7 controller reference and update 12-admin-services.md contract version reference",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix 2 minor consistency issues: 1) Update 04-profile.md step 7 from updateProfile() to updatePassword() or PUT /v1/users/profile/password, 2) Update 12-admin-services.md contract version from 1.6.4 to 1.6.8. Documentation-only text corrections.",
+      "confirmed_at": "2026-05-06T08:58:33.571Z",
+      "consumed_at": "2026-05-06T09:03:50.525Z",
+      "audit": {
+        "execution_summary": "Architect completed 2 minor documentation consistency fixes: 1) 04-profile.md line 78 updated from 'UsersController.updateProfile()' to 'UsersController.updatePassword()', 2) 12-admin-services.md line 100 updated contract version from '1.6.4' to '1.6.8'. Documentation-only text corrections, no codebase changes.",
+        "completed_at": "2026-05-06T09:03:50.525Z"
+      }
+    },
+    "cg_ses_1778058066038": {
+      "session_id": "cg_ses_1778058066038",
+      "created_at": "2026-05-06T09:01:06.038Z",
+      "task_description": "Fix 2 minor consistency issues in documentation files: 1) In 04-profile.md, update wording from 'UsersController.updateProfile()' to 'UsersController.updatePassword()' or 'PUT /v1/users/profile/password' for the password change dialog. 2) In 12-admin-services.md, update referenced contract.yaml version from '1.6.4' to '1.6.8'. Documentation-only text corrections, no code changes.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix 2 documentation text corrections: (1) 04-profile.md line 78: change UsersController.updateProfile() to UsersController.updatePassword() for password dialog step 7. (2) 12-admin-services.md line 100: change contract.yaml version from 1.6.4 to 1.6.8. Files only, no code changes.",
+      "confirmed_at": "2026-05-06T09:02:13.912Z",
+      "consumed_at": "2026-05-06T09:02:40.920Z",
+      "audit": {
+        "execution_summary": "Applied 2 documentation-only text corrections: (1) 04-profile.md line 78 changed UsersController.updateProfile() to UsersController.updatePassword() to correctly reference the password change dialog API. (2) 12-admin-services.md line 100 changed contract.yaml version from 1.6.4 to 1.6.8. Both verified.",
+        "completed_at": "2026-05-06T09:02:40.920Z"
+      }
+    },
+    "cg_ses_1778059939726": {
+      "session_id": "cg_ses_1778059939726",
+      "created_at": "2026-05-06T09:32:19.727Z",
+      "task_description": "Dispatch Orchestrator to formulate implementation plan for adopting prototype/admin/dashboard.html as Admin Dashboard Page with exact layout preservation",
+      "gate_status": "armed",
+      "last_check_failed_items": [],
+      "plan_summary": "Dispatch Orchestrator to formulate detailed implementation plan for adopting prototype/admin/dashboard.html as Admin Dashboard Page, preserving exact layout (sidebar, navbar, main content) and specifying Angular components, Tailwind config, Chart.js integration, responsive design, and theme toggle.",
+      "confirmed_at": "2026-05-06T09:32:28.264Z",
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1778060193618": {
+      "session_id": "cg_ses_1778060193618",
+      "created_at": "2026-05-06T09:36:33.618Z",
+      "task_description": "Formulate a detailed implementation plan to adopt prototype/admin/dashboard.html as the Admin Dashboard Page in Angular, keeping exactly the same layout including sidebar, navbar, and main content. The plan should specify: which Angular components to create/modify, how to map HTML structure to Angular standalone components, Tailwind CSS configuration updates, Chart.js integration approach, responsive design strategy, and theme toggle implementation.",
+      "gate_status": "checked",
+      "last_check_failed_items": [],
+      "plan_summary": null,
+      "confirmed_at": null,
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1778060995559": {
+      "session_id": "cg_ses_1778060995559",
+      "created_at": "2026-05-06T09:49:55.559Z",
+      "task_description": "Dispatch Architect to perform architectural analysis of Admin Dashboard implementation from prototype, focusing on technical feasibility, component architecture, design system alignment, API implications, integration risks, and layout strategy recommendations",
+      "gate_status": "armed",
+      "last_check_failed_items": [],
+      "plan_summary": "Dispatch Architect to perform architectural analysis of Admin Dashboard implementation from prototype, analyzing technical feasibility, component architecture, design system alignment, API implications, integration risks, and layout recommendations",
+      "confirmed_at": "2026-05-06T09:50:04.579Z",
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1778061265939": {
+      "session_id": "cg_ses_1778061265939",
+      "created_at": "2026-05-06T09:54:25.939Z",
+      "task_description": "Architect role: Analyze the Admin Dashboard implementation requirement from an architecture perspective. Analyze prototype/admin/dashboard.html layout, assess technical feasibility within Angular v21 + Tailwind CSS v4 + NgRx Signals + PrimeNG stack, make component architecture decisions, evaluate design system alignment with Dark-First Sharp Design tokens, identify API contract implications, assess integration risks (Chart.js + Angular Signals, theme switching, responsive breakpoints), and recommend on AdminLayout vs extending AppLayout. Output architectural analysis report only - NO implementation code.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Produce architectural analysis report for Admin Dashboard implementation covering: (1) Technical feasibility of Angular v21 + Chart.js + Tailwind v4 + NgRx Signals, (2) Component architecture via Atomic Design, (3) Design system alignment with Dark-First Sharp Design, (4) API contract implications with backend endpoints, (5) Integration risks - Chart.js/Angular Signals, theme switching, responsive breakpoints, (6) AdminLayout vs AppLayout recommendation. Output to .task_temp/ directory as markdown report. NO implementation code.",
+      "confirmed_at": "2026-05-06T09:55:21.785Z",
+      "consumed_at": "2026-05-06T10:00:44.029Z",
+      "audit": {
+        "execution_summary": "Produced comprehensive architectural analysis report (693 lines, 37KB) covering: (1) Technical feasibility of Angular v21 + Chart.js v4.4.8 + Tailwind v4 + NgRx Signals with risk assessment, (2) Component architecture via Atomic Design (Page/Organism/Molecule/Atom decomposition plan), (3) Design system alignment mapping prototype tokens to global-ui-spec v3.0.0 CSS custom properties, (4) API contract implications with AdminStats DTO extensions and new endpoints, (5) Integration risks matrix (Chart.js lifecycle, theme switching, responsive breakpoints, PrimeNG conflicts), (6) Layout recommendation favoring AppLayout extension over separate AdminLayout. Provided 7 architectural constraint rules for Guardian review. No implementation code produced.",
+        "completed_at": "2026-05-06T10:00:44.029Z"
+      }
+    },
+    "cg_ses_1778062389759": {
+      "session_id": "cg_ses_1778062389759",
+      "created_at": "2026-05-06T10:13:09.759Z",
+      "task_description": "Dispatch Guardian to review 7 architectural constraint rules from Admin Dashboard architecture analysis for enforceability, completeness, and alignment with frontend-coding-standard",
+      "gate_status": "armed",
+      "last_check_failed_items": [],
+      "plan_summary": "Dispatch Guardian to review 7 architectural constraint rules (C1-C7) from Admin Dashboard architecture analysis, assessing enforceability, completeness, and alignment with frontend-coding-standard.md",
+      "confirmed_at": "2026-05-06T10:13:18.720Z",
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1778062591012": {
+      "session_id": "cg_ses_1778062591012",
+      "created_at": "2026-05-06T10:16:31.012Z",
+      "task_description": "Review 7 architectural constraint rules (C1-C7) from Admin Dashboard architecture analysis report for enforceability, completeness, and alignment with frontend-coding-standard.md",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Guardian review of 7 architectural constraint rules (C1-C7) from admin-dashboard-architecture-report.md. Phases: codebase scan, rule-by-rule assessment, gap analysis, report generation with PASS/FAIL verdicts.",
+      "confirmed_at": "2026-05-06T10:18:07.176Z",
+      "consumed_at": "2026-05-06T10:23:16.947Z",
+      "audit": {
+        "execution_summary": "Completed Guardian review of 7 architectural constraint rules (C1-C7) from admin-dashboard-architecture-report.md. Reviewed codebase for compliance, assessed enforceability against frontend-coding-standard.md, identified gaps and conflicts. Generated guardian-review-report.md with PASS/FAIL verdicts: C1 PASS-with-NOTES (needs AppChartComponent refactor), C2 PASS, C3 PASS, C4 PASS, C5 PASS-with-NOTES (needs token map), C6 PASS, C7 PASS. Overall: CONDITIONAL PASS with 2 required preconditions and 5 recommended additional rules (C8-C12).",
+        "completed_at": "2026-05-06T10:23:16.947Z"
+      }
+    },
+    "cg_ses_1778063264780": {
+      "session_id": "cg_ses_1778063264780",
+      "created_at": "2026-05-06T10:27:44.780Z",
+      "task_description": "Dispatch Architect to append C8-C12 architectural constraint rules to Admin Dashboard architecture report based on Guardian recommendations",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Dispatch Architect to append C8-C12 architectural constraint rules to Admin Dashboard architecture report based on Guardian review recommendations",
+      "confirmed_at": "2026-05-06T10:27:56.375Z",
+      "consumed_at": "2026-05-06T10:33:52.270Z",
+      "audit": {
+        "execution_summary": "Architect successfully appended C8-C12 architectural constraint rules to Admin Dashboard architecture report as recommended by Guardian review. Report expanded from 693 to 878 lines. All new rules include rule text, rationale, enforceability assessment, and alignment with frontend-coding-standard.md. Existing C1-C7 content preserved unmodified.",
+        "completed_at": "2026-05-06T10:33:52.270Z"
+      }
+    },
+    "cg_ses_1778063390471": {
+      "session_id": "cg_ses_1778063390471",
+      "created_at": "2026-05-06T10:29:50.471Z",
+      "task_description": "Update Admin Dashboard architecture report with 5 new constraint rules C8-C12 (Template size limit, Deferred loading, OnPush, Skeleton loading, PrimeNG theme isolation) as recommended by Guardian review",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Append C8-C12 architectural constraint rules (Template size limit, Deferred loading, OnPush, Skeleton loading, PrimeNG theme isolation) to Section 8 of admin-dashboard-architecture-report.md, each with rule text, rationale, enforceability assessment, and alignment with frontend-coding-standard.md",
+      "confirmed_at": "2026-05-06T10:30:39.267Z",
+      "consumed_at": "2026-05-06T10:32:38.036Z",
+      "audit": {
+        "execution_summary": "Appended 5 new architectural constraint rules (C8-C12) to Section 8 of admin-dashboard-architecture-report.md: C8 Template size limit (200 lines max), C9 Deferred loading @defer on viewport for chart organisms, C10 OnPush change detection for chart/data organisms, C11 Skeleton loading states for lazy panels, C12 PrimeNG theme isolation. Each rule includes rule text, rationale, enforceability assessment, and alignment with frontend-coding-standard.md. No existing C1-C7 content was modified.",
+        "completed_at": "2026-05-06T10:32:38.036Z"
+      }
+    },
+    "cg_ses_1778064708675": {
+      "session_id": "cg_ses_1778064708675",
+      "created_at": "2026-05-06T10:51:48.676Z",
+      "task_description": "Formulate a detailed implementation plan for the Admin Dashboard based on the architecture report. The plan will include phase breakdown with milestones, task dependencies, agent assignments, prerequisites, risk mitigation strategies, and Definition of Done criteria. Reference architectural constraint rules C1-C12.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Formulate Admin Dashboard implementation plan with 8 phases: synthesize analysis, define prerequisites, break milestones, map dependencies, assign agents, mitigate risks, define DoD, deliver document",
+      "confirmed_at": "2026-05-06T10:52:17.816Z",
+      "consumed_at": "2026-05-06T10:54:51.606Z",
+      "audit": {
+        "execution_summary": "Completed Admin Dashboard implementation plan. Produced comprehensive document at .task_temp/admin-dashboard-analysis/admin-dashboard-implementation-plan.md covering: 2 prerequisites (AppChartComponent refactor + chart-js-token-map.md), 6 execution phases (design token cleanup, backend API extensions, frontend data integration, layout enhancement, component decomposition, polish/performance), 17 tasks, agent assignments (@Coder-FE, @Coder-BE, @Architect, @Guardian), risk mitigation for R1-R8 + process risks, DAG-level dependency graph, and C1-C12 constraint compliance matrix.",
+        "completed_at": "2026-05-06T10:54:51.606Z"
+      }
+    },
+    "cg_ses_1778065222097": {
+      "session_id": "cg_ses_1778065222097",
+      "created_at": "2026-05-06T11:00:22.097Z",
+      "task_description": "Multi-agent execution: Parallel dispatch of Coder-FE for Prerequisite A (AppChartComponent refactor) and Prerequisite B (chart-js-token-map.md creation)",
+      "gate_status": "armed",
+      "last_check_failed_items": [],
+      "plan_summary": "Multi-agent parallel execution: Dispatch 2x Coder-FE for Gate 0 prerequisites - A) AppChartComponent native Chart.js refactor, B) chart-js-token-map.md documentation",
+      "confirmed_at": "2026-05-06T11:00:32.727Z",
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1778065442775": {
+      "session_id": "cg_ses_1778065442775",
+      "created_at": "2026-05-06T11:04:02.775Z",
+      "task_description": "Refactor AppChartComponent from primeng/chart to native chart.js. Replace ChartModule import with chart.js/auto, replace <p-chart> with <canvas #chartCanvas>, implement ngAfterViewInit for new Chart(), ngOnDestroy for chart.destroy(), add theme change support with chart.update('none'). Update unit tests following TDD.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Refactor AppChartComponent from primeng/chart to native chart.js. Replace ChartModule import with chart.js/auto, replace <p-chart> with <canvas #chartCanvas>, implement ngAfterViewInit for new Chart(), ngOnDestroy for chart.destroy(), add theme change support with chart.update('none'). Update unit tests following TDD RED→GREEN→REFACTOR.",
+      "confirmed_at": "2026-05-06T11:07:19.389Z",
+      "consumed_at": "2026-05-06T11:38:32.530Z",
+      "audit": {
+        "execution_summary": "Refactored AppChartComponent from primeng/chart to native chart.js. Replaced ChartModule import with chart.js/auto, replaced p-chart with canvas element. Implemented ngAfterViewInit for Chart init, ngOnDestroy for chart.destroy(), ngDoCheck for input reactivity, MutationObserver for theme change (chart.update('none')). TDD: RED (10 failing tests) → GREEN (16/16 passing) → REFACTOR (92.2% coverage). Committed with [Red] and [Green] tags.",
+        "completed_at": "2026-05-06T11:38:32.530Z"
+      }
+    },
+    "cg_ses_1778065486754": {
+      "session_id": "cg_ses_1778065486754",
+      "created_at": "2026-05-06T11:04:46.754Z",
+      "task_description": "Create docs/design/chart-js-token-map.md mapping Sharp Design CSS custom properties to Chart.js-safe hex/RGBA values. Documentation-only task, no code changes.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Create comprehensive chart-js-token-map.md documenting mapping of all Sharp Design CSS custom properties from styles.scss to Chart.js-safe hex/RGBA values. Includes dark/light theme tables, code examples with comment conventions, and usage guidelines for all chart types.",
+      "confirmed_at": "2026-05-06T11:07:20.646Z",
+      "consumed_at": "2026-05-06T11:10:23.823Z",
+      "audit": {
+        "execution_summary": "Created docs/design/chart-js-token-map.md (544 lines) mapping all Sharp Design CSS custom properties from styles.scss to Chart.js-safe hex/RGBA values. Includes dark/light theme tables, alpha channel guidelines, code comment conventions, complete config examples, default palette audit, quick reference card, and file cross-reference. Documentation-only task; no code changes. HANDOVER.md produced at .task_temp/prereq-b/HANDOVER.md.",
+        "completed_at": "2026-05-06T11:10:23.823Z"
+      }
+    },
+    "cg_ses_1778067813812": {
+      "session_id": "cg_ses_1778067813812",
+      "created_at": "2026-05-06T11:43:33.812Z",
+      "task_description": "Coder-FE: Execute Phase 1 (Design Token Cleanup) from Admin Dashboard Implementation Plan - P1.1 Replace bg-opacity-* with /10 syntax, P1.2 Remove particles.js, P1.3 Map fa-cutlery to pi-briefcase, P1.4 Add .skeleton shimmer animation. Frontend-only changes following TDD workflow.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Execute Phase 1 Design Token Cleanup TDD verification: write+run tests asserting zero bg-opacity-*, zero particles.js, zero fa-* icons, .skeleton class exists. All 4 tasks already clean. Produce HANDOVER.md and test_report.json.",
+      "confirmed_at": "2026-05-06T11:46:12.983Z",
+      "consumed_at": "2026-05-06T11:49:31.149Z",
+      "audit": {
+        "execution_summary": "Executed Phase 1 Design Token Cleanup TDD verification. Analyzed codebase: all 4 tasks (bg-opacity-* removal, particles.js removal, fa-cutlery→pi-briefcase mapping, .skeleton shimmer class) already complete. Wrote 11 verification tests in design-token-cleanup.spec.ts, all passed. Generated test_report.json and HANDOVER.md.",
+        "completed_at": "2026-05-06T11:49:31.149Z"
+      }
+    },
+    "cg_ses_1778067849079": {
+      "session_id": "cg_ses_1778067849079",
+      "created_at": "2026-05-06T11:44:09.079Z",
+      "task_description": "Extend AdminStatsDto in contract.yaml with timeDistribution and staffWorkload fields, including TimeDistributionItem and StaffWorkloadItem interfaces, as part of the Admin Dashboard Implementation Plan (task P2.1). Contract/documentation update only.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Phase 1-2: Read contract.yaml + machine.json to locate AdminStats schema. Phase 3: Check backend Stats module for alignment. Phase 4-6: Add TimeDistributionItem and StaffWorkloadItem interfaces, extend AdminStats with timeDistribution and staffWorkload arrays. Phase 7: Run keystone:hash. Phase 8: Verify consistency. Produce HANDOVER.md at end.",
+      "confirmed_at": "2026-05-06T11:46:18.152Z",
+      "consumed_at": "2026-05-06T11:52:24.290Z",
+      "audit": {
+        "execution_summary": "Task P2.1 completed: Extended contract.yaml v1.6.8→v1.6.9 with timeDistribution (TimeDistributionItem: hour/string, count/number) and staffWorkload (StaffWorkloadItem: staffId, name, initials, bookingPercentage) fields in AdminStats response schema. Updated changelog, metadata, inline hash sync, keystone:hash verify all pass. HANDOVER.md written to .task_temp/P2.1/.",
+        "completed_at": "2026-05-06T11:52:24.290Z"
+      }
+    },
+    "cg_ses_1778067875587": {
+      "session_id": "cg_ses_1778067875587",
+      "created_at": "2026-05-06T11:44:35.587Z",
+      "task_description": "Execute Phase 2 (Backend API Extensions) tasks P2.2-P2.4: Add TimeDistributionItem and StaffWorkloadItem types to admin-stats.dto.ts, extend AdminStatsService.getDashboard() to compute time distribution and staff workload, and create GET /api/admin/system-status endpoint. Follow TDD workflow RED->GREEN->REFACTOR.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Execute Phase 2 P2.2-P2.4: Add TimeDistributionItem/StaffWorkloadItem DTO types, extend AdminStatsService.getDashboard(), create system-status endpoint. TDD RED->GREEN->REFACTOR.",
+      "confirmed_at": "2026-05-06T11:46:18.798Z",
+      "consumed_at": "2026-05-06T11:53:42.742Z",
+      "audit": {
+        "execution_summary": "Executed Phase 2 P2.2-P2.4 backend tasks: added TimeDistributionItem/StaffWorkloadItem/SystemStatusDto types to admin-stats.dto.ts, extended AdminStatsService.getDashboard() with time distribution and staff workload computation, created GET /admin/system-status endpoint, added getTimeDistribution() to StatsService. All 62 tests pass. Followed TDD RED->GREEN workflow.",
+        "completed_at": "2026-05-06T11:53:42.742Z"
+      }
+    },
+    "cg_ses_1778070215692": {
+      "session_id": "cg_ses_1778070215692",
+      "created_at": "2026-05-06T12:23:35.692Z",
+      "task_description": "Execute Phase 3 (Frontend Data Integration) from Admin Dashboard Implementation Plan: P3.1 Sync frontend AdminStats DTO with contract.yaml v1.6.9 (add timeDistribution + staffWorkload). P3.2 Update AdminStore with loadTimeDistribution() and loadStaffWorkload(). P3.3 Wire DashboardComponent to use real store data. P3.4 Add AdminService.getSystemStatus(). Follow TDD (RED->GREEN->REFACTOR).",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Phase 3 Frontend Data Integration: Update DTOs, AdminStore, AdminService, and DashboardComponent to use real API data for timeDistribution, staffWorkload, and systemStatus sections. TDD (RED->GREEN->REFACTOR) for 7 files.",
+      "confirmed_at": "2026-05-06T12:23:53.581Z",
+      "consumed_at": "2026-05-06T12:31:45.402Z",
+      "audit": {
+        "execution_summary": "Phase 3 Frontend Data Integration completed: (P3.1) Added TimeDistributionItem, StaffWorkloadItem, SystemHealth DTOs, extended AdminStats. (P3.2) Updated AdminStore with loadTimeDistribution(), loadStaffWorkload(), loadSystemStatus() methods and state. (P3.3) Wired DashboardComponent to use real store data for staffWorkload, systemStatus, servicePopularity, and timeDistributionChart. (P3.4) Added AdminService.getSystemStatus() and getTimeDistribution(). TDD followed: RED (15 failing tests written) → GREEN (all 69 tests passing) → REFACTOR (cleanup). Produced HANDOVER.md and test_report.json.",
+        "completed_at": "2026-05-06T12:31:45.402Z"
+      }
+    },
+    "cg_ses_1778070245696": {
+      "session_id": "cg_ses_1778070245696",
+      "created_at": "2026-05-06T12:24:05.696Z",
+      "task_description": "Execute Phase 4 (Layout Enhancement) of the Admin Dashboard: P4.1 Add adminSidebarItems array to AppLayoutComponent with 7 items (Dashboard, Appointments, Users, Services, Analytics, History, Settings). P4.2 Add computed signal switching between admin/customer sidebar items based on isAdminRoute(). P4.3 Extend AppHeaderComponent with @Input() showSearch and @Input() extraActions. P4.4 Move user info display to sidebar bottom for admin routes. P4.5 Add .bg-grid background class to admin dashboard content area. Follow TDD workflow.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Phase 4 Layout Enhancement: adminSidebarItems with 7 items, route-based switching, showSearch/extraActions Inputs, admin user info in sidebar, bg-grid class. TDD workflow.",
+      "confirmed_at": "2026-05-06T12:32:24.851Z",
+      "consumed_at": "2026-05-06T12:42:42.117Z",
+      "audit": {
+        "execution_summary": "Phase 4 Layout Enhancement completed: P4.1 adminSidebarItems (7 items), P4.2 route-based sidebar switching (computed signal), P4.3 showSearch/extraActions header Inputs, P4.4 user info sidebar bottom with solid mode, P4.5 bg-grid background class. All 55 tests pass. TDD workflow followed: RED tests existed in responsive spec, GREEN implementation done, REFACTOR cleanup applied. Artifacts: TASK_LOG.md, HANDOVER.md, test_report.json.",
+        "completed_at": "2026-05-06T12:42:42.117Z"
+      }
+    },
+    "cg_ses_1778071549435": {
+      "session_id": "cg_ses_1778071549435",
+      "created_at": "2026-05-06T12:45:49.435Z",
+      "task_description": "Phase 5 — Component Decomposition: Decompose monolithic DashboardComponent into 8 organism components + 1 thin page host following atomic design. Execute 9 sequential extractions using TDD (RED→GREEN→REFACTOR) for each. Producing HANDOVER.md and test_report.json.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Phase 5 Dashboard Decomposition: Fix test setup, extract 8 organisms + 1 molecule chain, refactor DashboardComponent to thin host via 9-step sequential TDD",
+      "confirmed_at": "2026-05-06T12:46:14.144Z",
+      "consumed_at": "2026-05-06T13:05:23.613Z",
+      "audit": {
+        "execution_summary": "Phase 5 Dashboard Component Decomposition complete. Monolithic DashboardComponent (362+284 lines) decomposed into 8 organisms + 6 molecules + 2 shared utilities. Thin page host now 120+37 lines. TDD followed for each extraction: 68 component tests + 69 store/service tests pass. 26 RED tests preserved as TDD placeholders. All architectural constraints (C2, C8, C9, C10, C11, C3) enforced. Outputs: HANDOVER.md + test_report.json with execution_evidence.",
+        "completed_at": "2026-05-06T13:05:23.613Z"
+      }
+    },
+    "cg_ses_1778072929957": {
+      "session_id": "cg_ses_1778072929957",
+      "created_at": "2026-05-06T13:08:49.957Z",
+      "task_description": "Phase 6 — Polish, Performance & PrimeNG Isolation for booking-frontend (Angular v21+). Tasks: P6.1 Audit PrimeNG usage in admin pages, verify component-scoped ::ng-deep for .p-* overrides, verify dark theme overlay rendering. P6.2 Performance audit: verify @defer (on viewport) on chart organisms, verify skeleton placeholders, document performance strategy. P6.3 ESLint/Stylelint enforcement: audit hex colors in component SCSS, verify Font Awesome migrated to PrimeIcons, verify zero bg-opacity-* instances, verify Chart.js colors use token-comment convention.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Phase 6 audit & fix: PrimeNG theme isolation verification, performance/defer audit, ESLint/Stylelint enforcement with hex color review and Chart.js color token comments.",
+      "confirmed_at": "2026-05-06T13:09:20.451Z",
+      "consumed_at": "2026-05-06T13:15:36.135Z",
+      "audit": {
+        "execution_summary": "Phase 6 completed: P6.1 PrimeNG theme isolation audit verified all .p-* overrides are component-scoped; applied 22 dark-theme fixes (bg-white→bg-card-bg, stat icon tokenization, error banners). P6.2 Performance audit confirmed @defer+skelton on charts-section, documented strategy. P6.3 Lint enforcement confirmed zero Font Awesome/bg-opacity-*, added token-comment convention to dashboard-chart-factories.ts and app-chart.component.ts. HANDOVER.md + test_report.json produced in .task_temp/P6/.",
+        "completed_at": "2026-05-06T13:15:36.135Z"
+      }
+    },
+    "cg_ses_1778073370283": {
+      "session_id": "cg_ses_1778073370283",
+      "created_at": "2026-05-06T13:16:10.283Z",
+      "task_description": "Guardian: P6.4 — Final C1-C12 Compliance Review of Admin Dashboard implementation. Review all 12 architectural constraint rules across frontend code.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "P6.4 C1-C12 compliance review completed. All 12 architectural rules PASS: Chart.js lifecycle, SignalStore isolation, responsive CSS toggle, pi-* icons, design tokens, Tailwind v4, no particles.js, template sizes, @defer loading, OnPush, skeleton placeholders, PrimeNG isolation. Zero violations found.",
+      "confirmed_at": "2026-05-06T13:19:50.353Z",
+      "consumed_at": "2026-05-06T13:19:55.207Z",
+      "audit": {
+        "execution_summary": "P6.4 Guardian review completed: All 12 C1-C12 architectural constraint rules PASS. Reviewed AppChartComponent lifecycle (C1), 8 organism files for @Input/isolation/OnPush/template size (C2/C8/C10), responsive toggle CSS approach (C3), icon standards (C4), design tokens in chart factories and component SCSS (C5), Tailwind v4 bg-opacity-* check (C6), particles.js absence (C7), @defer/skeleton placement (C9/C11), PrimeNG ::ng-deep isolation (C12). Full PASS with zero violations.",
+        "completed_at": "2026-05-06T13:19:55.207Z"
+      }
+    },
+    "cg_ses_1778079318223": {
+      "session_id": "cg_ses_1778079318223",
+      "created_at": "2026-05-06T14:55:18.224Z",
+      "task_description": "Fix Tailwind CSS v4 configuration missing .postcssrc.json causing dashboard layout to break, and address Angular runtime injection error",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix missing Tailwind v4 PostCSS config: create .postcssrc.json, fix RouterLink injection error, verify build, then validate via Guardian",
+      "confirmed_at": "2026-05-06T14:59:31.863Z",
+      "consumed_at": "2026-05-06T15:12:29.359Z",
+      "audit": {
+        "execution_summary": "Created .postcssrc.json enabling Tailwind v4 PostCSS processing. Added missing theme alias tokens (--color-card-bg, etc.) to styles.scss so component class names resolve. Build passes, Tailwind utility classes compile correctly. RouterLink issue was cascading from broken layout - all imports are correct. Test failures pre-existing.",
+        "completed_at": "2026-05-06T15:12:29.359Z"
+      }
+    },
+    "cg_ses_1778079647387": {
+      "session_id": "cg_ses_1778079647387",
+      "created_at": "2026-05-06T15:00:47.387Z",
+      "task_description": "Fix missing Tailwind CSS v4 PostCSS configuration causing dashboard layout to break. Create .postcssrc.json with @tailwindcss/postcss plugin, verify Angular build compiles Tailwind utilities correctly, and investigate the RouterLinkWithHref injection runtime error. Run dev server and confirm dashboard renders matching prototype layout.",
+      "gate_status": "armed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix Tailwind CSS v4 PostCSS config + replace RouterModule with RouterLink in 9 components + build verification",
+      "confirmed_at": "2026-05-06T15:02:59.745Z",
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1778080406806": {
+      "session_id": "cg_ses_1778080406806",
+      "created_at": "2026-05-06T15:13:26.806Z",
+      "task_description": "Guardian review of Tailwind CSS v4 PostCSS fix for admin dashboard - verify .postcssrc.json, theme tokens, build, and layout",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Guardian review of Tailwind PostCSS fix: verify .postcssrc.json, theme tokens, build output, and dashboard layout",
+      "confirmed_at": "2026-05-06T15:13:32.254Z",
+      "consumed_at": "2026-05-06T15:18:46.956Z",
+      "audit": {
+        "execution_summary": "Guardian reviewed Tailwind PostCSS fix: PASS. All 5 phases passed - config audit, CSS token coverage (8 admin components), test execution (pre-existing failures only), standards compliance. Minor suggestions noted (duplicate alias tokens, missing IntersectionObserver mock).",
+        "completed_at": "2026-05-06T15:18:46.956Z"
+      }
+    },
+    "cg_ses_1778080483051": {
+      "session_id": "cg_ses_1778080483051",
+      "created_at": "2026-05-06T15:14:43.051Z",
+      "task_description": "Review Tailwind CSS v4 configuration fix for Angular admin dashboard: verify .postcssrc.json, styles.scss imports, CSS classes, dashboard layout, and run tests",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Review Tailwind CSS v4 config: audit .postcssrc.json, styles.scss @theme tokens, verify CSS class coverage across 6+ admin dashboard components, run Jest tests, and check frontend coding standard compliance",
+      "confirmed_at": "2026-05-06T15:16:25.727Z",
+      "consumed_at": "2026-05-06T15:18:08.215Z",
+      "audit": {
+        "execution_summary": "Reviewed Tailwind CSS v4 config for Angular admin dashboard: audited .postcssrc.json, styles.scss @theme tokens, verified CSS class coverage across 6+ admin components, ran Jest tests (6/7 admin sub-component suites PASS, dashboard suite has pre-existing IntersectionObserver issue), checked frontend coding standards. Result: PASS with pre-existing issues noted.",
+        "completed_at": "2026-05-06T15:18:08.215Z"
+      }
+    },
+    "cg_ses_1778080995820": {
+      "session_id": "cg_ses_1778080995820",
+      "created_at": "2026-05-06T15:23:15.820Z",
+      "task_description": "Strictly audit all admin dashboard source files against prototype to identify remaining visual/structural differences after Tailwind fix",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Audit all admin dashboard source files against prototype to identify remaining visual/structural differences after Tailwind fix",
+      "confirmed_at": "2026-05-06T15:23:42.623Z",
+      "consumed_at": "2026-05-06T15:28:06.372Z",
+      "audit": {
+        "execution_summary": "Completed comprehensive audit of all admin dashboard source files against prototype. Identified structural, layout, and content differences. Tailwind fix is in place and working.",
+        "completed_at": "2026-05-06T15:28:06.372Z"
+      }
+    },
+    "cg_ses_1778082246724": {
+      "session_id": "cg_ses_1778082246724",
+      "created_at": "2026-05-06T15:44:06.724Z",
+      "task_description": "Fix admin dashboard background color and sidebar height issues",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix admin dashboard: remove light bg-[#F2F3F5] override, ensure sidebar stretches full height",
+      "confirmed_at": "2026-05-06T15:45:20.531Z",
+      "consumed_at": "2026-05-06T15:47:24.832Z",
+      "audit": {
+        "execution_summary": "Fixed admin dashboard background and sidebar issues: removed bg-[#F2F3F5] light override from layout wrapper, added self-stretch to sidebar, added align-items: stretch to layout-content. Build passes successfully.",
+        "completed_at": "2026-05-06T15:47:24.832Z"
+      }
+    },
+    "cg_ses_1778082914003": {
+      "session_id": "cg_ses_1778082914003",
+      "created_at": "2026-05-06T15:55:14.003Z",
+      "task_description": "Re-analyze dashboard background and sidebar issues after latest screenshot",
+      "gate_status": "checked",
+      "last_check_failed_items": [],
+      "plan_summary": null,
+      "confirmed_at": null,
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1778084119771": {
+      "session_id": "cg_ses_1778084119771",
+      "created_at": "2026-05-06T16:15:19.772Z",
+      "task_description": "Fix sidebar not stretching full height and main content too narrow",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix sidebar height (add h-full to aside, remove misleading self-stretch) and remove max-w-7xl constraint from main content",
+      "confirmed_at": "2026-05-06T16:16:33.367Z",
+      "consumed_at": "2026-05-06T16:18:41.532Z",
+      "audit": {
+        "execution_summary": "Fixed two layout issues: (1) Sidebar now uses h-full instead of self-stretch to properly fill parent height, (2) Main content removed max-w-7xl constraint to fill available width. Build passes successfully.",
+        "completed_at": "2026-05-06T16:18:41.532Z"
+      }
+    },
+    "cg_ses_1778085219187": {
+      "session_id": "cg_ses_1778085219187",
+      "created_at": "2026-05-06T16:33:39.187Z",
+      "task_description": "Fix layout: make main content scroll independently while keeping sidebar+header fixed, no body scroll",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Lock layout to viewport height (no body scroll), make sidebar fill height via flex stretch, make main content independently scrollable with overflow-y: auto, remove unnecessary pt-16/lg:pl-60 padding",
+      "confirmed_at": "2026-05-06T16:34:29.452Z",
+      "consumed_at": "2026-05-06T16:38:30.618Z",
+      "audit": {
+        "execution_summary": "Fixed layout to lock viewport height: layout-container and layout-wrapper now use height:100vh with overflow:hidden. layout-content uses flex:1 with overflow:hidden and align-items:stretch. main-content uses height:100% with overflow-y:auto for independent scrolling. Removed min-h-screen from wrapper and main, removed pt-16/lg:pl-60 padding that was compensating for sticky positioning. Build passes successfully.",
+        "completed_at": "2026-05-06T16:38:30.618Z"
+      }
+    },
+    "cg_ses_1778112679106": {
+      "session_id": "cg_ses_1778112679106",
+      "created_at": "2026-05-07T00:11:19.107Z",
+      "task_description": "Revert body overflow fix, properly fix sidebar flex layout and dropdown positioning",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Revert body overflow:hidden, fix sidebar host flex display, ensure layout containers properly constrain viewport without clipping",
+      "confirmed_at": "2026-05-07T00:11:58.213Z",
+      "consumed_at": "2026-05-07T00:14:14.551Z",
+      "audit": {
+        "execution_summary": "Reverted body overflow:hidden which was causing sidebar clipping. Fixed app-sidebar host element to use display:flex and height:100% so it properly stretches within the flex layout. Layout containers maintain height:100vh with overflow:hidden to lock viewport, but body no longer clips content. Build passes successfully.",
+        "completed_at": "2026-05-07T00:14:14.551Z"
+      }
+    },
+    "cg_ses_1778120123229": {
+      "session_id": "cg_ses_1778120123229",
+      "created_at": "2026-05-07T02:15:23.231Z",
+      "task_description": "Fix PrimeNG popup menu layout shift in admin dashboard navbar by adding overflow-y:hidden and scrollbar-gutter:stable to styles.scss",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Add scrollbar-gutter: stable to html and change body overflow-x: hidden to overflow: hidden in styles.scss to prevent PrimeNG popup menu from causing layout shift when it opens",
+      "confirmed_at": "2026-05-07T02:16:02.749Z",
+      "consumed_at": "2026-05-07T02:16:11.452Z",
+      "audit": {
+        "execution_summary": "Fixed PrimeNG popup menu layout shift by editing styles.scss: (1) Added `scrollbar-gutter: stable` to `html` to reserve scrollbar space permanently, preventing layout reflow when overlays toggle body overflow. (2) Changed `body` from `overflow-x: hidden` to `overflow: hidden` so PrimeNG overlay's BlockScrollStrategy cannot create/remove a body scrollbar, eliminating the root cause of the leftward shift when the System Admin dropdown opens.",
+        "completed_at": "2026-05-07T02:16:11.452Z"
+      }
+    },
+    "cg_ses_1778122335642": {
+      "session_id": "cg_ses_1778122335642",
+      "created_at": "2026-05-07T02:52:15.643Z",
+      "task_description": "Add appendTo=body to p-menu in app-header to prevent layout clipping",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Add appendTo=body to p-menu in app-header.component.html to fix layout clipping when dropdown opens",
+      "confirmed_at": "2026-05-07T02:53:02.102Z",
+      "consumed_at": "2026-05-07T02:56:04.699Z",
+      "audit": {
+        "execution_summary": "Added appendTo=\"body\" to p-menu in app-header.component.html. This makes PrimeNG render the user dropdown menu outside the layout containers, bypassing overflow:hidden clipping. Build passes successfully.",
+        "completed_at": "2026-05-07T02:56:04.699Z"
+      }
+    },
+    "cg_ses_1778124584290": {
+      "session_id": "cg_ses_1778124584290",
+      "created_at": "2026-05-07T03:29:44.290Z",
+      "task_description": "Move sidebar icon to header, remove sidebar brand row, fix persistent focus animation on nav items",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Move calendar icon from sidebar to header brand, remove sidebar brand section entirely, fix routerLinkActive persistent focus state",
+      "confirmed_at": "2026-05-07T03:30:25.457Z",
+      "consumed_at": "2026-05-07T03:35:56.978Z",
+      "audit": {
+        "execution_summary": "Completed 3 UI polish fixes: 1) Moved calendar icon from sidebar brand to header brand area. 2) Removed sidebar brand section entirely from both desktop sidebar and mobile drawer. 3) Fixed nav item persistent focus/animation by removing hover:translate-x-[2px] and replacing transition-all with transition-colors, plus added border-l-2 border-transparent to prevent layout shift when routerLinkActive applies active border. Build passes successfully.",
+        "completed_at": "2026-05-07T03:35:56.978Z"
+      }
+    },
+    "cg_ses_1778127493655": {
+      "session_id": "cg_ses_1778127493655",
+      "created_at": "2026-05-07T04:18:13.655Z",
+      "task_description": "Make dashboard buttons and card borders match View Bookings button style from screenshot",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Update Booking Trends toggle buttons to match View Bookings button style and set card border to match button color",
+      "confirmed_at": "2026-05-07T04:21:03.314Z",
+      "consumed_at": "2026-05-07T04:21:13.875Z",
+      "audit": {
+        "execution_summary": "Updated Booking Trends chart: 1) Changed Weekly/Monthly/Yearly toggle buttons to match primary button style (bg-accent-blue text-white) like View Bookings button. 2) Added cyan border (#00c6ff) to the card to match primary button color. Build passes successfully.",
+        "completed_at": "2026-05-07T04:21:13.875Z"
+      }
+    },
+    "cg_ses_1778133450501": {
+      "session_id": "cg_ses_1778133450501",
+      "created_at": "2026-05-07T05:57:30.501Z",
+      "task_description": "Update admin dashboard colors: welcome card border, sidebar selected item border, and stat card icons to match View Bookings button color",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Update welcome card border, sidebar selected item border, and stat card icons to match View Bookings button color (#00c6ff accent-blue)",
+      "confirmed_at": "2026-05-07T06:02:49.285Z",
+      "consumed_at": "2026-05-07T06:03:05.151Z",
+      "audit": {
+        "execution_summary": "Updated admin dashboard colors to match View Bookings button (#00c6ff): 1) styles.scss - changed welcome card border-left to use var(--color-accent-blue) consistently in both dark and light modes (light mode was previously #0284c7). 2) dashboard.component.ts - changed all 4 stat card icon colors from mixed palette (yellow/green/purple) to text-accent-blue with bg-accent-blue/10 backgrounds. 3) Sidebar was already correct with border-accent-blue on selected items. Build verified successfully.",
+        "completed_at": "2026-05-07T06:03:05.151Z"
+      }
+    },
+    "cg_ses_1778140782660": {
+      "session_id": "cg_ses_1778140782660",
+      "created_at": "2026-05-07T07:59:42.660Z",
+      "task_description": "Fix theme toggle double-icon bug by replacing CSS-based hidden with Angular @if structural directive",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix theme-toggle component by replacing CSS hidden classes with Angular @if structural directive to conditionally render only one icon at a time",
+      "confirmed_at": "2026-05-07T07:59:55.865Z",
+      "consumed_at": "2026-05-07T08:01:17.096Z",
+      "audit": {
+        "execution_summary": "Fixed theme-toggle double-icon bug by replacing CSS hidden classes with Angular @if structural directive. Changes made to theme-toggle.component.html: replaced two <i> elements with ngClass hidden toggles with a single @if block that conditionally renders either sun or moon icon. Also removed unused NgClass import from theme-toggle.component.ts. Build verified successfully.",
+        "completed_at": "2026-05-07T08:01:17.096Z"
+      }
+    },
+    "cg_ses_1778141379362": {
+      "session_id": "cg_ses_1778141379362",
+      "created_at": "2026-05-07T08:09:39.363Z",
+      "task_description": "Remove New Booking and Add Service quick action buttons from admin header",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Remove New Booking and Add Service quick action buttons from admin header, clean up related actionClick output and handler in header and layout components",
+      "confirmed_at": "2026-05-07T08:12:09.599Z",
+      "consumed_at": "2026-05-07T08:16:07.225Z",
+      "audit": {
+        "execution_summary": "Removed New Booking and Add Service quick action buttons from admin header. Changes: (1) app-header.component.html - removed admin quick actions section with both buttons, (2) app-header.component.ts - removed AppButtonComponent import, actionClick output, and onActionClick method, (3) app-layout.component.html - removed (actionClick) binding, (4) app-layout.component.ts - removed onHeaderAction method, (5) app-layout.component.spec.ts - removed actionClick from stub header. Build succeeded (bundle size reduced from 766KB to 725KB). Tests have pre-existing infrastructure issue (NG0400 platform error) unrelated to changes.",
+        "completed_at": "2026-05-07T08:16:07.225Z"
+      }
+    },
+    "cg_ses_1778141904270": {
+      "session_id": "cg_ses_1778141904270",
+      "created_at": "2026-05-07T08:18:24.271Z",
+      "task_description": "Remove Quick Booking form, Service Popularity, and Staff Workload cards from admin dashboard",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Remove Quick Booking form, Service Popularity, and Staff Workload cards from admin dashboard template and component imports",
+      "confirmed_at": "2026-05-07T08:18:59.961Z",
+      "consumed_at": "2026-05-07T08:21:43.281Z",
+      "audit": {
+        "execution_summary": "Removed Quick Booking form, Service Popularity, and Staff Workload cards from admin dashboard. Changes: (1) dashboard.component.html - removed three component tags from the grid, keeping only System Status, (2) dashboard.component.ts - removed imports and computed signals for servicePopularity and staffWorkload, (3) dashboard.component.spec.ts - removed Quick Actions and Staff Workload test sections, updated stats card count from 7 to 4. Build verified successfully (dashboard chunk reduced from 23.92KB to 17.58KB).",
+        "completed_at": "2026-05-07T08:21:43.281Z"
+      }
+    },
+    "cg_ses_1778157278818": {
+      "session_id": "cg_ses_1778157278818",
+      "created_at": "2026-05-07T12:34:38.818Z",
+      "task_description": "Fix C-1: Stat Card Icon Colors All Hardcoded to Blue. Update dashboard.component.ts to use accent-yellow, accent-green, and accent-purple for the respective cards as specified in admin-ui-spec.md.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix C-1: Update stat card icon colors in dashboard.component.ts - change Pending Confirmation to accent-yellow, Active Users to accent-green, Total Revenue to accent-purple",
+      "confirmed_at": "2026-05-07T12:35:08.032Z",
+      "consumed_at": "2026-05-07T12:36:00.746Z",
+      "audit": {
+        "execution_summary": "Successfully fixed C-1: Updated stat card icon colors in dashboard.component.ts - Pending Confirmation now uses accent-yellow, Active Users uses accent-green, Total Revenue uses accent-purple",
+        "completed_at": "2026-05-07T12:36:00.746Z"
+      }
+    },
+    "cg_ses_1778159084891": {
+      "session_id": "cg_ses_1778159084891",
+      "created_at": "2026-05-07T13:04:44.891Z",
+      "task_description": "C-2 analysis: Cross-reference full project requirements against current system-status-panel implementation to verify Indicator ordering (Server/Database/API/Redis/Last Backup/Uptime), Redis presence, status dot glow, auto-refresh, and auto-refresh.",
+      "gate_status": "checked",
+      "last_check_failed_items": [],
+      "plan_summary": null,
+      "confirmed_at": null,
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1778160368767": {
+      "session_id": "cg_ses_1778160368767",
+      "created_at": "2026-05-07T13:26:08.767Z",
+      "task_description": "C-2 execution: Update admin-ui-spec.md §4.2, contract.yaml SYS-001, 10-admin-dashboard.md, admin.dto.ts, dashboard.component.ts, and system-status-panel.component.ts to align with 6-item indicator order: Server / Database / API / Redis / Last Backup / Uptime",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Execute C-2 fix across 6 files: (1) admin-ui-spec.md §4.2 update to 6 indicators, (2) contract.yaml SYS-001 add redis field, (3) 10-admin-dashboard.md add redis field, (4) admin.dto.ts add redis to SystemHealth, (5) dashboard.component.ts insert Redis row, (6) system-status-panel.component.ts add glow CSS",
+      "confirmed_at": "2026-05-07T13:26:18.278Z",
+      "consumed_at": "2026-05-07T13:28:49.413Z",
+      "audit": {
+        "execution_summary": "C-2 fix executed across 6 files: (1) admin-ui-spec.md §4.2 updated to 6 indicators, (2) contract.yaml SYS-001 added redis field, (3) 10-admin-dashboard.md added redis field, (4) admin.dto.ts added redis to SystemHealth, (5) dashboard.component.ts inserted Redis as 4th indicator row, (6) system-status-panel.component.ts added dynamic glow CSS for Online/Degraded/Offline states",
+        "completed_at": "2026-05-07T13:28:49.413Z"
+      }
+    },
+    "cg_ses_1778161837958": {
+      "session_id": "cg_ses_1778161837958",
+      "created_at": "2026-05-07T13:50:37.959Z",
+      "task_description": "Update requirements documents to make them sufficient for C-2b auto-refresh (WebSocket) and expand features: (1) Add system.health.updated WebSocket event to 接口设计规范文档.md, (2) Update contract.yaml SYS-001 with WebSocket push spec, (3) Update 10-admin-dashboard.md with auto-refresh docs, (4) Add GET /v1/admin/system/metrics endpoint to contract.yaml, (5) Update 10-admin-dashboard.md with metrics endpoint docs",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Update requirements docs for C-2b: (1) Add system.health.updated WebSocket event to 接口设计规范文档.md, (2) contract.yaml SYS-001 add WebSocket push spec, (3) 10-admin-dashboard.md document auto-refresh, (4) contract.yaml add GET /v1/admin/system/metrics endpoint, (5) 10-admin-dashboard.md document metrics endpoint",
+      "confirmed_at": "2026-05-07T13:50:49.013Z",
+      "consumed_at": "2026-05-07T13:52:59.587Z",
+      "audit": {
+        "execution_summary": "Made requirements documents sufficient for C-2b: (1) Added system.health.updated WebSocket event to 接口设计规范文档.md with payload example, (2) Updated contract.yaml SYS-001 with refresh spec (WebSocket push + 60s polling fallback), (3) Added GET /v1/admin/system/metrics (SYS-002) endpoint to contract.yaml, (4) Updated 10-admin-dashboard.md with auto-refresh docs and new metrics endpoint row, (5) Updated conformance report marking C-2b as REQ SUFFICIENT",
+        "completed_at": "2026-05-07T13:52:59.587Z"
+      }
+    },
+    "cg_ses_1778162476602": {
+      "session_id": "cg_ses_1778162476602",
+      "created_at": "2026-05-07T14:01:16.602Z",
+      "task_description": "C-2b implementation: Add auto-refresh (WebSocket + 60s polling fallback) and expand functionality (CPU/memory/disk metrics) to system status panel across socket.service.ts, admin.dto.ts, admin.service.ts, dashboard.component.ts, and system-status-panel.component.ts",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Implement C-2b auto-refresh and expand: (1) socket.service.ts add system.health.updated listener, (2) admin.dto.ts add SystemHealthDetail, (3) admin.service.ts add getSystemMetrics, (4) dashboard.component.ts add auto-refresh logic + expand handler, (5) system-status-panel.component.ts add expand UI with metrics bars",
+      "confirmed_at": "2026-05-07T14:01:25.766Z",
+      "consumed_at": "2026-05-07T14:06:16.393Z",
+      "audit": {
+        "execution_summary": "C-2b fully implemented: (1) socket.service.ts added system.health.updated WebSocket listener, (2) admin.dto.ts added SystemHealthDetail, (3) admin.service.ts added getSystemMetrics, (4) dashboard.component.ts added auto-refresh (WebSocket + 60s polling) + expand handler, (5) system-status-panel.component.ts added expand UI with CPU/memory/disk progress bars, (6) Updated conformance report marking C-2 as fully resolved",
+        "completed_at": "2026-05-07T14:06:16.393Z"
+      }
+    },
+    "cg_ses_1778190652380": {
+      "session_id": "cg_ses_1778190652380",
+      "created_at": "2026-05-07T21:50:52.381Z",
+      "task_description": "Implement Time button dropdown for time range selection in Booking Distribution Panel: Add TimeRange types, update admin service/store, add dropdown with 6 options (last24h/last7d/last30d/thisMonth/lastMonth/custom), smooth animations, outside-click close, selected state. Update docs to reflect standalone date range selector removal.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Split implementation into two parallel tracks: (1) Code track: Add TimeRange types to admin.dto.ts, update getStats() in admin.service.ts and loadStats() in admin.store.ts, add dropdown with animations/outputs to booking-distribution-panel.component.ts, add onTimeRangeChange() to dashboard.component.ts, wire output in dashboard.component.html. (2) Docs track: Update admin-ui-spec.md §4.1/§4.3 to remove standalone date selector and document Time button dropdown, update 10-admin-dashboard.md API/interaction flow, add §6.4 to interaction-patterns.md, update conformance report C-3/D-3 statuses, add frontend-driver notes to contract.yaml and 接口设计规范文档.md.",
+      "confirmed_at": "2026-05-07T21:51:03.600Z",
+      "consumed_at": "2026-05-07T21:59:27.741Z",
+      "audit": {
+        "execution_summary": "Successfully implemented Time button dropdown feature for Booking Distribution Panel: Added TimeRange types to admin.dto.ts, updated getStats() in admin.service.ts and loadStats() in admin.store.ts to accept timeRange params, rewrote booking-distribution-panel.component.ts with dropdown UI featuring 6 time range options (last24h/last7d/last30d/thisMonth/lastMonth/custom), smooth CSS animations (opacity+scale 200ms), hover effects, selected state with blue indicator, outside-click close via HostListener, and timeRangeChange output. Updated dashboard.component.ts with timeRange signal and onTimeRangeChange handler, wired output through charts-section.component.ts to dashboard.component.html. Updated 6 documentation files: admin-ui-spec.md (removed standalone date selector, added Time button dropdown spec), 10-admin-dashboard.md (updated API/interaction flow), interaction-patterns.md (added §6.4 Chart Filter Dropdown pattern), conformance report (resolved C-3, D-3, D-2), contract.yaml (ad",
+        "completed_at": "2026-05-07T21:59:27.741Z"
+      }
+    },
+    "cg_ses_1778190712511": {
+      "session_id": "cg_ses_1778190712511",
+      "created_at": "2026-05-07T21:51:52.511Z",
+      "task_description": "Implement Time button dropdown feature for Booking Distribution Panel in Angular admin dashboard. Modify 6 files: admin.dto.ts, admin.service.ts, admin.store.ts, booking-distribution-panel.component.ts, dashboard.component.ts, dashboard.component.html. Add TimeRange type, update service/store methods, implement dropdown UI with animations, wire up dashboard component.",
+      "gate_status": "checked",
+      "last_check_failed_items": [],
+      "plan_summary": null,
+      "confirmed_at": null,
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1778190742575": {
+      "session_id": "cg_ses_1778190742575",
+      "created_at": "2026-05-07T21:52:22.575Z",
+      "task_description": "Update 6 documentation files to reflect Time button dropdown feature and removal of standalone date range selector in admin dashboard",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Update 6 documentation files to reflect Time button dropdown feature in Booking Distribution Panel and removal of standalone date range selector: admin-ui-spec.md, 10-admin-dashboard.md, interaction-patterns.md, conformance report, contract.yaml, and API design spec.",
+      "confirmed_at": "2026-05-07T21:52:59.026Z",
+      "consumed_at": "2026-05-07T21:55:34.559Z",
+      "audit": {
+        "execution_summary": "Successfully updated all 6 documentation files to reflect the Time button dropdown feature in Booking Distribution Panel and the removal of standalone date range selector: 1) admin-ui-spec.md - removed date range selector from header layout, added note, added new Time Range Filter subsection; 2) 10-admin-dashboard.md - updated API contract, dashboard content, interaction flow, and local computed properties; 3) interaction-patterns.md - added new §6.4 Chart Filter Dropdown section; 4) conformance report - marked C-3, D-3 as RESOLVED, updated D-2 Time button entry, marked C-3/D-3 completed in Appendix A; 5) contract.yaml - updated DASH-001 timeRange description and added x-frontend-driver comment; 6) 接口设计规范文档.md - added frontend implementation note after DASH-001 query parameters.",
+        "completed_at": "2026-05-07T21:55:34.559Z"
+      }
+    },
+    "cg_ses_1778195765526": {
+      "session_id": "cg_ses_1778195765526",
+      "created_at": "2026-05-07T23:16:05.526Z",
+      "task_description": "Implement Custom Range date picker feature for Booking Distribution Panel Time dropdown: Add TimeRangeSelection interface, update getTimeDistribution with startDate/endDate, add date picker panel UI with Apply/Cancel, update output chain to TimeRangeSelection. Also revise 5 requirements documents.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Execute Custom Range feature in parallel: Code track (5 files): Add TimeRangeSelection to admin.dto.ts, add startDate/endDate to getTimeDistribution in admin.service.ts, update dashboard.component.ts onTimeRangeChange to TimeRangeSelection, update charts-section output type, add custom date panel with PrimeNG DatePicker to booking-distribution-panel.component.ts. Docs track (5 documents): Update admin-ui-spec.md §4.3 with custom range spec, fix interaction-patterns.md §6.4 output type + add custom range subsection, fix 10-admin-dashboard.md DASH reference and flow description, add x-frontend-driver to contract.yaml DASH-004, fix 接口设计规范文档.md implementation notes.",
+      "confirmed_at": "2026-05-07T23:16:16.576Z",
+      "consumed_at": "2026-05-07T23:23:07.469Z",
+      "audit": {
+        "execution_summary": "Implemented Custom Range date picker feature for Booking Distribution Panel Time dropdown in parallel: Code track (6 files): Added TimeRangeSelection interface to admin.dto.ts, added startDate/endDate params to getTimeDistribution() in admin.service.ts, updated loadTimeDistribution() in admin.store.ts to forward dates, rewrote booking-distribution-panel.component.ts with PrimeNG DatePicker custom range panel (From/To date pickers, minDate constraint, Apply/Cancel buttons, formatted date label), updated dashboard.component.ts onTimeRangeChange to TimeRangeSelection, updated charts-section.component.ts output type. Docs track (5 files): Updated admin-ui-spec.md §4.3 with Custom Range panel specification, fixed interaction-patterns.md §6.4 output type + added Custom Range subsection, fixed 10-admin-dashboard.md DASH reference (001→004) and flow description + fixed duplicate step numbering, added x-frontend-driver comment to contract.yaml DASH-004, fixed 接口设计规范文档.md implementation notes fo",
+        "completed_at": "2026-05-07T23:23:07.469Z"
+      }
+    },
+    "cg_ses_1778195820788": {
+      "session_id": "cg_ses_1778195820788",
+      "created_at": "2026-05-07T23:17:00.788Z",
+      "task_description": "Implement Custom Range date picker feature for Booking Distribution Panel's Time dropdown in Angular frontend",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Implement Custom Range date picker for Booking Distribution Panel: 1) Add TimeRangeSelection DTO, 2) Update admin service/store to accept startDate/endDate, 3) Update dashboard and charts-section components, 4) Rewrite booking-distribution-panel with PrimeNG DatePicker, custom date signals, apply/close methods, and updated template. Verify with tsc --noEmit and Jest tests.",
+      "confirmed_at": "2026-05-07T23:22:24.164Z",
+      "consumed_at": "2026-05-07T23:22:30.371Z",
+      "audit": {
+        "execution_summary": "Implemented Custom Range date picker feature for Booking Distribution Panel's Time dropdown across 6 files: added TimeRangeSelection DTO, updated admin service and store to accept startDate/endDate, updated dashboard and charts-section components to use new selection type, and completely rewrote booking-distribution-panel with custom date range picker using PrimeNG DatePicker and FormsModule. TypeScript compilation passes with zero errors. Component tests for modified files pass (6/6).",
+        "completed_at": "2026-05-07T23:22:30.371Z"
+      }
+    },
+    "cg_ses_1778204125902": {
+      "session_id": "cg_ses_1778204125902",
+      "created_at": "2026-05-08T01:35:25.903Z",
+      "task_description": "Revise admin dashboard conformance report C-4 and related requirements documents to align with actual source code implementation",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Update admin dashboard documentation (conformance report C-4, admin-ui-spec.md §4.1/§4.3, 10-admin-dashboard.md) to accurately reflect the actual 2-column grid layout (trend chart left, distribution panel right with merged doughnut+bar), gradient trend chart fill, and flat bar chart color. No code changes — docs-only revision to align with working implementation.",
+      "confirmed_at": "2026-05-08T01:37:57.346Z",
+      "consumed_at": "2026-05-08T01:41:01.394Z",
+      "audit": {
+        "execution_summary": "Updated 4 documentation files to align with actual admin dashboard chart implementation: (1) Conformance report C-4 — rewrote from 'deviation' to 'confirmed' status with accurate 2-column grid layout, gradient trend fill, flat bar color, centerTextPlugin, barDataLabelsPlugin details; (2) admin-ui-spec.md §4.1 — updated ASCII layout diagram to show 2-column grid with consolidated distribution panel; (3) admin-ui-spec.md §4.3 — rewrote chart descriptions to match actual gradient fill, flat bar color, merged panel structure, and time range dropdown styling; (4) 10-admin-dashboard.md — updated chart descriptions and interaction flow to reflect actual layout. Frontend build verified passing (npm run build). No code changes made — docs-only revision.",
+        "completed_at": "2026-05-08T01:41:01.394Z"
+      }
+    },
+    "cg_ses_1778205190006": {
+      "session_id": "cg_ses_1778205190006",
+      "created_at": "2026-05-08T01:53:10.006Z",
+      "task_description": "Revise admin dashboard conformance report C-6 (search bar hidden on admin) and C-7 (stat card labels in English) and related requirements documents to align with actual source code",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Update admin-ui-spec.md §3.1 to note search bar hidden on admin routes (C-6), and update admin-ui-spec.md §4.2 stat card table labels from Chinese to English matching actual code (C-7), then update conformance report C-6/C-7 to CONFIRMED. No code changes.",
+      "confirmed_at": "2026-05-08T01:53:28.284Z",
+      "consumed_at": "2026-05-08T01:54:38.724Z",
+      "audit": {
+        "execution_summary": "Updated C-6 (Search Bar Hidden on Admin) and C-7 (Stat Card Labels) docs to match actual source code. For C-6: admin-ui-spec.md §3.1 updated to document search bar hidden on admin routes as intentional design (each admin page has built-in search). For C-7: admin-ui-spec.md §4.2 stat card labels updated from Chinese to English matching actual code labels (Today's Bookings, Pending Confirmation, Total Customers, Total Revenue); ASCII diagram label also updated. Conformance report C-6 and C-7 rewritten as CONFIRMED with full implementation tables. Fix priority matrix C-7 marked RESOLVED.",
+        "completed_at": "2026-05-08T01:54:38.724Z"
+      }
+    },
+    "cg_ses_1778208558730": {
+      "session_id": "cg_ses_1778208558730",
+      "created_at": "2026-05-08T02:49:18.730Z",
+      "task_description": "Implement A-1 fix: update backend to return StatCardDto rich objects, update frontend to consume them, replacing hardcoded trends/progress/targets with real API data. No UI design changes.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Implement A-1 fix: update backend to return StatCardDto rich objects, update frontend to consume them, replacing hardcoded trends/progress/targets with real API data. No UI design changes. Touch 8 files across BE DTO/service/tests and FE DTO/component/tests.",
+      "confirmed_at": "2026-05-08T02:50:05.081Z",
+      "consumed_at": "2026-05-08T03:00:04.270Z",
+      "audit": {
+        "execution_summary": "Implemented A-1 fix: Backend now returns StatCardDto rich objects (value, changePercentage, isPositive, target, progressPercentage) for all 5 stat cards including newly added pendingBookings. Backend service computes real changePercentage from dailyBookings (today vs yesterday, last 7 days vs previous 7 days, user/revenue month over month). Frontend DTO updated with matching StatCard interface. Dashboard component now consumes real API data instead of hardcoded fake trends/progress/targets. Updated 6 test spec files (controller spec, service spec, dashboard spec, admin store spec, admin service spec, user-management spec). Frontend build, backend build, and all 116 admin tests pass. Conformance report A-1 marked resolved.",
+        "completed_at": "2026-05-08T03:00:04.270Z"
+      }
+    },
+    "cg_ses_1778217506272": {
+      "session_id": "cg_ses_1778217506272",
+      "created_at": "2026-05-08T05:18:26.272Z",
+      "task_description": "Fix A-2: Align booking trend structure to Option B (array of objects {date,count,revenue}) across contract, requirements doc, backend, frontend, and tests. Add revenue field to bookingTrend that already exists in source data but was discarded.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix A-2: (1) Backend: add revenue to bookingTrend items (data already available from DailyBooking), (2) Frontend: add revenue to BookingTrendItem + chart factory uses real revenue data instead of empty, (3) Contract + requirements doc: change from parallel arrays {labels,bookingsData,revenueData} to array of objects {date,count,revenue}, (4) All test mocks updated, (5) Conformance report marked resolved.",
+      "confirmed_at": "2026-05-08T05:18:32.469Z",
+      "consumed_at": "2026-05-08T05:21:58.025Z",
+      "audit": {
+        "execution_summary": "A-2 fix completed: All layers aligned on array-of-objects {date,count,revenue}[]. Code changes: backend DTO + service now include revenue in bookingTrend items (data was already available from DailyBooking but silently discarded); frontend DTO + chart factory now consume real revenue data instead of empty array. Doc changes: contract.yaml DASH-001+DASH-002 booking_trend changed from parallel-array object to array of self-contained objects; 接口设计规范文档.md BookingTrendDto replaced with BookingTrendItem; conformance report marked resolved. 116/116 admin tests pass, frontend and backend builds pass.",
+        "completed_at": "2026-05-08T05:21:58.025Z"
+      }
+    },
+    "cg_ses_1778219259446": {
+      "session_id": "cg_ses_1778219259446",
+      "created_at": "2026-05-08T05:47:39.446Z",
+      "task_description": "Fix A-3 and A-4: Add percentage field to servicePopularity across backend DTO, backend service, frontend DTO. Update all test mocks with percentage values. Mark conformance report resolved.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix A-3/A-4: Add percentage to servicePopularity in backend DTO, backend service computation, frontend DTO, and all 6 test spec mocks. No doc changes needed (contract/requirements already define percentage). Estimated 30 min.",
+      "confirmed_at": "2026-05-08T05:47:44.107Z",
+      "consumed_at": "2026-05-08T05:50:15.132Z",
+      "audit": {
+        "execution_summary": "A-3 and A-4 fully resolved. Code changes: backend DTO + service now compute and return percentage in servicePopularity items (round(count/total*100,2)); frontend DTO now includes percentage in ServicePopularityItem. All 6 test spec mocks updated with percentage values. No doc changes needed (contract/requirements already defined percentage). Frontend build, backend build, and 116/116 admin tests pass. Conformance report A-3/A-4 marked resolved, priority matrix and appendix B updated.",
+        "completed_at": "2026-05-08T05:50:15.132Z"
+      }
+    },
+    "cg_ses_1778220365770": {
+      "session_id": "cg_ses_1778220365770",
+      "created_at": "2026-05-08T06:06:05.770Z",
+      "task_description": "Fix B-1: Add real API call for recent bookings in dashboard ngOnInit. Fix B-2: Rewrite 8 broken tests to match current dashboard DOM structure. Update conformance report.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix B-1: Add loadRecentBookings() in dashboard.component.ts calling adminService.getAdminAppointments({limit:5,page:1}) on init, store via setAppointments. Add test. Fix B-2: Rewrite 8 broken tests to match current DOM (app-stat-card, welcome-card h1, recent-bookings-table headers, system-status-panel structure). Update conformance report + priority matrix.",
+      "confirmed_at": "2026-05-08T06:06:11.284Z",
+      "consumed_at": "2026-05-08T06:13:57.180Z",
+      "audit": {
+        "execution_summary": "B-1 + B-2 fully resolved. B-1: Added loadRecentBookings() in dashboard ngOnInit calling adminService.getAdminAppointments({limit:5,page:1}), storing via setAppointments(). Hardcoded fallback retained for error cases. B-2: All 8 broken tests rewritten for current DOM (app-stat-card selectors, welcome-card h1, recent-bookings-table headers, system-status-panel query). Chart.js mock fixed to include register() static method preventing module-load crash. Additional 9th broken test (Pending Bookings using app-card) also fixed. Dashboard spec now 23/23 pass. Frontend build passes.",
+        "completed_at": "2026-05-08T06:13:57.180Z"
+      }
+    },
+    "cg_ses_1778222665355": {
+      "session_id": "cg_ses_1778222665355",
+      "created_at": "2026-05-08T06:44:25.355Z",
+      "task_description": "Update conformance report D-1/D-2. Fix D-2 dead buttons: wire View Bookings to routerLink, wire View buttons with output, wire Weekly/Monthly/Yearly periodChange output through charts-section to dashboard. Update priority matrix.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Update conformance report D-1/D-2 with stale entries and fix plan results. Fix D-2 dead buttons: (1) welcome-card View Bookings -> add routerLink=\"/admin/appointments\", (2) recent-bookings-table View buttons -> add rowClick output, (3) booking-trends-chart Weekly/Monthly/Yearly -> add periodChange output forwarded through charts-section to dashboard. Update priority matrix to mark resolved items. Verify builds+tests.",
+      "confirmed_at": "2026-05-08T06:44:31.338Z",
+      "consumed_at": "2026-05-08T06:48:40.522Z",
+      "audit": {
+        "execution_summary": "D-1 and D-2 resolved. Code fixes: (1) welcome-card View Bookings button -> added routerLink=\"/admin/appointments\" wrapping. (2) recent-bookings-table View buttons -> added rowClick output wired to both mobile and desktop buttons, forwarded through recent-bookings-panel. (3) booking-trends-chart Weekly/Monthly/Yearly toggles -> added periodChange output, forwarded through charts-section to dashboard onPeriodChange() which maps to time range and reloads stats. Conformance report updated with D-1 Recent Bookings status change, D-2 all items resolved, priority matrix updated. Build passes, 23/23 dashboard tests pass.",
+        "completed_at": "2026-05-08T06:48:40.522Z"
+      }
+    },
+    "cg_ses_1778226217611": {
+      "session_id": "cg_ses_1778226217611",
+      "created_at": "2026-05-08T07:43:37.611Z",
+      "task_description": "Implement chart data isolation: (1) Fix computed signal over-subscription, (2) Time dropdown reloads both doughnut+bar via separate store fields, (3) Backend DASH-002 endpoint, (4) Period toggle loads only trend data via dedicated endpoint/signal. Update conformance report.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Execute chart isolation: Phase1 - Fix over-subscription (3 computed signals use direct store signals). Phase2 - Add store.loadDistributionByTimeRange() + store.bookingTrend field + loadBookingTrend(). Phase3 - Backend DASH-002 endpoint. Phase4 - Frontend DASH-002 integration + handler wiring. Phase5 - Update conformance report. Time dropdown affects only doughnut+bar. Period toggle affects only trend chart.",
+      "confirmed_at": "2026-05-08T07:43:44.560Z",
+      "consumed_at": "2026-05-08T07:49:46.755Z",
+      "audit": {
+        "execution_summary": "Chart data isolation fully implemented. (1) Over-subscription fixed: dashboard chart computed signals now read individual store signals instead of vm(). (2) Store isolated: new servicePopularity and bookingTrend state fields independent from stats. (3) Time dropdown: onTimeRangeChange() calls loadDistributionByTimeRange() which fetches DASH-001 and patches only servicePopularity+timeDistribution — ONLY doughnut+bar reload. (4) Period toggle: onPeriodChange() calls loadBookingTrend() via new DASH-002 backend endpoint — ONLY trend chart reloads. (5) Backend: new @Get(\"stats/booking-trends\") controller route + getBookingTrend() service method. (6) Frontend: getBookingTrend() service method, loadBookingTrend() store method. Builds pass, all tests pass. Conformance report D-1/D-2/D-5 all updated.",
+        "completed_at": "2026-05-08T07:49:46.755Z"
+      }
+    },
+    "cg_ses_1778235243698": {
+      "session_id": "cg_ses_1778235243698",
+      "created_at": "2026-05-08T10:14:03.698Z",
+      "task_description": "Update detailed design docs: (1) fix bookingTrend format in 10-admin-dashboard.md line 69, (2) add chart empty state to admin-ui-spec.md §4.3, (3) fix DASH-002 test expectation in 测试策略与计划.md §5.2.6",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix bookingTrend format in 3 docs: (1) admin-dashboard.md line 69 parallel arrays → array-of-objects; (2) admin-ui-spec.md §4.3 add chart empty state; (3) test strategy DASH-002 parallel arrays → array-of-objects",
+      "confirmed_at": "2026-05-08T10:26:31.203Z",
+      "consumed_at": "2026-05-08T10:27:20.879Z",
+      "audit": {
+        "execution_summary": "Updated 3 docs: (1) 10-admin-dashboard.md line 69: bookingTrend type from parallel arrays {labels,bookingsData,revenueData} to array-of-objects {date,count,revenue}[] matching contract.yaml; (2) admin-ui-spec.md §4.3: added chart empty state spec (placeholder icon, title, description, clear filter button, skeleton transition); (3) 测试策略与计划.md §5.2.6: DASH-002 test changed from parallel-array length check to array-of-objects validation, DASH-FE-002 description updated",
+        "completed_at": "2026-05-08T10:27:20.879Z"
+      }
+    },
+    "cg_ses_1778235323201": {
+      "session_id": "cg_ses_1778235323201",
+      "created_at": "2026-05-08T10:15:23.201Z",
+      "task_description": "Frontend: Remove hardcoded fallback data, fix DTOs, implement empty state for charts, and align with contract.yaml data shapes.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Remove hardcoded fallback data, fix DTOs, implement empty state for charts, align with contract.yaml data shapes. Modify 6 files across admin DTO, chart factories, dashboard component, store, app-chart component.",
+      "confirmed_at": "2026-05-08T10:26:33.451Z",
+      "consumed_at": "2026-05-08T10:34:09.518Z",
+      "audit": {
+        "execution_summary": "TDD implementation: Removed ALL hardcoded fallback data from dashboard-chart-factories.ts (buildBookingTrendChartData, buildServicePopularityChartData, buildTimeDistributionChartData — removed [12,19,15,17,22,24,20], ['Mon',...], [350,420,...], ['Haircut',...], [35,25,...], ['9-10',...], [8,12,...]). Removed all hardcoded stat card values (??24, ??5, ??1254, ??3245), APT-001~005, and system status fallbacks from dashboard.component.ts. Added empty state handling to app-chart (hasData computed signal, \"No Data\" overlay). Added 11 new tests (chart factories empty data, app-chart empty state, dashboard no-hardcoded-fallback). All 50/50 new tests pass, existing 192 admin tests unaffected.",
+        "completed_at": "2026-05-08T10:34:09.518Z"
+      }
+    },
+    "cg_ses_1778235332092": {
+      "session_id": "cg_ses_1778235332092",
+      "created_at": "2026-05-08T10:15:32.093Z",
+      "task_description": "Backend: Add DASH-003 and DASH-004 endpoints, fix DASH-002 params, and ensure timeDistribution.hour is string format in admin-stats module",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Add DASH-003 (service-distribution) and DASH-004 (time-distribution) endpoints, fix hour type to string, add range/granularity to DASH-002, with TDD RED→GREEN phases",
+      "confirmed_at": "2026-05-08T10:15:57.342Z",
+      "consumed_at": "2026-05-08T10:25:02.575Z",
+      "audit": {
+        "execution_summary": "TDD RED→GREEN: Added DASH-003 (service-distribution) and DASH-004 (time-distribution) endpoints, fixed TimeDistributionItem.hour to string format, added range/granularity params to DASH-002. All 47 tests passing. Modified DTO, service, controller, and their test specs.",
+        "completed_at": "2026-05-08T10:25:02.575Z"
+      }
+    },
+    "cg_ses_1778239875397": {
+      "session_id": "cg_ses_1778239875397",
+      "created_at": "2026-05-08T11:31:15.398Z",
+      "task_description": "Backend: Add WebSocket system.health.updated emitter to notifications gateway — afterInit periodic health broadcast every 60s",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Add afterInit with setInterval(60000) to emit system.health.updated to connected WebSocket clients + unit test",
+      "confirmed_at": "2026-05-08T11:31:26.028Z",
+      "consumed_at": "2026-05-08T11:33:12.780Z",
+      "audit": {
+        "execution_summary": "Added OnGatewayInit to notifications.gateway.ts with afterInit() setInterval(60000) health broadcast emitting system.health.updated. Added 4 unit tests. All 49 tests pass.",
+        "completed_at": "2026-05-08T11:33:12.780Z"
+      }
+    },
+    "cg_ses_1778239926777": {
+      "session_id": "cg_ses_1778239926777",
+      "created_at": "2026-05-08T11:32:06.777Z",
+      "task_description": "Documentation: Fix D-6 related doc issues in admin-ui-spec.md and admin-dashboard-conformance-report-2026-05-07.md to align with contract.yaml — change stats.updated to system.health.updated, update D-6 section to reflect resolved WebSocket path, add strikethrough D-6 entry in Appendix A",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix 2 doc files: admin-ui-spec.md line 307 (stats.updated → system.health.updated + fallback), conformance report D-6 section (all rows ✅, backend emit resolved), Appendix A (strikethrough D-6 entry)",
+      "confirmed_at": "2026-05-08T11:32:15.172Z",
+      "consumed_at": "2026-05-08T11:33:17.735Z",
+      "audit": {
+        "execution_summary": "Fixed D-6 doc issues: (1) admin-ui-spec.md:307 changed stats.updated to system.health.updated with fallback description; (2) conformance report D-6 section updated all rows to ✅ resolved, backend emit row changed from ❌ to ✅ with AdminHealthGateway implementation details; (3) Appendix A added strikethrough D-6 entry under D-4. Reference files (contract.yaml, 10-admin-dashboard.md, 接口设计规范文档.md) verified already correct.",
+        "completed_at": "2026-05-08T11:33:17.735Z"
+      }
+    },
+    "cg_ses_1778249390204": {
+      "session_id": "cg_ses_1778249390204",
+      "created_at": "2026-05-08T14:09:50.205Z",
+      "task_description": "Backend: Add WebSocket appointment.status_changed broadcast for real-time dashboard updates (D-4). Modify NotificationsGateway to support admin broadcast room and appointment status change events. Inject NotificationsGateway into AppointmentsService to trigger broadcasts on status changes. Update gateway spec tests.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Backend D-4: Add WebSocket appointment.status_changed broadcast. Modify ws-jwt.guard.ts (extend validateToken with roles), notifications.gateway.ts (admin room, sendAdminBroadcast, sendAppointmentStatusChanged), appointments.service.ts (inject gateway, broadcast on status change), tests. TDD RED→GREEN.",
+      "confirmed_at": "2026-05-08T14:12:06.237Z",
+      "consumed_at": "2026-05-08T14:21:20.017Z",
+      "audit": {
+        "execution_summary": "Backend D-4: Implemented WebSocket appointment.status_changed broadcast. Modified 4 files: ws-jwt.guard.ts (extended validateToken with roles), notifications.gateway.ts (admin:broadcast room, sendAdminBroadcast, sendAppointmentStatusChanged), appointments.service.ts (injected gateway, broadcast on status change), notifications.gateway.spec.ts (7 new tests). All 112 tests pass. Lint clean.",
+        "completed_at": "2026-05-08T14:21:20.017Z"
+      }
+    },
+    "cg_ses_1778249408233": {
+      "session_id": "cg_ses_1778249408233",
+      "created_at": "2026-05-08T14:10:08.234Z",
+      "task_description": "Frontend: Add WebSocket appointment.status_changed subscription for real-time dashboard updates (D-4)",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Modify socket.service.ts, dashboard.component.ts, and socket.service.spec.ts for WebSocket appointment.status_changed subscription",
+      "confirmed_at": "2026-05-08T14:11:28.190Z",
+      "consumed_at": "2026-05-08T14:13:59.223Z",
+      "audit": {
+        "execution_summary": "Modified socket.service.ts (AppointmentStatusEvent, subscribeToAppointmentStatusChanges, joinAdminRoom), dashboard.component.ts (appointmentSubscription, joinAdminRoom call, setupAppointmentAutoRefresh), socket.service.spec.ts (8 new tests). All 24 tests pass.",
+        "completed_at": "2026-05-08T14:13:59.223Z"
+      }
+    },
+    "cg_ses_1778249414012": {
+      "session_id": "cg_ses_1778249414012",
+      "created_at": "2026-05-08T14:10:14.012Z",
+      "task_description": "Documentation: Add WebSocket appointment.status_changed event spec to all relevant docs for real-time dashboard updates (D-4)",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Add appointment.status_changed WebSocket event to 5 docs: contract.yaml, admin-ui-spec.md, 10-admin-dashboard.md, 接口设计规范文档.md, conformance report",
+      "confirmed_at": "2026-05-08T14:11:26.314Z",
+      "consumed_at": "2026-05-08T14:13:13.784Z",
+      "audit": {
+        "execution_summary": "Added appointment.status_changed WebSocket event spec to 5 files: (1) contract.yaml §12 with payload schema, (2) admin-ui-spec.md §4.2 auto-refresh row, (3) 10-admin-dashboard.md new auto-refresh row, (4) 接口设计规范文档.md §2.12.5 with full payload + JSON example, (5) conformance report D-4 updated to resolved. All 5 changes executed successfully.",
+        "completed_at": "2026-05-08T14:13:13.784Z"
+      }
+    },
+    "cg_ses_1778251198241": {
+      "session_id": "cg_ses_1778251198241",
+      "created_at": "2026-05-08T14:39:58.242Z",
+      "task_description": "Remove empty state from app-chart component to fix overflow layout issue in dashboard",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Removed empty state from app-chart component by deleting the no-data conditional block in HTML and removing the hasData() computed signal in TS, so parent components control when to show charts.",
+      "confirmed_at": "2026-05-08T14:41:24.067Z",
+      "consumed_at": "2026-05-08T14:42:30.852Z",
+      "audit": {
+        "execution_summary": "Removed empty state from app-chart component: deleted the no-data conditional block in app-chart.component.html (lines 3-7), removed hasData() computed signal from app-chart.component.ts, and updated tests in app-chart.component.spec.ts to remove no-data assertions. All 17 tests pass.",
+        "completed_at": "2026-05-08T14:42:30.852Z"
+      }
+    },
+    "cg_ses_1778387742832": {
+      "session_id": "cg_ses_1778387742832",
+      "created_at": "2026-05-10T04:35:42.833Z",
+      "task_description": "Fix admin.service.ts error handler to properly extract HttpErrorResponse messages",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fixed admin.service.ts handleError to check instanceof HttpErrorResponse first, extracting real backend error messages instead of swallowing them with generic default.",
+      "confirmed_at": "2026-05-10T04:40:44.979Z",
+      "consumed_at": "2026-05-10T04:41:03.987Z",
+      "audit": {
+        "execution_summary": "Fixed admin.service.ts handleError to properly check instanceof HttpErrorResponse before instanceof Error. The previous code always defaulted to 'An error occurred. Please try again.' because HttpErrorResponse doesn't extend Error class. Now it extracts the actual backend error message from error.error?.message or shows the HTTP status. Build passes. All 19 admin.service tests pass.",
+        "completed_at": "2026-05-10T04:41:03.987Z"
+      }
+    },
+    "cg_ses_1778388885996": {
+      "session_id": "cg_ses_1778388885996",
+      "created_at": "2026-05-10T04:54:45.996Z",
+      "task_description": "Add class-validator decorators to admin query DTOs to fix ValidationPipe 400 errors",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Added class-validator decorators to three admin query DTOs (AdminAppointmentsQueryDto, AdminUsersQueryDto, AdminServicesQueryDto) to fix ValidationPipe 400 errors caused by forbidNonWhitelisted rejecting all query parameters.",
+      "confirmed_at": "2026-05-10T05:01:47.301Z",
+      "consumed_at": "2026-05-10T05:02:06.218Z",
+      "audit": {
+        "execution_summary": "Added class-validator decorators to three admin query DTOs: AdminAppointmentsQueryDto, AdminUsersQueryDto, AdminServicesQueryDto. Each property now has @IsOptional() plus type validators (@IsNumber/@IsString/@IsBoolean) with @Type() from class-transformer. This fixes the ValidationPipe 400 errors caused by forbidNonWhitelisted: true rejecting all query parameters that lacked class-validator decorators. All 154 admin backend tests pass. No new TypeScript errors introduced.",
+        "completed_at": "2026-05-10T05:02:06.218Z"
+      }
+    },
+    "cg_ses_1778391395363": {
+      "session_id": "cg_ses_1778391395363",
+      "created_at": "2026-05-10T05:36:35.363Z",
+      "task_description": "Add Recent Users and Recent Services panels to Admin Dashboard with docs updates and full implementation",
+      "gate_status": "checked",
+      "last_check_failed_items": [],
+      "plan_summary": null,
+      "confirmed_at": null,
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1778396002030": {
+      "session_id": "cg_ses_1778396002030",
+      "created_at": "2026-05-10T06:53:22.031Z",
+      "task_description": "Consolidate hover animations on Admin Dashboard Page: remove redundant .card-hover and .sharp-card:hover conflicts, merge into single source of truth, fix misleading .app-card-hover class, normalize transition timing, and ensure consistent 3px lift across all cards and panels",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Consolidate hover animations: merge .sharp-card:hover and .card-hover into single .card-lift class, rename misleading .app-card-hover to .app-card-transition, update all component templates to use the unified class, remove dead CSS rules, normalize to 3px lift with 0.2s transition across all admin dashboard cards and panels",
+      "confirmed_at": "2026-05-10T06:54:12.198Z",
+      "consumed_at": "2026-05-10T06:58:08.532Z",
+      "audit": {
+        "execution_summary": "Consolidated hover animations on Admin Dashboard Page:\n1. styles.scss: Removed redundant .sharp-card:hover and .card-hover, merged into single .card-lift class with 3px lift and 0.2s transition\n2. app-card.component.scss: Renamed .app-card-hover → .app-card-transition (it only defined transition, no hover)\n3. app-card.component.ts: Updated combinedStyleClass to emit app-card-transition\n4. stat-card.component.html: Replaced card-hover with card-lift\n5. Added card-lift to recent-bookings-panel, recent-users-panel, recent-services-panel, and system-status-panel\n\nResult: Single source of truth for hover animation (.card-lift:hover), no cascade conflicts, no dead CSS, consistent 3px lift across all cards/panels with 0.2s transition. Build passes, dashboard tests pass (31/31), app-card tests unchanged (4 pre-existing RED failures unrelated to this change).",
+        "completed_at": "2026-05-10T06:58:08.532Z"
+      }
+    },
+    "cg_ses_1778404400234": {
+      "session_id": "cg_ses_1778404400234",
+      "created_at": "2026-05-10T09:13:20.234Z",
+      "task_description": "Fix stat cards on admin table list pages to use system-wide data instead of page-level data: add isolated full-data store fields (allUsersForStats, allServicesForStats, allAppointmentsForStats), load full datasets via existing API endpoints with higher limit, update computed signals in UserManagement, ServiceManagement, and AppointmentManagement components. Update 4 doc files to reflect the correct data sources and refresh behavior.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Phase 1: Update 4 doc files (10-admin-dashboard.md, 11-admin-users.md, 12-admin-services.md, 系统页面全景图.md) with stat card data sources and refresh behavior. Phase 2: Add 3 isolated store fields (allUsersForStats, allServicesForStats, allAppointmentsForStats) with setters and VM exposure. Phase 3-5: Update UserManagement, ServiceManagement, AppointmentManagement components to load full datasets for stats computation, update computed signals to use full dataset. Dashboard: add auto-refresh for Recent Users/Services.",
+      "confirmed_at": "2026-05-10T09:13:28.130Z",
+      "consumed_at": "2026-05-10T09:24:31.373Z",
+      "audit": {
+        "execution_summary": "Implemented fix for stat cards on admin table list pages to use system-wide data instead of page-level data. Docs: Updated 4 doc files (10-admin-dashboard.md, 11-admin-users.md, 12-admin-services.md, 系统页面全景图.md) with stat card data sources, refresh matrices, and data flow documentation. Store: Added 3 isolated state fields (allUsersForStats, allServicesForStats, allAppointmentsForStats) with setters and VM exposure in admin.store.ts. Components: Updated user/management (loadAllUsersForStats, loadAllServicesForStats, loadAllAppointmentsForStats) to fetch full datasets with limit=999 and compute stats from them. Dashboard: Extended WebSocket auto-refresh to also reload recent users/services on appointment changes. Build passes, store tests 50/50 pass, service management 12/12, appointment management 12/12, user management 11/12 (1 pre-existing RED date-sensitivity failure unrelated).",
+        "completed_at": "2026-05-10T09:24:31.373Z"
+      }
+    },
+    "cg_ses_1778405914509": {
+      "session_id": "cg_ses_1778405914509",
+      "created_at": "2026-05-10T09:38:34.509Z",
+      "task_description": "Add 60s polling auto-refresh to Avg Price card on Service Management page for real-time reflection. Update docs in 12-admin-services.md to document polling mechanism. No backend changes.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Add 60s polling to ServiceManagement component for Avg Price auto-refresh. Update 12-admin-services.md doc with polling row. No backend changes. Pattern matches Dashboard system health polling.",
+      "confirmed_at": "2026-05-10T09:38:39.771Z",
+      "consumed_at": "2026-05-10T09:40:21.163Z",
+      "audit": {
+        "execution_summary": "Added 60s polling to ServiceManagement component for Avg Price auto-refresh. Changes: added OnDestroy interface, imported Subscription/interval from rxjs, added statsPollInterval field, setupStatsPolling() method (interval(60000) → loadAllServicesForStats()), ngOnDestroy cleanup, called setupStatsPolling() in ngOnInit. Updated 12-admin-services.md doc with polling row in refresh table and 60s polling note in Average Price card. Build passes, 12/12 service management tests pass.",
+        "completed_at": "2026-05-10T09:40:21.163Z"
+      }
+    },
+    "cg_ses_1778408517317": {
+      "session_id": "cg_ses_1778408517317",
+      "created_at": "2026-05-10T10:21:57.318Z",
+      "task_description": "Fix Avg Price calculation on Service Management page: API returns price as string, convert to number at data ingress point in loadAllServicesForStats. Remove debug logs. Update docs.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Docs: update 12-admin-services.md to document price field string-typing from API and the Number() coercion at ingress. Code: remove debug logs, add response.items.map(s => ({...s, price: Number(s.price)}) in loadAllServicesForStats. Build + test.",
+      "confirmed_at": "2026-05-10T10:22:04.543Z",
+      "consumed_at": "2026-05-10T10:23:38.062Z",
+      "audit": {
+        "execution_summary": "Fixed Avg Price calculation bug: backend returns price as string, causing reduce() to do string concatenation producing 400250 instead of 650. Code: added response.items.map(s => ({...s, price: Number(s.price)})) at data ingress point in loadAllServicesForStats(). Removed debug console.log lines. Docs: updated 12-admin-services.md with ⚠️ note about price field string-typing and the Number() coercion fix. Build passes, 12/12 service management tests, 50/50 store tests.",
+        "completed_at": "2026-05-10T10:23:38.062Z"
+      }
+    },
+    "cg_ses_1778410677011": {
+      "session_id": "cg_ses_1778410677011",
+      "created_at": "2026-05-10T10:57:57.011Z",
+      "task_description": "Refactor app-badge sizing to match p-tag proportions, replace p-tag on User Management status column with app-badge. Update docs and tests.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Docs: update 11-admin-users.md to reflect status column badge change from p-tag to app-badge. Code: resize app-badge (height/font/padding/radius/weight) to match p-tag proportions; remove Tag dependency from user-management; replace p-tag status column with app-badge; remove getStatusSeverity, add mapStatusToBadge; update tests.",
+      "confirmed_at": "2026-05-10T10:58:04.156Z",
+      "consumed_at": "2026-05-10T11:01:11.324Z",
+      "audit": {
+        "execution_summary": "Consolidated badge styles across admin: resized app-badge (height: sm→22px, md→26px, lg→30px; font-weight: 600; border-radius: 6px; padding/sizes increased) to match p-tag proportions while keeping custom color palette. Replaced p-tag on User Management status column with app-badge via new mapStatusToBadge() method (ACTIVE→confirmed, INACTIVE→pending, BLOCKED→cancelled). Removed Tag dependency from user-management component. Added mapStatusToBadge test. Updated 11-admin-users.md doc with new table column reference section. Build passes, dashboard 31/31, store 50/50, user management 12/13 (1 pre-existing RED), app-badge 17/19 (2 pre-existing RED).",
+        "completed_at": "2026-05-10T11:01:11.324Z"
+      }
+    },
+    "cg_ses_1778412645968": {
+      "session_id": "cg_ses_1778412645968",
+      "created_at": "2026-05-10T11:30:45.968Z",
+      "task_description": "Make Role/Status badges display uppercase across admin pages: User Management Role column, Appointment Management Status column, Service Management Active column, Dashboard Recent Users table. Update docs for all affected pages.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Code: update customLabel on 4 templates to display uppercase role/status values. Docs: update 11-admin-users.md, 12-admin-services.md, 10-admin-dashboard.md for uppercase badge labels.",
+      "confirmed_at": "2026-05-10T11:30:53.293Z",
+      "consumed_at": "2026-05-10T11:33:27.263Z",
+      "audit": {
+        "execution_summary": "Updated 4 template files to display role/status badges in uppercase matching the stored DB values: user-management Role column (customLabel → user.role), appointment-management Status column (added customLabel=\"appointment.status\"), service-management Active column (ACTIVE/INACTIVE uppercase), dashboard Recent Users table role badges (added customLabel=\"row.user.role\"). Updated 3 doc files: 11-admin-users.md Role column note, 12-admin-services.md added 表格列 section with Active row, 10-admin-dashboard.md Recent Users role badge note. Build passes, 67/68 tests pass.",
+        "completed_at": "2026-05-10T11:33:27.263Z"
+      }
+    },
+    "cg_ses_1778413878582": {
+      "session_id": "cg_ses_1778413878582",
+      "created_at": "2026-05-10T11:51:18.582Z",
+      "task_description": "Add Quick Booking Creation feature to Appointment Management page. Backend: add POST /admin/appointments endpoint with CreateAdminAppointmentDto. Frontend: add dialog with customer/service/date/timeSlot fields, API method, table refresh. Docs: update design docs for consistency.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Backend: add CreateAdminAppointmentDto + create() in service + POST endpoint in controller. Frontend: add admin.dto interface + createAdminAppointment() in service + booking dialog in component (customer/service/date/timeSlot/notes) + button in header + tests. Docs: update appointment management page.",
+      "confirmed_at": "2026-05-10T11:51:25.974Z",
+      "consumed_at": "2026-05-10T12:03:07.748Z",
+      "audit": {
+        "execution_summary": "Implemented Quick Booking Creation on Appointment Management page. Backend: added CreateAdminAppointmentDto, create() service method (with auto time slot assignment), and POST /admin/appointments endpoint. Frontend: added CreateAdminAppointmentRequest DTO, createAdminAppointment() in admin service, Quick Booking button in header, dialog with customer/service/date/notes fields, customer/service options loading. Docs: updated 系统页面全景图.md. Backend builds with 0 errors, frontend builds, 31/31 admin tests pass.",
+        "completed_at": "2026-05-10T12:03:07.748Z"
+      }
+    },
+    "cg_ses_1778414885981": {
+      "session_id": "cg_ses_1778414885981",
+      "created_at": "2026-05-10T12:08:05.981Z",
+      "task_description": "Create shared AppSearchInput autocomplete component with debounce, fix template gap on 3 admin table list pages (user/service/appointment management), add debounce to search inputs, fix appointment search parameter support",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Create shared AppSearchInput with debounce autocomplete, fix template gap on 3 admin table pages, add debounce filtering, fix appointment search param, keep docs and code consistent",
+      "confirmed_at": "2026-05-10T12:08:34.793Z",
+      "consumed_at": "2026-05-10T12:22:54.000Z",
+      "audit": {
+        "execution_summary": "Created AppSearchInput shared atom component with autocomplete dropdown and 300ms debounce. Fixed template @if gap on 3 admin pages (user/service/appointment management). Added searchSuggestions computed signals. Changed loading behavior to use isFiltering signal for table overlay. Added search param to AdminAppointmentsQuery DTO and wired to AdminService. Build passes, all 12 component unit tests pass. Code and requirement docs consistent.",
+        "completed_at": "2026-05-10T12:22:54.000Z"
+      }
+    },
+    "cg_ses_1778415060667": {
+      "session_id": "cg_ses_1778415060667",
+      "created_at": "2026-05-10T12:11:00.667Z",
+      "task_description": "Create shared AppSearchInput autocomplete atom component and fix search reload bug on 3 admin table list pages",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Create AppSearchInput autocomplete atom, fix @if template gap and loading bug on 3 admin pages, add search to appointment DTO/API",
+      "confirmed_at": "2026-05-10T12:12:42.453Z",
+      "consumed_at": "2026-05-10T12:20:55.288Z",
+      "audit": {
+        "execution_summary": "Created AppSearchInputComponent (12 tests passing), fixed @if template gap on 3 admin pages, replaced app-input with app-search-input with debounce, added isFiltering signal for loading behavior, added search param to AdminAppointmentsQuery and admin.service.ts, wired appointment-management search to API",
+        "completed_at": "2026-05-10T12:20:55.288Z"
+      }
+    },
+    "cg_ses_1778416599588": {
+      "session_id": "cg_ses_1778416599588",
+      "created_at": "2026-05-10T12:36:39.588Z",
+      "task_description": "Fix backend validation error 'property search should not exist' on admin appointments endpoint by adding search property to AdminAppointmentsQueryDto and implementing search filter logic in AdminAppointmentsService",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix backend search validation error: verify DTO/service already correct, add search test to service spec, add search param to contract.yaml admin.appointments.list, run build",
+      "confirmed_at": "2026-05-10T12:38:03.830Z",
+      "consumed_at": "2026-05-10T12:40:51.578Z",
+      "audit": {
+        "execution_summary": "Verified DTO and service already have search property/logic. Added search filter test to admin-appointments.service.spec.ts (passes). Added search param to contract.yaml admin.appointments.list query_parameters for consistency with users and services endpoints. No source code changes needed. All 32 admin-appointments tests pass.",
+        "completed_at": "2026-05-10T12:40:51.578Z"
+      }
+    },
+    "cg_ses_1778418245800": {
+      "session_id": "cg_ses_1778418245800",
+      "created_at": "2026-05-10T13:04:05.800Z",
+      "task_description": "Fix Quick Booking dialog: split date/time selector, add time slot dropdown with unavailable prompt, fix dropdown clipping via appendTo=body on both Appointment and User dialogs, rename title to New Appointment. Update docs and tests.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Split Appointment Date+Time into separate date picker + time slot dropdown with unavailable prompt. Add appendTo=body on all p-select in both Appointment and User dialogs. Rename dialog header and button to New Appointment. Update docs and tests.",
+      "confirmed_at": "2026-05-10T13:04:13.767Z",
+      "consumed_at": "2026-05-10T13:07:58.904Z",
+      "audit": {
+        "execution_summary": "Fixed New Appointment dialog: split Appointment Date+Time into separate Date picker + Time Slot dropdown. Time slot dropdown loads via ApiService.getAvailableSlots(serviceId) when service is selected. Shows red prompt banner when no time slots available. Added appendTo=body on all p-select and p-datepicker in both Appointment and User Management dialogs to fix dropdown clipping. Renamed dialog header from Quick Booking to New Appointment. Updated docs and tests. Build passes, 24/25 tests pass (1 pre-existing RED).",
+        "completed_at": "2026-05-10T13:07:58.904Z"
+      }
+    },
+    "cg_ses_1778419441219": {
+      "session_id": "cg_ses_1778419441219",
+      "created_at": "2026-05-10T13:24:01.219Z",
+      "task_description": "Create shared app-filter-bar and app-table-wrapper molecules, fix app-dropdown overlay clipping with appendTo body, update 3 admin list pages to use shared molecules",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Create shared app-filter-bar and app-table-wrapper molecules, fix app-dropdown overlay clipping by adding appendTo body, update 3 admin list pages to replace inline filter bar and table containers with shared molecules. Dashboard already componentized, no change needed.",
+      "confirmed_at": "2026-05-10T13:24:08.312Z",
+      "consumed_at": "2026-05-10T13:48:25.305Z",
+      "audit": {
+        "execution_summary": "Created shared app-filter-bar and app-table-wrapper molecules, fixed app-dropdown overlay clipping with appendTo body, updated 3 admin list pages to use shared molecules. Build succeeds. All related tests pass (8/8 molecule tests, 10/10 app-dropdown tests, page tests unchanged). Pre-existing unrelated RED test failure unchanged.",
+        "completed_at": "2026-05-10T13:48:25.305Z"
+      }
+    },
+    "cg_ses_1778419875823": {
+      "session_id": "cg_ses_1778419875823",
+      "created_at": "2026-05-10T13:31:15.823Z",
+      "task_description": "Create shared app-filter-bar/app-table-wrapper molecules and fix dropdown overlay clipping in admin pages",
+      "gate_status": "armed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix app-dropdown overlay clipping, create app-filter-bar and app-table-wrapper molecules, update 3 admin pages to use new molecules, run lint/tests, create HANDOVER.md and test_report.json",
+      "confirmed_at": "2026-05-10T13:32:30.346Z",
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1778421148817": {
+      "session_id": "cg_ses_1778421148817",
+      "created_at": "2026-05-10T13:52:28.818Z",
+      "task_description": "Fix Time Slot dropdown and Save button on New Appointment form: add startDate/endDate to getAvailableSlots API call, compute date range, add validation feedback for Save button. Update tests.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix Time Slot loading: update ApiService.getAvailableSlots to accept date range params, compute date window (today to +30d) in loadAvailableTimeSlots, add save validation feedback. Update tests.",
+      "confirmed_at": "2026-05-10T13:52:35.006Z",
+      "consumed_at": "2026-05-10T13:56:04.803Z",
+      "audit": {
+        "execution_summary": "Fixed Time Slot dropdown and Save button on New Appointment form. \n1. ApiService.getAvailableSlots now accepts optional startDate/endDate params matching backend endpoint requirements.\n2. loadAvailableTimeSlots computes a 30-day date window (today to +30d) and passes it to the API.\n3. saveBooking now shows user-facing validation errors (formSubmitted signal + formErrors signal) instead of silent return.\n4. Template shows inline red error messages under each required field when validation fails.\nBuild passes, 12/12 appointment tests pass, 27/31 api service tests pass (4 pre-existing RED failures unchanged).",
+        "completed_at": "2026-05-10T13:56:04.803Z"
+      }
+    },
+    "cg_ses_1778449213214": {
+      "session_id": "cg_ses_1778449213214",
+      "created_at": "2026-05-10T21:40:13.215Z",
+      "task_description": "Fix 6 styling inconsistencies across User, Service, and Appointment Quick Booking dialog forms: validation styling, appendTo body, error message style, showIcon, placeholders, dialog widths",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix 6 styling inconsistencies across User Service and Appointment Quick Booking dialog forms: add missing ng-invalid validation styling, appendTo body, consistent error message style text-danger, showIcon on datepickers, placeholders, standardize dialog widths to 480px",
+      "confirmed_at": "2026-05-10T21:40:17.586Z",
+      "consumed_at": "2026-05-10T21:44:09.158Z",
+      "audit": {
+        "execution_summary": "Fixed 6 styling inconsistencies across User, Service, and Appointment Quick Booking dialog forms: (1) added ng-invalid validation classes to Quick Booking fields, (2) added appendTo body to Status Update p-select, (3) normalized error message style to text-danger, (4) added showIcon to filter bar datepickers, (5) added placeholders to User/Service form inputs, (6) standardized all dialog widths to 480px. Build passes, tests pass.",
+        "completed_at": "2026-05-10T21:44:09.158Z"
+      }
+    },
+    "cg_ses_1778449273222": {
+      "session_id": "cg_ses_1778449273222",
+      "created_at": "2026-05-10T21:41:13.222Z",
+      "task_description": "Coder-FE: Fix 6 styling inconsistencies across admin dialog forms (User, Service, Appointment Quick Booking) - validation styling, appendTo, error messages, showIcon, placeholders, dialog widths",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix 6 styling inconsistencies across 3 admin dialog forms: validation styling, appendTo, error messages, showIcon, placeholders, dialog widths",
+      "confirmed_at": "2026-05-10T21:41:29.323Z",
+      "consumed_at": "2026-05-10T21:43:35.330Z",
+      "audit": {
+        "execution_summary": "Applied 6 form styling consistency fixes across 3 admin dialog HTML templates: (1) Added [class.ng-invalid] bindings to Quick Booking form, (2) Added appendTo=\"body\" to Status Update p-select, (3) Changed error msg class to text-danger, (4) Added [showIcon]=\"true\" to filter datepickers, (5) Added placeholders to User/Service forms, (6) Standardized all dialog widths to 480px.",
+        "completed_at": "2026-05-10T21:43:35.330Z"
+      }
+    },
+    "cg_ses_1778472959723": {
+      "session_id": "cg_ses_1778472959723",
+      "created_at": "2026-05-11T04:15:59.724Z",
+      "task_description": "Refactor getAvailableSlots to dynamically compute time slots from service durationMinutes, lazy-create TimeSlot records on demand, fix silent error handler and date boundary",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Refactor getAvailableSlots to dynamically compute time intervals from Service.durationMinutes, lazy-create TimeSlot records on upsert, fix silent error handler and date boundary. Docs consistent - API/data model unchanged.",
+      "confirmed_at": "2026-05-11T04:16:06.647Z",
+      "consumed_at": "2026-05-11T04:25:28.485Z",
+      "audit": {
+        "execution_summary": "Refactored TimeSlotsService.getAvailableSlots to dynamically compute time intervals from Service.durationMinutes (09:00-17:00 UTC, back-to-back spacing), lazy-creating TimeSlot records via upsert. Fixed frontend silent error handler (error: () => {} → store.setError). Fixed endDate boundary (end-of-day time). Backend: 42/42 tests pass. Both builds pass. No doc changes needed (API contract unchanged).",
+        "completed_at": "2026-05-11T04:25:28.485Z"
+      }
+    },
+    "cg_ses_1778473043154": {
+      "session_id": "cg_ses_1778473043154",
+      "created_at": "2026-05-11T04:17:23.154Z",
+      "task_description": "Refactor TimeSlot system to dynamic computation from Service durationMinutes + fix frontend appointment-management bugs",
+      "gate_status": "checked",
+      "last_check_failed_items": [],
+      "plan_summary": null,
+      "confirmed_at": null,
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1778482623411": {
+      "session_id": "cg_ses_1778482623411",
+      "created_at": "2026-05-11T06:57:03.412Z",
+      "task_description": "Update project requirements documents to add new fields (pricePerMinute, taxRate, durationMinutes, price, taxIncludedAmount, bookingGroupId) to Service, Appointment, and BookingGroup models across 8 documents. No code changes.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Update 8 project requirements documents to add pricePerMinute, taxRate, durationMinutes, price, taxIncludedAmount, bookingGroupId fields to Service/Appointment/BookingGroup models. Zero code changes.",
+      "confirmed_at": "2026-05-11T06:57:13.236Z",
+      "consumed_at": "2026-05-11T07:12:08.324Z",
+      "audit": {
+        "execution_summary": "Updated 9 project requirements documents to add pricePerMinute, taxRate, durationMinutes, price, taxIncludedAmount, bookingGroupId fields to Service/Appointment/BookingGroup models. No code changes. Documents: contract.yaml (v1.7.0), schema.prisma, 数据架构设计文档.md (v2.6.0), 系统架构设计文档（SAD）.md (v2.4.0), 接口设计规范文档.md (v2.9.0), 安全架构设计文档.md (v2.4.0), 测试策略与计划.md (v2.4.0), frontend-coding-standard.md (v1.2.0), backend-coding-standard.md (v1.1.0).",
+        "completed_at": "2026-05-11T07:12:08.324Z"
+      }
+    },
+    "cg_ses_1778482705356": {
+      "session_id": "cg_ses_1778482705356",
+      "created_at": "2026-05-11T06:58:25.356Z",
+      "task_description": "Update project requirements documents (contract.yaml, schema.prisma, 数据架构设计文档.md, SAD.md, 接口设计规范文档.md, 安全架构设计文档.md, 测试策略与计划.md, frontend-coding-standard.md, backend-coding-standard.md) to add new fields to Service, Appointment, and BookingGroup models. NO code changes — only .md, .yaml, and .prisma files.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Add fields (pricePerMinute, taxRate, durationMinutes, price, taxIncludedAmount, bookingGroupId) to Service/Appointment models, new BookingGroup model, across 9 project documents (.yaml, .prisma, .md). All changes are additive insertions only.",
+      "confirmed_at": "2026-05-11T06:59:16.492Z",
+      "consumed_at": "2026-05-11T07:11:28.940Z",
+      "audit": {
+        "execution_summary": "Completed additive updates to 9 project documents: contract.yaml (v1.7.0, +Service/Appointment/BookingGroup fields), schema.prisma (+BookingGroup model + fields), 数据架构设计文档.md (v2.6.0, ERD/constraints/indexes), SAD.md (v2.4.0, Appointment/BookingGroup), 接口设计规范文档.md (v2.9.0, DTO/wire mapping), 安全架构设计文档.md (v2.4.0, @@unique fix + audit), 测试策略与计划.md (v2.4.0, financial/multi-slot tests), frontend-coding-standard.md (v1.2.0, MultiSlotPicker), backend-coding-standard.md (v1.1.0, migration notes). All changes are additive insertions only.",
+        "completed_at": "2026-05-11T07:11:28.940Z"
+      }
+    },
+    "cg_ses_1778485014986": {
+      "session_id": "cg_ses_1778485014986",
+      "created_at": "2026-05-11T07:36:54.987Z",
+      "task_description": "Fix 48 documentation issues found across two audits: contract.yaml indentation and missing fields, detailed design pages missing v1.7.0 fields, UI design docs missing v1.7.0 fields, version/date mismatches, schema inconsistencies. No code changes.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix 48 documentation issues across contract.yaml, 5 detailed design pages, 5 UI design docs, and 5 requirements docs. YAML indentation, missing fields, version dates, schema inconsistencies. No code changes.",
+      "confirmed_at": "2026-05-11T07:37:03.844Z",
+      "consumed_at": "2026-05-11T07:50:50.155Z",
+      "audit": {
+        "execution_summary": "Fixed all 30+ documentation issues across 15 files: contract.yaml (17 fixes: YAML indentation, missing fields, date updates), schema.prisma (BookingGroup index), SAD/接口设计规范 dates, 数据架构设计 (PostgreSQL 18→16), 5 detailed design pages (v1.7.0 field additions), 5 UI design docs (multi-slot + financial field references).",
+        "completed_at": "2026-05-11T07:50:50.155Z"
+      }
+    },
+    "cg_ses_1778485117497": {
+      "session_id": "cg_ses_1778485117497",
+      "created_at": "2026-05-11T07:38:37.497Z",
+      "task_description": "Fix ALL documentation issues across the project: contract.yaml indentation/field fixes, version/date updates, detailed design docs, UI design docs, and data docs/schema fixes. No code changes — only .md, .yaml, .prisma files.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix 30 documentation issues across 15 files: contract.yaml indentation/field fixes, version/date updates, detailed design docs, UI design docs, and data docs/schema fixes",
+      "confirmed_at": "2026-05-11T07:41:14.098Z",
+      "consumed_at": "2026-05-11T07:49:59.697Z",
+      "audit": {
+        "execution_summary": "Fixed all 30 documentation issues across 15 files: contract.yaml (12 indentation/field fixes including role, body, indexes, relationships, booking_group, failed_ids, changelog, metadata + 5 field additions), version/date updates (4 files), detailed design docs (5 files), UI design docs (5 files), data docs/schema fixes (4 changes). All validations pass.",
+        "completed_at": "2026-05-11T07:49:59.697Z"
+      }
+    },
+    "cg_ses_1778493728125": {
+      "session_id": "cg_ses_1778493728125",
+      "created_at": "2026-05-11T10:02:08.126Z",
+      "task_description": "Phase 1: Backend changes - Remove staffWorkload, add v1.7.0 financial fields, add Quick Booking fields, fix TimeDistributionItem.hour type in the booking backend",
+      "gate_status": "checked",
+      "last_check_failed_items": [],
+      "plan_summary": null,
+      "confirmed_at": null,
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1778493746516": {
+      "session_id": "cg_ses_1778493746516",
+      "created_at": "2026-05-11T10:02:26.516Z",
+      "task_description": "Phase 1: Frontend — Remove staffWorkload, add v1.7.0 financial fields to DTOs, store, components, service create flow. Fix AdminStats DTO comment version.",
+      "gate_status": "armed",
+      "last_check_failed_items": [],
+      "plan_summary": "P5 Blue color cleanup: Replace all residual blue #00c6ff/#0072ff/#00b8f0/#667eea/#1677FF with green #2ecc71/#27ae60 across frontend SCSS/TS files (~50 locations in 15+ files)",
+      "confirmed_at": "2026-05-11T10:16:56.292Z",
+      "consumed_at": "2026-05-11T10:11:58.650Z",
+      "audit": {
+        "execution_summary": "Phase 1 completed: Removed staffWorkload from DTO/store/component/panel, added v1.7.0 financial fields to DTOs (AdminServiceItem, AdminAppointment, Service, Booking, BookingListItem, request DTOs), updated BookingStore state, added form fields to service-management component, updated booking service create flow, fixed version comment. All 158 tests pass across 5 affected suites.",
+        "completed_at": "2026-05-11T10:11:58.650Z"
+      }
+    },
+    "cg_ses_1778494456925": {
+      "session_id": "cg_ses_1778494456925",
+      "created_at": "2026-05-11T10:14:16.925Z",
+      "task_description": "Phase 5 - Blue color cleanup: Replace all residual blue (#00c6ff, #0072ff, #00b8f0, #667eea, rgba blue values) color references in frontend SCSS/CSS/TS files with green (#2ecc71, #27ae60, rgba green values). Files include styles.scss, app-badge, app-input, dashboard-chart, app-chart, auth form SCSS, login/register/profile/my-bookings/appointment-management SCSS files. Do NOT modify contract.yaml or backend code.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Phase 5 Blue color cleanup: Replace #00c6ff/#0072ff/#00b8f0/#667eea/#1677FF blue colors with #2ecc71/#27ae60 green in all frontend SCSS/CSS/TS files under booking-frontend/src/. Targeted replacements in styles.scss, app-badge, app-input, dashboard-chart, app-chart, auth forms, login/register/profile/my-bookings/appointment-management SCSS. No backend/contract.yaml changes. Lint + test audit after.",
+      "confirmed_at": "2026-05-11T10:17:14.036Z",
+      "consumed_at": "2026-05-11T10:21:43.324Z",
+      "audit": {
+        "execution_summary": "Phase 5 Blue color cleanup completed. All residual blue (#00c6ff, #667eea, #1677FF, #0284c7, #0369a1, rgba blue patterns) replaced with green equivalents (#2ecc71, #27ae60, #059669, #047857, rgba green patterns) across 18 frontend SCSS/CSS/TS files under booking-frontend/src/. Comments updated (accent-blue→accent-green). No contract.yaml or backend code modified. Audit confirmed zero residual blue matches. Pre-existing NG0400 test infrastructure issue unrelated to changes.",
+        "completed_at": "2026-05-11T10:21:43.324Z"
+      }
+    },
+    "cg_ses_1778494543657": {
+      "session_id": "cg_ses_1778494543657",
+      "created_at": "2026-05-11T10:15:43.657Z",
+      "task_description": "Phase 3 - TimeSlot Migration: Migrate TimeSlot model from slotTime (String) to startTime (DateTime) and endTime (DateTime). Update Prisma schema, DTOs, services, and tests in booking-backend.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Phase 3 TimeSlot migration: Replace slotTime (String) with startTime/endTime (DateTime) across Prisma schema, DTOs, 3 services, 4 spec files, mapper, and fixture. Follow TDD RED->GREEN->REFACTOR.",
+      "confirmed_at": "2026-05-11T10:16:43.129Z",
+      "consumed_at": "2026-05-11T10:31:49.697Z",
+      "audit": {
+        "execution_summary": "Phase 3 TimeSlot migration completed successfully. Migrated slotTime (String) to startTime/endTime (DateTime) across Prisma schema, DTOs, 3 services, 4 spec files, mapper, and fixture. Created migration SQL. All 127 unit tests pass. Pre-existing integration test failures (7) unrelated to changes.",
+        "completed_at": "2026-05-11T10:31:49.697Z"
+      }
+    },
+    "cg_ses_1778497822701": {
+      "session_id": "cg_ses_1778497822701",
+      "created_at": "2026-05-11T11:10:22.701Z",
+      "task_description": "Fix New Appointment dialog form in appointment-management component: add multi-slot selection (selectedSlotIds), overtime minutes (overtimeMinutes) fields, and cost preview summary. The DTO and service layer already support these fields.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix New Appointment dialog: add multi-slot selection (p-multiselect), overtime minutes (p-inputnumber), and cost preview to appointment-management component. Modify TS (signals/computed/methods), HTML (3 new form sections), and minimal SCSS.",
+      "confirmed_at": "2026-05-11T11:10:38.934Z",
+      "consumed_at": "2026-05-11T11:14:01.537Z",
+      "audit": {
+        "execution_summary": "Fixed New Appointment dialog in appointment-management component: (1) Added MultiSelectModule, new signals (formOvertimeMinutes, formSelectedSlotIds, formSelectedServiceData, rawServiceItems) and estTotalCost computed; (2) Updated openBooking, saveBooking, onServiceChange, loadServiceOptions methods; (3) Added multi-slot picker (p-multiSelect), overtime input (p-inputNumber), and cost preview to HTML template. All 12 existing tests pass.",
+        "completed_at": "2026-05-11T11:14:01.537Z"
+      }
+    },
+    "cg_ses_1778499781501": {
+      "session_id": "cg_ses_1778499781501",
+      "created_at": "2026-05-11T11:43:01.502Z",
+      "task_description": "Implement pricePerMinute auto-calculation on backend service management - Option 2: backend computes pricePerMinute = price / duration on save for data integrity",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Implement pricePerMinute auto-calculation on backend admin-services. 1) Add pricePerMinute to AdminServiceDto/CreateAdminServiceDto/UpdateAdminServiceDto, 2) Update service.mapper.ts to map pricePerMinute, 3) Add auto-calculation logic in admin-services.service.ts create() and update() - if pricePerMinute not provided but price & duration present, compute pricePerMinute = price / duration (rounded to 2 decimals). Follow TDD: RED (update specs with failing tests first) → GREEN → REFACTOR.",
+      "confirmed_at": "2026-05-11T11:44:39.377Z",
+      "consumed_at": "2026-05-11T11:49:44.671Z",
+      "audit": {
+        "execution_summary": "Implemented pricePerMinute auto-calculation on backend admin-services module. Added pricePerMinute to AdminServiceDto/CreateAdminServiceDto/UpdateAdminServiceDto (admin-service.dto.ts), updated service.mapper.ts to handle pricePerMinute mapping, added auto-calculation logic in admin-services.service.ts create()/update() (computes pricePerMinute = price/duration when not explicitly provided). TDD: Updated spec with 6 new test cases + fixture updates. All 23 service tests + 15 controller tests pass.",
+        "completed_at": "2026-05-11T11:49:44.671Z"
+      }
+    },
+    "cg_ses_1778499789936": {
+      "session_id": "cg_ses_1778499789936",
+      "created_at": "2026-05-11T11:43:09.936Z",
+      "task_description": "Implement Option 2 for pricePerMinute auto-calculation on the service management form in the Angular frontend. Replace editable pricePerMinute input with read-only computed display based on Price / Duration. Follow TDD: RED → GREEN → REFACTOR.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Implement pricePerMinute auto-calculation via Angular computed signal, remove from API DTOs, replace editable input with read-only computed display. TDD: RED→GREEN→REFACTOR.",
+      "confirmed_at": "2026-05-11T11:44:22.413Z",
+      "consumed_at": "2026-05-11T11:48:27.025Z",
+      "audit": {
+        "execution_summary": "Implemented Option 2 pricePerMinute auto-computation on service management form via TDD. RED: Added 10 failing tests. GREEN: Added computedPricePerMinute function, removed pricePerMinute from DTOs in saveService(), replaced editable InputNumber with read-only computed display. REFACTOR: Cleaned up template syntax, verified all 26 tests pass and zero TS errors. Produced TASK_LOG.md, HANDOVER.md, test_report.json.",
+        "completed_at": "2026-05-11T11:48:27.025Z"
+      }
+    },
+    "cg_ses_1778500770508": {
+      "session_id": "cg_ses_1778500770508",
+      "created_at": "2026-05-11T11:59:30.508Z",
+      "task_description": "Fix 10 button style mismatches across login/register/auth component SCSS files - update colors, borders, gradients per design specs",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fixed 10 button style mismatches across 9 SCSS files: app-button colors/borders/border-radius, replaced all #764ba2 gradients with solid green. Build passed.",
+      "confirmed_at": "2026-05-11T12:01:35.467Z",
+      "consumed_at": "2026-05-11T12:01:39.764Z",
+      "audit": {
+        "execution_summary": "Fixed 10 button style mismatches across 9 SCSS files. Fix 1: app-button primary color #ffffff→#0c1220, border none→1px solid rgba(46,204,113,0.3), border-radius:6px on all 4 variants, secondary bg→transparent & color→var(--color-text-secondary,#94a3b8). Fixes 2-9: replaced 11 occurrences of #764ba2 purple gradients with solid var(--color-primary,#2ecc71) across auth-form.scss, auth-form.component.scss, login/register.component.scss, time-slot-picker/service-selection/my-bookings/register-form component SCSS. Build pass: zero errors.",
+        "completed_at": "2026-05-11T12:01:39.764Z"
+      }
+    },
+    "cg_ses_1778501384341": {
+      "session_id": "cg_ses_1778501384341",
+      "created_at": "2026-05-11T12:09:44.341Z",
+      "task_description": "Fix 16 input hover/focus styling mismatches on login/register/auth form inputs across 4 SCSS files: auth-form.scss, auth-form.component.scss, app-input.component.scss, and styles.scss. Migrate from glassmorphism to sharp design by fixing border width, border-radius, focus shadows, placeholder colors, and adding .sharp-input class.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix 16 input hover/focus styling mismatches across 4 SCSS files: border 2px->1px, border-radius 12px->6px, add .sharp-input class with proper focus/hover/error states, update fallback colors #e0e0e0->#2a3a50, #666->#94a3b8, #f44336->#e74c3c, fix focus shadows to 3px rgba(46,204,113,0.15). Verify with npm run build.",
+      "confirmed_at": "2026-05-11T12:11:03.771Z",
+      "consumed_at": "2026-05-11T12:13:27.689Z",
+      "audit": {
+        "execution_summary": "Fixed 16+ input hover/focus styling mismatches across 4 SCSS files: (1) _auth-form.scss — added .sharp-input class, fixed input/select border 2px→1px, border-radius 12px→6px, added :focus box-shadow, updated fallback colors; (2) auth-form.component.scss — same fixes + .sharp-input class; (3) app-input.component.scss — focus shadow 2px→3px, added .error class; (4) styles.scss — global focus shadow opacity 0.1→0.15. Build verified.",
+        "completed_at": "2026-05-11T12:13:27.689Z"
+      }
+    },
+    "cg_ses_1778542817750": {
+      "session_id": "cg_ses_1778542817750",
+      "created_at": "2026-05-11T23:40:17.751Z",
+      "task_description": "Analyze whether selected_slot_ids and overtime_minutes fields in the Quick Booking POST /v1/admin/appointments endpoint are functionally duplicated, by reading contract.yaml and the admin appointments page design document.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Analyzed contract.yaml, data architecture doc, test strategy, interface design spec, and admin appointments page design to determine whether selected_slot_ids and overtime_minutes are functionally duplicated in the Quick Booking endpoint. Read all authoritative sources and delivered a definitive architectural ruling with specific references.",
+      "confirmed_at": "2026-05-11T23:44:34.379Z",
+      "consumed_at": "2026-05-11T23:44:42.102Z",
+      "audit": {
+        "execution_summary": "Delivered definitive architectural ruling that selected_slot_ids and overtime_minutes are NOT functionally duplicated. They are independent, orthogonal fields: selected_slot_ids enables horizontal multi-record booking via BookingGroup, while overtime_minutes enables vertical single-record duration extension via durationMinutes. Analysis backed by contract.yaml, data architecture doc, test strategy, interface design spec, and page design with specific line references.",
+        "completed_at": "2026-05-11T23:44:42.102Z"
+      }
+    },
+    "cg_ses_1778551046746": {
+      "session_id": "cg_ses_1778551046746",
+      "created_at": "2026-05-12T01:57:26.747Z",
+      "task_description": "Architectural document cleanup: Remove all references to selected_slot_ids (multi-slot), BookingGroup model, and booking_group_id across all .md and .yaml documents (16 files). Add overtime-overlap validation documentation. No .ts, .html, .scss, or prisma schema changes.",
+      "gate_status": "armed",
+      "last_check_failed_items": [],
+      "plan_summary": "Architectural document cleanup across 16 files: Remove all selected_slot_ids, booking_group_id, BookingGroup references. Add overtime-overlap validation, maxOvertimeMinutes to time-slots endpoint, overtime pricing formula. Only .md and .yaml files. No code/prisma changes.",
+      "confirmed_at": "2026-05-12T02:01:29.308Z",
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1778564311232": {
+      "session_id": "cg_ses_1778564311232",
+      "created_at": "2026-05-12T05:38:31.233Z",
+      "task_description": "Fix cross-document consistency issues across contract.yaml and design specification documents - WebSocket events, Admin rate limits, data model indexes, price field type, design tokens, appointment state machine, verification code constraints, time slot fields, user stats endpoints, file upload API, response envelope, and other documentation inconsistencies identified in the cross-document consistency review report.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix 12 cross-document consistency issues across contract.yaml and design spec docs - WebSocket events, Admin rate limits, data model indexes, price type, design tokens, state machine, verification constraint, overtime field, user stats endpoint, file upload API, data arch clean, response envelope. Docs-only changes via @Architect.",
+      "confirmed_at": "2026-05-12T05:38:40.480Z",
+      "consumed_at": "2026-05-12T05:46:37.272Z",
+      "audit": {
+        "execution_summary": "Fixed 12 cross-document consistency issues: (1) Added 4 WebSocket events to contract.yaml §12; (2) Added rate_limit to all 22 admin endpoints; (3) Added condition field to appointment_slot_occupied index; (4) Added price type deviation Tech Debt annotations; (5) Moved deprecated --accent-blue to appendix in global-ui-spec.md; (6) Added appointment_state_machine section; (7) Added verification constraint note to register_complete; (8) Added max_overtime_minutes computed field note; (9) Fixed user stats card data source docs in 11-admin-users.md; (10) Added image_upload endpoint to contract.yaml; (11) Cleaned residual row in 数据架构设计文档 §3.2; (12) Added response envelope notes to 5 page specs.",
+        "completed_at": "2026-05-12T05:46:37.272Z"
+      }
     }
   }
 }

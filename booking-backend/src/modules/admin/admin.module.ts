@@ -8,11 +8,13 @@ import { AdminUsersController } from "./controllers/admin-users.controller";
 import { AdminServicesController } from "./controllers/admin-services.controller";
 import { AdminAppointmentsController } from "./controllers/admin-appointments.controller";
 import { AdminReportsController } from "./controllers/admin-reports.controller";
+import { AdminNotificationsController } from "./controllers/admin-notifications.controller";
 import { AdminStatsService } from "./services/admin-stats.service";
 import { AdminUsersService } from "./services/admin-users.service";
 import { AdminServicesService } from "./services/admin-services.service";
 import { AdminAppointmentsService } from "./services/admin-appointments.service";
 import { AdminReportsService } from "./services/admin-reports.service";
+import { AdminNotificationsService } from "./services/admin-notifications.service";
 
 @Module({
   imports: [
@@ -27,6 +29,7 @@ import { AdminReportsService } from "./services/admin-reports.service";
     AdminServicesController,
     AdminAppointmentsController,
     AdminReportsController,
+    AdminNotificationsController,
   ],
   providers: [
     AdminStatsService,
@@ -34,6 +37,7 @@ import { AdminReportsService } from "./services/admin-reports.service";
     AdminServicesService,
     AdminAppointmentsService,
     AdminReportsService,
+    AdminNotificationsService,
   ],
 })
 export class AdminModule {}

@@ -136,9 +136,9 @@ describe('AppCardComponent', () => {
   });
 
   describe('card hover micro-interaction', () => {
-    it('[RED] should have app-card-hover class in combinedStyleClass', () => {
+    it('[RED] should have app-card-transition class in combinedStyleClass', () => {
       fixture.detectChanges();
-      expect(component.combinedStyleClass).toContain('app-card-hover');
+      expect(component.combinedStyleClass).toContain('app-card-transition');
     });
   });
 

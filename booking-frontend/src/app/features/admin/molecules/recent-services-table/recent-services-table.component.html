@@ -1,0 +1,52 @@
+<div class="block lg:hidden space-y-3">
+  @for (row of rows(); track row.service.id) {
+    <div class="border border-border-color p-4 rounded-lg">
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <p class="text-sm font-medium text-text-primary">{{ row.service.name }}</p>
+          <p class="text-xs text-text-secondary">{{ row.service.duration }} min · {{ row.service.price | currency:'USD' }}</p>
+        </div>
+        <app-badge [status]="row.statusBadge" [customLabel]="row.service.active ? 'ACTIVE' : 'INACTIVE'" size="sm" />
+      </div>
+      <div class="flex justify-end">
+        <app-button label="View" variant="ghost" size="sm" icon="pi pi-eye" (onClick)="rowClick.emit(row)" />
+      </div>
+    </div>
+  }
+</div>
+
+<div class="hidden lg:block overflow-x-auto">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Service</th>
+        <th>Duration</th>
+        <th>Price</th>
+        <th>Status</th>
+        <th class="text-right">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of rows(); track row.service.id) {
+        <tr>
+          <td>
+            <div class="min-w-0">
+              <span class="text-sm text-text-primary font-medium truncate block">{{ row.service.name }}</span>
+              @if (row.service.description) {
+                <p class="text-sm text-text-secondary truncate">{{ row.service.description }}</p>
+              }
+            </div>
+          </td>
+          <td class="text-sm text-text-secondary">{{ row.service.duration }} min</td>
+          <td class="font-medium text-text-primary">{{ row.service.price | currency:'USD' }}</td>
+          <td>
+            <app-badge [status]="row.statusBadge" [customLabel]="row.service.active ? 'ACTIVE' : 'INACTIVE'" size="sm" />
+          </td>
+          <td class="text-right">
+            <app-button variant="ghost" size="sm" icon="pi pi-eye" [iconOnly]="true" (onClick)="rowClick.emit(row)" />
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AppHeaderComponent } from './app-header.component';
-import { Component, input } from '@angular/core';
+import { Component, input, TemplateRef } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 
 // Stub ThemeToggleComponent
@@ -58,37 +58,29 @@ describe('AppHeaderComponent', () => {
     setupDefaultInputs();
     const header = fixture.nativeElement.querySelector('header');
     expect(header).toBeTruthy();
-    expect(header.classList.contains('fixed')).toBe(true);
+    expect(header.classList.contains('sticky')).toBe(true);
     expect(header.classList.contains('top-0')).toBe(true);
-    expect(header.classList.contains('left-0')).toBe(true);
-    expect(header.classList.contains('right-0')).toBe(true);
-    expect(header.classList.contains('h-16')).toBe(true);
     expect(header.classList.contains('z-50')).toBe(true);
     expect(header.classList.contains('transition-all')).toBe(true);
     expect(header.classList.contains('duration-300')).toBe(true);
-    expect(header.classList.contains('shadow-sm')).toBe(true);
-  });
-
-  it('should have border-bottom classes', () => {
-    setupDefaultInputs();
-    const header = fixture.nativeElement.querySelector('header');
+    expect(header.classList.contains('bg-card-bg')).toBe(true);
     expect(header.classList.contains('border-b')).toBe(true);
-    expect(header.classList.contains('border-gray-200')).toBe(true);
+    expect(header.classList.contains('border-border-color')).toBe(true);
+    expect(header.classList.contains('shadow-sm')).toBe(true);
   });
 
   it('should render logo link', () => {
     setupDefaultInputs();
     const logo = fixture.nativeElement.querySelector('a[routerlink="/"]');
     expect(logo).toBeTruthy();
-    expect(logo.textContent.trim()).toBe('Booking');
+    expect(logo.textContent.trim()).toBe('BookSys');
   });
 
-  it('should render navigation links', () => {
+  it('should receive navigation links as input', () => {
     setupDefaultInputs();
-    const navLinks = fixture.nativeElement.querySelectorAll('nav a');
-    expect(navLinks.length).toBeGreaterThanOrEqual(2);
-    expect(navLinks[0].textContent.trim()).toBe('Home');
-    expect(navLinks[1].textContent.trim()).toBe('Booking');
+    expect(component.navLinks().length).toBeGreaterThanOrEqual(2);
+    expect(component.navLinks()[0].label).toBe('Home');
+    expect(component.navLinks()[1].label).toBe('Booking');
   });
 
   it('should render notification badge with count', () => {
@@ -107,7 +99,7 @@ describe('AppHeaderComponent', () => {
     setupDefaultInputs();
     const adminBadge = fixture.nativeElement.querySelector('[data-testid="admin-badge"]');
     expect(adminBadge).toBeTruthy();
-    expect(adminBadge.textContent.trim()).toBe('Admin');
+    expect(adminBadge.textContent.trim()).toBe('ADMIN');
   });
 
   it('should emit menuToggle when hamburger button is clicked', () => {
@@ -124,19 +116,13 @@ describe('AppHeaderComponent', () => {
     fixture.componentRef.setInput('menuItems', defaultMenuItems);
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.textContent).toContain('登录');
-  });
-
-  it('should have proper spacing with gap-3 in right section', () => {
-    setupDefaultInputs();
-    const rightSection = fixture.nativeElement.querySelector('header .flex.items-center.gap-3');
-    expect(rightSection).toBeTruthy();
+    expect(fixture.nativeElement.textContent).toContain('Sign In');
   });
 
   it('should apply shadow-md class when scrolled', () => {
     setupDefaultInputs();
     const header = fixture.nativeElement.querySelector('header');
-    // Initially should only have shadow-sm
+    // Initially only shadow-sm
     expect(header.classList.contains('shadow-md')).toBe(false);
 
     // Simulate scroll
@@ -144,14 +130,22 @@ describe('AppHeaderComponent', () => {
     window.dispatchEvent(new Event('scroll'));
     fixture.detectChanges();
 
-    // After scroll, should have shadow-md
     expect(header.classList.contains('shadow-md')).toBe(true);
   });
 
-  it('should have responsive container with max-width', () => {
-    setupDefaultInputs();
-    const container = fixture.nativeElement.querySelector('header .max-w-7xl');
-    expect(container).toBeTruthy();
-    expect(container.classList.contains('mx-auto')).toBe(true);
+  it('should show search bar when showSearch is true', () => {
+    fixture.componentRef.setInput('showSearch', true);
+    fixture.detectChanges();
+
+    const searchInput = fixture.nativeElement.querySelector('input[placeholder="Search..."]');
+    expect(searchInput).toBeTruthy();
+  });
+
+  it('should hide search bar when showSearch is false', () => {
+    fixture.componentRef.setInput('showSearch', false);
+    fixture.detectChanges();
+
+    const searchInput = fixture.nativeElement.querySelector('input[placeholder="Search..."]');
+    expect(searchInput).toBeFalsy();
   });
 });

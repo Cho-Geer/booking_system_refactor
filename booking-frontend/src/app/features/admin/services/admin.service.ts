@@ -1,10 +1,12 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { ApiResponse } from '../../../core/services/api.service';
 import {
   AdminStats,
   AdminUser,
+  BookingTrendItem,
   AdminServiceItem,
   AdminAppointment,
   CreateAdminUserRequest,
@@ -14,10 +16,17 @@ import {
   UpdateAppointmentStatusRequest,
   BatchCancelRequest,
   BatchCancelResponse,
+  CreateAdminAppointmentRequest,
   PaginatedResponse,
   AdminUsersQuery,
   AdminServicesQuery,
   AdminAppointmentsQuery,
+  TimeDistributionItem,
+  SystemHealth,
+  SystemHealthDetail,
+  TimeRange,
+  NotificationList,
+  UnreadCount,
 } from '../dto/admin.dto';
 
 @Injectable({ providedIn: 'root' })
@@ -29,9 +38,13 @@ export class AdminService {
   // Stats
   // ==========================================
 
-  getStats(): Observable<AdminStats> {
-    return this.http.get<AdminStats>(`${this.apiUrl}/admin/stats`)
-      .pipe(catchError(this.handleError));
+  getStats(timeRange?: TimeRange, startDate?: string, endDate?: string): Observable<AdminStats> {
+    let params = new HttpParams();
+    if (timeRange) params = params.set('timeRange', timeRange);
+    if (startDate) params = params.set('startDate', startDate);
+    if (endDate) params = params.set('endDate', endDate);
+    return this.http.get<ApiResponse<AdminStats>>(`${this.apiUrl}/admin/stats`, { params })
+      .pipe(map(response => response.data), catchError(this.handleError));
   }
 
   // ==========================================
@@ -46,23 +59,23 @@ export class AdminService {
     if (query.role) params = params.set('role', query.role);
     if (query.status) params = params.set('status', query.status);
 
-    return this.http.get<PaginatedResponse<AdminUser>>(`${this.apiUrl}/admin/users`, { params })
-      .pipe(catchError(this.handleError));
+    return this.http.get<ApiResponse<PaginatedResponse<AdminUser>>>(`${this.apiUrl}/admin/users`, { params })
+      .pipe(map(response => response.data), catchError(this.handleError));
   }
 
   createUser(dto: CreateAdminUserRequest): Observable<AdminUser> {
-    return this.http.post<AdminUser>(`${this.apiUrl}/admin/users`, dto)
-      .pipe(catchError(this.handleError));
+    return this.http.post<ApiResponse<AdminUser>>(`${this.apiUrl}/admin/users`, dto)
+      .pipe(map(response => response.data), catchError(this.handleError));
   }
 
   updateUser(id: string, dto: UpdateAdminUserRequest): Observable<AdminUser> {
-    return this.http.put<AdminUser>(`${this.apiUrl}/admin/users/${id}`, dto)
-      .pipe(catchError(this.handleError));
+    return this.http.put<ApiResponse<AdminUser>>(`${this.apiUrl}/admin/users/${id}`, dto)
+      .pipe(map(response => response.data), catchError(this.handleError));
   }
 
   deleteUser(id: string): Observable<null> {
-    return this.http.delete<null>(`${this.apiUrl}/admin/users/${id}`)
-      .pipe(catchError(this.handleError));
+    return this.http.delete<ApiResponse<null>>(`${this.apiUrl}/admin/users/${id}`)
+      .pipe(map(response => response.data), catchError(this.handleError));
   }
 
   // ==========================================
@@ -76,23 +89,23 @@ export class AdminService {
     if (query.search) params = params.set('search', query.search);
     if (query.active !== undefined) params = params.set('active', query.active.toString());
 
-    return this.http.get<PaginatedResponse<AdminServiceItem>>(`${this.apiUrl}/admin/services`, { params })
-      .pipe(catchError(this.handleError));
+    return this.http.get<ApiResponse<PaginatedResponse<AdminServiceItem>>>(`${this.apiUrl}/admin/services`, { params })
+      .pipe(map(response => response.data), catchError(this.handleError));
   }
 
   createAdminService(dto: CreateAdminServiceRequest): Observable<AdminServiceItem> {
-    return this.http.post<AdminServiceItem>(`${this.apiUrl}/admin/services`, dto)
-      .pipe(catchError(this.handleError));
+    return this.http.post<ApiResponse<AdminServiceItem>>(`${this.apiUrl}/admin/services`, dto)
+      .pipe(map(response => response.data), catchError(this.handleError));
   }
 
   updateAdminService(id: string, dto: UpdateAdminServiceRequest): Observable<AdminServiceItem> {
-    return this.http.put<AdminServiceItem>(`${this.apiUrl}/admin/services/${id}`, dto)
-      .pipe(catchError(this.handleError));
+    return this.http.put<ApiResponse<AdminServiceItem>>(`${this.apiUrl}/admin/services/${id}`, dto)
+      .pipe(map(response => response.data), catchError(this.handleError));
   }
 
   deleteAdminService(id: string): Observable<null> {
-    return this.http.delete<null>(`${this.apiUrl}/admin/services/${id}`)
-      .pipe(catchError(this.handleError));
+    return this.http.delete<ApiResponse<null>>(`${this.apiUrl}/admin/services/${id}`)
+      .pipe(map(response => response.data), catchError(this.handleError));
   }
 
   // ==========================================
@@ -103,25 +116,92 @@ export class AdminService {
     let params = new HttpParams();
     if (query.page) params = params.set('page', query.page.toString());
     if (query.limit) params = params.set('limit', query.limit.toString());
+    if (query.search) params = params.set('search', query.search);
     if (query.status) params = params.set('status', query.status);
     if (query.startDate) params = params.set('startDate', query.startDate);
     if (query.endDate) params = params.set('endDate', query.endDate);
     if (query.serviceId) params = params.set('serviceId', query.serviceId);
     if (query.userId) params = params.set('userId', query.userId);
 
-    return this.http.get<PaginatedResponse<AdminAppointment>>(`${this.apiUrl}/admin/appointments`, { params })
-      .pipe(catchError(this.handleError));
+    return this.http.get<ApiResponse<PaginatedResponse<AdminAppointment>>>(`${this.apiUrl}/admin/appointments`, { params })
+      .pipe(map(response => response.data), catchError(this.handleError));
   }
 
   updateAppointmentStatus(id: string, dto: UpdateAppointmentStatusRequest): Observable<{ id: string; status: string; updatedAt: string }> {
-    return this.http.put<{ id: string; status: string; updatedAt: string }>(
+    return this.http.put<ApiResponse<{ id: string; status: string; updatedAt: string }>>(
       `${this.apiUrl}/admin/appointments/${id}/status`, dto
-    ).pipe(catchError(this.handleError));
+    ).pipe(map(response => response.data), catchError(this.handleError));
   }
 
   batchCancelAppointments(dto: BatchCancelRequest): Observable<BatchCancelResponse> {
-    return this.http.post<BatchCancelResponse>(`${this.apiUrl}/admin/appointments/batch-cancel`, dto)
-      .pipe(catchError(this.handleError));
+    return this.http.post<ApiResponse<BatchCancelResponse>>(`${this.apiUrl}/admin/appointments/batch-cancel`, dto)
+      .pipe(map(response => response.data), catchError(this.handleError));
+  }
+
+  createAdminAppointment(dto: CreateAdminAppointmentRequest): Observable<AdminAppointment> {
+    return this.http.post<ApiResponse<AdminAppointment>>(`${this.apiUrl}/admin/appointments`, dto)
+      .pipe(map(response => response.data), catchError(this.handleError));
+  }
+
+  // ==========================================
+  // Time Distribution
+  // ==========================================
+
+  getTimeDistribution(timeRange?: TimeRange, startDate?: string, endDate?: string): Observable<TimeDistributionItem[]> {
+    let params = new HttpParams();
+    if (timeRange) params = params.set('timeRange', timeRange);
+    if (startDate) params = params.set('startDate', startDate);
+    if (endDate) params = params.set('endDate', endDate);
+    return this.http.get<ApiResponse<TimeDistributionItem[]>>(`${this.apiUrl}/admin/stats/time-distribution`, { params })
+      .pipe(map(response => response.data), catchError(this.handleError));
+  }
+
+  // ==========================================
+  // Booking Trends (DASH-002)
+  // ==========================================
+
+  getBookingTrend(timeRange?: TimeRange): Observable<BookingTrendItem[]> {
+    let params = new HttpParams();
+    if (timeRange) params = params.set('timeRange', timeRange);
+    return this.http.get<ApiResponse<BookingTrendItem[]>>(`${this.apiUrl}/admin/stats/booking-trends`, { params })
+      .pipe(map(response => response.data), catchError(this.handleError));
+  }
+
+  // ==========================================
+  // System Health
+  // ==========================================
+
+  getSystemStatus(): Observable<SystemHealth> {
+    return this.http.get<ApiResponse<SystemHealth>>(`${this.apiUrl}/admin/system/health`)
+      .pipe(map(response => response.data), catchError(this.handleError));
+  }
+
+  getSystemMetrics(): Observable<SystemHealthDetail> {
+    return this.http.get<ApiResponse<SystemHealthDetail>>(`${this.apiUrl}/admin/system/metrics`)
+      .pipe(map(response => response.data), catchError(this.handleError));
+  }
+
+  // ==========================================
+  // Notifications (SYS-002, SYS-003, MSG-004)
+  // ==========================================
+
+  getNotifications(page: number = 1, limit: number = 20, unreadOnly: boolean = false): Observable<NotificationList> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('limit', limit.toString());
+    if (unreadOnly) params = params.set('unread_only', 'true');
+    return this.http.get<ApiResponse<NotificationList>>(`${this.apiUrl}/admin/notifications`, { params })
+      .pipe(map(response => response.data), catchError(this.handleError));
+  }
+
+  markNotificationRead(id: string): Observable<null> {
+    return this.http.post<ApiResponse<null>>(`${this.apiUrl}/admin/notifications/${id}/read`, {})
+      .pipe(map(response => null), catchError(this.handleError));
+  }
+
+  getUnreadCount(): Observable<UnreadCount> {
+    return this.http.get<ApiResponse<UnreadCount>>(`${this.apiUrl}/admin/messages/unread-count`)
+      .pipe(map(response => response.data), catchError(this.handleError));
   }
 
   // ==========================================
@@ -130,7 +210,9 @@ export class AdminService {
 
   private handleError(error: unknown): Observable<never> {
     let message = 'An error occurred. Please try again.';
-    if (error instanceof Error) {
+    if (error instanceof HttpErrorResponse) {
+      message = error.error?.message || `HTTP ${error.status}: ${error.statusText}`;
+    } else if (error instanceof Error) {
       message = error.message;
     }
     return throwError(() => new Error(message));

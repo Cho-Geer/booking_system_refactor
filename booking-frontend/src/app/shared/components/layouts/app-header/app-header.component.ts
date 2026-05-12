@@ -1,10 +1,10 @@
-import { Component, input, output, signal, HostListener } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, input, output, signal, HostListener, TemplateRef } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { Menu } from 'primeng/menu';
-import { Avatar } from 'primeng/avatar';
 import { ThemeToggleComponent } from '../../molecules/theme-toggle/theme-toggle.component';
-import { AppButtonComponent } from '../../atoms/app-button/app-button.component';
+
 
 export interface NavLink {
   label: string;
@@ -15,7 +15,7 @@ export interface NavLink {
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, Menu, Avatar, ThemeToggleComponent, AppButtonComponent],
+  imports: [RouterLink, Menu, ThemeToggleComponent, NgTemplateOutlet],
   templateUrl: './app-header.component.html',
   styleUrl: './app-header.component.scss',
   host: { class: 'z-50' },
@@ -28,10 +28,11 @@ export class AppHeaderComponent {
   readonly isAdmin = input<boolean>(false);
   readonly menuItems = input<MenuItem[]>([]);
   readonly notificationCount = input<number>(0);
+  readonly showSearch = input<boolean>(true);
+  readonly extraActions = input<TemplateRef<unknown> | null>(null);
 
   readonly menuToggle = output<void>();
   readonly logout = output<void>();
-  readonly actionClick = output<string>();
 
   sidebarOpen = false;
 
@@ -49,9 +50,5 @@ export class AppHeaderComponent {
 
   onLogout(): void {
     this.logout.emit();
-  }
-
-  onActionClick(action: string): void {
-    this.actionClick.emit(action);
   }
 }

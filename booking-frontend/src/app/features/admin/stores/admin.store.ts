@@ -6,6 +6,8 @@ import {
   AdminUser,
   AdminServiceItem,
   AdminAppointment,
+  BookingTrendItem,
+  ServicePopularityItem,
   UpdateAdminUserRequest,
   UpdateAdminServiceRequest,
   AdminUsersQuery,
@@ -15,6 +17,9 @@ import {
   CreateAdminServiceRequest,
   UpdateAppointmentStatusRequest,
   BatchCancelRequest,
+  TimeDistributionItem,
+  SystemHealth,
+  TimeRange,
 } from '../dto/admin.dto';
 import { AdminService } from '../services/admin.service';
 
@@ -22,20 +27,48 @@ export interface AdminState {
   // Stats
   stats: AdminStats | null;
 
+  // Isolated chart data (loaded independently to avoid cross-chart reloads)
+  servicePopularity: ServicePopularityItem[];
+  bookingTrend: BookingTrendItem[];
+
+  // Phase 3: Analytics
+  timeDistribution: TimeDistributionItem[];
+
+  // System Health
+  systemHealth: SystemHealth | null;
+
   // Users (paginated list)
   users: AdminUser[];
   usersTotal: number;
   usersPage: number;
+
+  // Recent Users (dashboard only, isolated from paginated list)
+  recentUsers: AdminUser[];
+
+  // Users (full dataset for stats computation, isolated from paginated list)
+  allUsersForStats: AdminUser[];
 
   // Services (paginated list)
   services: AdminServiceItem[];
   servicesTotal: number;
   servicesPage: number;
 
+  // Recent Services (dashboard only, isolated from paginated list)
+  recentServices: AdminServiceItem[];
+
+  // Services (full dataset for stats computation, isolated from paginated list)
+  allServicesForStats: AdminServiceItem[];
+
+  // Appointments (full dataset for stats computation, isolated from paginated list)
+  allAppointmentsForStats: AdminAppointment[];
+
   // Appointments (paginated list)
   appointments: AdminAppointment[];
   appointmentsTotal: number;
   appointmentsPage: number;
+
+  // Notifications
+  unreadCount: number;
 
   // UI state
   isLoading: boolean;
@@ -44,15 +77,25 @@ export interface AdminState {
 
 export const initialAdminState: AdminState = {
   stats: null,
+  servicePopularity: [],
+  bookingTrend: [],
+  timeDistribution: [],
+  systemHealth: null,
   users: [],
   usersTotal: 0,
   usersPage: 1,
+  recentUsers: [],
+  allUsersForStats: [],
   services: [],
   servicesTotal: 0,
   servicesPage: 1,
+  recentServices: [],
+  allServicesForStats: [],
+  allAppointmentsForStats: [],
   appointments: [],
   appointmentsTotal: 0,
   appointmentsPage: 1,
+  unreadCount: 0,
   isLoading: false,
   error: null,
 };
@@ -60,20 +103,30 @@ export const initialAdminState: AdminState = {
 export const AdminStore = signalStore(
   { providedIn: 'root' },
   withState<AdminState>(initialAdminState),
-  withComputed(({ isLoading, error, stats, users, usersTotal, usersPage, services, servicesTotal, servicesPage, appointments, appointmentsTotal, appointmentsPage }) => ({
+  withComputed(({ isLoading, error, stats, servicePopularity, bookingTrend, timeDistribution, systemHealth, users, usersTotal, usersPage, recentUsers, allUsersForStats, services, servicesTotal, servicesPage, recentServices, allServicesForStats, allAppointmentsForStats, appointments, appointmentsTotal, appointmentsPage, unreadCount }) => ({
     vm: computed(() => ({
       isLoading: isLoading(),
       error: error(),
       stats: stats(),
+      servicePopularity: servicePopularity(),
+      bookingTrend: bookingTrend(),
+      timeDistribution: timeDistribution(),
+      systemHealth: systemHealth(),
       users: users(),
       usersTotal: usersTotal(),
       usersPage: usersPage(),
+      recentUsers: recentUsers(),
+      allUsersForStats: allUsersForStats(),
       services: services(),
       servicesTotal: servicesTotal(),
       servicesPage: servicesPage(),
+      recentServices: recentServices(),
+      allServicesForStats: allServicesForStats(),
+      allAppointmentsForStats: allAppointmentsForStats(),
       appointments: appointments(),
       appointmentsTotal: appointmentsTotal(),
       appointmentsPage: appointmentsPage(),
+      unreadCount: unreadCount(),
     })),
     hasError: computed(() => error() !== null),
   })),
@@ -86,12 +139,99 @@ export const AdminStore = signalStore(
       patchState(store, { stats });
     },
 
+    /**
+     * Load servicePopularity + timeDistribution from DASH-001 filtered by time range.
+     * Patches isolated state fields so only distribution panel charts reload.
+     */
+    async loadDistributionByTimeRange(timeRange?: TimeRange, startDate?: string, endDate?: string): Promise<void> {
+      patchState(store, { error: null });
+      try {
+        const stats = await lastValueFrom(adminService.getStats(timeRange, startDate, endDate));
+        patchState(store, { servicePopularity: stats.servicePopularity, timeDistribution: stats.timeDistribution });
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Failed to load distribution data';
+        patchState(store, { error: message });
+      }
+    },
+
+    /**
+     * Load bookingTrend data (DASH-002 standalone endpoint) filtered by time range.
+     * Patches isolated bookingTrend field so only the trend chart reloads.
+     */
+    async loadBookingTrend(timeRange?: TimeRange): Promise<void> {
+      patchState(store, { error: null });
+      try {
+        const data = await lastValueFrom(adminService.getBookingTrend(timeRange));
+        patchState(store, { bookingTrend: data });
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Failed to load booking trend';
+        patchState(store, { error: message });
+      }
+    },
+
+    setSystemHealth(health: SystemHealth): void {
+      patchState(store, { systemHealth: health });
+    },
+
+    // ==========================================
+    // Phase 3: Analytics
+    // ==========================================
+
+    /**
+     * Load time distribution data from API with optional time range filter.
+     * This is a lightweight background update — does NOT trigger global loading state.
+     */
+    async loadTimeDistribution(timeRange?: TimeRange, startDate?: string, endDate?: string): Promise<void> {
+      patchState(store, { error: null });
+      try {
+        const data = await lastValueFrom(adminService.getTimeDistribution(timeRange, startDate, endDate));
+        patchState(store, { timeDistribution: data });
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Failed to load time distribution';
+        patchState(store, { error: message });
+      }
+    },
+
+    /**
+     * Load system health status from API.
+     */
+    async loadSystemStatus(): Promise<void> {
+      patchState(store, { isLoading: true, error: null });
+      try {
+        const health = await lastValueFrom(adminService.getSystemStatus());
+        patchState(store, { systemHealth: health, isLoading: false });
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Failed to load system status';
+        patchState(store, { error: message, isLoading: false });
+      }
+    },
+
     // ==========================================
     // Users
     // ==========================================
 
-    setUsers(users: AdminUser[], total: number, page: number): void {
-      patchState(store, { users, usersTotal: total, usersPage: page });
+    setUsers(users: AdminUser[], total: number | undefined, page: number): void {
+      patchState(store, { users, usersTotal: total ?? users.length, usersPage: page });
+    },
+
+    setRecentUsers(users: AdminUser[]): void {
+      patchState(store, { recentUsers: users });
+    },
+
+    setAllUsersForStats(users: AdminUser[]): void {
+      patchState(store, { allUsersForStats: users });
+    },
+
+    setRecentServices(services: AdminServiceItem[]): void {
+      patchState(store, { recentServices: services });
+    },
+
+    setAllServicesForStats(services: AdminServiceItem[]): void {
+      patchState(store, { allServicesForStats: services });
+    },
+
+    setAllAppointmentsForStats(appointments: AdminAppointment[]): void {
+      patchState(store, { allAppointmentsForStats: appointments });
     },
 
     updateUserInList(id: string, updates: UpdateAdminUserRequest): void {
@@ -114,8 +254,8 @@ export const AdminStore = signalStore(
     // Services
     // ==========================================
 
-    setServices(services: AdminServiceItem[], total: number, page: number): void {
-      patchState(store, { services, servicesTotal: total, servicesPage: page });
+    setServices(services: AdminServiceItem[], total: number | undefined, page: number): void {
+      patchState(store, { services, servicesTotal: total ?? services.length, servicesPage: page });
     },
 
     updateServiceInList(id: string, updates: UpdateAdminServiceRequest): void {
@@ -136,8 +276,8 @@ export const AdminStore = signalStore(
     // Appointments
     // ==========================================
 
-    setAppointments(appointments: AdminAppointment[], total: number, page: number): void {
-      patchState(store, { appointments, appointmentsTotal: total, appointmentsPage: page });
+    setAppointments(appointments: AdminAppointment[], total: number | undefined, page: number): void {
+      patchState(store, { appointments, appointmentsTotal: total ?? appointments.length, appointmentsPage: page });
     },
 
     updateAppointmentStatusInList(id: string, status: string): void {
@@ -171,17 +311,30 @@ export const AdminStore = signalStore(
       patchState(store, { error: null });
     },
 
+    setUnreadCount(count: number): void {
+      patchState(store, { unreadCount: count });
+    },
+
+    async loadUnreadCount(): Promise<void> {
+      try {
+        const result = await lastValueFrom(adminService.getUnreadCount());
+        patchState(store, { unreadCount: result.count });
+      } catch {
+        patchState(store, { unreadCount: 0 });
+      }
+    },
+
     // ==========================================
     // Async API methods
     // ==========================================
 
     /**
-     * Load admin dashboard stats from API.
+     * Load admin dashboard stats from API with optional time range filter.
      */
-    async loadStats(): Promise<void> {
+    async loadStats(timeRange?: TimeRange, startDate?: string, endDate?: string): Promise<void> {
       patchState(store, { isLoading: true, error: null });
       try {
-        const stats = await lastValueFrom(adminService.getStats());
+        const stats = await lastValueFrom(adminService.getStats(timeRange, startDate, endDate));
         patchState(store, { stats, isLoading: false });
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Failed to load stats';

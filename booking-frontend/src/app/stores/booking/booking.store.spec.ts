@@ -48,6 +48,14 @@ describe('BookingStore', () => {
     expect(store.activeBookings()).toEqual([]);
   });
 
+  it('should initialize with empty selectedSlotIds', () => {
+    expect(store.selectedSlotIds()).toEqual([]);
+  });
+
+  it('should initialize with zero overtimeMinutes', () => {
+    expect(store.overtimeMinutes()).toBe(0);
+  });
+
   it('should expose availableSlots computed signal', () => {
     const mockSlots: TimeSlot[] = [
       { id: '1', startTime: '09:00', endTime: '10:00', capacity: 5, bookedCount: 0, available: true },
@@ -449,6 +457,22 @@ describe('BookingStore', () => {
       await store.cancelMyBooking('apt-1');
 
       expect(store.error()).toBe('Cancel failed');
+    });
+  });
+
+  // ==========================================
+  // FINANCIAL FIELDS (v1.7.0): selectedSlotIds, overtimeMinutes
+  // ==========================================
+
+  describe('[GREEN] Financial fields (v1.7.0)', () => {
+    it('[Green] selectedSlotIds should exist in BookingState with empty default', () => {
+      expect(store.selectedSlotIds).toBeDefined();
+      expect(store.selectedSlotIds()).toEqual([]);
+    });
+
+    it('[Green] overtimeMinutes should exist in BookingState with zero default', () => {
+      expect(store.overtimeMinutes).toBeDefined();
+      expect(store.overtimeMinutes()).toBe(0);
     });
   });
 });

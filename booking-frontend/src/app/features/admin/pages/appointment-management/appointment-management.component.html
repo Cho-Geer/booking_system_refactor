@@ -5,14 +5,17 @@
       <h1 class="text-2xl sm:text-display font-bold text-text-primary">Appointment Management</h1>
       <p class="text-sm text-text-secondary mt-1">View and manage all appointments</p>
     </div>
-    @if (selectedAppointments().length > 0) {
-      <app-button
-        label="Batch Cancel ({{ selectedAppointments().length }})"
-        variant="danger"
-        icon="pi pi-times"
-        (onClick)="batchCancel()"
-      ></app-button>
-    }
+    <div class="flex gap-2">
+      <app-button label="New Appointment" variant="primary" icon="pi pi-plus" (onClick)="openBooking()"></app-button>
+      @if (selectedAppointments().length > 0) {
+        <app-button
+          label="Batch Cancel ({{ selectedAppointments().length }})"
+          variant="danger"
+          icon="pi pi-times"
+          (onClick)="batchCancel()"
+        ></app-button>
+      }
+    </div>
   </div>
 
   <!-- Loading State -->
@@ -20,15 +23,13 @@
     <div class="flex justify-center py-12">
       <app-spinner></app-spinner>
     </div>
-  }
-
-  @if (!vm().isLoading) {
+  } @else {
     <!-- Stats Summary -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
       <app-card variant="sharp">
         <div class="flex items-center gap-4 p-2">
-          <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-            <i class="pi pi-calendar text-blue-600 text-xl"></i>
+          <div class="w-12 h-12 rounded-full bg-accent-green/10 flex items-center justify-center flex-shrink-0">
+            <i class="pi pi-calendar text-accent-green text-xl"></i>
           </div>
           <div>
             <p class="text-3xl font-bold text-text-primary">{{ todayCount() }}</p>
@@ -39,8 +40,8 @@
 
       <app-card variant="sharp">
         <div class="flex items-center gap-4 p-2">
-          <div class="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
-            <i class="pi pi-clock text-amber-600 text-xl"></i>
+          <div class="w-12 h-12 rounded-full bg-accent-yellow/10 flex items-center justify-center flex-shrink-0">
+            <i class="pi pi-clock text-accent-yellow text-xl"></i>
           </div>
           <div>
             <p class="text-3xl font-bold text-text-primary">{{ pendingCount() }}</p>
@@ -51,8 +52,8 @@
 
       <app-card variant="sharp">
         <div class="flex items-center gap-4 p-2">
-          <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-            <i class="pi pi-check-circle text-green-600 text-xl"></i>
+          <div class="w-12 h-12 rounded-full bg-accent-green/10 flex items-center justify-center flex-shrink-0">
+            <i class="pi pi-check-circle text-accent-green text-xl"></i>
           </div>
           <div>
             <p class="text-3xl font-bold text-text-primary">{{ confirmedCount() }}</p>
@@ -63,8 +64,8 @@
 
       <app-card variant="sharp">
         <div class="flex items-center gap-4 p-2">
-          <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
-            <i class="pi pi-ban text-red-600 text-xl"></i>
+          <div class="w-12 h-12 rounded-full bg-accent-red/10 flex items-center justify-center flex-shrink-0">
+            <i class="pi pi-ban text-accent-red text-xl"></i>
           </div>
           <div>
             <p class="text-3xl font-bold text-text-primary">{{ cancelledCount() }}</p>
@@ -76,44 +77,46 @@
 
     <!-- Error State -->
     @if (vm().error) {
-      <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+      <div class="bg-card-bg border border-accent-red/30 text-accent-red px-4 py-3 rounded-lg text-sm">
         {{ vm().error }}
       </div>
     }
 
     <!-- Filter Bar + View Toggle -->
-    <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 sm:items-center sm:justify-between bg-white p-4 rounded-xl shadow-sm border border-border">
-      <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 sm:items-center sm:flex-wrap">
-        <app-input
-          [value]="filterSearch()"
-          placeholder="Search customer..."
-          (valueChange)="filterSearch.set($event); applyFilter()"
-          styleClass="w-full sm:w-44"
-        ></app-input>
-        <app-dropdown
-          [options]="statusOptions"
-          optionLabel="label"
-          optionValue="value"
-          placeholder="All Statuses"
-          styleClass="w-full sm:w-36"
-          (valueChange)="onStatusFilterChange($event)"
-        ></app-dropdown>
-        <div class="flex items-center gap-2">
-          <label class="text-sm text-text-secondary hidden sm:inline">From:</label>
-          <p-datepicker [(ngModel)]="filterStartDate" dateFormat="yy-mm-dd" (onSelect)="applyFilter()" />
-        </div>
-        <div class="flex items-center gap-2">
-          <label class="text-sm text-text-secondary hidden sm:inline">To:</label>
-          <p-datepicker [(ngModel)]="filterEndDate" dateFormat="yy-mm-dd" (onSelect)="applyFilter()" />
-        </div>
-        <app-button
-          label="Clear"
-          variant="ghost"
-          icon="pi pi-filter-slash"
-          size="sm"
-          (onClick)="clearFilters()"
-        ></app-button>
+    <app-filter-bar>
+      <app-search-input
+        [value]="filterSearch()"
+        placeholder="Search customer..."
+        [suggestions]="searchSuggestions()"
+        [debounceMs]="300"
+        [minLength]="1"
+        styleClass="w-full sm:w-56"
+        (valueChange)="onSearchChange($event)"
+      ></app-search-input>
+      <app-dropdown
+        [value]="filterStatus()"
+        [options]="statusOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="All Statuses"
+        styleClass="w-full sm:w-36"
+        (valueChange)="onStatusFilterChange($event)"
+      ></app-dropdown>
+      <div class="flex items-center gap-2">
+        <label class="text-sm text-text-secondary hidden sm:inline">From:</label>
+        <p-datepicker [ngModel]="filterStartDate()" (ngModelChange)="filterStartDate.set($event)" dateFormat="yy-mm-dd" [showIcon]="true" (onSelect)="applyFilter()" appendTo="body" />
       </div>
+      <div class="flex items-center gap-2">
+        <label class="text-sm text-text-secondary hidden sm:inline">To:</label>
+        <p-datepicker [ngModel]="filterEndDate()" (ngModelChange)="filterEndDate.set($event)" dateFormat="yy-mm-dd" [showIcon]="true" (onSelect)="applyFilter()" appendTo="body" />
+      </div>
+      <app-button
+        label="Clear"
+        variant="ghost"
+        icon="pi pi-filter-slash"
+        size="sm"
+        (onClick)="clearFilters()"
+      ></app-button>
       <!-- View Toggle -->
       <div class="flex gap-1 bg-bg-secondary rounded-lg p-1">
         <app-button
@@ -121,7 +124,7 @@
           variant="ghost"
           size="sm"
           [iconOnly]="true"
-          [styleClass]="viewMode() === 'list' ? 'bg-white shadow-sm rounded' : ''"
+          [styleClass]="viewMode() === 'list' ? 'bg-card-bg shadow-sm rounded' : ''"
           (onClick)="toggleView('list')"
         ></app-button>
         <app-button
@@ -129,11 +132,11 @@
           variant="ghost"
           size="sm"
           [iconOnly]="true"
-          [styleClass]="viewMode() === 'calendar' ? 'bg-white shadow-sm rounded' : ''"
+          [styleClass]="viewMode() === 'calendar' ? 'bg-card-bg shadow-sm rounded' : ''"
           (onClick)="toggleView('calendar')"
         ></app-button>
       </div>
-    </div>
+    </app-filter-bar>
 
     <!-- Calendar View -->
     @if (viewMode() === 'calendar') {
@@ -169,10 +172,10 @@
 
     <!-- List View -->
     @if (viewMode() === 'list') {
-      <div class="bg-white rounded-xl shadow-sm border border-border overflow-hidden">
+      <app-table-wrapper>
         <p-table
           [value]="vm().appointments"
-          [loading]="vm().isLoading"
+          [loading]="vm().isLoading || isFiltering()"
           [paginator]="true"
           [rows]="10"
           [totalRecords]="vm().appointmentsTotal"
@@ -206,13 +209,18 @@
               <td class="text-text-secondary">{{ appointment.serviceName }}</td>
               <td class="text-text-secondary text-sm">{{ appointment.appointmentDate | date:'medium' }}</td>
               <td>
-                <app-badge [status]="getStatusBadge(appointment.status)" size="sm"></app-badge>
+                <app-badge [status]="getStatusBadge(appointment.status)" [customLabel]="appointment.status" size="sm"></app-badge>
               </td>
               <td>
-                <app-button icon="pi pi-refresh" variant="ghost" size="sm" [iconOnly]="true"
-                  (onClick)="openStatusDialog(appointment)"
-                  [pTooltip]="'Update Status'"
-                ></app-button>
+                <div class="flex gap-2">
+                  <app-button icon="pi pi-eye" variant="ghost" size="sm" [iconOnly]="true"
+                    (onClick)="viewAppointment(appointment)"
+                  ></app-button>
+                  <app-button icon="pi pi-refresh" variant="ghost" size="sm" [iconOnly]="true"
+                    (onClick)="openStatusDialog(appointment)"
+                    [pTooltip]="'Update Status'"
+                  ></app-button>
+                </div>
               </td>
             </tr>
           </ng-template>
@@ -222,47 +230,236 @@
             </tr>
           </ng-template>
         </p-table>
-      </div>
+      </app-table-wrapper>
     }
   }
 
-  <!-- Status Update Dialog -->
-  <p-dialog
-    [(visible)]="statusDialogVisible"
-    header="Update Appointment Status"
+  <!-- View Appointment Dialog -->
+  <app-modal
+    [visible]="viewDialogVisible()"
+    (visibleChange)="viewDialogVisible.set($event)"
+    header="View Appointment"
     [modal]="true"
-    [style]="{ width: '400px' }"
-    styleClass="rounded-xl"
-    (onHide)="statusDialogVisible.set(false)"
+    [closable]="true"
+    [styleClass]="'rounded-xl w-[450px]'"
   >
-    <ng-template #content>
-      @if (selectedAppointment()) {
-        <div class="flex flex-col gap-4 p-4">
+    @if (appointmentForView()) {
+      <div class="flex flex-col gap-4 p-4">
+        <div class="grid grid-cols-2 gap-4">
           <div>
-            <p class="text-sm text-text-secondary">Appointment: <strong class="text-text-primary">{{ selectedAppointment()?.appointmentNumber }}</strong></p>
-            <p class="text-sm text-text-secondary">Customer: <strong class="text-text-primary">{{ selectedAppointment()?.userName }}</strong></p>
-            <p class="text-sm text-text-secondary">Service: <strong class="text-text-primary">{{ selectedAppointment()?.serviceName }}</strong></p>
+            <label class="block text-sm font-medium text-text-primary mb-1">Appointment Number</label>
+            <p class="text-text-primary">{{ appointmentForView()?.appointmentNumber }}</p>
           </div>
           <div>
-            <label class="block font-medium mb-1 text-text-primary">New Status</label>
-            <p-select
-              [(ngModel)]="newStatus"
-              [options]="updateStatusOptions"
-              class="w-full"
-            />
+            <label class="block text-sm font-medium text-text-primary mb-1">Status</label>
+            <app-badge [status]="getStatusBadge(appointmentForView()?.status ?? 'PENDING')" [customLabel]="appointmentForView()?.status ?? ''" size="sm"></app-badge>
+          </div>
+          <div class="col-span-2">
+            <label class="block text-sm font-medium text-text-primary mb-1">Customer</label>
+            <p class="text-text-primary">{{ appointmentForView()?.userName }}</p>
+          </div>
+          <div class="col-span-2">
+            <label class="block text-sm font-medium text-text-primary mb-1">Service</label>
+            <p class="text-text-primary">{{ appointmentForView()?.serviceName }}</p>
           </div>
           <div>
-            <label class="block font-medium mb-1 text-text-primary">Reason (optional)</label>
-            <input pInputText [(ngModel)]="statusUpdateReason" class="w-full" placeholder="Reason for status change..." />
+            <label class="block text-sm font-medium text-text-primary mb-1">Date & Time</label>
+            <p class="text-text-primary">{{ appointmentForView()?.appointmentDate | date:'medium' }}</p>
+          </div>
+          <div class="flex items-end pb-2">
+            <p class="text-sm text-text-primary">Created: {{ appointmentForView()?.createdAt | date:'short' }}</p>
           </div>
         </div>
-      }
-    </ng-template>
-    <ng-template #footer>
+      </div>
+    }
+    <div app-modal-footer>
+      <div class="flex flex-col-reverse sm:flex-row gap-2 sm:gap-2">
+        <app-button label="Close" variant="primary" (onClick)="viewDialogVisible.set(false)"></app-button>
+      </div>
+    </div>
+  </app-modal>
+
+  <!-- Status Update Dialog -->
+  <app-modal
+    [visible]="statusDialogVisible()"
+    (visibleChange)="statusDialogVisible.set($event)"
+    header="Update Appointment Status"
+    [modal]="true"
+    [closable]="true"
+    [styleClass]="'rounded-xl w-[400px]'"
+  >
+    @if (selectedAppointment()) {
+      <div class="flex flex-col gap-4 p-4">
+        <div>
+          <p class="text-sm text-text-secondary">Appointment: <strong class="text-text-primary">{{ selectedAppointment()?.appointmentNumber }}</strong></p>
+          <p class="text-sm text-text-secondary">Customer: <strong class="text-text-primary">{{ selectedAppointment()?.userName }}</strong></p>
+          <p class="text-sm text-text-secondary">Service: <strong class="text-text-primary">{{ selectedAppointment()?.serviceName }}</strong></p>
+        </div>
+        <div>
+          <label class="block font-medium mb-1 text-text-primary">New Status</label>
+          <p-select
+            [(ngModel)]="newStatus"
+            [options]="updateStatusOptions"
+            class="w-full"
+            appendTo="body"
+          />
+        </div>
+        <div>
+          <label class="block font-medium mb-1 text-text-primary">Reason (optional)</label>
+          <input pInputText [(ngModel)]="statusUpdateReason" class="w-full" placeholder="Reason for status change..." />
+        </div>
+      </div>
+    }
+    <div app-modal-footer>
       <div class="flex flex-col-reverse sm:flex-row gap-2 sm:gap-2">
         <app-button label="Cancel" variant="secondary" (onClick)="statusDialogVisible.set(false)"></app-button>
         <app-button label="Update" variant="primary" (onClick)="updateStatus()"></app-button>
       </div>
-    </ng-template>
-  </p-dialog>
+    </div>
+  </app-modal>
+
+  <!-- Quick Booking Dialog -->
+  <app-modal
+    [visible]="bookingDialogVisible()"
+    (visibleChange)="bookingDialogVisible.set($event); !$event && closeBooking()"
+    header="New Appointment"
+    [modal]="true"
+    [closable]="true"
+    [styleClass]="'rounded-xl w-[480px]'"
+  >
+    <div class="flex flex-col gap-4 p-4">
+      @if (timeSlotUnavailable()) {
+        <div class="text-sm text-accent-red bg-accent-red/5 border border-accent-red/20 rounded-lg px-3 py-2">
+          No available time slots for the selected service. Please choose a different service.
+        </div>
+      }
+      <div>
+        <label class="block font-medium mb-1 text-text-primary">Customer *</label>
+        <p-select
+          [(ngModel)]="formUserId"
+          [options]="customerOptions()"
+          placeholder="Select customer..."
+          class="w-full"
+          appendTo="body"
+          [class.ng-invalid]="formSubmitted() && formErrors().userId"
+        />
+        @if (formSubmitted() && formErrors().userId) {
+          <small class="text-danger">{{ formErrors().userId }}</small>
+        }
+      </div>
+      <div>
+        <label class="block font-medium mb-1 text-text-primary">Service *</label>
+        <p-select
+          [(ngModel)]="formServiceId"
+          [options]="serviceOptions()"
+          placeholder="Select service..."
+          class="w-full"
+          appendTo="body"
+          [class.ng-invalid]="formSubmitted() && formErrors().serviceId"
+          (onChange)="onServiceChange($event.value)"
+        />
+        @if (formSubmitted() && formErrors().serviceId) {
+          <small class="text-danger">{{ formErrors().serviceId }}</small>
+        }
+      </div>
+      <div>
+        <label class="block font-medium mb-1 text-text-primary">Appointment Date *</label>
+        <p-datepicker
+          [(ngModel)]="formAppointmentDate"
+          [showIcon]="true"
+          styleClass="w-full"
+          placeholder="Select date..."
+          appendTo="body"
+          [minDate]="minAppointmentDate()"
+          [maxDate]="maxAppointmentDate()"
+          [class.ng-invalid]="formSubmitted() && formErrors().appointmentDate"
+        />
+        @if (formSubmitted() && formErrors().appointmentDate) {
+          <small class="text-danger">{{ formErrors().appointmentDate }}</small>
+        }
+      </div>
+      <div>
+        <label class="block font-medium mb-1 text-text-primary">Time Slot *</label>
+        <p-select
+          [(ngModel)]="formTimeSlotId"
+          [options]="availableTimeSlots()"
+          placeholder="Select time slot..."
+          class="w-full"
+          appendTo="body"
+          [disabled]="!formServiceId()"
+        />
+        @if (!formServiceId()) {
+          <p class="text-xs text-text-secondary mt-1">Please select a service first.</p>
+        }
+      </div>
+      <div>
+        <label class="block font-medium mb-1 text-text-primary">Additional Time Slots (optional)</label>
+        <p-multiSelect
+          [(ngModel)]="formSelectedSlotIds"
+          [options]="availableTimeSlots()"
+          placeholder="Select additional slots..."
+          display="chip"
+          class="w-full"
+          appendTo="body"
+          [disabled]="!formServiceId()"
+        />
+        @if (!formServiceId()) {
+          <p class="text-xs text-text-secondary mt-1">Please select a service first.</p>
+        }
+      </div>
+      <div>
+        <label class="block font-medium mb-1 text-text-primary">Overtime Minutes</label>
+        <p-inputNumber
+          [(ngModel)]="formOvertimeMinutes"
+          [min]="0"
+          [max]="120"
+          [step]="5"
+          [showButtons]="true"
+          buttonLayout="horizontal"
+          inputId="overtime-minutes"
+          class="w-full"
+          [disabled]="!formServiceId()"
+        >
+          <ng-template #incrementbuttonicon>
+            <span class="pi pi-plus"></span>
+          </ng-template>
+          <ng-template #decrementbuttonicon>
+            <span class="pi pi-minus"></span>
+          </ng-template>
+        </p-inputNumber>
+        @if (!formServiceId()) {
+          <p class="text-xs text-text-secondary mt-1">Please select a service first.</p>
+        }
+      </div>
+      <div>
+        <label class="block font-medium mb-1 text-text-primary">Notes (optional)</label>
+        <textarea
+          pTextarea
+          [(ngModel)]="formNotes"
+          rows="3"
+          class="w-full"
+          placeholder="Additional notes..."
+        ></textarea>
+      </div>
+      @if (estTotalCost(); as cost) {
+        <div class="border-t border-border-light pt-3 space-y-1">
+          <div class="text-sm text-text-secondary">
+            Base ({{ cost.totalMinutes }} min @ ${{ cost.pricePerMinute.toFixed(2) }}/min) — ${{ cost.baseCost.toFixed(2) }}
+          </div>
+          <div class="text-sm text-text-secondary">
+            Tax ({{ cost.taxRate }}%) — ${{ cost.tax.toFixed(2) }}
+          </div>
+          <div class="font-bold text-text-primary text-base pt-1 border-t border-border-light">
+            Total — ${{ cost.total.toFixed(2) }}
+          </div>
+        </div>
+      }
+    </div>
+    <div app-modal-footer>
+      <div class="flex flex-col-reverse sm:flex-row gap-2 sm:gap-2">
+        <app-button label="Cancel" variant="secondary" (onClick)="closeBooking()"></app-button>
+        <app-button label="Save" variant="primary" (onClick)="saveBooking()"></app-button>
+      </div>
+    </div>
+  </app-modal>
 </div>

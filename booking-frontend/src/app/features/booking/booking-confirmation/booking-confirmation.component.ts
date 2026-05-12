@@ -2,7 +2,7 @@ import { Component, inject, computed } from '@angular/core';
 import { DatePipe, CurrencyPipe } from '@angular/common';
 import { BookingStore } from '../../../stores/booking/booking.store';
 import { AuthStore } from '../../../stores/auth/auth.store';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AppCardComponent } from '../../../shared/components/atoms/app-card/app-card.component';
 import { AppButtonComponent } from '../../../shared/components/atoms/app-button/app-button.component';
@@ -14,7 +14,7 @@ import { AppButtonComponent } from '../../../shared/components/atoms/app-button/
     DatePipe,
     CurrencyPipe,
     FormsModule,
-    RouterModule,
+    RouterLink,
     AppCardComponent,
     AppButtonComponent,
   ],

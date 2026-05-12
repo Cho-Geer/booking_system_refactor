@@ -24,10 +24,10 @@ export class AppCardComponent {
   get combinedStyleClass(): string {
     const base = this.styleClass() || '';
     const variant = this.variant();
-    const classes = ['app-card-hover', `app-card--${variant}`];
+    const classes = ['app-card-transition', `app-card--${variant}`];
 
     if (variant === 'sharp') {
-      classes.push('sharp-card');
+      classes.push('sharp-card', 'card-lift');
     }
 
     if (variant === 'bordered') {
