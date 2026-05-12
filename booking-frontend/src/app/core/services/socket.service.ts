@@ -63,6 +63,10 @@ export class SocketService {
       }
       this.socket.connect();
     }
+
+    this.socket.on('ping', () => {
+      this.socket.emit('pong');
+    });
   }
 
   disconnect(): void {
@@ -111,6 +115,41 @@ export class SocketService {
         this.socket.off('appointment.status_changed');
       };
     });
+  }
+
+  subscribeToSlotBooked(
+    callback: (data: {
+      timeSlotId: string;
+      appointmentDate: string;
+      remainingCapacity: number;
+      timestamp: string;
+    }) => void,
+  ): void {
+    this.socket.on('slot.booked', callback);
+  }
+
+  subscribeToNewNotification(
+    callback: (data: {
+      id: string;
+      type: string;
+      title: string;
+      body: string;
+      createdAt: string;
+    }) => void,
+  ): void {
+    this.socket.on('notification.new', callback);
+  }
+
+  subscribeToStatsUpdated(
+    callback: (data: {
+      totalBookings: number;
+      todayBookings: number;
+      pendingBookings: number;
+      activeUsers: number;
+      totalRevenue: number;
+    }) => void,
+  ): void {
+    this.socket.on('stats.updated', callback);
   }
 
   joinAdminRoom(): void {

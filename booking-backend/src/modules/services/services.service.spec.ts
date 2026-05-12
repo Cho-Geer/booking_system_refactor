@@ -351,6 +351,103 @@ describe('ServicesService', () => {
     });
   });
 
+  // ============================================================
+  // [TDD-RED] BE-CATEGORY-NULLABLE: Service.categoryId nullable tests
+  // These tests are expected to FAIL because:
+  //   - CreateServiceDto.categoryId is currently `string` (required), needs `string | null` (optional)
+  //   - UpdateServiceDto.categoryId is currently `string | undefined`, needs `string | null | undefined`
+  //   - strictNullChecks: true causes ts-jest compilation failures
+  // ============================================================
+  describe('categoryId nullable [RED phase - expected failures]', () => {
+    it('should create service without categoryId [RED - categoryId required in DTO]', async () => {
+      // This test should FAIL because CreateServiceDto.categoryId is required (string, not optional).
+      // TypeScript will error: Property 'categoryId' is missing in type '{ ... }' but required in type 'CreateServiceDto'.
+      const dtoWithoutCategory: CreateServiceDto = {
+        name: 'Service Without Category',
+        description: 'Test service with null category',
+        durationMinutes: 45,
+        price: 100.00,
+        // categoryId intentionally omitted — causes TypeScript compilation error
+      };
+
+      const expectedService = {
+        ...mockService,
+        id: 'service-null-cat',
+        name: 'Service Without Category',
+        categoryId: null,
+        category: null,
+      };
+
+      prisma.service.create.mockResolvedValue(expectedService);
+
+      const result = await service.create(dtoWithoutCategory);
+
+      expect(result.categoryId).toBeNull();
+      expect(result.category).toBeNull();
+    });
+
+    it('should accept null as categoryId value [RED - null not assignable to string]', async () => {
+      // This test should FAIL because null is not assignable to type 'string'.
+      const dtoWithNullCategory: CreateServiceDto = {
+        categoryId: null, // TypeScript error: null is not assignable to string
+        name: 'Service With Null Category',
+        durationMinutes: 30,
+        price: 50.00,
+      };
+
+      const expectedService = {
+        ...mockService,
+        id: 'service-null-cat-2',
+        name: 'Service With Null Category',
+        categoryId: null,
+        category: null,
+      };
+
+      prisma.service.create.mockResolvedValue(expectedService);
+
+      const result = await service.create(dtoWithNullCategory);
+
+      expect(result.categoryId).toBeNull();
+      expect(result.category).toBeNull();
+    });
+
+    it('should query services with null categoryId successfully', async () => {
+      // This test may PASS at runtime since Prisma supports nullable categoryId,
+      // but combined with type-level failures above, the full test run will fail.
+      const mockServicesWithNullCategory = [
+        { ...mockService, id: 'svc-null-1', categoryId: null, category: null },
+        { ...mockService, id: 'svc-null-2', categoryId: null, category: null },
+      ];
+
+      prisma.service.findMany.mockResolvedValue(mockServicesWithNullCategory);
+      prisma.service.count.mockResolvedValue(2);
+
+      const result = await service.findAll(1, 10, undefined);
+
+      const nullCategoryServices = result.items.filter(s => s.categoryId === null);
+      expect(nullCategoryServices.length).toBeGreaterThan(0);
+      nullCategoryServices.forEach(s => {
+        expect(s.categoryId).toBeNull();
+      });
+    });
+
+    it('should allow updating categoryId to null [RED - null not assignable to string|undefined]', async () => {
+      // This test should FAIL because UpdateServiceDto.categoryId is `string | undefined`,
+      // and null is not assignable to `string | undefined`.
+      const updateDto: UpdateServiceDto = {
+        categoryId: null, // TypeScript error: null is not assignable to string | undefined
+      };
+
+      prisma.service.findUnique.mockResolvedValue(mockService);
+      const updatedService = { ...mockService, categoryId: null, category: null };
+      prisma.service.update.mockResolvedValue(updatedService);
+
+      const result = await service.update('service-1', updateDto);
+
+      expect(result.categoryId).toBeNull();
+    });
+  });
+
   describe('remove', () => {
     it('should throw NotFoundException if service not found', async () => {
       prisma.service.findUnique.mockResolvedValue(null);

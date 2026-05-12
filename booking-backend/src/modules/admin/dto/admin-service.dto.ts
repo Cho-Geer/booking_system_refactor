@@ -27,11 +27,22 @@ export class AdminServiceDto {
   @ApiPropertyOptional({ description: "Image URL (placeholder)" })
   imageUrl?: string;
 
+  @ApiPropertyOptional({ description: "Tax rate" })
+  taxRate?: number;
+
+  @ApiPropertyOptional({ description: "Service category name" })
+  category?: string;
+
   @ApiProperty({ format: "date-time" })
   createdAt!: Date;
 }
 
 export class CreateAdminServiceDto {
+  @ApiPropertyOptional({ description: "Service category name" })
+  @IsOptional()
+  @IsString()
+  category?: string;
+
   @ApiProperty()
   name!: string;
 
@@ -100,6 +111,11 @@ export class AdminServicesQueryDto {
   @Type(() => Boolean)
   @IsBoolean()
   active?: boolean;
+
+  @ApiPropertyOptional({ description: "Filter by category" })
+  @IsOptional()
+  @IsString()
+  category?: string;
 }
 
 export class AdminServiceSummaryDto {

@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../../../common/database/prisma.service";
 import { ServicesService } from "../../services/services.service";
 import {
@@ -49,11 +49,19 @@ export class AdminServicesService {
       ];
     }
 
+    // Category filter: match by category name
+    if (query.category) {
+      where.category = { name: { contains: query.category, mode: "insensitive" } };
+    }
+
     const [services, total] = await Promise.all([
       this.prisma.service.findMany({
         skip,
         take: limit,
         where,
+        include: {
+          category: true,
+        },
         orderBy: { createdAt: "desc" },
       }),
       this.prisma.service.count({ where }),
@@ -116,6 +124,26 @@ export class AdminServicesService {
     const prismaData = fromUpdateAdminServiceDto(dto);
     const service = await this.servicesService.update(id, prismaData as any);
     return mapToDto(service as any);
+  }
+
+  async uploadImage(
+    id: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    file: any,
+  ): Promise<{ image_url: string }> {
+    const service = await this.prisma.service.findUnique({ where: { id } });
+    if (!service) {
+      throw new NotFoundException(`Service with ID ${id} not found`);
+    }
+
+    const imageUrl = `/uploads/services/${file.filename ?? file.originalname}`;
+
+    await this.prisma.service.update({
+      where: { id },
+      data: { imageUrl },
+    });
+
+    return { image_url: imageUrl };
   }
 
   async remove(id: string): Promise<void> {

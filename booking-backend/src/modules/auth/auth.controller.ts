@@ -216,7 +216,7 @@ export class AuthController {
 
   @Public()
   @Post("reset-password/verify")
-  @RateLimit({ tier: "auth", key: "email" })
+  @RateLimit({ tier: "auth", key: "ip", limit: 10 })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: "重置密码第二步：验证码校验并更新密码" })
   @ApiBody({ type: ResetPasswordVerifyDto })

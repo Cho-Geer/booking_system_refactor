@@ -30,6 +30,18 @@ export class AdminAppointmentDto {
   @ApiProperty({ enum: ["PENDING", "CONFIRMED", "COMPLETED", "CANCELLED", "EXPIRED"] })
   status!: string;
 
+  @ApiPropertyOptional({ description: "Duration in minutes" })
+  durationMinutes?: number;
+
+  @ApiPropertyOptional({ description: "Price" })
+  price?: number;
+
+  @ApiPropertyOptional({ description: "Tax rate" })
+  taxRate?: number;
+
+  @ApiPropertyOptional({ description: "Tax included amount" })
+  taxIncludedAmount?: number;
+
   @ApiProperty({ format: "date-time" })
   createdAt!: Date;
 }

@@ -46,7 +46,7 @@ async function main() {
       phoneHash: hashWithPepper(adminPhone),
       phoneEncrypted: '', // 需要加密服务运行时生成，种子数据留空
       passwordHash: hashedPassword,
-      userType: 'ADMIN',
+      role: 'ADMIN',
       status: 'ACTIVE',
     },
   });

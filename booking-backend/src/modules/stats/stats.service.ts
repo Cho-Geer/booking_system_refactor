@@ -29,7 +29,7 @@ export interface RevenueStats {
 }
 
 export interface UserStats {
-  usersByUserType: Record<string, number>;
+  usersByRole: Record<string, number>;
   usersByMonth: Array<{ month: string; count: number }>;
   activeUsers: number;
 }
@@ -168,19 +168,19 @@ export class StatsService {
    * Get user growth statistics
    */
   async getUserStats(): Promise<UserStats> {
-    const usersByUserTypeRaw = await this.prisma.user.groupBy({
-      by: ["userType"],
+    const usersByRoleRaw = await this.prisma.user.groupBy({
+      by: ["role"],
       _count: true,
     });
 
-    const usersByUserType: Record<string, number> = {
+    const usersByRole: Record<string, number> = {
       CUSTOMER: 0,
       ADMIN: 0,
       SUPER_ADMIN: 0,
     };
 
-    for (const item of usersByUserTypeRaw) {
-      usersByUserType[item.userType] = item._count as number;
+    for (const item of usersByRoleRaw) {
+      usersByRole[item.role] = item._count as number;
     }
 
     // Get users by month (last 12 months)
@@ -214,7 +214,7 @@ export class StatsService {
     });
 
     return {
-      usersByUserType,
+      usersByRole,
       usersByMonth,
       activeUsers,
     };

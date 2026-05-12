@@ -15,7 +15,7 @@ export class AdminUserDto {
   @ApiPropertyOptional({ description: "Masked phone" })
   phone?: string;
 
-  @ApiProperty({ description: "User role mapped from userType" })
+  @ApiProperty({ description: "User role" })
   role!: string;
 
   @ApiProperty({ description: "User status" })
@@ -38,8 +38,8 @@ export class CreateAdminUserDto {
   @ApiProperty({ enum: ["CUSTOMER", "ADMIN", "SUPER_ADMIN"] })
   role!: string;
 
-  @ApiProperty({ minLength: 8 })
-  password!: string;
+  @ApiPropertyOptional({ minLength: 8 })
+  password?: string;
 }
 
 export class UpdateAdminUserDto {

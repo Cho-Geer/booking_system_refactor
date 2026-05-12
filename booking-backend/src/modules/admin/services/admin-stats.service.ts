@@ -86,14 +86,6 @@ export class AdminStatsService {
           : 0,
     }));
 
-    // totalBookings: sum of last 7 days vs sum of 7-14 days ago
-    const last7Sum = dailyBookings
-      .slice(-7)
-      .reduce((s, d) => s + d.bookings, 0);
-    const prev7Sum = dailyBookings
-      .slice(-14, -7)
-      .reduce((s, d) => s + d.bookings, 0);
-
     // activeUsers change: last month vs month before from usersByMonth
     const userMonths = userStats.usersByMonth;
     const lastUserMonth =
@@ -109,11 +101,6 @@ export class AdminStatsService {
       revMonths.length >= 2 ? revMonths[revMonths.length - 2].revenue : 0;
 
     return {
-      totalBookings: this.toStatCard(
-        overview.totalAppointments,
-        prev7Sum,
-        Math.max(1000, Math.round(overview.totalAppointments * 1.2)),
-      ),
       todayBookings: this.toStatCard(
         todayCount,
         yesterdayCount,

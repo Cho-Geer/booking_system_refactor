@@ -5,52 +5,53 @@
 generator client {
   provider        = "prisma-client-js"
   binaryTargets   = ["native", "debian-openssl-3.0.x"]
-  previewFeatures = ["partialIndexes"]
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
   provider   = "postgresql"
   url        = env("DATABASE_URL")
+  extensions = [pg_trgm, uuid_ossp]
 }
 
 // ============================================
 // Enums
 // ============================================
 
-enum UserType {
-  CUSTOMER    // 客户
-  ADMIN       // 管理员
+enum SystemRole {
+  CUSTOMER // 客户
+  ADMIN // 管理员
   SUPER_ADMIN // 超级管理员
 }
 
 enum UserStatus {
-  ACTIVE      // 活跃
-  INACTIVE    // 非活跃
-  BLOCKED     // 已禁用
+  ACTIVE // 活跃
+  INACTIVE // 非活跃
+  BLOCKED // 已禁用
 }
 
 enum AppointmentStatus {
-  PENDING     // 待确认
-  CONFIRMED   // 已确认
-  CANCELLED   // 已取消
-  COMPLETED   // 已完成
-  EXPIRED     // 已过期
+  PENDING // 待确认
+  CONFIRMED // 已确认
+  CANCELLED // 已取消
+  COMPLETED // 已完成
+  EXPIRED // 已过期
 }
 
 enum NotificationType {
-  SMS       // 短信通知
-  EMAIL     // 邮件通知
-  WECHAT    // 微信通知
-  PUSH      // 推送通知
-  SYSTEM    // 系统通知
+  SMS // 短信通知
+  EMAIL // 邮件通知
+  WECHAT // 微信通知
+  PUSH // 推送通知
+  SYSTEM // 系统通知
 }
 
 enum NotificationStatus {
-  PENDING   // 待发送
-  SENT      // 已发送
-  FAILED    // 发送失败
-  READ      // 已阅读
-  QUEUED    // 已入队 (BullMQ集成)
+  PENDING // 待发送
+  SENT // 已发送
+  FAILED // 发送失败
+  READ // 已阅读
+  QUEUED // 已入队 (BullMQ集成)
 }
 
 // ============================================
@@ -58,40 +59,42 @@ enum NotificationStatus {
 // ============================================
 
 model User {
-  id           String         @id @default(uuid())
-  name         String         // 用户姓名
-  
+  id   String @id @default(uuid())
+  name String // 用户姓名
+
   // Phone 三字段（PII 加密，方案 C v4）
-  phone            String?        // 脱敏展示（如 138****5678）
-  phoneHash        String?        @unique @map("phone_hash")  // SHA-256(phone + pepper)
-  phoneEncrypted   String?        @map("phone_encrypted")     // AES-256-GCM 密文
-  
+  phone          String? // 脱敏展示（如 138****5678）
+  phoneHash      String? @unique @map("phone_hash") // SHA-256(phone + pepper)
+  phoneEncrypted String? @map("phone_encrypted") // AES-256-GCM 密文
+
   // Email 三字段（PII 加密，方案 C v4）
-  email            String?        // 脱敏展示（如 us***@example.com）
-  emailHash        String?        @unique @map("email_hash")  // SHA-256(email + pepper)
-  emailEncrypted   String?        @map("email_encrypted")     // AES-256-GCM 密文
-  
-  passwordHash String?        @map("password_hash") // 密码哈希 (bcrypt rounds=12)
-  userType     UserType       @default(CUSTOMER) @map("user_type") // 用户类型
-  status       UserStatus     @default(ACTIVE) // 用户状态
-  lastLoginAt  DateTime?      @map("last_login_at") // 最后登录时间
-  deviceInfo   Json?          @map("device_info") // 设备信息（JSON格式）
-  remarks      String?        @db.Text // 备注信息
-  createdAt    DateTime       @default(now()) @map("created_at")
-  updatedAt    DateTime       @updatedAt @map("updated_at")
+  email          String? // 脱敏展示（如 us***@example.com）
+  emailHash      String? @unique @map("email_hash") // SHA-256(email + pepper)
+  emailEncrypted String? @map("email_encrypted") // AES-256-GCM 密文
+
+  passwordHash      String?    @map("password_hash") // 密码哈希 (bcrypt rounds=12)
+  role              SystemRole @default(CUSTOMER) @map("role") // 用户类型
+  status            UserStatus @default(ACTIVE) // 用户状态
+  lastLoginAt       DateTime?  @map("last_login_at") // 最后登录时间
+  preferredTimezone String?    @map("preferred_timezone") // 首选时区
+  deviceInfo        Json?      @map("device_info") // 设备信息（JSON格式）
+  remarks           String?    @db.Text // 备注信息
+  createdAt         DateTime   @default(now()) @map("created_at")
+  updatedAt         DateTime   @updatedAt @map("updated_at")
 
   // 关系字段
-  sessions     UserSession[]  // 用户会话
-  appointments Appointment[]  // 用户预约
-  notifications Notification[] // 用户通知
-  activityLogs ActivityLog[]   // 用户活动日志
+  sessions           UserSession[] // 用户会话
+  appointments       Appointment[] // 用户预约
+  notifications      Notification[] // 用户通知
+  activityLogs       ActivityLog[] // 用户活动日志
+  inAppNotifications InAppNotification[] // 应用内通知
+  sentMessages       Message[]           @relation("SentMessages") // 已发送消息
+  receivedMessages   Message[]           @relation("ReceivedMessages") // 已接收消息
 
-  @@map("users")
-  @@index([phoneHash])
-  @@index([emailHash])
-  @@index([userType, status])
+  @@index([role, status])
   @@index([createdAt])
-  @@index([lastLoginAt])  // 部分索引 - 通过 SQL 迁移实现 WHERE status = 'ACTIVE'
+  @@index([lastLoginAt]) // 部分索引 - 通过 SQL 迁移实现 WHERE status = 'ACTIVE'
+  @@map("users")
 }
 
 // ============================================
@@ -99,17 +102,17 @@ model User {
 // ============================================
 
 model UserSession {
-  id               String   @id @default(uuid())
-  userId           String   @map("user_id")
-  sessionToken     String   @unique @map("session_token")      // 会话标识符，用于快速查询
-  refreshToken     String   @unique @map("refresh_token")     // 存储 Refresh Token，支持旋转与吊销
-  expiresAt        DateTime @map("expires_at")
+  id               String    @id @default(uuid())
+  userId           String    @map("user_id")
+  sessionToken     String    @unique @map("session_token") // 会话标识符，用于快速查询
+  refreshToken     String    @unique @map("refresh_token") // 存储 Refresh Token，支持旋转与吊销
+  expiresAt        DateTime  @map("expires_at")
   refreshExpiresAt DateTime? @map("refresh_expires_at")
-  ipAddress        String?  @map("ip_address") @db.Inet        // 审计与风控
-  userAgent        String?  @map("user_agent") @db.Text        // 设备指纹
-  deviceInfo       Json?    @map("device_info") @db.JsonB      // 设备详情（JSON格式）
-  isActive         Boolean  @default(true) @map("is_active")  // 软删除标志，支持强制登出
-  createdAt        DateTime @default(now()) @map("created_at")
+  ipAddress        String?   @map("ip_address") @db.Inet // 审计与风控
+  userAgent        String?   @map("user_agent") @db.Text // 设备指纹
+  deviceInfo       Json?     @map("device_info") @db.JsonB // 设备详情（JSON格式）
+  isActive         Boolean   @default(true) @map("is_active") // 软删除标志，支持强制登出
+  createdAt        DateTime  @default(now()) @map("created_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -125,22 +128,22 @@ model UserSession {
 // ============================================
 
 model ServiceCategory {
-  id           String    @id @default(uuid())
-  name         String    @unique
-  description  String?   @db.Text
-  iconUrl      String?   @map("icon_url")  // 新增
-  isActive     Boolean   @default(true) @map("is_active")
-  displayOrder Int      @default(0) @map("display_order")  // 重命名自 sortOrder
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @updatedAt @map("updated_at")
+  id           String   @id @default(uuid())
+  name         String   @unique
+  description  String?  @db.Text
+  iconUrl      String?  @map("icon_url") // 新增
+  isActive     Boolean  @default(true) @map("is_active")
+  displayOrder Int      @default(0) @map("display_order") // 重命名自 sortOrder
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
   services Service[]
 
-  @@map("service_categories")
   @@index([name])
   @@index([isActive])
   @@index([displayOrder])
   @@index([isActive, displayOrder])
+  @@map("service_categories")
 }
 
 // ============================================
@@ -148,31 +151,31 @@ model ServiceCategory {
 // ============================================
 
 model Service {
-  id               String   @id @default(uuid())
-  categoryId       String   @map("category_id")
-  name             String
-  description      String?  @db.Text
-  durationMinutes  Int      @default(60) @map("duration_minutes")
-  price            Decimal? @db.Decimal(10, 2)
-  pricePerMinute   Decimal? @db.Decimal(10, 2) @map("price_per_minute")
-  taxRate          Decimal? @db.Decimal(5, 4) @map("tax_rate")
-  imageUrl         String?  @map("image_url")
-  isActive         Boolean  @default(true) @map("is_active")
-  displayOrder     Int      @default(0) @map("display_order")
-  createdAt        DateTime @default(now()) @map("created_at")
-  updatedAt        DateTime @updatedAt @map("updated_at")
+  id              String   @id @default(uuid())
+  categoryId      String?  @map("category_id")
+  name            String
+  description     String?  @db.Text
+  durationMinutes Int      @default(60) @map("duration_minutes")
+  price           Decimal? @db.Decimal(10, 2)
+  pricePerMinute  Decimal? @map("price_per_minute") @db.Decimal(10, 2)
+  taxRate         Decimal? @map("tax_rate") @db.Decimal(5, 4)
+  imageUrl        String?  @map("image_url")
+  isActive        Boolean  @default(true) @map("is_active")
+  displayOrder    Int      @default(0) @map("display_order")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
 
-  category     ServiceCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  category     ServiceCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   appointments Appointment[]
   timeSlots    TimeSlot[]
 
-  @@map("services")
   @@index([categoryId])
   @@index([name])
   @@index([isActive])
   @@index([displayOrder])
   @@index([categoryId, isActive])
   @@index([price])
+  @@map("services")
 }
 
 // ============================================
@@ -192,14 +195,14 @@ model TimeSlot {
 
   service      Service       @relation(fields: [serviceId], references: [id], onDelete: Restrict)
   appointments Appointment[]
+  // 注意: Prisma 6.x 不支持 WHERE 子句的部分索引，需要通过 SQL 迁移实现
+  // 迁移 SQL: CREATE INDEX timeslots_active_capacity_seq ON time_slots (capacity, current_sequence) WHERE is_active = true;
 
-  @@map("time_slots")
   @@index([serviceId, startTime, endTime])
   @@index([startTime])
   @@index([isActive])
   @@index([capacity, currentSequence], map: "timeslots_capacity_seq_idx")
-  // 注意: Prisma 6.x 不支持 WHERE 子句的部分索引，需要通过 SQL 迁移实现
-  // 迁移 SQL: CREATE INDEX timeslots_active_capacity_seq ON time_slots (capacity, current_sequence) WHERE is_active = true;
+  @@map("time_slots")
 }
 
 // ============================================
@@ -207,45 +210,42 @@ model TimeSlot {
 // ============================================
 
 model Appointment {
-  id                String            @id @default(uuid())
-  userId            String            @map("user_id")
-  timeSlotId        String            @map("time_slot_id")
-  serviceId         String            @map("service_id")
-  appointmentNumber String            @unique @map("appointment_number")
-  appointmentDate   DateTime          @map("appointment_date")
-  slotSequence      Int               @default(0) @map("slot_sequence")
-  durationMinutes   Int               @default(30) @map("duration_minutes")
-  price             Decimal?          @db.Decimal(10, 2)
-  taxRate           Decimal?          @db.Decimal(5, 4) @map("tax_rate")
-  taxIncludedAmount Decimal?          @db.Decimal(10, 2) @map("tax_included_amount")
+  id                String   @id @default(uuid())
+  userId            String   @map("user_id")
+  timeSlotId        String   @map("time_slot_id")
+  serviceId         String   @map("service_id")
+  appointmentNumber String   @unique @map("appointment_number")
+  appointmentDate   DateTime @map("appointment_date")
+  slotSequence      Int      @default(0) @map("slot_sequence")
+  durationMinutes   Int      @default(30) @map("duration_minutes")
+  price             Decimal? @db.Decimal(10, 2)
+  taxRate           Decimal? @map("tax_rate") @db.Decimal(5, 4)
+  taxIncludedAmount Decimal? @map("tax_included_amount") @db.Decimal(10, 2)
 
-  status            AppointmentStatus @default(PENDING)
-  customerInfo      Json              @map("customer_info")
-  remarks           String?           @db.Text
-  createdAt         DateTime          @default(now()) @map("created_at")
-  updatedAt         DateTime          @updatedAt @map("updated_at")
+  status       AppointmentStatus @default(PENDING)
+  customerInfo Json              @map("customer_info")
+  remarks      String?           @db.Text
+  createdAt    DateTime          @default(now()) @map("created_at")
+  updatedAt    DateTime          @updatedAt @map("updated_at")
 
-  user          User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  timeSlot      TimeSlot           @relation(fields: [timeSlotId], references: [id], onDelete: Restrict)
-  service       Service            @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  timeSlot TimeSlot @relation(fields: [timeSlotId], references: [id], onDelete: Restrict)
+  service  Service  @relation(fields: [serviceId], references: [id], onDelete: Restrict)
 
   histories     AppointmentHistory[]
   notifications Notification[]
-
-  // 部分唯一索引 - 高并发核心 (通过 SQL 迁移实现部分索引)
-  @@unique([timeSlotId, appointmentDate, slotSequence],
-           map: "appointment_slot_occupied",
-           where: raw("\"status\" IN ('PENDING', 'CONFIRMED', 'COMPLETED')"))
-
-  @@map("appointments")
-  @@index([userId, appointmentDate])
-  @@index([timeSlotId, appointmentDate, status])
-  @@index([appointmentNumber])
-  @@index([status, appointmentDate])
   // 包含索引 - 高频查询优化 (需要通过 SQL 迁移实现)
   // CREATE INDEX appointments_pending_include ON appointments (appointment_date, time_slot_id, status) 
   // INCLUDE (user_id, customer_info) 
   // WHERE status IN ('PENDING', 'CONFIRMED');
+
+  // 部分唯一索引 - 高并发核心 (通过 SQL 迁移实现部分索引)
+  @@unique([timeSlotId, appointmentDate, slotSequence], map: "appointment_slot_occupied")
+  @@index([userId, appointmentDate])
+  @@index([timeSlotId, appointmentDate, status])
+  @@index([appointmentNumber])
+  @@index([status, appointmentDate])
+  @@map("appointments")
 }
 
 // ============================================
@@ -253,23 +253,23 @@ model Appointment {
 // ============================================
 
 model AppointmentHistory {
-  id              String             @id @default(uuid())
-  appointmentId   String             @map("appointment_id")
-  action          String
-  previousStatus  AppointmentStatus? @map("previous_status")
-  newStatus       AppointmentStatus? @map("new_status")
-  changeReason    String?            @map("change_reason")
-  performedBy     String             @map("performed_by")
-  performedAt     DateTime           @default(now()) @map("performed_at")
-  metadata        Json?
+  id             String             @id @default(uuid())
+  appointmentId  String             @map("appointment_id")
+  action         String
+  previousStatus AppointmentStatus? @map("previous_status")
+  newStatus      AppointmentStatus? @map("new_status")
+  changeReason   String?            @map("change_reason")
+  performedBy    String             @map("performed_by")
+  performedAt    DateTime           @default(now()) @map("performed_at")
+  metadata       Json?
 
   appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
 
-  @@map("appointment_histories")
   @@index([appointmentId])
   @@index([performedAt])
   @@index([action])
   @@index([appointmentId, performedAt], map: "appointment_history_appt_date_desc")
+  @@map("appointment_histories")
 }
 
 // ============================================
@@ -277,26 +277,25 @@ model AppointmentHistory {
 // ============================================
 
 model Notification {
-  id              String             @id @default(uuid())
-  userId          String             @map("user_id")
-  appointmentId   String?            @map("appointment_id")
-  type            NotificationType
-  title           String             // 从 subject 改为 title (文档要求)
-  content         String             @db.Text
-  isRead          Boolean            @default(false) @map("is_read")
-  status          NotificationStatus @default(PENDING)
-  metadata        Json?              // BullMQ jobId 等元数据
-  scheduledAt     DateTime?          @map("scheduled_at")  // 计划发送时间
-  sentAt          DateTime?          @map("sent_at")
-  retryCount      Int                @default(0) @map("retry_count")
-  lastError       String?            @map("last_error")
-  createdAt       DateTime           @default(now()) @map("created_at")
-  updatedAt       DateTime           @updatedAt @map("updated_at")
+  id            String             @id @default(uuid())
+  userId        String?            @map("user_id")
+  appointmentId String?            @map("appointment_id")
+  type          NotificationType
+  title         String // 从 subject 改为 title (文档要求)
+  content       String             @db.Text
+  isRead        Boolean            @default(false) @map("is_read")
+  status        NotificationStatus @default(PENDING)
+  metadata      Json? // BullMQ jobId 等元数据
+  scheduledAt   DateTime?          @map("scheduled_at") // 计划发送时间
+  sentAt        DateTime?          @map("sent_at")
+  retryCount    Int                @default(0) @map("retry_count")
+  lastError     String?            @map("last_error")
+  createdAt     DateTime           @default(now()) @map("created_at")
+  updatedAt     DateTime           @updatedAt @map("updated_at")
 
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
   appointment Appointment? @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
 
-  @@map("notifications")
   @@index([userId])
   @@index([userId, isRead])
   @@index([status])
@@ -304,6 +303,7 @@ model Notification {
   @@index([type])
   @@index([createdAt])
   @@index([appointmentId])
+  @@map("notifications")
 }
 
 // ============================================
@@ -313,13 +313,13 @@ model Notification {
 model InAppNotification {
   id        String    @id @default(uuid())
   userId    String
-  type      String    // info, warning, error, success
+  type      String // info, warning, error, success
   title     String
   body      String
   readAt    DateTime?
   createdAt DateTime  @default(now())
 
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, readAt])
   @@index([createdAt])
@@ -339,8 +339,8 @@ model Message {
   readAt      DateTime?
   createdAt   DateTime  @default(now())
 
-  sender      User      @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
-  recipient   User      @relation("ReceivedMessages", fields: [recipientId], references: [id], onDelete: Cascade)
+  sender    User @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  recipient User @relation("ReceivedMessages", fields: [recipientId], references: [id], onDelete: Cascade)
 
   @@index([recipientId, readAt])
   @@index([senderId])
@@ -354,24 +354,24 @@ model Message {
 model ActivityLog {
   id           String   @id @default(uuid())
   userId       String?  @map("user_id") // 用户ID（可选）
-  action       String   // 操作类型
+  action       String // 操作类型
   resourceType String   @map("resource_type") // 资源类型
   resourceId   String?  @map("resource_id") // 资源ID
   ipAddress    String?  @map("ip_address") // IP地址
   userAgent    String?  @map("user_agent") // 用户代理
-  metadata     Json?    // 元数据
+  metadata     Json? // 元数据
   createdAt    DateTime @default(now()) @map("created_at")
 
   // 关系字段
-  user         User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 
-  @@map("activity_logs")
   @@index([userId])
   @@index([action])
   @@index([resourceType])
   @@index([resourceId])
   @@index([createdAt])
-  @@index([userId, createdAt], map: "activity_logs_user_created_desc")  // DESC ordering for timeline queries
+  @@index([userId, createdAt], map: "activity_logs_user_created_desc") // DESC ordering for timeline queries
+  @@map("activity_logs")
 }
 
 // ============================================
@@ -384,14 +384,14 @@ model SystemSetting {
   settingValue String   @map("setting_value")
   settingType  String   @default("STRING") @map("setting_type")
   category     String   @default("GENERAL") // 设置分类
-  description  String?  // 设置描述
+  description  String? // 设置描述
   isProtected  Boolean  @default(false) @map("is_protected") // 是否受保护
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
-  @@map("system_settings")
   @@index([settingKey])
   @@index([category])
+  @@map("system_settings")
 }
 
 // ============================================
@@ -400,16 +400,17 @@ model SystemSetting {
 
 model SystemLog {
   id        String   @id @default(uuid())
-  level     String   // 日志级别
-  message   String   // 日志消息
-  context   Json?    // 上下文信息
+  level     String // 日志级别
+  message   String // 日志消息
+  context   Json? // 上下文信息
   ipAddress String?  @map("ip_address") // IP地址
   createdAt DateTime @default(now()) @map("created_at")
 
-  @@map("system_logs")
   @@index([level])
   @@index([createdAt])
   @@index([level, createdAt])
+  @@map("system_logs")
 }
+
 // test: new field added [Agent simulation]
 // test: another change [Agent forgot hash]

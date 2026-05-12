@@ -8,7 +8,7 @@ import { Reflector } from "@nestjs/core";
 
 interface RequestUser {
   id: string;
-  userType: string;
+  role: string;
   roles?: string[];
   [key: string]: unknown;
 }
@@ -55,8 +55,8 @@ export class RolesGuard implements CanActivate {
     }
 
     // Check if user has at least one of the required roles
-    // Prefer roles array over userType when available
-    const userRoles = Array.isArray(user.roles) ? user.roles : [user.userType];
+    // Prefer roles array over role when available
+    const userRoles = Array.isArray(user.roles) ? user.roles : [user.role];
     const hasRole = requiredRoles.some((role) => userRoles.includes(role));
 
     if (!hasRole) {
@@ -81,7 +81,7 @@ export class RolesGuard implements CanActivate {
     const logData = {
       timestamp: new Date().toISOString(),
       userId: user.id,
-      userRole: user.userType,
+      userRole: user.role,
       requiredRoles,
       endpoint: `${request.method} ${request.url}`,
       ipAddress: request.ip,

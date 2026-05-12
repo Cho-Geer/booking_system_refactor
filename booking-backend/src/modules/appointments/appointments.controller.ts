@@ -24,14 +24,15 @@ import {
   UpdateAppointmentDto,
 } from "./dto/appointment.dto";
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
+import { RolesGuard } from "../../common/guards/roles.guard";
 import { Roles } from "../../common/decorators/roles.decorator";
-import { UserType, AppointmentStatus } from "@prisma/client";
+import { SystemRole, AppointmentStatus } from "@prisma/client";
 import { RateLimit } from "../rate-limiter/rate-limiter.decorator";
 import { CacheService } from "../cache/cache.service";
 
 @ApiTags("Appointments")
 @Controller("appointments")
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth("JWT-auth")
 export class AppointmentsController {
   constructor(
@@ -40,7 +41,7 @@ export class AppointmentsController {
   ) {}
 
   @Post()
-  @Roles(UserType.CUSTOMER)
+  @Roles(SystemRole.CUSTOMER)
   @RateLimit({ tier: "api", key: "ip", limit: 30 })
   @ApiOperation({ summary: "Create a new appointment" })
   @ApiResponse({ status: 201, description: "Appointment created" })
@@ -68,7 +69,7 @@ export class AppointmentsController {
 
   @Get()
   @RateLimit({ tier: "api", key: "user" })
-  @Roles(UserType.CUSTOMER)
+  @Roles(SystemRole.CUSTOMER)
   @ApiOperation({ summary: "Get all appointments" })
   @ApiResponse({ status: 200, description: "List of appointments" })
   async findAll(
@@ -94,7 +95,7 @@ export class AppointmentsController {
   }
 
   @Get(":id")
-  @Roles(UserType.CUSTOMER)
+  @Roles(SystemRole.CUSTOMER)
   @RateLimit({ tier: "api", key: "user" })
   @ApiOperation({ summary: "Get appointment by ID" })
   @ApiResponse({ status: 200, description: "Appointment found" })
@@ -104,7 +105,7 @@ export class AppointmentsController {
   }
 
   @Patch(":id")
-  @Roles(UserType.CUSTOMER)
+  @Roles(SystemRole.CUSTOMER)
   @RateLimit({ tier: "strict", key: "user" })
   @ApiOperation({ summary: "Update appointment" })
   @ApiResponse({ status: 200, description: "Appointment updated" })
@@ -116,7 +117,7 @@ export class AppointmentsController {
   }
 
   @Post(":id/cancel")
-  @Roles(UserType.CUSTOMER)
+  @Roles(SystemRole.CUSTOMER)
   @RateLimit({ tier: "strict", key: "user" })
   @ApiOperation({ summary: "Cancel appointment" })
   @ApiResponse({ status: 200, description: "Appointment cancelled" })
@@ -126,7 +127,7 @@ export class AppointmentsController {
 
   @Delete(":id")
   @RateLimit({ tier: "strict", key: "user" })
-  @Roles(UserType.ADMIN)
+  @Roles(SystemRole.ADMIN)
   @ApiOperation({ summary: "Delete appointment" })
   @ApiResponse({ status: 200, description: "Appointment deleted" })
   async remove(@Param("id") id: string) {

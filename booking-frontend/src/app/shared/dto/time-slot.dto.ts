@@ -16,7 +16,8 @@ export interface TimeSlot {
 
 export interface AvailableTimeSlotsQuery {
   serviceId: string;
-  date: string;
+  startDate: string;
+  endDate: string;
 }
 
 export type AvailableTimeSlotsResponse = TimeSlot[];

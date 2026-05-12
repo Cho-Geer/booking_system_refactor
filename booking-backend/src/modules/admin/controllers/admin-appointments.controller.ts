@@ -25,6 +25,7 @@ import {
 import { JwtAuthGuard } from "../../../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../../../common/guards/roles.guard";
 import { Roles } from "../../../common/decorators/roles.decorator";
+import { RateLimit } from "../../rate-limiter/rate-limiter.decorator";
 
 @ApiTags("Admin Appointments")
 @Controller("admin/appointments")
@@ -37,6 +38,7 @@ export class AdminAppointmentsController {
   ) {}
 
   @Get()
+  @RateLimit({ tier: "api", key: "ip", limit: 30 })
   @ApiOperation({ summary: "List all appointments with filters" })
   @ApiResponse({ status: 200, description: "Paginated list of appointments" })
   async findAll(@Query() query: AdminAppointmentsQueryDto) {
@@ -58,6 +60,7 @@ export class AdminAppointmentsController {
   }
 
   @Post()
+  @RateLimit({ tier: "api", key: "ip", limit: 30 })
   @ApiOperation({ summary: "Create appointment on behalf of a customer" })
   @ApiResponse({ status: 201, description: "Appointment created" })
   @ApiResponse({ status: 404, description: "User or service not found" })

@@ -7,7 +7,7 @@ import {
   MaxLength,
 } from "class-validator";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { UserType, UserStatus } from "@prisma/client";
+import { SystemRole, UserStatus } from "@prisma/client";
 
 export interface DeviceInfo {
   [key: string]: unknown;
@@ -38,13 +38,13 @@ export class CreateUserDto {
   password: string;
 
   @ApiPropertyOptional({
-    description: "User type",
-    enum: UserType,
+    description: "User role",
+    enum: SystemRole,
     default: "CUSTOMER",
   })
   @IsOptional()
-  @IsEnum(UserType, { message: "Invalid user type" })
-  userType?: UserType;
+  @IsEnum(SystemRole, { message: "Invalid user role" })
+  role?: SystemRole;
 }
 
 export class UpdateUserDto {
@@ -72,10 +72,10 @@ export class UpdateUserDto {
   @IsEnum(UserStatus, { message: "Invalid user status" })
   status?: UserStatus;
 
-  @ApiPropertyOptional({ description: "User type", enum: UserType })
+  @ApiPropertyOptional({ description: "User role", enum: SystemRole })
   @IsOptional()
-  @IsEnum(UserType, { message: "Invalid user type" })
-  userType?: UserType;
+  @IsEnum(SystemRole, { message: "Invalid user role" })
+  role?: SystemRole;
 }
 
 export class UserResponseDto {
@@ -91,8 +91,8 @@ export class UserResponseDto {
   @ApiPropertyOptional({ description: "Phone number" })
   phone?: string;
 
-  @ApiProperty({ description: "User type", enum: UserType })
-  userType: UserType;
+  @ApiProperty({ description: "User role", enum: SystemRole })
+  role: SystemRole;
 
   @ApiProperty({ description: "User status", enum: UserStatus })
   status: UserStatus;

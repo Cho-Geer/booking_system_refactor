@@ -25,11 +25,15 @@ export interface Booking {
   taxIncludedAmount?: number;
   createdAt?: string;
   notes?: string;
+  appointmentNumber?: string;
+  serviceId?: string;
 }
 
 export interface CreateBookingRequest {
   timeSlotId: string;
+  serviceId: string;
   appointmentDate: string;
+  preferredSequence: number;
   notes?: string;
   overtimeMinutes?: number;
 }

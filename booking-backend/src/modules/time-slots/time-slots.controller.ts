@@ -19,20 +19,21 @@ import {
 import { TimeSlotsService } from "./time-slots.service";
 import { CreateTimeSlotDto, UpdateTimeSlotDto } from "./dto/time-slot.dto";
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
+import { RolesGuard } from "../../common/guards/roles.guard";
 import { Roles } from "../../common/decorators/roles.decorator";
-import { UserType } from "@prisma/client";
+import { SystemRole } from "@prisma/client";
 import { RateLimit } from "../rate-limiter/rate-limiter.decorator";
 
 @ApiTags("Time Slots")
 @Controller("time-slots")
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth("JWT-auth")
 @RateLimit({ tier: "public", key: "ip" })
 export class TimeSlotsController {
   constructor(private readonly timeSlotsService: TimeSlotsService) {}
 
   @Post()
-  @Roles(UserType.ADMIN)
+  @Roles(SystemRole.ADMIN)
   @ApiOperation({ summary: "Create a new time slot" })
   @ApiResponse({ status: 201, description: "Time slot created" })
   @ApiResponse({ status: 409, description: "Time slot already exists" })
@@ -60,6 +61,7 @@ export class TimeSlotsController {
     @Query("startDate") startDate: string,
     @Query("endDate") endDate: string,
     @Query("overtimeMinutes") overtimeMinutes?: number,
+    @Query("timezone") timezone?: string,
   ) {
     return this.timeSlotsService.getAvailableSlots(
       serviceId,
@@ -78,7 +80,7 @@ export class TimeSlotsController {
   }
 
   @Patch(":id")
-  @Roles(UserType.ADMIN)
+  @Roles(SystemRole.ADMIN)
   @ApiOperation({ summary: "Update time slot" })
   @ApiResponse({ status: 200, description: "Time slot updated" })
   async update(
@@ -89,7 +91,7 @@ export class TimeSlotsController {
   }
 
   @Delete(":id")
-  @Roles(UserType.ADMIN)
+  @Roles(SystemRole.ADMIN)
   @ApiOperation({ summary: "Delete time slot" })
   @ApiResponse({ status: 200, description: "Time slot deleted" })
   async remove(@Param("id") id: string) {

@@ -111,11 +111,13 @@ export class ServiceManagementComponent implements OnInit, OnDestroy {
     { label: 'Inactive', value: 'inactive' },
   ];
 
-  readonly categoryOptions = [
-    { label: 'All Categories', value: '' },
-    { label: 'Category A', value: 'Category A' },
-    { label: 'Category B', value: 'Category B' },
-  ];
+  readonly categoryOptions = computed(() => {
+    const categories = [...new Set(this.vm().allServicesForStats.map(s => s.category).filter(Boolean))] as string[];
+    return [
+      { label: 'All Categories', value: '' },
+      ...categories.map(c => ({ label: c, value: c })),
+    ];
+  });
 
   ngOnInit(): void {
     this.store.clearError();

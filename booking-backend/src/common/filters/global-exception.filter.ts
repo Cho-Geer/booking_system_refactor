@@ -71,17 +71,29 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     let message = "Internal server error";
     let error = "Unknown error";
 
+    const errors: Array<{ field: string; message: string; code: string }> = [];
+
     if (exception instanceof HttpException) {
       status = exception.getStatus();
       const exceptionResponse = exception.getResponse();
-      message =
-        typeof exceptionResponse === "string"
-          ? exceptionResponse
-          : ((exceptionResponse as Record<string, unknown>)
-              .message as string) || message;
-      // For contract compliance, use the exception message as the error field
-      error =
-        typeof exceptionResponse === "string" ? exceptionResponse : message;
+      const rawMessage = (exceptionResponse as Record<string, unknown>).message;
+
+      if (Array.isArray(rawMessage)) {
+        message = rawMessage[0] || message;
+        error = "Validation Error";
+        rawMessage.forEach((msg: string) => {
+          const spaceIdx = msg.indexOf(" ");
+          const field = spaceIdx > 0 ? msg.substring(0, spaceIdx) : "unknown";
+          errors.push({ field, message: msg, code: "VALIDATION_ERROR" });
+        });
+      } else {
+        message =
+          typeof rawMessage === "string"
+            ? rawMessage
+            : (rawMessage as string) || message;
+        error =
+          typeof exceptionResponse === "string" ? exceptionResponse : message;
+      }
     } else if (isPrismaError(exception)) {
       // Handle Prisma errors using mapping table
       const mapping = PRISMA_ERROR_MAP[exception.code];
@@ -116,6 +128,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       statusCode: status,
       message,
       error,
+      errors: errors.length > 0 ? errors : undefined,
       timestamp: new Date().toISOString(),
       path: request.url,
       requestId,

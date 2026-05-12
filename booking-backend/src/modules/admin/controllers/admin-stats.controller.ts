@@ -16,6 +16,7 @@ import {
 import { JwtAuthGuard } from "../../../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../../../common/guards/roles.guard";
 import { Roles } from "../../../common/decorators/roles.decorator";
+import { RateLimit } from "../../rate-limiter/rate-limiter.decorator";
 
 @ApiTags("Admin Stats")
 @Controller("admin")
@@ -26,6 +27,7 @@ export class AdminStatsController {
 
   @Get("stats")
   @Roles("ADMIN", "SUPER_ADMIN")
+  @RateLimit({ tier: "api", key: "ip", limit: 30 })
   @ApiOperation({ summary: "Get admin dashboard stats" })
   @ApiQuery({
     name: "timeRange",
@@ -38,12 +40,14 @@ export class AdminStatsController {
     @Query("timeRange") timeRange?: string,
     @Query("startDate") startDate?: string,
     @Query("endDate") endDate?: string,
+    @Query("timezone") timezone?: string,
   ): Promise<AdminStatsDto> {
     return this.adminStatsService.getDashboard(timeRange, startDate, endDate);
   }
 
   @Get("stats/booking-trends")
   @Roles("ADMIN", "SUPER_ADMIN")
+  @RateLimit({ tier: "api", key: "ip", limit: 30 })
   @ApiOperation({ summary: "Get booking trend data filtered by time range" })
   @ApiQuery({
     name: "timeRange",
@@ -80,6 +84,7 @@ export class AdminStatsController {
 
   @Get("stats/service-distribution")
   @Roles("ADMIN", "SUPER_ADMIN")
+  @RateLimit({ tier: "api", key: "ip", limit: 30 })
   @ApiOperation({
     summary: "Get service distribution with percentages (DASH-003)",
   })
@@ -104,6 +109,7 @@ export class AdminStatsController {
 
   @Get("stats/time-distribution")
   @Roles("ADMIN", "SUPER_ADMIN")
+  @RateLimit({ tier: "api", key: "ip", limit: 30 })
   @ApiOperation({
     summary:
       "Get hourly time distribution with formatted hour strings (DASH-004)",

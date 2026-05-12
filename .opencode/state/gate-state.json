@@ -3695,6 +3695,232 @@
         "execution_summary": "Applied 7 cross-document consistency fixes across 4 files: contract.yaml (FIX-1: role↔userType mapping, FIX-2: categoryId nullable note, FIX-3: passwordHash→nullable, FIX-4: removed total_bookings stat card, FIX-5: flattened business hours response, FIX-6: added phone/status/createdAt to profile responses, FIX-7: updated based_on_documents references) + 数据架构设计文档.md (categoryId String→String?, version 2.6.0→2.6.1) + 系统架构设计文档 SAD.md (version 2.5.0→2.5.1) + 接口设计规范文档.md (version 2.9.0→2.9.1). Ran keystone:hash to update machine.json.",
         "completed_at": "2026-05-12T13:44:44.179Z"
       }
+    },
+    "cg_ses_1778594235486": {
+      "session_id": "cg_ses_1778594235486",
+      "created_at": "2026-05-12T13:57:15.487Z",
+      "task_description": "READ-ONLY: Strict thorough cross-reference audit of current source code against all spec docs, detailed design docs, schema, and Prisma to identify inconsistencies, potential problems, ambiguities, and omissions.",
+      "gate_status": "checked",
+      "last_check_failed_items": [],
+      "plan_summary": null,
+      "confirmed_at": null,
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1778595543727": {
+      "session_id": "cg_ses_1778595543727",
+      "created_at": "2026-05-12T14:19:03.728Z",
+      "task_description": "Execute the full requirements modification plan covering: role/userType unification, Service.categoryId nullable, passwordHash nullable, stats alignment, business hours restructuring, and TranslationDictionary i18n system implementation",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Dispatch @Meta-Planner to decompose the 5-phase cross-doc consistency & i18n plan into Task.DAG.json with TDD phases. Will then dispatch @Architect, @Coder-BE, @Coder-FE per the generated DAG.",
+      "confirmed_at": "2026-05-12T14:23:20.095Z",
+      "consumed_at": "2026-05-12T14:29:03.179Z",
+      "audit": {
+        "execution_summary": "Completed Meta-Planner delegation: analyzed cross-doc consistency & i18n plan, scanned project state (Prisma schema, contract.yaml, Task.DAG.json, TECH_DEBT_REGISTRY), generated 25-task comprehensive DAG with TDD phase enforcement across 5 phases. DAG written to Task.DAG.json.",
+        "completed_at": "2026-05-12T14:29:03.179Z"
+      }
+    },
+    "cg_ses_1778595883353": {
+      "session_id": "cg_ses_1778595883353",
+      "created_at": "2026-05-12T14:24:43.353Z",
+      "task_description": "Phase 0: Prisma schema fixes — add preferredTimezone, fix nullable fields, remove redundant indexes, add extensions",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Phase 0: 8 Prisma schema fixes — add preferredTimezone, fix nullable fields (Service.categoryId, Notification.userId), remove redundant indexes, add partial index WHERE clause, add postgresqlExtensions, add datasource extensions, generate migration",
+      "confirmed_at": "2026-05-12T14:34:49.088Z",
+      "consumed_at": "2026-05-12T14:39:49.584Z",
+      "audit": {
+        "execution_summary": "Phase 0: Applied all 8 Prisma schema fixes — added preferredTimezone to User, made Service.categoryId nullable (with SetNull FK), made Notification.userId nullable (with SetNull FK), removed redundant @@index([phoneHash]) and @@index([emailHash]), updated previewFeatures to postgresqlExtensions (removed deprecated partialIndexes), added pg_trgm/uuid-ossp extensions to datasource, and generated migration SQL. Fixed pre-existing validation errors (missing opposite relations on User model, unsupported where:raw in @@unique).",
+        "completed_at": "2026-05-12T14:39:49.584Z"
+      }
+    },
+    "cg_ses_1778595945404": {
+      "session_id": "cg_ses_1778595945404",
+      "created_at": "2026-05-12T14:25:45.404Z",
+      "task_description": "Meta-Planner: Decompose cross-document consistency fixes and dictionary parameterization plan into Task.DAG.json. Reference: cross-doc-consistency-and-i18n-plan.md. 5-phase roadmap covering role/userType unification, nullable fixes, business hours flattening, TranslationDictionary model, backend translation service/API, frontend TranslatePipe/Signal store, copy migration, testing and cleanup.",
+      "gate_status": "checked",
+      "last_check_failed_items": [],
+      "plan_summary": null,
+      "confirmed_at": null,
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1778596641731": {
+      "session_id": "cg_ses_1778596641731",
+      "created_at": "2026-05-12T14:37:21.731Z",
+      "task_description": "[TDD-RED] BE-STATS-CONTRACT-FIXES: Write ONLY failing test cases for: (1) AdminStatsService no longer returns total_bookings, (2) business hours response is flattened (no schedule wrapper), (3) passwordHash nullable in user creation DTO, (4) contract.yaml updated to v1.7.6. No business implementation code.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "TDD-RED BE-STATS-CONTRACT-FIXES: Write failing test cases for (1) total_bookings removal from AdminStatsDto, (2) flattened business hours response, (3) passwordHash nullable in CreateAdminUserDto, (4) contract.yaml v1.7.6 version check. Zero business implementation code.",
+      "confirmed_at": "2026-05-12T14:39:49.273Z",
+      "consumed_at": "2026-05-12T14:45:46.930Z",
+      "audit": {
+        "execution_summary": "TDD-RED phase for BE-STATS-CONTRACT-FIXES: Wrote/modified 6 test spec files. 4 contract fixes tested: (1) totalBookings removal from AdminStatsDto — 8 failing assertions, (2) flattened business hours response — 2 new test suites fail (no implementation), (3) passwordHash nullable in CreateAdminUserDto — 1 failing assertion on mapper output, (4) contract.yaml v1.7.6 version check — 1 failing assertion (got 1.7.5). All 9 RED tests confirmed failing with exit code 1.",
+        "completed_at": "2026-05-12T14:45:46.930Z"
+      }
+    },
+    "cg_ses_1778596721108": {
+      "session_id": "cg_ses_1778596721108",
+      "created_at": "2026-05-12T14:38:41.108Z",
+      "task_description": "[TDD-RED] BE-ROLE-UNIFY - Write failing tests for userType→role rename",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "BE-ROLE-UNIFY RED phase: write failing tests for userType→role rename - Prisma schema (UserType→SystemRole, userType→role), DTOs, auth/guard, services",
+      "confirmed_at": "2026-05-12T14:38:46.262Z",
+      "consumed_at": "2026-05-12T14:43:38.639Z",
+      "audit": {
+        "execution_summary": "BE-ROLE-UNIFY RED phase: Created 21 tests validating userType→role rename (Prisma schema, DTOs, auth/guard, services). 17 tests FAIL confirming the rename has NOT been implemented. Output: test_report.json (with execution_evidence), TASK_LOG.md, HANDOVER.md, and test file in src/test/rename-validation/role-rename-validation.spec.ts",
+        "completed_at": "2026-05-12T14:43:38.639Z"
+      }
+    },
+    "cg_ses_1778596834352": {
+      "session_id": "cg_ses_1778596834352",
+      "created_at": "2026-05-12T14:40:34.352Z",
+      "task_description": "[TDD-RED] BE-CATEGORY-NULLABLE - Write failing tests for categoryId nullable",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "BE-CATEGORY-NULLABLE RED: failing tests for categoryId nullable",
+      "confirmed_at": "2026-05-12T14:40:39.793Z",
+      "consumed_at": "2026-05-12T14:40:45.883Z",
+      "audit": {
+        "execution_summary": "RED phase completed for BE-CATEGORY-NULLABLE. Added 6 failing test cases across 2 spec files (services.service.spec.ts and services.controller.spec.ts) that validate Service.categoryId should be nullable. Tests fail with 5 TypeScript compilation errors (TS2741, TS2322) confirming CreateServiceDto.categoryId is currently required. All task artifacts (TASK_LOG.md, HANDOVER.md, test_report.json) generated at .task_temp/BE-CATEGORY-NULLABLE/.",
+        "completed_at": "2026-05-12T14:40:45.883Z"
+      }
+    },
+    "cg_ses_1778596931689": {
+      "session_id": "cg_ses_1778596931689",
+      "created_at": "2026-05-12T14:42:11.690Z",
+      "task_description": "Phase 1: Security RBAC + Rate Limits",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Phase 1 Security RBAC + Rate Limits: Add RolesGuard to appointments/time-slots controllers, fix reset-password/verify rate limit to 10/min, add audit log for logout, add @RateLimit to admin controllers",
+      "confirmed_at": "2026-05-12T14:43:15.375Z",
+      "consumed_at": "2026-05-12T14:44:41.186Z",
+      "audit": {
+        "execution_summary": "Phase 1 Security RBAC + Rate Limits completed: (1.1) Added RolesGuard to appointments.controller.ts, (1.2) Added RolesGuard to time-slots.controller.ts, (1.3) Changed reset-password/verify rate limit to 10/min keyed by ip, (1.4) Added audit log entry on logout in auth.service.ts, (1.5) Added @RateLimit decorators to admin-users, admin-services, admin-appointments, and admin-stats controllers. TypeScript compilation passes with no new errors.",
+        "completed_at": "2026-05-12T14:44:41.186Z"
+      }
+    },
+    "cg_ses_1778596937119": {
+      "session_id": "cg_ses_1778596937119",
+      "created_at": "2026-05-12T14:42:17.119Z",
+      "task_description": "Phase 5: WebSocket enhancements",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Phase 5: WebSocket enhancements - Add slot.booked, notification.new, stats.updated events to backend gateway, add 3 frontend subscriptions, add 30s heartbeat, fix appointment.status_changed payload wrapper",
+      "confirmed_at": "2026-05-12T14:43:17.262Z",
+      "consumed_at": "2026-05-12T14:44:11.929Z",
+      "audit": {
+        "execution_summary": "Phase 5 WebSocket enhancements: Added sendSlotBooked, sendNewNotification, sendStatsUpdated methods to NotificationsGateway (emit flat payload to admin:broadcast). Added 30s ping heartbeat in afterInit(). Fixed sendAppointmentStatusChanged to emit raw data without NotificationPayload wrapper. Added 3 subscription methods (subscribeToSlotBooked, subscribeToNewNotification, subscribeToStatsUpdated) to frontend SocketService. Added pong response in connect(). All changes pass tsc --noEmit.",
+        "completed_at": "2026-05-12T14:44:11.929Z"
+      }
+    },
+    "cg_ses_1778596947640": {
+      "session_id": "cg_ses_1778596947640",
+      "created_at": "2026-05-12T14:42:27.640Z",
+      "task_description": "Phase 4: Frontend bug fixes",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Phase 4: 7 frontend bug fixes - HTTP method, range, DTO fields, role enum, query params, type fixes",
+      "confirmed_at": "2026-05-12T14:43:16.000Z",
+      "consumed_at": "2026-05-12T14:44:24.124Z",
+      "audit": {
+        "execution_summary": "Phase 4: 7 frontend bug fixes applied. cancelBooking .delete→.post, preferredSequence 10→100, Booking DTO fields added, UserRole updated, TimeSlot query fixed, TimeDistributionItem.hour type fixed. TypeScript compilation clean (exit 0). Handover artifacts created at .task_temp/PHASE4-FE-FIXES/.",
+        "completed_at": "2026-05-12T14:44:24.124Z"
+      }
+    },
+    "cg_ses_1778597138905": {
+      "session_id": "cg_ses_1778597138905",
+      "created_at": "2026-05-12T14:45:38.905Z",
+      "task_description": "Phase 2: Add new endpoints (PATCH /profile/timezone, GET/PUT /admin/settings/business-hours, POST /admin/services/:id/image) + DTO fields (AdminAppointmentDto financial fields, AdminServiceDto taxRate/category, profile timezone, timezone query params, mappers) in booking-backend",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Add 6 new/modified items: 1) PATCH /profile/timezone endpoint + UpdateTimezoneDto, 2) GET/PUT /admin/settings/business-hours with SystemSetting key, 3) POST /admin/services/:id/image with FileInterceptor, 4) Add financial fields to AdminAppointmentDto + mapper, 5) Add taxRate/category to AdminServiceDto + mapper + query, 6) Add preferredTimezone to profile + timezone query params to time-slots & admin-stats controllers",
+      "confirmed_at": "2026-05-12T14:46:34.088Z",
+      "consumed_at": "2026-05-12T14:49:16.292Z",
+      "audit": {
+        "execution_summary": "Phase 2 completed: Created UpdateTimezoneDto + PATCH /profile/timezone, AdminSettingsController + AdminSettingsService for GET/PUT /admin/settings/business-hours, POST /admin/services/:id/image with file upload. Added financial fields to AdminAppointmentDto + mapper, taxRate/category to AdminServiceDto + mapper + query, preferredTimezone to profile, timezone query params to time-slots & admin-stats controllers. All new code type-checks cleanly.",
+        "completed_at": "2026-05-12T14:49:16.292Z"
+      }
+    },
+    "cg_ses_1778597207825": {
+      "session_id": "cg_ses_1778597207825",
+      "created_at": "2026-05-12T14:46:47.825Z",
+      "task_description": "[TDD-GREEN] BE-ROLE-UNIFY implement userType→role rename in NestJS backend - Prisma schema, DTOs, services, auth, guards, controllers, fixtures. Make all 21 RED-phase tests pass.",
+      "gate_status": "armed",
+      "last_check_failed_items": [],
+      "plan_summary": "GREEN phase for BE-ROLE-UNIFY: Implement userType→role rename across Prisma schema, 11 backend source files, fixtures, and contract.yaml. Run migrations, generate client, verify all 21 tests pass.",
+      "confirmed_at": "2026-05-12T14:48:34.369Z",
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1778597208788": {
+      "session_id": "cg_ses_1778597208788",
+      "created_at": "2026-05-12T14:46:48.788Z",
+      "task_description": "[TDD-GREEN] BE-CATEGORY-NULLABLE implement: Modify CreateServiceDto and UpdateServiceDto to support nullable categoryId",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "BE-CATEGORY-NULLABLE GREEN phase: Modify CreateServiceDto.categoryId to `string | null` with @IsOptional and @ApiPropertyOptional, and UpdateServiceDto.categoryId to `string | null`. Only DTO types change; Prisma schema already supports nullable.",
+      "confirmed_at": "2026-05-12T14:47:43.104Z",
+      "consumed_at": "2026-05-12T14:53:58.511Z",
+      "audit": {
+        "execution_summary": "BE-CATEGORY-NULLABLE GREEN phase completed. Modified CreateServiceDto.categoryId from `string` to `string | null` with @IsOptional/@ApiPropertyOptional, and UpdateServiceDto.categoryId from `string | undefined` to `string | null`. Regenerated Prisma client to align generated types with schema. All 41 services module tests pass (24 service + 17 controller), including 7 RED→GREEN tests. Outputs: TASK_LOG.md, HANDOVER.md, test_report.json.",
+        "completed_at": "2026-05-12T14:53:58.511Z"
+      }
+    },
+    "cg_ses_1778597214853": {
+      "session_id": "cg_ses_1778597214853",
+      "created_at": "2026-05-12T14:46:54.853Z",
+      "task_description": "[TDD-GREEN] BE-STATS-CONTRACT-FIXES implement based on RED-phase tests and HANDOVER",
+      "gate_status": "checked",
+      "last_check_failed_items": [],
+      "plan_summary": null,
+      "confirmed_at": null,
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1778597386995": {
+      "session_id": "cg_ses_1778597386995",
+      "created_at": "2026-05-12T14:49:46.995Z",
+      "task_description": "Phase 3 — Contract DTO Alignment: Fix PaginatedResponse type conflict, admin-notifications pagination, register DTO password regex, ResponseInterceptor dynamic statusCode, GlobalExceptionFilter validation errors array",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Phase 3 DTO alignment: 3.1 PaginatedResponse meta-wrap, 3.2 notifications return meta format + DTO update, 3.5 sync password regex from login DTO, 3.6 dynamic statusCode in interceptor, 3.7 validation errors array in exception filter",
+      "confirmed_at": "2026-05-12T14:51:09.547Z",
+      "consumed_at": "2026-05-12T14:52:09.811Z",
+      "audit": {
+        "execution_summary": "Phase 3 Contract DTO Alignment completed: (3.1) Updated PaginatedResponse<T> to meta-wrapped format with PaginatedMeta in admin.dto.ts; (3.2) Updated NotificationListDto to use PaginatedMetaDto and admin-notifications.service.ts to return meta object with totalPages/hasNext/hasPrev; (3.5) Synced register DTO password regex to match login-password.dto.ts; (3.6) Made ResponseInterceptor statusCode dynamic from HTTP response and message configurable via _message; (3.7) Added validation errors array extraction in GlobalExceptionFilter for ValidationPipe errors. Fixed 2 test files to match new DTO shapes.",
+        "completed_at": "2026-05-12T14:52:09.811Z"
+      }
+    },
+    "cg_ses_1778597394039": {
+      "session_id": "cg_ses_1778597394039",
+      "created_at": "2026-05-12T14:49:54.039Z",
+      "task_description": "Phase 4 items 4.8-4.10 — Frontend UI Polish: remove extra stat card, make category filter API-driven, fix 404 page role-based navigation",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Phase 4 items 4.8-4.10: remove Total Bookings stat card from dashboard, make category filter API-driven using computed signal, fix 404 page goHome() for role-based navigation",
+      "confirmed_at": "2026-05-12T14:49:58.830Z",
+      "consumed_at": "2026-05-12T14:51:23.692Z",
+      "audit": {
+        "execution_summary": "Phase 4 items 4.8-4.10: removed Total Bookings stat card from dashboard (4 cards remain), replaced hardcoded category options with API-driven computed signal from allServicesForStats, updated 404 page goHome() to use AuthStore userType + RouteResolver for role-based navigation",
+        "completed_at": "2026-05-12T14:51:23.692Z"
+      }
+    },
+    "cg_ses_1778597555336": {
+      "session_id": "cg_ses_1778597555336",
+      "created_at": "2026-05-12T14:52:35.336Z",
+      "task_description": "Phase 6 — Documentation sync: Update contract.yaml and architecture docs for TimeSlot.isActive, sync version references, update WebSocket namespace, add change log entry",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Phase 6 documentation sync: update contract.yaml and data architecture doc for TimeSlot.isActive, sync version references to v1.7.5, update WebSocket namespace, add change log entry",
+      "confirmed_at": "2026-05-12T14:54:55.478Z",
+      "consumed_at": "2026-05-12T14:54:59.685Z",
+      "audit": {
+        "execution_summary": "Phase 6 documentation sync complete: (1) Added isActive field + index to time_slot in contract.yaml, (2) Added isActive field + index to TimeSlot model in 数据架构设计文档.md, (3) Updated contract.yaml v1.7.0 → v1.7.5 in 接口设计规范文档.md, (4) Updated WebSocket endpoint /v1/ws → /notifications in contract.yaml, (5) Added v1.7.6 change log entry for all fixes",
+        "completed_at": "2026-05-12T14:54:59.685Z"
+      }
     }
   }
 }

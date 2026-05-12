@@ -42,14 +42,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   readonly statsCards = computed(() => {
     const s = this.vm().stats;
-    const totalSC = s?.totalBookings;
     const todaySC = s?.todayBookings;
     const pendingSC = s?.pendingBookings;
     const activeSC = s?.activeUsers;
     const revenueSC = s?.totalRevenue;
     if (!s) return [];
     return [
-      { label: 'Total Bookings', value: totalSC?.value ?? 0, icon: 'pi pi-book', iconBg: 'bg-accent-blue/10', iconColor: 'text-accent-blue', ...this.formatTrend(totalSC, '0%', true), progress: totalSC?.progressPercentage ?? 0, target: totalSC?.target ?? 0, color: 'from-blue-500 to-blue-800' },
       { label: "Today's Bookings", value: todaySC?.value ?? 0, icon: 'pi pi-calendar', iconBg: 'bg-accent-green/10', iconColor: 'text-accent-green', ...this.formatTrend(todaySC, '0%', true), progress: todaySC?.progressPercentage ?? 0, target: todaySC?.target ?? 0, color: 'from-accent-green to-accent-green-dark' },
       { label: 'Pending Confirmation', value: pendingSC?.value ?? 0, icon: 'pi pi-clock', iconBg: 'bg-accent-yellow/10', iconColor: 'text-accent-yellow', ...this.formatTrend(pendingSC, '0%', false), progress: pendingSC?.progressPercentage ?? 0, target: pendingSC?.target ?? 0, color: 'from-accent-yellow to-accent-orange' },
       { label: 'Total Customers', value: activeSC?.value ?? 0, icon: 'pi pi-users', iconBg: 'bg-accent-green/10', iconColor: 'text-accent-green', ...this.formatTrend(activeSC, '0%', true), progress: activeSC?.progressPercentage ?? 0, target: activeSC?.target ?? 0, color: 'from-accent-green to-green-700' },

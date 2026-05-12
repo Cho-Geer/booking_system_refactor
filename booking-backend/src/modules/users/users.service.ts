@@ -6,7 +6,8 @@ import {
 } from "@nestjs/common";
 import { PrismaService } from "../../common/database/prisma.service";
 import { CreateUserDto, UpdateUserDto } from "./dto/user.dto";
-import { UserType, UserStatus } from "@prisma/client";
+import { UpdateTimezoneDto } from "./dto/update-timezone.dto";
+import { SystemRole, UserStatus } from "@prisma/client";
 import { HashService } from "../encryption/hash.service";
 import { PasswordUtil } from "../../common/utils/password.util";
 
@@ -45,7 +46,7 @@ export class UsersService {
     return this.prisma.user.create({
       data: {
         name: createUserDto.name,
-        userType: createUserDto.userType || UserType.CUSTOMER,
+        role: createUserDto.role || SystemRole.CUSTOMER,
         status: UserStatus.ACTIVE,
       },
       select: this.getSafeUserSelect(),
@@ -169,6 +170,22 @@ export class UsersService {
     return { message: "User deleted successfully" };
   }
 
+  async updateTimezone(
+    id: string,
+    dto: UpdateTimezoneDto,
+  ) {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
+    return this.prisma.user.update({
+      where: { id },
+      data: { preferredTimezone: dto.timezone },
+      select: this.getSafeUserSelect(),
+    });
+  }
+
   async updatePassword(id: string, oldPassword: string, newPassword: string) {
     const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) {
@@ -198,11 +215,12 @@ export class UsersService {
     return {
       id: true,
       name: true,
-      phone: true, // 脱敏值
-      email: true, // 脱敏值
-      userType: true,
+      phone: true,
+      email: true,
+      role: true,
       status: true,
       lastLoginAt: true,
+      preferredTimezone: true,
       createdAt: true,
       updatedAt: true,
       remarks: true,

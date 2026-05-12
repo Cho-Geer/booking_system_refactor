@@ -77,6 +77,8 @@ describe('AdminStatsController', () => {
     });
 
     const mockDashboard: AdminStatsDto = {
+      // HIGH-2: totalBookings field exists in current code but should be removed per contract.yaml v1.7.6
+      // RED phase: assertion below expects it to NOT be present → will fail
       totalBookings: sc(850, 12, true, 1000, 85),
       todayBookings: sc(25, 25, true, 50, 50),
       pendingBookings: sc(5, 0, true, 50, 10),
@@ -108,12 +110,23 @@ describe('AdminStatsController', () => {
       expect(result).toEqual(mockDashboard);
     });
 
+    it('[RED] should NOT contain totalBookings in response (HIGH-2)', async () => {
+      mockAdminStatsService.getDashboard.mockResolvedValue(mockDashboard);
+
+      const result: AdminStatsDto = await controller.getStats();
+
+      // totalBookings must be removed per contract.yaml v1.7.6
+      // This will FAIL because current AdminStatsDto still has totalBookings
+      expect(result).not.toHaveProperty('totalBookings');
+    });
+
     it('should return correct AdminStatsDto shape with new fields', async () => {
       mockAdminStatsService.getDashboard.mockResolvedValue(mockDashboard);
 
       const result: AdminStatsDto = await controller.getStats();
 
-      expect(result).toHaveProperty('totalBookings');
+      // HIGH-2: totalBookings removed — do not check for it
+      expect(result).not.toHaveProperty('totalBookings');
       expect(result).toHaveProperty('todayBookings');
       expect(result).toHaveProperty('pendingBookings');
       expect(result).toHaveProperty('activeUsers');
@@ -122,7 +135,6 @@ describe('AdminStatsController', () => {
       expect(result).toHaveProperty('servicePopularity');
       expect(result).toHaveProperty('timeDistribution');
 
-      expect(typeof result.totalBookings).toBe('object');
       expect(typeof result.todayBookings).toBe('object');
       expect(typeof result.pendingBookings).toBe('object');
       expect(typeof result.activeUsers).toBe('object');
@@ -132,10 +144,11 @@ describe('AdminStatsController', () => {
       expect(Array.isArray(result.timeDistribution)).toBe(true);
     });
 
-    it('should handle empty dashboard data gracefully', async () => {
+    it('[RED] should handle empty dashboard data without totalBookings', async () => {
       const empty = (): StatCardDto => ({ value: 0, changePercentage: 0, isPositive: true, target: 0, progressPercentage: 0 });
       const emptyDashboard: AdminStatsDto = {
-        totalBookings: empty(),
+        // HIGH-2: totalBookings removed per contract.yaml v1.7.6
+        totalBookings: empty(), // still exists in current DTO — test expects absence → will FAIL
         todayBookings: empty(),
         pendingBookings: empty(),
         activeUsers: empty(),
@@ -149,7 +162,8 @@ describe('AdminStatsController', () => {
 
       const result: AdminStatsDto = await controller.getStats();
 
-      expect(result.totalBookings.value).toBe(0);
+      // RED assertion: totalBookings should NOT be in response, will FAIL on current code
+      expect(result).not.toHaveProperty('totalBookings');
       expect(result.todayBookings.value).toBe(0);
       expect(result.activeUsers.value).toBe(0);
       expect(result.totalRevenue.value).toBe(0);

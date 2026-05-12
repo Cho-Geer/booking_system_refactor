@@ -51,7 +51,7 @@ const mockRevenue: RevenueStats = {
 };
 
 const mockUserStats: UserStats = {
-  usersByUserType: {
+  usersByRole: {
     CUSTOMER: 180,
     ADMIN: 15,
     SUPER_ADMIN: 5,
@@ -135,6 +135,21 @@ describe('AdminStatsService', () => {
     expect(service).toBeDefined();
   });
 
+  // ─── HIGH-2: totalBookings REMOVED from AdminStatsDto ───────────
+  it('[RED] should NOT contain totalBookings in dashboard response (HIGH-2)', async () => {
+    mockStatsService.getOverview.mockResolvedValue(mockOverview);
+    mockStatsService.getRevenue.mockResolvedValue(mockRevenue);
+    mockStatsService.getUserStats.mockResolvedValue(mockUserStats);
+    mockStatsService.getPopularServices.mockResolvedValue(mockPopularServices);
+    mockStatsService.getDailyBookings.mockResolvedValue(mockDailyBookings);
+    mockStatsService.getTimeDistribution.mockResolvedValue(mockRawTimeDistribution);
+
+    const result: AdminStatsDto = await service.getDashboard();
+
+    // totalBookings field must be removed per contract.yaml v1.7.6
+    expect(result).not.toHaveProperty('totalBookings');
+  });
+
   // ─── getDashboard ─────────────────────────────────────────────────
   describe('getDashboard', () => {
     beforeEach(() => {
@@ -153,7 +168,8 @@ describe('AdminStatsService', () => {
       const result: AdminStatsDto = await service.getDashboard();
 
       expect(result).toBeDefined();
-      expect(result.totalBookings.value).toBe(850);
+      // HIGH-2: totalBookings removed from contract.yaml v1.7.6
+      expect(result).not.toHaveProperty('totalBookings');
       expect(result.todayBookings.value).toBe(25); // matches date '2026-05-01'
       expect(result.pendingBookings.value).toBe(50); // from mockOverview.appointmentsByStatus.PENDING
       expect(result.activeUsers.value).toBe(85);
@@ -199,7 +215,8 @@ describe('AdminStatsService', () => {
       const result: AdminStatsDto = await service.getDashboard();
 
       // Verify shape of AdminStatsDto (including new fields)
-      expect(result).toHaveProperty('totalBookings');
+      // HIGH-2: totalBookings removed from contract.yaml v1.7.6
+      expect(result).not.toHaveProperty('totalBookings');
       expect(result).toHaveProperty('todayBookings');
       expect(result).toHaveProperty('pendingBookings');
       expect(result).toHaveProperty('activeUsers');
@@ -208,16 +225,15 @@ describe('AdminStatsService', () => {
       expect(result).toHaveProperty('servicePopularity');
       expect(result).toHaveProperty('timeDistribution');
       // Type checks — stat card fields are StatCardDto objects
-      expect(typeof result.totalBookings).toBe('object');
       expect(typeof result.todayBookings).toBe('object');
       expect(typeof result.pendingBookings).toBe('object');
       expect(typeof result.activeUsers).toBe('object');
       expect(typeof result.totalRevenue).toBe('object');
-      expect(result.totalBookings).toHaveProperty('value');
-      expect(result.totalBookings).toHaveProperty('changePercentage');
-      expect(result.totalBookings).toHaveProperty('isPositive');
-      expect(result.totalBookings).toHaveProperty('target');
-      expect(result.totalBookings).toHaveProperty('progressPercentage');
+      expect(result.todayBookings).toHaveProperty('value');
+      expect(result.todayBookings).toHaveProperty('changePercentage');
+      expect(result.todayBookings).toHaveProperty('isPositive');
+      expect(result.todayBookings).toHaveProperty('target');
+      expect(result.todayBookings).toHaveProperty('progressPercentage');
       expect(Array.isArray(result.bookingTrend)).toBe(true);
       expect(Array.isArray(result.servicePopularity)).toBe(true);
       expect(Array.isArray(result.timeDistribution)).toBe(true);
@@ -232,6 +248,8 @@ describe('AdminStatsService', () => {
 
       const result: AdminStatsDto = await service.getDashboard();
 
+      // HIGH-2: totalBookings removed from contract.yaml v1.7.6
+      expect(result).not.toHaveProperty('totalBookings');
       expect(result.todayBookings.value).toBe(0);
       expect(result.bookingTrend).toEqual([]);
       expect(result.servicePopularity).toEqual([]);

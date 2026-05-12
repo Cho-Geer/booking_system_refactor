@@ -71,7 +71,7 @@ export class BookingConfirmationComponent {
       timeSlotId: slot.id,
       serviceId,
       appointmentDate: new Date().toISOString(),
-      preferredSequence: Math.floor(Math.random() * 10),
+      preferredSequence: Math.floor(Math.random() * 100),
       notes: undefined,
     }).then((response) => {
       if (response.status === 'SUCCESS') {

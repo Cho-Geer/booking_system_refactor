@@ -251,7 +251,7 @@ export class ApiService {
 
   cancelBooking(bookingId: string): Observable<void> {
     return this.http
-      .delete<void>(`${this.apiUrl}/appointments/${bookingId}`)
+      .post<void>(`${this.apiUrl}/appointments/${bookingId}/cancel`, {})
       .pipe(catchError(this.handleError));
   }
 

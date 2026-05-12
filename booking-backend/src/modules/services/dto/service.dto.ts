@@ -9,9 +9,10 @@ import {
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 
 export class CreateServiceDto {
-  @ApiProperty({ description: "Service category ID" })
+  @ApiPropertyOptional({ description: "Service category ID" })
+  @IsOptional()
   @IsString()
-  categoryId: string;
+  categoryId?: string | null;
 
   @ApiProperty({ description: "Service name" })
   @IsString()
@@ -43,7 +44,7 @@ export class UpdateServiceDto {
   @ApiPropertyOptional({ description: "Service category ID" })
   @IsOptional()
   @IsString()
-  categoryId?: string;
+  categoryId?: string | null;
 
   @ApiPropertyOptional({ description: "Service name" })
   @IsOptional()

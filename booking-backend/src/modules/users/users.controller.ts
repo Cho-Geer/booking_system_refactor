@@ -23,10 +23,11 @@ import { UsersService } from "./users.service";
 import { CreateUserDto, UpdateUserDto, UserResponseDto } from "./dto/user.dto";
 import { ProfileResponseDto } from "./dto/profile-response.dto";
 import { UpdatePasswordDto } from "./dto/update-password.dto";
+import { UpdateTimezoneDto } from "./dto/update-timezone.dto";
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../../common/guards/roles.guard";
 import { Roles } from "../../common/decorators/roles.decorator";
-import { UserType } from "@prisma/client";
+import { SystemRole } from "@prisma/client";
 import { RateLimit } from "../rate-limiter/rate-limiter.decorator";
 import { Request } from "express";
 import { ClsService } from "nestjs-cls";
@@ -34,7 +35,7 @@ import { ClsService } from "nestjs-cls";
 interface JwtUser {
   id: string;
   roles?: string[];
-  userType?: string;
+  role?: string;
 }
 
 /**
@@ -74,7 +75,7 @@ export class UsersController {
   ) {}
 
   @Post()
-  @Roles(UserType.ADMIN)
+  @Roles(SystemRole.ADMIN)
   @ApiOperation({ summary: "Create a new user" })
   @ApiResponse({
     status: 201,
@@ -87,7 +88,7 @@ export class UsersController {
   }
 
   @Get()
-  @Roles(UserType.ADMIN)
+  @Roles(SystemRole.ADMIN)
   @ApiOperation({ summary: "Get all users with pagination" })
   @ApiResponse({ status: 200, description: "List of users" })
   async findAll(
@@ -153,12 +154,25 @@ export class UsersController {
   }
 
   @Delete(":id")
-  @Roles(UserType.ADMIN)
+  @Roles(SystemRole.ADMIN)
   @ApiOperation({ summary: "Delete user" })
   @ApiResponse({ status: 200, description: "User deleted" })
   @ApiResponse({ status: 404, description: "User not found" })
   async remove(@Param("id") id: string) {
     return this.usersService.remove(id);
+  }
+
+  @Patch("profile/timezone")
+  @Roles(SystemRole.CUSTOMER, SystemRole.ADMIN, SystemRole.SUPER_ADMIN)
+  @RateLimit({ tier: "api", key: "ip" })
+  @ApiOperation({ summary: "Update preferred timezone" })
+  @ApiResponse({ status: 200, description: "Timezone updated" })
+  async updateTimezone(@Body() dto: UpdateTimezoneDto, @Req() req: Request) {
+    const user = req.user as JwtUser | undefined;
+    if (!user) {
+      throw new ForbiddenException("User not authenticated");
+    }
+    return this.usersService.updateTimezone(user.id, dto);
   }
 
   @Put("profile/password")

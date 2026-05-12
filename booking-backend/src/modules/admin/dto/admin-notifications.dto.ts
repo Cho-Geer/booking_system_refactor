@@ -20,11 +20,8 @@ export class NotificationItemDto {
   created_at!: string;
 }
 
-export class NotificationListDto {
-  @ApiProperty({ type: [NotificationItemDto] })
-  items!: NotificationItemDto[];
-
-  @ApiProperty({ description: "Total number of notifications" })
+export class PaginatedMetaDto {
+  @ApiProperty({ description: "Total number of items" })
   total!: number;
 
   @ApiProperty({ description: "Current page number" })
@@ -32,6 +29,23 @@ export class NotificationListDto {
 
   @ApiProperty({ description: "Items per page" })
   limit!: number;
+
+  @ApiProperty({ description: "Total number of pages" })
+  totalPages!: number;
+
+  @ApiProperty({ description: "Whether there is a next page" })
+  hasNext!: boolean;
+
+  @ApiProperty({ description: "Whether there is a previous page" })
+  hasPrev!: boolean;
+}
+
+export class NotificationListDto {
+  @ApiProperty({ type: [NotificationItemDto] })
+  items!: NotificationItemDto[];
+
+  @ApiProperty({ type: PaginatedMetaDto })
+  meta!: PaginatedMetaDto;
 }
 
 export class UnreadCountDto {

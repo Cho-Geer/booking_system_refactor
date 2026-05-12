@@ -41,9 +41,6 @@ export class StatCardDto {
 }
 
 export class AdminStatsDto {
-  @ApiProperty({ description: "Total bookings stat card" })
-  totalBookings!: StatCardDto;
-
   @ApiProperty({ description: "Today's bookings stat card" })
   todayBookings!: StatCardDto;
 

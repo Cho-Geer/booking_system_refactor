@@ -7,9 +7,11 @@ interface PrismaService {
   durationMinutes: number;
   price: number;
   pricePerMinute?: number | null;
+  taxRate?: number | null;
   isActive: boolean;
   createdAt: Date;
   imageUrl?: string | null;
+  category?: { name: string } | null;
 }
 
 export function toAdminServiceDto(service: PrismaService): AdminServiceDto {
@@ -20,8 +22,10 @@ export function toAdminServiceDto(service: PrismaService): AdminServiceDto {
     duration: service.durationMinutes,
     price: service.price,
     pricePerMinute: service.pricePerMinute ?? undefined,
+    taxRate: service.taxRate ? Number(service.taxRate) : undefined,
     active: service.isActive,
     imageUrl: service.imageUrl ?? undefined,
+    category: service.category?.name ?? undefined,
     createdAt: service.createdAt,
   };
 }

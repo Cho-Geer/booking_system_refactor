@@ -39,15 +39,29 @@ export class ResponseInterceptor<T> implements NestInterceptor<
   ): Observable<StandardResponse<T>> {
     const requestId =
       this.cls.get<string>("requestId") ?? `req-${crypto.randomUUID()}`;
+    const response = context.switchToHttp().getResponse();
+    const statusCode = response.statusCode;
 
     return next.handle().pipe(
-      map((data) => ({
-        statusCode: 200,
-        message: "OK",
-        data,
-        timestamp: new Date().toISOString(),
-        requestId,
-      })),
+      map((data) => {
+        let message = "OK";
+        let cleanData = data;
+
+        if (data && typeof data === "object" && "_message" in (data as Record<string, unknown>)) {
+          const d = data as Record<string, unknown>;
+          message = (d._message as string) ?? "OK";
+          const { _message, ...rest } = d;
+          cleanData = rest as T;
+        }
+
+        return {
+          statusCode,
+          message,
+          data: cleanData,
+          timestamp: new Date().toISOString(),
+          requestId,
+        };
+      }),
     );
   }
 }

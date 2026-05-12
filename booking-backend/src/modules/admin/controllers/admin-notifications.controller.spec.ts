@@ -44,9 +44,7 @@ describe("AdminNotificationsController", () => {
     it("should return paginated notifications with default params", async () => {
       const expected: NotificationListDto = {
         items: [],
-        total: 0,
-        page: 1,
-        limit: 20,
+        meta: { total: 0, page: 1, limit: 20, totalPages: 0, hasNext: false, hasPrev: false },
       };
       mockService.findAll.mockResolvedValue(expected);
 

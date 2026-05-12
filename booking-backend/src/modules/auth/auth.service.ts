@@ -7,7 +7,7 @@ import {
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { PrismaService } from "../../common/database/prisma.service";
-import { UserStatus, UserType as PrismaUserType } from "@prisma/client";
+import { UserStatus, SystemRole } from "@prisma/client";
 import { EmailService } from "../email/email.service";
 import { VerificationService } from "../verification/verification.service";
 import { CacheService } from "../cache/cache.service";
@@ -49,13 +49,10 @@ const REFRESH_TOKEN_EXPIRES_DAYS = 7;
 /** 验证码 TTL: 5 分钟 */
 const VERIFICATION_CODE_TTL = 300;
 
-/** User type enum from Prisma schema */
-type UserType = "CUSTOMER" | "ADMIN" | "SUPER_ADMIN";
-
 export interface UserPayload {
   id: string;
   name: string;
-  userType: UserType;
+  role: SystemRole;
   passwordHash: string | null;
   phone: string | null;
   phoneHash: string | null;
@@ -206,7 +203,7 @@ export class AuthService {
     const createData: {
       name: string;
       passwordHash: string;
-      userType: PrismaUserType;
+      role: SystemRole;
       status: UserStatus;
       phoneHash: string | null;
       phoneEncrypted: string | null;
@@ -217,7 +214,7 @@ export class AuthService {
     } = {
       name,
       passwordHash,
-      userType: "CUSTOMER",
+      role: "CUSTOMER",
       status: "ACTIVE",
       phoneHash: null,
       phoneEncrypted: null,
@@ -640,6 +637,10 @@ export class AuthService {
     const jti = decodedToken?.jti || crypto.randomUUID();
     await this.cacheService.setSession(`token:blacklist:${jti}`, "revoked");
 
+    await this.prisma.activityLog.create({
+      data: { userId, action: "LOGOUT", resourceType: "AUTH", resourceId: userId },
+    });
+
     this.logger.log(`User logged out: ${userId}`);
 
     return { message: "登出成功" };
@@ -667,11 +668,11 @@ export class AuthService {
     const jti = crypto.randomUUID();
 
     // Access Token Payload（移除 email，符合 NIST SP 800-63B 最小化原则）
-    const permissions = this.getPermissionsForRole(user.userType);
+    const permissions = this.getPermissionsForRole(user.role);
     const accessToken = this.jwtService.sign(
       {
         sub: user.id,
-        roles: [this.mapUserTypeToRole(user.userType)],
+        roles: [user.role],
         permissions,
         jti,
       },
@@ -780,26 +781,10 @@ export class AuthService {
   }
 
   /**
-   * 映射 UserType 到 Role (符合 contract.yaml Role 枚举)
-   */
-  private mapUserTypeToRole(userType: UserType): string {
-    switch (userType) {
-      case "CUSTOMER":
-        return "CUSTOMER";
-      case "ADMIN":
-        return "ADMIN";
-      case "SUPER_ADMIN":
-        return "SUPER_ADMIN";
-      default:
-        return "CUSTOMER";
-    }
-  }
-
-  /**
    * Get permissions array for a role (from contract §5 security.authorization).
    * Included in JWT payload for client-side permission checks.
    */
-  private getPermissionsForRole(role: UserType): string[] {
+  private getPermissionsForRole(role: SystemRole): string[] {
     switch (role) {
       case "CUSTOMER":
         return [

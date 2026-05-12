@@ -21,7 +21,7 @@ export interface ServicePopularityItem {
 }
 
 export interface TimeDistributionItem {
-  hour: string;
+  hour: number;
   count: number;
 }
 
@@ -300,9 +300,16 @@ export interface UnreadCount {
 // Paginated Response
 // ==========================================
 
-export interface PaginatedResponse<T> {
-  items: T[];
+export interface PaginatedMeta {
   total: number;
   page: number;
   limit: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+}
+
+export interface PaginatedResponse<T> {
+  items: T[];
+  meta: PaginatedMeta;
 }
