@@ -3,13 +3,14 @@ import { FormsModule } from '@angular/forms';
 import { DatePicker } from 'primeng/datepicker';
 import { AppChartComponent } from '../../../../shared/components/atoms/app-chart/app-chart.component';
 import { AppButtonComponent } from '../../../../shared/components/atoms/app-button/app-button.component';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import type { ChartData, ChartOptions } from 'chart.js';
 import { TimeRange, TIME_RANGE_OPTIONS, TimeRangeSelection } from '../../dto/admin.dto';
 
 @Component({
   selector: 'app-booking-distribution-panel',
   standalone: true,
-  imports: [AppChartComponent, AppButtonComponent, DatePicker, FormsModule],
+  imports: [AppChartComponent, AppButtonComponent, DatePicker, FormsModule, TranslatePipe],
   templateUrl: './booking-distribution-panel.component.html',
   styleUrl: './booking-distribution-panel.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

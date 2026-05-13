@@ -7,11 +7,12 @@ import { ApiService } from '../../../../core/services/api.service';
 import { AdminUser, AdminServiceItem } from '../../dto/admin.dto';
 import { TimeSlot } from '../../../../shared/dto/time-slot.dto';
 import { AppButtonComponent } from '../../../../shared/components/atoms/app-button/app-button.component';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-quick-booking-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, AppButtonComponent],
+  imports: [CommonModule, FormsModule, AppButtonComponent, TranslatePipe],
   templateUrl: './quick-booking-form.component.html',
   styles: [':host { display: block; }'],
 })

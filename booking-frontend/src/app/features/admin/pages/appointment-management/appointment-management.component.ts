@@ -31,6 +31,7 @@ import { AppSpinnerComponent } from '../../../../shared/components/atoms/app-spi
 import { AppFilterBarComponent } from '../../../../shared/components/molecules/app-filter-bar/app-filter-bar.component';
 import { AppTableWrapperComponent } from '../../../../shared/components/molecules/app-table-wrapper/app-table-wrapper.component';
 import { AppModalComponent } from '../../../../shared/components/atoms/app-modal/app-modal.component';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 export type ViewMode = 'list' | 'calendar';
 
@@ -49,7 +50,7 @@ export interface CalendarEvent {
     InputTextModule, InputNumberModule, MultiSelectModule, Textarea, DatePicker, DatePipe,
     AppCardComponent, AppButtonComponent, AppBadgeComponent,
     AppSearchInputComponent, AppDropdownComponent, AppSpinnerComponent,
-    AppFilterBarComponent, AppTableWrapperComponent, AppModalComponent, Tooltip,
+    AppFilterBarComponent, AppTableWrapperComponent, AppModalComponent, Tooltip, TranslatePipe,
   ],
   templateUrl: './appointment-management.component.html',
   styleUrl: './appointment-management.component.scss',
@@ -137,6 +138,9 @@ export class AppointmentManagementComponent implements OnInit {
   readonly searchSuggestions = computed(() =>
     this.vm().allAppointmentsForStats.map(a => ({ label: a.userName, value: a.id }))
   );
+
+  // Calendar day headers
+  readonly dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   // Calendar events computed from full dataset
   readonly calendarEvents = computed<CalendarEvent[]>(() =>

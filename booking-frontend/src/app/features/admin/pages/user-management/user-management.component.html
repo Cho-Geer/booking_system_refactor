@@ -2,10 +2,10 @@
   <!-- Page Header -->
   <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
     <div>
-      <h1 class="text-2xl sm:text-display font-bold text-text-primary">User Management</h1>
-      <p class="text-sm text-text-secondary mt-1">Manage system users and their roles</p>
+      <h1 class="text-2xl sm:text-display font-bold text-text-primary">{{ 'admin.users.title' | t }}</h1>
+      <p class="text-sm text-text-secondary mt-1">{{ 'admin.users.subtitle' | t }}</p>
     </div>
-    <app-button label="New User" variant="primary" icon="pi pi-plus" (onClick)="openNew()"></app-button>
+    <app-button [label]="'admin.users.newUser' | t" variant="primary" icon="pi pi-plus" (onClick)="openNew()"></app-button>
   </div>
 
   <!-- Loading State -->
@@ -23,7 +23,7 @@
           </div>
           <div>
             <p class="text-3xl font-bold text-text-primary">{{ vm().usersTotal }}</p>
-            <p class="text-sm text-text-secondary">Total Users</p>
+            <p class="text-sm text-text-secondary">{{ 'admin.users.totalUsers' | t }}</p>
           </div>
         </div>
       </app-card>
@@ -35,7 +35,7 @@
           </div>
           <div>
             <p class="text-3xl font-bold text-text-primary">{{ activeUsers() }}</p>
-            <p class="text-sm text-text-secondary">Active Users</p>
+            <p class="text-sm text-text-secondary">{{ 'admin.users.activeUsers' | t }}</p>
           </div>
         </div>
       </app-card>
@@ -47,7 +47,7 @@
           </div>
           <div>
             <p class="text-3xl font-bold text-text-primary">{{ newThisWeek() }}</p>
-            <p class="text-sm text-text-secondary">New This Week</p>
+            <p class="text-sm text-text-secondary">{{ 'admin.users.newThisWeek' | t }}</p>
           </div>
         </div>
       </app-card>
@@ -64,7 +64,7 @@
     <app-filter-bar>
       <app-search-input
         [value]="searchQuery()"
-        placeholder="Search users..."
+        [placeholder]="'admin.users.searchPlaceholder' | t"
         [suggestions]="searchSuggestions()"
         [debounceMs]="300"
         [minLength]="1"
@@ -76,7 +76,7 @@
         [options]="filterRoleOptions"
         optionLabel="label"
         optionValue="value"
-        placeholder="All Roles"
+        [placeholder]="'admin.users.allRoles' | t"
         styleClass="w-full sm:w-40"
         (valueChange)="onRoleFilterChange($event)"
       ></app-dropdown>
@@ -85,12 +85,12 @@
         [options]="filterStatusOptions"
         optionLabel="label"
         optionValue="value"
-        placeholder="All Statuses"
+        [placeholder]="'admin.users.allStatuses' | t"
         styleClass="w-full sm:w-40"
         (valueChange)="onStatusFilterChange($event)"
       ></app-dropdown>
       <app-button
-        label="Clear"
+        [label]="'global.clear' | t"
         variant="ghost"
         icon="pi pi-filter-slash"
         size="sm"
@@ -108,19 +108,19 @@
         [totalRecords]="vm().usersTotal"
         [rowsPerPageOptions]="[10, 25, 50]"
         [showCurrentPageReport]="true"
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} users"
+        [currentPageReportTemplate]="'admin.users.pageReport' | t : { first: '{first}', last: '{last}', totalRecords: '{totalRecords}' }"
         [tableStyle]="{ 'min-width': '750px' }"
         stripedRows="true"
         [rowHover]="true"
       >
         <ng-template #header>
           <tr>
-            <th pSortableColumn="name">Name <p-sortIcon field="name" /></th>
-            <th pSortableColumn="email">Email <p-sortIcon field="email" /></th>
-            <th pSortableColumn="role">Role <p-sortIcon field="role" /></th>
-            <th pSortableColumn="status">Status <p-sortIcon field="status" /></th>
-            <th pSortableColumn="createdAt">Created <p-sortIcon field="createdAt" /></th>
-            <th>Actions</th>
+            <th pSortableColumn="name">{{ 'admin.table.name' | t }} <p-sortIcon field="name" /></th>
+            <th pSortableColumn="email">{{ 'admin.table.email' | t }} <p-sortIcon field="email" /></th>
+            <th pSortableColumn="role">{{ 'admin.table.role' | t }} <p-sortIcon field="role" /></th>
+            <th pSortableColumn="status">{{ 'admin.table.status' | t }} <p-sortIcon field="status" /></th>
+            <th pSortableColumn="createdAt">{{ 'admin.table.created' | t }} <p-sortIcon field="createdAt" /></th>
+            <th>{{ 'admin.table.actions' | t }}</th>
           </tr>
         </ng-template>
         <ng-template #body let-user>
@@ -150,7 +150,7 @@
         </ng-template>
         <ng-template #emptymessage>
           <tr>
-            <td colspan="6" class="text-center py-8 text-text-secondary">No users found.</td>
+            <td colspan="6" class="text-center py-8 text-text-secondary">{{ 'admin.users.noUsers' | t }}</td>
           </tr>
         </ng-template>
       </p-table>
@@ -161,7 +161,7 @@
   <app-modal
     [visible]="userDialogVisible()"
     (visibleChange)="userDialogVisible.set($event); !$event && closeDialog()"
-    [header]="isViewMode() ? 'View User' : isEdit() ? 'Edit User' : 'New User'"
+    [header]="isViewMode() ? ('admin.users.viewUser' | t) : isEdit() ? ('admin.users.editUser' | t) : ('admin.users.newUser' | t)"
     [modal]="true"
     [closable]="true"
     [styleClass]="'rounded-xl w-[480px]'"
@@ -169,8 +169,8 @@
     <div class="flex flex-col gap-4 p-4">
       <!-- Name -->
       <div>
-        <label class="block font-medium mb-1 text-text-primary">Name *</label>
-        <input pInputText [(ngModel)]="formName" class="w-full" placeholder="Enter name" [class.ng-invalid]="submitted() && formErrors.name" [disabled]="isViewMode()" />
+        <label class="block font-medium mb-1 text-text-primary">{{ 'admin.users.name' | t }} *</label>
+        <input pInputText [(ngModel)]="formName" class="w-full" [placeholder]="'admin.users.namePlaceholder' | t" [class.ng-invalid]="submitted() && formErrors.name" [disabled]="isViewMode()" />
         @if (submitted() && formErrors.name) {
           <small class="text-danger">{{ formErrors.name }}</small>
         }
@@ -179,8 +179,8 @@
       @if (!isEdit() || isViewMode()) {
         <!-- Email -->
         <div>
-          <label class="block font-medium mb-1 text-text-primary">Email</label>
-          <input pInputText [(ngModel)]="formEmail" class="w-full" placeholder="Enter email" [class.ng-invalid]="submitted() && formErrors.email" [disabled]="isViewMode()" />
+          <label class="block font-medium mb-1 text-text-primary">{{ 'admin.table.email' | t }}</label>
+          <input pInputText [(ngModel)]="formEmail" class="w-full" [placeholder]="'admin.users.emailPlaceholder' | t" [class.ng-invalid]="submitted() && formErrors.email" [disabled]="isViewMode()" />
           @if (submitted() && formErrors.email) {
             <small class="text-danger">{{ formErrors.email }}</small>
           }
@@ -188,16 +188,16 @@
 
         <!-- Phone -->
         <div>
-          <label class="block font-medium mb-1 text-text-primary">Phone</label>
-          <input pInputText [(ngModel)]="formPhone" class="w-full" placeholder="Enter phone" [disabled]="isViewMode()" />
+          <label class="block font-medium mb-1 text-text-primary">{{ 'admin.users.phone' | t }}</label>
+          <input pInputText [(ngModel)]="formPhone" class="w-full" [placeholder]="'admin.users.phonePlaceholder' | t" [disabled]="isViewMode()" />
         </div>
       }
 
       @if (!isEdit() && !isViewMode()) {
         <!-- Password -->
         <div>
-          <label class="block font-medium mb-1 text-text-primary">Password *</label>
-          <input pInputText [(ngModel)]="formPassword" class="w-full" type="password" placeholder="Enter password" [class.ng-invalid]="submitted() && formErrors.password" />
+          <label class="block font-medium mb-1 text-text-primary">{{ 'admin.users.password' | t }} *</label>
+          <input pInputText [(ngModel)]="formPassword" class="w-full" type="password" [placeholder]="'admin.users.passwordPlaceholder' | t" [class.ng-invalid]="submitted() && formErrors.password" />
           @if (submitted() && formErrors.password) {
             <small class="text-danger">{{ formErrors.password }}</small>
           }
@@ -206,25 +206,25 @@
 
       <!-- Role -->
       <div>
-        <label class="block font-medium mb-1 text-text-primary">Role</label>
-        <p-select [(ngModel)]="formRole" [options]="roleOptions" placeholder="Select role" class="w-full" appendTo="body" [disabled]="isViewMode()" />
+        <label class="block font-medium mb-1 text-text-primary">{{ 'admin.table.role' | t }}</label>
+        <p-select [(ngModel)]="formRole" [options]="roleOptions" [placeholder]="'admin.users.selectRole' | t" class="w-full" appendTo="body" [disabled]="isViewMode()" />
       </div>
 
       @if (isEdit() || isViewMode()) {
         <!-- Status -->
         <div>
-          <label class="block font-medium mb-1 text-text-primary">Status</label>
-          <p-select [(ngModel)]="formStatus" [options]="statusOptions" placeholder="Select status" class="w-full" appendTo="body" [disabled]="isViewMode()" />
+          <label class="block font-medium mb-1 text-text-primary">{{ 'admin.table.status' | t }}</label>
+          <p-select [(ngModel)]="formStatus" [options]="statusOptions" [placeholder]="'admin.users.selectStatus' | t" class="w-full" appendTo="body" [disabled]="isViewMode()" />
         </div>
       }
     </div>
     <div app-modal-footer>
       <div class="flex flex-col-reverse sm:flex-row gap-2 sm:gap-2">
         @if (isViewMode()) {
-          <app-button label="Close" variant="primary" (onClick)="closeDialog()"></app-button>
+          <app-button [label]="'global.close' | t" variant="primary" (onClick)="closeDialog()"></app-button>
         } @else {
-          <app-button label="Cancel" variant="secondary" (onClick)="closeDialog()"></app-button>
-          <app-button label="Save" variant="primary" (onClick)="saveUser()"></app-button>
+          <app-button [label]="'global.cancel' | t" variant="secondary" (onClick)="closeDialog()"></app-button>
+          <app-button [label]="'global.save' | t" variant="primary" (onClick)="saveUser()"></app-button>
         }
       </div>
     </div>
@@ -234,16 +234,16 @@
   <app-modal
     [visible]="deleteDialogVisible()"
     (visibleChange)="deleteDialogVisible.set($event)"
-    header="Confirm Delete"
+    [header]="'admin.users.confirmDelete' | t"
     [modal]="true"
     [closable]="true"
     [styleClass]="'rounded-xl w-[400px]'"
   >
-    <p class="p-4 text-text-primary">Are you sure you want to delete user <strong>{{ userToDelete()?.name }}</strong>? This action cannot be undone.</p>
+    <p class="p-4 text-text-primary">{{ 'admin.users.deleteMessage' | t : { name: userToDelete()?.name || '' } }}</p>
     <div app-modal-footer>
       <div class="flex flex-col-reverse sm:flex-row gap-2 sm:gap-2">
-        <app-button label="Cancel" variant="secondary" (onClick)="deleteDialogVisible.set(false)"></app-button>
-        <app-button label="Delete" variant="danger" (onClick)="deleteUser()"></app-button>
+        <app-button [label]="'global.cancel' | t" variant="secondary" (onClick)="deleteDialogVisible.set(false)"></app-button>
+        <app-button [label]="'global.delete' | t" variant="danger" (onClick)="deleteUser()"></app-button>
       </div>
     </div>
   </app-modal>

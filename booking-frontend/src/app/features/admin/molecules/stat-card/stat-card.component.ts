@@ -1,5 +1,6 @@
 import { Component, ChangeDetectionStrategy, input } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 export interface StatCardData {
   label: string;
@@ -17,7 +18,7 @@ export interface StatCardData {
 @Component({
   selector: 'app-stat-card',
   standalone: true,
-  imports: [DecimalPipe],
+  imports: [DecimalPipe, TranslatePipe],
   templateUrl: './stat-card.component.html',
   styleUrl: './stat-card.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

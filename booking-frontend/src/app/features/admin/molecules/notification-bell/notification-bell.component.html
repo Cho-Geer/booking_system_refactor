@@ -1,5 +1,5 @@
 <div class="notification-bell" (click)="toggleDropdown()" (keydown.escape)="closeDropdown()">
-  <button class="bell-button" aria-label="Notifications">
+  <button class="bell-button" [attr.aria-label]="'admin.notifications.title' | t">
     <i class="pi pi-bell text-lg text-text-primary"></i>
     @if (unreadCount() > 0) {
       <span class="badge">{{ unreadCount() > 99 ? '99+' : unreadCount() }}</span>
@@ -11,7 +11,7 @@
     <div class="dropdown-panel">
       <div class="dropdown-header">
         <h3 class="text-sm font-bold text-text-primary">{{ 'sidebar.notifications' | t }}</h3>
-        <button class="close-btn" (click)="closeDropdown()" aria-label="Close">&times;</button>
+        <button class="close-btn" (click)="closeDropdown()" [attr.aria-label]="'global.close' | t">&times;</button>
       </div>
       <div class="notifications-list">
         @for (notif of notifications(); track notif.id) {
@@ -32,7 +32,7 @@
         } @empty {
           <div class="empty-state">
             <i class="pi pi-inbox text-text-secondary/40 text-2xl"></i>
-            <p class="text-xs text-text-secondary/60 mt-2">No notifications</p>
+            <p class="text-xs text-text-secondary/60 mt-2">{{ 'admin.notifications.empty' | t }}</p>
           </div>
         }
       </div>

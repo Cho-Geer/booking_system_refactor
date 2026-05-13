@@ -23,6 +23,7 @@ import { AppSpinnerComponent } from '../../../../shared/components/atoms/app-spi
 import { AppFilterBarComponent } from '../../../../shared/components/molecules/app-filter-bar/app-filter-bar.component';
 import { AppTableWrapperComponent } from '../../../../shared/components/molecules/app-table-wrapper/app-table-wrapper.component';
 import { AppModalComponent } from '../../../../shared/components/atoms/app-modal/app-modal.component';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 export type ViewMode = 'grid' | 'list';
 
@@ -34,7 +35,7 @@ export type ViewMode = 'grid' | 'list';
     FormsModule, DatePipe,
     AppCardComponent, AppButtonComponent, AppBadgeComponent,
     AppSearchInputComponent, AppDropdownComponent, AppSpinnerComponent,
-    AppFilterBarComponent, AppTableWrapperComponent, AppModalComponent,
+    AppFilterBarComponent, AppTableWrapperComponent, AppModalComponent, TranslatePipe,
   ],
   templateUrl: './user-management.component.html',
   styleUrl: './user-management.component.scss',

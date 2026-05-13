@@ -1,4 +1,5 @@
 import { Component, ChangeDetectionStrategy, input, output, signal } from '@angular/core';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { SystemHealthDetail } from '../../dto/admin.dto';
 
 export interface SystemStatusItem {
@@ -10,7 +11,7 @@ export interface SystemStatusItem {
 @Component({
   selector: 'app-system-status-panel',
   standalone: true,
-  imports: [],
+  imports: [TranslatePipe],
   templateUrl: './system-status-panel.component.html',
   styleUrl: './system-status-panel.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

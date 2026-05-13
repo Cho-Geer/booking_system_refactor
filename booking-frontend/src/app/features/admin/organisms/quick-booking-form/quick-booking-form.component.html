@@ -1,16 +1,16 @@
 <div class="sharp-card p-5 bg-card-bg">
-  <h3 class="text-base font-bold text-text-primary mb-5">Quick Booking</h3>
+  <h3 class="text-base font-bold text-text-primary mb-5">{{ 'admin.quickBooking.title' | t }}</h3>
 
   <form class="space-y-4" (ngSubmit)="onSubmit()">
     <div>
-      <label class="block text-xs font-medium text-text-secondary mb-1.5">Customer</label>
+      <label class="block text-xs font-medium text-text-secondary mb-1.5">{{ 'admin.quickBooking.customer' | t }}</label>
       <select
         class="w-full px-3 py-2 rounded-lg border border-border-color bg-bg-primary text-text-primary text-sm focus:outline-none focus:border-accent-green focus:ring-1 focus:ring-accent-green/30 transition-colors"
         [ngModel]="selectedUser()"
         (ngModelChange)="selectedUser.set($event)"
         name="userId"
       >
-        <option [ngValue]="null">Select a customer</option>
+        <option [ngValue]="null">{{ 'admin.quickBooking.selectCustomer' | t }}</option>
         @for (user of users(); track user.id) {
           <option [ngValue]="user.id">{{ user.name }} ({{ user.email || user.phone }})</option>
         }
@@ -18,14 +18,14 @@
     </div>
 
     <div>
-      <label class="block text-xs font-medium text-text-secondary mb-1.5">Service</label>
+      <label class="block text-xs font-medium text-text-secondary mb-1.5">{{ 'admin.quickBooking.service' | t }}</label>
       <select
         class="w-full px-3 py-2 rounded-lg border border-border-color bg-bg-primary text-text-primary text-sm focus:outline-none focus:border-accent-green focus:ring-1 focus:ring-accent-green/30 transition-colors"
         [ngModel]="selectedService()"
         (ngModelChange)="selectedService.set($event)"
         name="serviceId"
       >
-        <option [ngValue]="null">Select a service</option>
+        <option [ngValue]="null">{{ 'admin.quickBooking.selectService' | t }}</option>
         @for (svc of services(); track svc.id) {
           <option [ngValue]="svc.id">{{ svc.name }} ({{ svc.price | currency }})</option>
         }
@@ -33,7 +33,7 @@
     </div>
 
     <div>
-      <label class="block text-xs font-medium text-text-secondary mb-1.5">Date</label>
+      <label class="block text-xs font-medium text-text-secondary mb-1.5">{{ 'admin.quickBooking.date' | t }}</label>
       <input
         type="date"
         class="w-full px-3 py-2 rounded-lg border border-border-color bg-bg-primary text-text-primary text-sm focus:outline-none focus:border-accent-green focus:ring-1 focus:ring-accent-green/30 transition-colors"
@@ -44,14 +44,14 @@
     </div>
 
     <div>
-      <label class="block text-xs font-medium text-text-secondary mb-1.5">Time Slot</label>
+      <label class="block text-xs font-medium text-text-secondary mb-1.5">{{ 'admin.quickBooking.timeSlot' | t }}</label>
       <select
         class="w-full px-3 py-2 rounded-lg border border-border-color bg-bg-primary text-text-primary text-sm focus:outline-none focus:border-accent-green focus:ring-1 focus:ring-accent-green/30 transition-colors"
         [ngModel]="selectedSlot()"
         (ngModelChange)="selectedSlot.set($event)"
         name="slotId"
       >
-        <option [ngValue]="null">Select a time slot</option>
+        <option [ngValue]="null">{{ 'admin.quickBooking.selectTimeSlot' | t }}</option>
         @for (slot of timeSlots(); track slot.id) {
           <option [ngValue]="slot.id">
             {{ slot.startTime | date:'shortTime' }} - {{ slot.endTime | date:'shortTime' }}
@@ -62,11 +62,11 @@
     </div>
 
     <div>
-      <label class="block text-xs font-medium text-text-secondary mb-1.5">Notes</label>
+      <label class="block text-xs font-medium text-text-secondary mb-1.5">{{ 'admin.quickBooking.notes' | t }}</label>
       <textarea
         class="w-full px-3 py-2 rounded-lg border border-border-color bg-bg-primary text-text-primary text-sm focus:outline-none focus:border-accent-green focus:ring-1 focus:ring-accent-green/30 transition-colors"
         rows="2"
-        placeholder="Optional notes"
+        [placeholder]="'admin.quickBooking.notesPlaceholder' | t"
         [ngModel]="notes()"
         (ngModelChange)="notes.set($event)"
         name="notes"
@@ -74,7 +74,7 @@
     </div>
 
     <div>
-      <label class="block text-xs font-medium text-text-secondary mb-1.5">Overtime (minutes)</label>
+      <label class="block text-xs font-medium text-text-secondary mb-1.5">{{ 'admin.quickBooking.overtime' | t }}</label>
       <input
         type="number"
         class="w-full px-3 py-2 rounded-lg border border-border-color bg-bg-primary text-text-primary text-sm focus:outline-none focus:border-accent-green focus:ring-1 focus:ring-accent-green/30 transition-colors"
@@ -96,7 +96,7 @@
 
     <app-button
       type="submit"
-      label="Create Booking"
+      [label]="'admin.quickBooking.createBooking' | t"
       variant="primary"
       styleClass="w-full"
       [disabled]="!selectedUser() || !selectedService() || !selectedSlot() || isSubmitting()"

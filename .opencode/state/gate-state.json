@@ -4679,12 +4679,15 @@
       "session_id": "cg_ses_1778663097958",
       "created_at": "2026-05-13T09:04:57.958Z",
       "task_description": "Large-scale i18n remediation: add missing translation keys to seed data, convert hardcoded text to TranslatePipe across 30+ templates (auth pages, profile, admin, 404, legal, app-layout).",
-      "gate_status": "armed",
+      "gate_status": "completed",
       "last_check_failed_items": [],
       "plan_summary": "i18n remediation Phase 1: seed translation keys + convert auth pages. Phase 2: profile/404/legal/app-layout. Phase 3: admin templates. All sent in parallel.",
       "confirmed_at": "2026-05-13T09:05:10.206Z",
-      "consumed_at": null,
-      "audit": null
+      "consumed_at": "2026-05-13T09:23:20.549Z",
+      "audit": {
+        "execution_summary": "i18n remediation complete: 142 hardcoded strings converted to translation pipes across auth (102), profile (34), 404 (3), and app-layout (3) templates. 140 new translation seed keys added across 8 domains. 4 English error fallback keys added. Zero TS errors, frontend build passes. 11 files changed, +337/-157.",
+        "completed_at": "2026-05-13T09:23:20.549Z"
+      }
     },
     "cg_ses_1778663172842": {
       "session_id": "cg_ses_1778663172842",
@@ -4712,6 +4715,42 @@
       "audit": {
         "execution_summary": "i18n remediation completed: 40 hardcoded strings converted across 4 components, 4 English fallback keys added to TranslationService, tsc --noEmit passes clean. Files changed: profile.component.ts/html, not-found-page.component.ts/html, app-layout.component.ts, translation.service.ts.",
         "completed_at": "2026-05-13T09:16:40.214Z"
+      }
+    },
+    "cg_ses_1778665558376": {
+      "session_id": "cg_ses_1778665558376",
+      "created_at": "2026-05-13T09:45:58.376Z",
+      "task_description": "Admin templates i18n conversion: convert ~80+ hardcoded English strings in dashboard, user-management, service-management, appointment-management, and all sub-components to translation pipes.",
+      "gate_status": "armed",
+      "last_check_failed_items": [],
+      "plan_summary": "Admin i18n: convert all admin templates (~80+ strings) to TranslatePipe + add admin seed translation keys.",
+      "confirmed_at": "2026-05-13T09:46:09.064Z",
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1778665653046": {
+      "session_id": "cg_ses_1778665653046",
+      "created_at": "2026-05-13T09:47:33.046Z",
+      "task_description": "Convert ALL hardcoded English text in admin templates to TranslatePipe across 15+ component HTML/TS files",
+      "gate_status": "checked",
+      "last_check_failed_items": [],
+      "plan_summary": null,
+      "confirmed_at": null,
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1778665773039": {
+      "session_id": "cg_ses_1778665773039",
+      "created_at": "2026-05-13T09:49:33.039Z",
+      "task_description": "Convert ALL hardcoded English text in admin templates to TranslatePipe for the booking-frontend project",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Convert all hardcoded English text in 20+ admin component templates and their TS files to use TranslatePipe with admin.* translation keys",
+      "confirmed_at": "2026-05-13T09:51:04.005Z",
+      "consumed_at": "2026-05-13T09:56:09.951Z",
+      "audit": {
+        "execution_summary": "Converted all hardcoded English text to TranslatePipe across 28 admin component files. Added TranslatePipe imports to 14 TypeScript files. Converted ~150+ hardcoded strings to admin.*, global.*, sidebar.*, and admin.quickBooking.* translation keys in HTML templates. Updated dashboard.ts stat card labels and system status labels to use translation keys. Updated stat-card template to pipe-translate labels and target text. tsc --noEmit passes cleanly.",
+        "completed_at": "2026-05-13T09:56:09.951Z"
       }
     }
   }

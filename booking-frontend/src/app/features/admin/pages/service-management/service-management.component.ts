@@ -25,6 +25,7 @@ import { AppFilterBarComponent } from '../../../../shared/components/molecules/a
 import { AppTableWrapperComponent } from '../../../../shared/components/molecules/app-table-wrapper/app-table-wrapper.component';
 import { AppModalComponent } from '../../../../shared/components/atoms/app-modal/app-modal.component';
 import { Subscription, interval } from 'rxjs';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 export type ViewMode = 'grid' | 'list';
 
@@ -36,7 +37,7 @@ export type ViewMode = 'grid' | 'list';
     Textarea, SelectModule, ToggleSwitch, FormsModule, CurrencyPipe,
     AppCardComponent, AppButtonComponent, AppBadgeComponent,
     AppSearchInputComponent, AppDropdownComponent, AppSpinnerComponent,
-    AppFilterBarComponent, AppTableWrapperComponent, AppModalComponent,
+    AppFilterBarComponent, AppTableWrapperComponent, AppModalComponent, TranslatePipe,
   ],
   templateUrl: './service-management.component.html',
   styleUrl: './service-management.component.scss',

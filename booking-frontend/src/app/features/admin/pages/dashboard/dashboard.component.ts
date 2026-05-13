@@ -48,10 +48,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const revenueSC = s?.totalRevenue;
     if (!s) return [];
     return [
-      { label: "Today's Bookings", value: todaySC?.value ?? 0, icon: 'pi pi-calendar', iconBg: 'bg-accent-green/10', iconColor: 'text-accent-green', ...this.formatTrend(todaySC, '0%', true), progress: todaySC?.progressPercentage ?? 0, target: todaySC?.target ?? 0, color: 'from-accent-green to-accent-green-dark' },
-      { label: 'Pending Confirmation', value: pendingSC?.value ?? 0, icon: 'pi pi-clock', iconBg: 'bg-accent-yellow/10', iconColor: 'text-accent-yellow', ...this.formatTrend(pendingSC, '0%', false), progress: pendingSC?.progressPercentage ?? 0, target: pendingSC?.target ?? 0, color: 'from-accent-yellow to-accent-orange' },
-      { label: 'Total Customers', value: activeSC?.value ?? 0, icon: 'pi pi-users', iconBg: 'bg-accent-green/10', iconColor: 'text-accent-green', ...this.formatTrend(activeSC, '0%', true), progress: activeSC?.progressPercentage ?? 0, target: activeSC?.target ?? 0, color: 'from-accent-green to-green-700' },
-      { label: 'Total Revenue', value: revenueSC?.value ?? 0, icon: 'pi pi-dollar', iconBg: 'bg-accent-purple/10', iconColor: 'text-accent-purple', ...this.formatTrend(revenueSC, '0%', true), progress: revenueSC?.progressPercentage ?? 0, target: revenueSC?.target ?? 0, color: 'from-accent-purple to-purple-800' },
+      { label: 'admin.stats.todayBookings', value: todaySC?.value ?? 0, icon: 'pi pi-calendar', iconBg: 'bg-accent-green/10', iconColor: 'text-accent-green', ...this.formatTrend(todaySC, '0%', true), progress: todaySC?.progressPercentage ?? 0, target: todaySC?.target ?? 0, color: 'from-accent-green to-accent-green-dark' },
+      { label: 'admin.stats.pendingBookings', value: pendingSC?.value ?? 0, icon: 'pi pi-clock', iconBg: 'bg-accent-yellow/10', iconColor: 'text-accent-yellow', ...this.formatTrend(pendingSC, '0%', false), progress: pendingSC?.progressPercentage ?? 0, target: pendingSC?.target ?? 0, color: 'from-accent-yellow to-accent-orange' },
+      { label: 'admin.stats.activeUsers', value: activeSC?.value ?? 0, icon: 'pi pi-users', iconBg: 'bg-accent-green/10', iconColor: 'text-accent-green', ...this.formatTrend(activeSC, '0%', true), progress: activeSC?.progressPercentage ?? 0, target: activeSC?.target ?? 0, color: 'from-accent-green to-green-700' },
+      { label: 'admin.stats.totalRevenue', value: revenueSC?.value ?? 0, icon: 'pi pi-dollar', iconBg: 'bg-accent-purple/10', iconColor: 'text-accent-purple', ...this.formatTrend(revenueSC, '0%', true), progress: revenueSC?.progressPercentage ?? 0, target: revenueSC?.target ?? 0, color: 'from-accent-purple to-purple-800' },
     ];
   });
 
@@ -75,12 +75,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const h = this.vm().systemHealth;
     if (!h) return [];
     return [
-      { label: 'Server', status: h.server, color: h.server === 'Online' ? 'text-accent-green' : 'text-accent-red' },
-      { label: 'Database', status: h.database, color: h.database === 'Online' ? 'text-accent-green' : 'text-accent-red' },
-      { label: 'API', status: h.api, color: h.api === 'Online' ? 'text-accent-green' : 'text-accent-red' },
-      { label: 'Redis', status: h.redis, color: h.redis === 'Online' ? 'text-accent-green' : 'text-accent-red' },
-      { label: 'Last Backup', status: h.lastBackup, color: 'text-text-secondary' },
-      { label: 'Uptime', status: h.uptime, color: 'text-text-secondary' },
+      { label: 'admin.system.server', status: h.server, color: h.server === 'Online' ? 'text-accent-green' : 'text-accent-red' },
+      { label: 'admin.system.database', status: h.database, color: h.database === 'Online' ? 'text-accent-green' : 'text-accent-red' },
+      { label: 'admin.system.api', status: h.api, color: h.api === 'Online' ? 'text-accent-green' : 'text-accent-red' },
+      { label: 'admin.system.redis', status: h.redis, color: h.redis === 'Online' ? 'text-accent-green' : 'text-accent-red' },
+      { label: 'admin.system.lastBackup', status: h.lastBackup, color: 'text-text-secondary' },
+      { label: 'admin.system.uptime', status: h.uptime, color: 'text-text-secondary' },
     ];
   });
 
