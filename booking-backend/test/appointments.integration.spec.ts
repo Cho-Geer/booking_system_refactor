@@ -52,9 +52,9 @@ describe('Appointments Module (Integration)', () => {
   });
 
   // Helper to generate JWT token for a user
-  function generateToken(userId: string, userType: UserType = SystemRole.CUSTOMER): string {
+  function generateToken(userId: string, role: SystemRole = SystemRole.CUSTOMER): string {
     return jwtService.sign(
-      { sub: userId, userType },
+      { sub: userId, role },
       { expiresIn: '15m', secret: process.env.JWT_SECRET },
     );
   }
@@ -99,8 +99,8 @@ describe('Appointments Module (Integration)', () => {
       const timeSlot = await prisma.timeSlot.create({
         data: {
           serviceId: service.id,
-          slotTime: '2026-04-22T10:00:00.000Z',
-          durationMinutes: 60,
+          startTime: new Date('2026-04-22T10:00:00.000Z'),
+          endTime: new Date('2026-04-22T11:00:00.000Z'),
           capacity: 1,
           isActive: true,
         },
@@ -186,7 +186,7 @@ describe('Appointments Module (Integration)', () => {
       const adminData = UserFactory.create({
         email: 'admin@example.com',
         phone: undefined,
-        userType: SystemRole.ADMIN,
+        role: SystemRole.ADMIN,
       });
       const admin = await prisma.user.create({ data: adminData as any });
       adminId = admin.id;
@@ -277,7 +277,8 @@ describe('Appointments Module (Integration)', () => {
       const timeSlot = await prisma.timeSlot.create({
         data: {
           serviceId: service.id,
-          slotTime: '2026-04-22T10:00:00.000Z',
+          startTime: new Date('2026-04-22T10:00:00.000Z'),
+          endTime: new Date('2026-04-22T11:00:00.000Z'),
           isActive: true,
         },
       });
@@ -348,7 +349,8 @@ describe('Appointments Module (Integration)', () => {
       const timeSlot = await prisma.timeSlot.create({
         data: {
           serviceId: service.id,
-          slotTime: '2026-04-22T10:00:00.000Z',
+          startTime: new Date('2026-04-22T10:00:00.000Z'),
+          endTime: new Date('2026-04-22T11:00:00.000Z'),
           isActive: true,
         },
       });
@@ -415,7 +417,8 @@ describe('Appointments Module (Integration)', () => {
       const timeSlot = await prisma.timeSlot.create({
         data: {
           serviceId: service.id,
-          slotTime: '2026-04-22T10:00:00.000Z',
+          startTime: new Date('2026-04-22T10:00:00.000Z'),
+          endTime: new Date('2026-04-22T11:00:00.000Z'),
           isActive: true,
         },
       });
@@ -478,7 +481,7 @@ describe('Appointments Module (Integration)', () => {
       const adminData = UserFactory.create({
         email: 'admin-delete@example.com',
         phone: undefined,
-        userType: SystemRole.ADMIN,
+        role: SystemRole.ADMIN,
       });
       const admin = await prisma.user.create({ data: adminData as any });
       adminId = admin.id;
@@ -504,7 +507,8 @@ describe('Appointments Module (Integration)', () => {
       const timeSlot = await prisma.timeSlot.create({
         data: {
           serviceId: service.id,
-          slotTime: '2026-04-22T10:00:00.000Z',
+          startTime: new Date('2026-04-22T10:00:00.000Z'),
+          endTime: new Date('2026-04-22T11:00:00.000Z'),
           isActive: true,
         },
       });

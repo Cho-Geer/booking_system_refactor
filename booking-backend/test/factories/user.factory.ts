@@ -1,4 +1,4 @@
-import { UserType, UserStatus } from '@prisma/client';
+import { SystemRole, UserStatus } from '@prisma/client';
 import * as crypto from 'crypto';
 
 /**
@@ -17,7 +17,7 @@ export interface UserFactoryOverrides {
   phone?: string;
   email?: string;
   passwordHash?: string;
-  userType?: UserType;
+  role?: SystemRole;
   status?: UserStatus;
   lastLoginAt?: Date;
   deviceInfo?: Record<string, unknown>;
@@ -60,7 +60,7 @@ export class UserFactory {
       phoneHash: this.hashValue(phone),
       emailHash: this.hashValue(email),
       passwordHash: overrides.passwordHash ?? '$2b$12$LJ3m4ys4Lk0RHBmRFr4xMOuMqBNfT8nVbV8oWqYqJ5ZmJvZqVqHmG',
-      userType: overrides.userType ?? UserType.CUSTOMER,
+      role: overrides.role ?? SystemRole.CUSTOMER,
       status: overrides.status ?? UserStatus.ACTIVE,
       lastLoginAt: overrides.lastLoginAt ?? new Date(),
       deviceInfo: overrides.deviceInfo ?? { browser: 'Chrome', os: 'Linux' },

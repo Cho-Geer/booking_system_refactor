@@ -7,5 +7,5 @@ beforeAll(() => {
 });
 
 afterAll(() => {
-  (console.error as jest.SpyInstance).mockRestore();
+  (console.error as unknown as jest.SpyInstance).mockRestore();
 });

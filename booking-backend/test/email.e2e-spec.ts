@@ -4,7 +4,7 @@ import { PrismaClient } from '@prisma/client';
 import { getQueueToken } from '@nestjs/bullmq';
 import { Queue, Worker } from 'bullmq';
 import request from 'supertest';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import * as nodemailer from 'nodemailer';
 import type { Transporter } from 'nodemailer';
 import { AppModule } from '../src/app.module';
@@ -42,7 +42,7 @@ const TEST_ADMIN = {
   password: 'AdminEmailE2E@1234',
   name: 'Admin Email E2E',
   phone: '+19998887778',
-  userType: 'ADMIN',
+  role: 'ADMIN',
 };
 
 const TEST_SERVICE_DATA = {
@@ -79,7 +79,7 @@ async function createTestUser(prisma: PrismaClient, userData: any) {
       phone: userData.phone || `+1${Math.floor(Math.random() * 10000000000)}`,
       name: userData.name || 'Test User',
       passwordHash,
-      userType: userData.userType || 'CUSTOMER',
+      role: userData.role || 'CUSTOMER',
       status: 'ACTIVE',
     },
   });
@@ -136,7 +136,8 @@ async function createTimeSlot(prisma: PrismaClient, serviceId: string, offsetMin
   return prisma.timeSlot.create({
     data: {
       serviceId,
-      slotTime: uniqueSlotTime,
+      startTime: slotTime,
+      endTime: new Date(slotTime.getTime() + 60 * 60 * 1000),
       isActive: true,
     },
   });
@@ -833,7 +834,7 @@ describe('Email Module E2E Tests', () => {
       const result = await emailService.sendEmail(emailData);
 
       expect(result.success).toBe(true);
-      expect(result.messageId).toBeDefined();
+      expect(result.jobId).toBeDefined();
       expect(mockTransporter.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           to: emailData.to,
@@ -955,7 +956,7 @@ describe('Email Module E2E Tests', () => {
       const token = loginResponse.body.access_token;
 
       // Get the user from DB
-      const user = await prisma.user.findUnique({
+      const user = await prisma.user.findFirst({
         where: { email: 'fullflow@example.com' },
       });
       expect(user).toBeDefined();

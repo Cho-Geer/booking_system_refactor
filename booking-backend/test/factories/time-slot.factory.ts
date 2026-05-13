@@ -11,12 +11,11 @@
 export interface TimeSlotFactoryOverrides {
   id?: string;
   serviceId?: string;
-  slotTime?: string;
-  durationMinutes?: number;
+  startTime?: Date;
+  endTime?: Date;
   capacity?: number;
   currentSequence?: number;
   isActive?: boolean;
-  displayOrder?: number;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -30,16 +29,16 @@ export class TimeSlotFactory {
   }
 
   /**
-   * Generate a realistic slot time string (ISO 8601 format).
+   * Generate a realistic start time (Date).
    * Produces times between 09:00 and 17:00 on future dates.
    */
-  private static generateSlotTime(): string {
+  private static generateStartTime(): Date {
     const d = new Date();
     d.setDate(d.getDate() + Math.floor(Math.random() * 30) + 1);
     const hour = 9 + Math.floor(Math.random() * 8); // 09:00 - 16:00
     const minute = Math.random() > 0.5 ? 0 : 30;
     d.setHours(hour, minute, 0, 0);
-    return d.toISOString();
+    return d;
   }
 
   /**
@@ -53,14 +52,15 @@ export class TimeSlotFactory {
     const serviceId = overrides.serviceId ?? TimeSlotFactory.lastServiceId ?? `svc-${uid}`;
     TimeSlotFactory.lastServiceId = serviceId;
 
+    const startTime = overrides.startTime ?? TimeSlotFactory.generateStartTime();
+    const endTime = overrides.endTime ?? new Date(startTime.getTime() + 60 * 60 * 1000);
     return {
       serviceId,
-      slotTime: overrides.slotTime ?? TimeSlotFactory.generateSlotTime(),
-      durationMinutes: overrides.durationMinutes ?? 60,
+      startTime,
+      endTime,
       capacity: overrides.capacity ?? 5,
       currentSequence: overrides.currentSequence ?? 0,
       isActive: overrides.isActive ?? true,
-      displayOrder: overrides.displayOrder ?? 0,
       createdAt: overrides.createdAt ?? new Date(),
       updatedAt: overrides.updatedAt ?? new Date(),
       ...(overrides.id ? { id: overrides.id } : {}),

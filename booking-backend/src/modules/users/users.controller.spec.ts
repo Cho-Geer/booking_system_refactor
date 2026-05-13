@@ -4,6 +4,7 @@ import { Request } from 'express';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { CreateUserDto, UpdateUserDto, UserResponseDto } from './dto/user.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 import { SystemRole } from '@prisma/client';
 import { ClsService } from 'nestjs-cls';
 
@@ -273,10 +274,10 @@ describe('UsersController', () => {
 
       mockReq.user = { id: 'user-1', roles: [] };
       await expect(
-        controller.changePassword({ oldPassword: 'WrongPass!', newPassword: 'NewPass!', currentPassword: 'WrongPass!' } as unknown as Record<string, unknown>, mockReq as unknown as Request)
+        controller.changePassword({ currentPassword: 'WrongPass!', newPassword: 'NewPass!' } as UpdatePasswordDto, mockReq as unknown as Request)
       ).rejects.toThrow(BadRequestException);
       await expect(
-        controller.changePassword({ oldPassword: 'WrongPass!', newPassword: 'NewPass!', currentPassword: 'WrongPass!' } as unknown as Record<string, unknown>, mockReq as unknown as Request)
+        controller.changePassword({ currentPassword: 'WrongPass!', newPassword: 'NewPass!' } as UpdatePasswordDto, mockReq as unknown as Request)
       ).rejects.toThrow('Current password is incorrect');
     });
 
@@ -366,15 +367,13 @@ describe('UsersController', () => {
 
       mockReq.user = { id: 'different-user', roles: [] };
       await expect(controller.changePassword({
-        oldPassword: 'OldPass123!',
-        newPassword: 'HackedPass456!',
         currentPassword: 'OldPass123!',
-      } as unknown as Record<string, unknown>, mockReq as unknown as Request)).rejects.toThrow(ForbiddenException);
+        newPassword: 'HackedPass456!',
+      } as UpdatePasswordDto, mockReq as unknown as Request)).rejects.toThrow(ForbiddenException);
       await expect(controller.changePassword({
-        oldPassword: 'OldPass123!',
-        newPassword: 'HackedPass456!',
         currentPassword: 'OldPass123!',
-      } as unknown as Record<string, unknown>, mockReq as unknown as Request)).rejects.toThrow('You can only change your own profile');
+        newPassword: 'HackedPass456!',
+      } as UpdatePasswordDto, mockReq as unknown as Request)).rejects.toThrow('You can only change your own profile');
     });
 
     it('should allow GET /users/:id when requester IS the resource owner', async () => {

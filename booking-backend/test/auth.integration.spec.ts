@@ -184,7 +184,7 @@ describe('Auth Module (Integration)', () => {
           name: 'Refresh User',
           email: 'refresh@example.com',
           phone: '+8613800138003',
-          userType: UserType.CUSTOMER,
+          role: SystemRole.CUSTOMER,
           passwordHash: hashedPassword,
           status: UserStatus.ACTIVE,
         },

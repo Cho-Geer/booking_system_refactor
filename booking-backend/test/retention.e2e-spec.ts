@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import { RetentionService } from '../src/common/services/retention.service';
+import { RetentionService } from '../src/modules/retention/retention.service';
 import { PrismaService } from '../src/common/database/prisma.service';
 import { AppModule } from '../src/app.module';
 import {
@@ -14,7 +14,7 @@ import {
   createTestTimeSlot,
   createTestAppointment,
 } from './fixtures/database.fixture';
-import { UserType, UserStatus, AppointmentStatus } from '@prisma/client';
+import { SystemRole, UserStatus, AppointmentStatus } from '@prisma/client';
 import { PasswordUtil } from '../src/common/utils/password.util';
 import { generateTestId } from './helpers/test-helper';
 
@@ -70,7 +70,7 @@ describe('RetentionService (e2e)', () => {
           email: `retention-${ts}@example.com`,
           phone: `+1${Date.now().toString().slice(-10)}`,
           passwordHash: hash,
-          userType: UserType.CUSTOMER,
+          role: SystemRole.CUSTOMER,
           status: UserStatus.ACTIVE,
         },
       });
@@ -84,12 +84,11 @@ describe('RetentionService (e2e)', () => {
       const oldSlot = await prisma.timeSlot.create({
         data: {
           serviceId: svc.id,
-          slotTime: oldDate.toISOString(),
-          durationMinutes: 60,
+          startTime: oldDate,
+          endTime: new Date(oldDate.getTime() + 60 * 60 * 1000),
           capacity: 5,
           currentSequence: 0,
           isActive: true,
-          displayOrder: 0,
         },
       });
 
@@ -114,15 +113,15 @@ describe('RetentionService (e2e)', () => {
       `;
 
       // Create a recent COMPLETED appointment (should NOT be archived)
+      const now = new Date();
       const recentSlot = await prisma.timeSlot.create({
         data: {
           serviceId: svc.id,
-          slotTime: new Date().toISOString(),
-          durationMinutes: 60,
+          startTime: now,
+          endTime: new Date(now.getTime() + 60 * 60 * 1000),
           capacity: 5,
           currentSequence: 0,
           isActive: true,
-          displayOrder: 1,
         },
       });
 
@@ -168,7 +167,7 @@ describe('RetentionService (e2e)', () => {
           email: `retention-${ts}@example.com`,
           phone: `+1${Date.now().toString().slice(-10)}`,
           passwordHash: hash,
-          userType: UserType.CUSTOMER,
+          role: SystemRole.CUSTOMER,
           status: UserStatus.ACTIVE,
         },
       });
@@ -182,12 +181,11 @@ describe('RetentionService (e2e)', () => {
       const oldSlot = await prisma.timeSlot.create({
         data: {
           serviceId: svc.id,
-          slotTime: oldDate.toISOString(),
-          durationMinutes: 60,
+          startTime: oldDate,
+          endTime: new Date(oldDate.getTime() + 60 * 60 * 1000),
           capacity: 5,
           currentSequence: 0,
           isActive: true,
-          displayOrder: 0,
         },
       });
 
@@ -214,12 +212,11 @@ describe('RetentionService (e2e)', () => {
       const confirmedSlot = await prisma.timeSlot.create({
         data: {
           serviceId: svc.id,
-          slotTime: oldDate.toISOString(),
-          durationMinutes: 60,
+          startTime: oldDate,
+          endTime: new Date(oldDate.getTime() + 60 * 60 * 1000),
           capacity: 5,
           currentSequence: 0,
           isActive: true,
-          displayOrder: 1,
         },
       });
 
@@ -268,7 +265,7 @@ describe('RetentionService (e2e)', () => {
           email: `retention-${ts}@example.com`,
           phone: `+1${Date.now().toString().slice(-10)}`,
           passwordHash: hash,
-          userType: UserType.CUSTOMER,
+          role: SystemRole.CUSTOMER,
           status: UserStatus.ACTIVE,
         },
       });
@@ -283,12 +280,11 @@ describe('RetentionService (e2e)', () => {
         const slot = await prisma.timeSlot.create({
           data: {
             serviceId: svc.id,
-            slotTime: oldDate.toISOString(),
-            durationMinutes: 60,
+            startTime: oldDate,
+          endTime: new Date(oldDate.getTime() + 60 * 60 * 1000),
             capacity: 5,
             currentSequence: 0,
             isActive: true,
-            displayOrder: 0,
           },
         });
 
@@ -427,7 +423,7 @@ describe('RetentionService (e2e)', () => {
           email: `session-${ts}@example.com`,
           phone: `+1${Date.now().toString().slice(-10)}`,
           passwordHash: hash,
-          userType: UserType.CUSTOMER,
+          role: SystemRole.CUSTOMER,
           status: UserStatus.ACTIVE,
         },
       });
@@ -492,7 +488,7 @@ describe('RetentionService (e2e)', () => {
           email: `session-${ts}@example.com`,
           phone: `+1${Date.now().toString().slice(-10)}`,
           passwordHash: hash,
-          userType: UserType.CUSTOMER,
+          role: SystemRole.CUSTOMER,
           status: UserStatus.ACTIVE,
         },
       });
@@ -547,7 +543,7 @@ describe('RetentionService (e2e)', () => {
           email: `session-${ts}@example.com`,
           phone: `+1${Date.now().toString().slice(-10)}`,
           passwordHash: hash,
-          userType: UserType.CUSTOMER,
+          role: SystemRole.CUSTOMER,
           status: UserStatus.ACTIVE,
         },
       });
@@ -591,7 +587,7 @@ describe('RetentionService (e2e)', () => {
           email: `activity-${ts}@example.com`,
           phone: `+1${Date.now().toString().slice(-10)}`,
           passwordHash: hash,
-          userType: UserType.CUSTOMER,
+          role: SystemRole.CUSTOMER,
           status: UserStatus.ACTIVE,
         },
       });
@@ -741,7 +737,7 @@ describe('RetentionService (e2e)', () => {
           email: `retention-${ts}@example.com`,
           phone: `+1${Date.now().toString().slice(-10)}`,
           passwordHash: hash,
-          userType: UserType.CUSTOMER,
+          role: SystemRole.CUSTOMER,
           status: UserStatus.ACTIVE,
         },
       });
@@ -755,12 +751,11 @@ describe('RetentionService (e2e)', () => {
       const slot = await prisma.timeSlot.create({
         data: {
           serviceId: svc.id,
-          slotTime: recentDate.toISOString(),
-          durationMinutes: 60,
+          startTime: recentDate,
+          endTime: new Date(recentDate.getTime() + 60 * 60 * 1000),
           capacity: 5,
           currentSequence: 0,
           isActive: true,
-          displayOrder: 0,
         },
       });
 
@@ -806,7 +801,7 @@ describe('RetentionService (e2e)', () => {
           email: `cron-${ts}@example.com`,
           phone: `+1${Date.now().toString().slice(-10)}`,
           passwordHash: hash,
-          userType: UserType.CUSTOMER,
+          role: SystemRole.CUSTOMER,
           status: UserStatus.ACTIVE,
         },
       });
@@ -817,7 +812,7 @@ describe('RetentionService (e2e)', () => {
       // Seed various old data
       const category = await createTestCategory(prisma);
       const svc = await createTestService(prisma, category.id);
-      const slot = await createTestTimeSlot(prisma, svc.id, { slotTime: oldDate.toISOString() });
+      const slot = await createTestTimeSlot(prisma, svc.id, { startTime: oldDate, endTime: new Date(oldDate.getTime() + 60 * 60 * 1000) });
 
       // Old completed appointment
       const apt = await createTestAppointment(prisma, {
@@ -885,7 +880,7 @@ describe('RetentionService (e2e)', () => {
           email: `batch-${ts}@example.com`,
           phone: `+1${Date.now().toString().slice(-10)}`,
           passwordHash: hash,
-          userType: UserType.CUSTOMER,
+          role: SystemRole.CUSTOMER,
           status: UserStatus.ACTIVE,
         },
       });
@@ -904,12 +899,11 @@ describe('RetentionService (e2e)', () => {
         const slot = await prisma.timeSlot.create({
           data: {
             serviceId: svc.id,
-            slotTime: oldDate.toISOString(),
-            durationMinutes: 60,
+            startTime: oldDate,
+          endTime: new Date(oldDate.getTime() + 60 * 60 * 1000),
             capacity: 5,
             currentSequence: i,
             isActive: true,
-            displayOrder: i,
           },
         });
         const apt = await prisma.appointment.create({
@@ -934,12 +928,11 @@ describe('RetentionService (e2e)', () => {
       const recentSlot = await prisma.timeSlot.create({
         data: {
           serviceId: svc.id,
-          slotTime: recentDate.toISOString(),
-          durationMinutes: 60,
+          startTime: recentDate,
+          endTime: new Date(recentDate.getTime() + 60 * 60 * 1000),
           capacity: 5,
           currentSequence: 0,
           isActive: true,
-          displayOrder: 10,
         },
       });
       const recentApt = await prisma.appointment.create({
