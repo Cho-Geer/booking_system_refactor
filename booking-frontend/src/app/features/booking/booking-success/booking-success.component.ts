@@ -25,7 +25,7 @@ export class BookingSuccessComponent {
   lastAppointment = this.bookingStore.lastAppointment;
 
   bookingReference = computed(() => this.lastAppointment()?.appointmentNumber ?? '');
-  bookingAmount = computed(() => this.lastAppointment()?.price ?? 0);
+  bookingAmount = computed(() => this.lastAppointment()?.taxIncludedAmount ?? 0);
   bookingDuration = computed(() => this.lastAppointment()?.durationMinutes ?? 0);
 
   viewMyBookings(): void {

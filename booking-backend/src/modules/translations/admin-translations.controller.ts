@@ -8,11 +8,19 @@ import {
   Body,
   Query,
   UseGuards,
+  HttpCode,
+  HttpStatus,
 } from "@nestjs/common";
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../../common/guards/roles.guard";
 import { Roles } from "../../common/decorators/roles.decorator";
-import { TranslationService, TranslationResult } from "./translations.service";
+import {
+  TranslationService,
+  TranslationResult,
+  BatchUpsertResult,
+  SeedTranslationResult,
+  PaginatedTranslationsResult,
+} from "./translations.service";
 
 // ============================================================
 // DTOs
@@ -28,30 +36,6 @@ export interface BatchUpsertEntry {
 
 export interface BatchUpsertDto {
   entries: BatchUpsertEntry[];
-}
-
-export interface BatchUpsertResult {
-  updatedCount: number;
-  createdCount: number;
-}
-
-export interface DeleteResult {
-  deleted: boolean;
-}
-
-export interface SeedResult {
-  seeded: boolean;
-  count: number;
-}
-
-export interface PaginatedTranslationsResult {
-  data: Record<string, unknown>[];
-  meta: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  };
 }
 
 // ============================================================
@@ -72,11 +56,13 @@ export class AdminTranslationsController {
     @Query("domain") domain?: string,
     @Query("isCustom") isCustom?: boolean,
   ): Promise<PaginatedTranslationsResult> {
-    // Delegate to service (mocked in tests)
-    return this.translationService.getTranslations(
+    return this.translationService.getAdminTranslations(
+      page ?? 1,
+      limit ?? 20,
       locale,
       domain,
-    ) as unknown as PaginatedTranslationsResult;
+      isCustom,
+    );
   }
 
   @Put()
@@ -87,17 +73,17 @@ export class AdminTranslationsController {
     return result;
   }
 
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(":id")
   @Roles("ADMIN", "SUPER_ADMIN")
-  async deleteTranslation(@Param("id") id: string): Promise<DeleteResult> {
-    const result = await this.translationService.deleteTranslation(id);
+  async deleteTranslation(@Param("id") id: string): Promise<void> {
+    await this.translationService.deleteTranslation(id);
     await this.translationService.invalidateCache();
-    return result;
   }
 
   @Post("seed")
   @Roles("SUPER_ADMIN")
-  async seedDefaultTranslations(): Promise<SeedResult> {
+  async seedDefaultTranslations(): Promise<SeedTranslationResult> {
     const result = await this.translationService.seedDefaultTranslations();
     await this.translationService.invalidateCache();
     return result;

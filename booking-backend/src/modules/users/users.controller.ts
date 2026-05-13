@@ -164,7 +164,8 @@ export class UsersController {
   @Put("profile")
   @Roles(SystemRole.CUSTOMER, SystemRole.ADMIN, SystemRole.SUPER_ADMIN)
   async updateProfile(@Req() req, @Body() dto: UpdateProfileDto) {
-    return this.usersService.updateProfile(req.user.sub, dto);
+    const result = await this.usersService.updateProfile(req.user.sub, dto);
+    return { ...result, _message: "资料已更新" };
   }
 
   @Patch("profile/timezone")
@@ -177,7 +178,8 @@ export class UsersController {
     if (!user) {
       throw new ForbiddenException("User not authenticated");
     }
-    return this.usersService.updateTimezone(user.id, dto);
+    const result = await this.usersService.updateTimezone(user.id, dto);
+    return { ...result, _message: "时区已更新" };
   }
 
   @Put("profile/password")
@@ -192,10 +194,11 @@ export class UsersController {
     if (!user) {
       throw new ForbiddenException("User not authenticated");
     }
-    return this.usersService.updatePassword(
+    const result = await this.usersService.updatePassword(
       user.id,
       dto.currentPassword,
       dto.newPassword,
     );
+    return { ...result, _message: "密码修改成功" };
   }
 }

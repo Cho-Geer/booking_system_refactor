@@ -71,8 +71,8 @@ const MOCK_PAGINATED_RESPONSE = {
 };
 
 const MOCK_BATCH_UPSERT_RESPONSE = {
-  updatedCount: 5,
-  createdCount: 3,
+  updated: 5,
+  created: 3,
 };
 
 describe('TranslationsController (Public)', () => {
@@ -368,8 +368,8 @@ describe('AdminTranslationsController', () => {
       const result = await controller.batchUpsert(MOCK_UPSERT_DTO);
 
       // Assert
-      expect(result.updatedCount).toBe(5);
-      expect(result.createdCount).toBe(3);
+      expect(result.updated).toBe(5);
+      expect(result.created).toBe(3);
     });
 
     it('should call service.batchUpsert with the provided entries', async () => {
@@ -385,14 +385,14 @@ describe('AdminTranslationsController', () => {
 
     it('should accept empty entries array and return zero counts', async () => {
       // Arrange
-      mockService.batchUpsert.mockResolvedValue({ updatedCount: 0, createdCount: 0 });
+      mockService.batchUpsert.mockResolvedValue({ updated: 0, created: 0 });
 
       // Act
       const result = await controller.batchUpsert({ entries: [] });
 
       // Assert
-      expect(result.updatedCount).toBe(0);
-      expect(result.createdCount).toBe(0);
+      expect(result.updated).toBe(0);
+      expect(result.created).toBe(0);
     });
 
     it('should invalidate cache after successful batch upsert', async () => {
@@ -415,13 +415,12 @@ describe('AdminTranslationsController', () => {
 
     it('should delete a custom translation by id', async () => {
       // Arrange
-      mockService.deleteTranslation.mockResolvedValue({ deleted: true });
+      mockService.deleteTranslation.mockResolvedValue(undefined);
 
       // Act
-      const result = await controller.deleteTranslation(TRANSLATION_ID);
+      await controller.deleteTranslation(TRANSLATION_ID);
 
       // Assert
-      expect(result.deleted).toBe(true);
       expect(mockService.deleteTranslation).toHaveBeenCalledWith(TRANSLATION_ID);
     });
 
@@ -439,7 +438,7 @@ describe('AdminTranslationsController', () => {
 
     it('should invalidate cache after successful deletion', async () => {
       // Arrange
-      mockService.deleteTranslation.mockResolvedValue({ deleted: true });
+      mockService.deleteTranslation.mockResolvedValue(undefined);
 
       // Act
       await controller.deleteTranslation(TRANSLATION_ID);
@@ -456,7 +455,7 @@ describe('AdminTranslationsController', () => {
     it('should re-populate default translations and return success', async () => {
       // Arrange
       mockService.seedDefaultTranslations.mockResolvedValue({
-        seeded: true,
+        message: "seed_success",
         count: 205,
       });
 
@@ -464,14 +463,14 @@ describe('AdminTranslationsController', () => {
       const result = await controller.seedDefaultTranslations();
 
       // Assert
-      expect(result.seeded).toBe(true);
+      expect(result.message).toBe("seed_success");
       expect(result.count).toBeGreaterThan(0);
     });
 
     it('should call service.seedDefaultTranslations', async () => {
       // Arrange
       mockService.seedDefaultTranslations.mockResolvedValue({
-        seeded: true,
+        message: "seed_success",
         count: 205,
       });
 
@@ -485,7 +484,7 @@ describe('AdminTranslationsController', () => {
     it('should invalidate cache after seeding', async () => {
       // Arrange
       mockService.seedDefaultTranslations.mockResolvedValue({
-        seeded: true,
+        message: "seed_success",
         count: 205,
       });
 

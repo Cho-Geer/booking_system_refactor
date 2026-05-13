@@ -10,6 +10,7 @@ import {
 } from "@nestjs/common";
 import { Request, Response } from "express";
 import { ClsService } from "nestjs-cls";
+import { formatTimestampWithTimezone } from "../utils/timezone.util";
 
 interface PrismaError {
   code: string;
@@ -129,7 +130,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       message,
       error,
       errors: errors.length > 0 ? errors : undefined,
-      timestamp: new Date().toISOString(),
+      timestamp: formatTimestampWithTimezone(request.headers?.["x-timezone"] as string | undefined),
       path: request.url,
       requestId,
     });

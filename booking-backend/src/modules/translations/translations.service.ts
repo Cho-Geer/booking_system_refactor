@@ -25,8 +25,8 @@ export interface BatchUpsertEntry {
 }
 
 export interface BatchUpsertResult {
-  updatedCount: number;
-  createdCount: number;
+  updated: number;
+  created: number;
 }
 
 export interface DeleteTranslationResult {
@@ -34,8 +34,18 @@ export interface DeleteTranslationResult {
 }
 
 export interface SeedTranslationResult {
-  seeded: boolean;
+  message: string;
   count: number;
+}
+
+export interface PaginatedTranslationsResult {
+  data: Record<string, unknown>[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
 }
 
 const CACHE_TTL = 3600; // 1 hour
@@ -189,7 +199,40 @@ export class TranslationService {
       firstEntry?.locale,
     );
 
-    return { updatedCount, createdCount };
+    return { updated: updatedCount, created: createdCount };
+  }
+
+  // ============================================================
+  // Admin Get Translations (paginated)
+  // ============================================================
+
+  async getAdminTranslations(
+    page: number = 1,
+    limit: number = 20,
+    locale?: string,
+    domain?: string,
+    isCustom?: boolean | string,
+  ): Promise<PaginatedTranslationsResult> {
+    const where: Record<string, unknown> = {};
+    if (locale) where.locale = locale;
+    if (domain) where.domain = domain;
+    if (isCustom !== undefined) where.isCustom = isCustom === true || isCustom === "true";
+
+    const skip = (page - 1) * limit;
+    const [data, total] = await Promise.all([
+      this.prisma.translationDictionary.findMany({ where, skip, take: limit }),
+      this.prisma.translationDictionary.count({ where }),
+    ]);
+
+    return {
+      data: data as unknown as Record<string, unknown>[],
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   // ============================================================
@@ -235,7 +278,7 @@ export class TranslationService {
 
     this.notificationsGateway.sendTranslationsUpdated();
 
-    return { seeded: true, count };
+    return { message: "seed_success", count };
   }
 
   // ============================================================

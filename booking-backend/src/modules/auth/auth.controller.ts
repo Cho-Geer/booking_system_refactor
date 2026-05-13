@@ -104,10 +104,10 @@ export class AuthController {
   async registerComplete(
     @Body() completeDto: RegisterCompleteDto,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<AuthResponseDto> {
+  ): Promise<AuthResponseDto & { _message: string }> {
     const result = await this.authService.registerComplete(completeDto);
     this.setRefreshCookie(res, result.refreshToken);
-    return this.stripRefreshToken(result);
+    return { ...this.stripRefreshToken(result), _message: "注册成功" };
   }
 
   // ==================== 登录流程 ====================
@@ -152,14 +152,14 @@ export class AuthController {
     @Body() verifyDto: LoginVerifyCodeDto,
     @Res({ passthrough: true }) res: Response,
     @Req() req: Request,
-  ): Promise<AuthResponseDto> {
+  ): Promise<AuthResponseDto & { _message: string }> {
     const result = await this.authService.loginVerifyCode(
       verifyDto,
       req.ip,
       req.headers["user-agent"],
     );
     this.setRefreshCookie(res, result.refreshToken);
-    return this.stripRefreshToken(result);
+    return { ...this.stripRefreshToken(result), _message: "登录成功" };
   }
 
   @Public()
@@ -185,14 +185,14 @@ export class AuthController {
     @Body() loginDto: LoginPasswordDto,
     @Res({ passthrough: true }) res: Response,
     @Req() req: Request,
-  ): Promise<AuthResponseDto> {
+  ): Promise<AuthResponseDto & { _message: string }> {
     const result = await this.authService.loginPassword(
       loginDto,
       req.ip,
       req.headers["user-agent"],
     );
     this.setRefreshCookie(res, result.refreshToken);
-    return this.stripRefreshToken(result);
+    return { ...this.stripRefreshToken(result), _message: "登录成功" };
   }
 
   // ==================== 重置密码流程 ====================
@@ -230,8 +230,9 @@ export class AuthController {
   })
   async resetPasswordVerify(
     @Body() verifyDto: ResetPasswordVerifyDto,
-  ): Promise<{ message: string }> {
-    return this.authService.resetPasswordVerify(verifyDto);
+  ): Promise<{ _message: string } & { message: string }> {
+    const result = await this.authService.resetPasswordVerify(verifyDto);
+    return { ...result, _message: "密码重置成功" };
   }
 
   // ==================== Token 管理 ====================

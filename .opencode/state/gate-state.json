@@ -4567,12 +4567,15 @@
       "session_id": "cg_ses_1778656615766",
       "created_at": "2026-05-13T07:16:55.766Z",
       "task_description": "Execute Phase 1 of Meta-Planner fix plan: timezone route fix, WebSocket events, CSRF path, Quick Booking financial fields, frontend WS subscriptions.",
-      "gate_status": "armed",
+      "gate_status": "completed",
       "last_check_failed_items": [],
       "plan_summary": "Execute Phase 1 (5 tasks): fix PATCH timezone route, add WebSocket backend events + frontend subscriptions, fix Admin Quick Booking financial fields, fix CSRF bypass path.",
       "confirmed_at": "2026-05-13T07:17:00.604Z",
-      "consumed_at": null,
-      "audit": null
+      "consumed_at": "2026-05-13T07:18:24.454Z",
+      "audit": {
+        "execution_summary": "Phase 1 complete: 5 P0 fixes across 8 files — PATCH timezone route repaired, Admin Quick Booking financial field snapshots added, CSRF bypass path corrected, 2 WebSocket backend events added and wired to translation service, 3 frontend WS subscription methods added.",
+        "completed_at": "2026-05-13T07:18:24.454Z"
+      }
     },
     "cg_ses_1778656650642": {
       "session_id": "cg_ses_1778656650642",
@@ -4614,6 +4617,59 @@
       "audit": {
         "execution_summary": "Added 3 callback-style WebSocket subscription methods to socket.service.ts: subscribeToAppointmentUpdated (appointment_updated), subscribeToBookingConfirmed (booking_confirmed), subscribeToBookingCancelled (booking_cancelled). tsc --noEmit passed.",
         "completed_at": "2026-05-13T07:17:52.081Z"
+      }
+    },
+    "cg_ses_1778656861277": {
+      "session_id": "cg_ses_1778656861277",
+      "created_at": "2026-05-13T07:21:01.277Z",
+      "task_description": "Execute Phase 2 (3 tasks) and Phase 3 (2 tasks) and Phase 4 (3 tasks) — all remaining phases to completion.",
+      "gate_status": "armed",
+      "last_check_failed_items": [],
+      "plan_summary": "Execute Phase 2 (translations auth/pagination, profile timezone, booking amount), Phase 3 (X-Timezone timestamp, _message convention), Phase 4 (Guardian, Arbiter, DAG update) to completion.",
+      "confirmed_at": "2026-05-13T07:21:08.311Z",
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1778656897392": {
+      "session_id": "cg_ses_1778656897392",
+      "created_at": "2026-05-13T07:21:37.392Z",
+      "task_description": "Execute Phase 2 + Phase 3 backend tasks: Fix translations auth, admin translations pagination + response fields, X-Timezone header formatting, auth controller _message fields",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Execute 5 backend tasks: Fix translations auth, admin pagination, response field renames, X-Timezone formatting, _message fields on auth responses",
+      "confirmed_at": "2026-05-13T07:25:55.780Z",
+      "consumed_at": "2026-05-13T07:25:58.664Z",
+      "audit": {
+        "execution_summary": "Executed 5 backend tasks: A) Removed @Public, added @UseGuards(JwtAuthGuard) to translations.controller.ts; B) Added paginated getAdminTranslations to service + controller; C) Renamed updatedCount→updated, createdCount→created, seeded→message, added @HttpCode(NO_CONTENT) to DELETE; D) Created timezone.util.ts, applied formatTimestampWithTimezone in response interceptor and exception filter; E) Added _message fields to auth controller (4 handlers) and users controller (3 handlers). All tests updated for type consistency.",
+        "completed_at": "2026-05-13T07:25:58.664Z"
+      }
+    },
+    "cg_ses_1778656899066": {
+      "session_id": "cg_ses_1778656899066",
+      "created_at": "2026-05-13T07:21:39.066Z",
+      "task_description": "Execute Phase 2 frontend tasks: add preferredTimezone display to profile page and fix bookingAmount on success page",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Phase 2 frontend: add preferredTimezone to profile page, fix bookingAmount to taxIncludedAmount in booking-success component",
+      "confirmed_at": "2026-05-13T07:21:57.760Z",
+      "consumed_at": "2026-05-13T07:22:00.077Z",
+      "audit": {
+        "execution_summary": "Phase 2 frontend tasks: (1) Added preferredTimezone display row to profile.component.html using existing info-row pattern; (2) Changed bookingAmount from price to taxIncludedAmount in booking-success.component.ts. Both changes pass tsc --noEmit.",
+        "completed_at": "2026-05-13T07:22:00.077Z"
+      }
+    },
+    "cg_ses_1778657174551": {
+      "session_id": "cg_ses_1778657174551",
+      "created_at": "2026-05-13T07:26:14.551Z",
+      "task_description": "Quality gate review of Phase 1-3 changes - code standards, security, architecture constraint review, and test execution evidence verification",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Guardian quality gate review of Phase 1-3 changes (last 5 commits): git diff capture, contract.yaml alignment check, TSC compilation on BE+FE, test execution evidence verification, test suite run, coding standards scan, security review, PASS/FAIL report delivery",
+      "confirmed_at": "2026-05-13T07:26:26.302Z",
+      "consumed_at": "2026-05-13T07:32:11.686Z",
+      "audit": {
+        "execution_summary": "Guardian Quality Gate review completed. Reviewed last 5 commits (documentation-only), cumulative codebase against contract.yaml v1.7.7. Verified TSC (BE/FE both PASS), contract compliance (6/8 PASS), coding standards (7 lint issues), test execution evidence (critical FAIL - no test_report.json found), test suites (BE 110 failed, FE 280 failed), and security (12 vulnerabilities). Final verdict: ❌ FAIL due to missing test execution evidence, failing tests, and contract compliance issues.",
+        "completed_at": "2026-05-13T07:32:11.686Z"
       }
     }
   }

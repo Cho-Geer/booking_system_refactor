@@ -96,6 +96,13 @@
             <p class="text-base text-gray-900">{{ formatDate(u.createdAt) }}</p>
           </div>
         }
+
+        @if (currentUser()?.preferredTimezone; as tz) {
+          <div class="profile-field">
+            <span class="field-label">Timezone</span>
+            <span class="field-value">{{ tz }}</span>
+          </div>
+        }
       </div>
 
       <!-- Save/Cancel buttons (edit mode) -->
