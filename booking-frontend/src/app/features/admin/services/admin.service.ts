@@ -89,6 +89,7 @@ export class AdminService {
     if (query.limit) params = params.set('limit', query.limit.toString());
     if (query.search) params = params.set('search', query.search);
     if (query.active !== undefined) params = params.set('active', query.active.toString());
+    if (query.category) params = params.set('category', query.category);
 
     return this.http.get<ApiResponse<PaginatedResponse<AdminServiceItem>>>(`${this.apiUrl}/admin/services`, { params })
       .pipe(map(response => response.data), catchError(this.handleError));

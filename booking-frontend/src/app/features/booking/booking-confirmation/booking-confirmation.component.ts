@@ -50,7 +50,7 @@ export class BookingConfirmationComponent {
 
   /** Tax computation */
   taxRate = computed(() => this.selectedService()?.taxRate ?? 0);
-  estTaxAmount = computed(() => (this.servicePrice() * this.taxRate()) / 100);
+  estTaxAmount = computed(() => this.servicePrice() * this.taxRate());
   estTaxIncludedTotal = computed(() => this.servicePrice() + this.estTaxAmount());
 
   confirmBooking(): void {

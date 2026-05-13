@@ -54,6 +54,7 @@ export interface BookingListItem {
   price?: number;
   taxRate?: number;
   taxIncludedAmount?: number;
+  appointmentNumber?: string;
 }
 
 export interface BookingListQuery {

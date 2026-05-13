@@ -9,10 +9,9 @@ import { of } from 'rxjs';
  */
 export interface TimeSlot {
   id: string;
-  date: string;
-  time: string;
-  isActive: boolean;
-  bookedBy?: string;
+  startTime: string;
+  endTime: string;
+  available: boolean;
 }
 
 /**
@@ -45,41 +44,39 @@ export const slotResolver: ResolveFn<TimeSlot[]> = (
   const sampleSlots: TimeSlot[] = [
     {
       id: `slot-${date}-0900`,
-      date,
-      time: '09:00',
-      isActive: true,
+      startTime: `${date}T09:00:00`,
+      endTime: `${date}T10:00:00`,
+      available: true,
     },
     {
       id: `slot-${date}-1000`,
-      date,
-      time: '10:00',
-      isActive: true,
+      startTime: `${date}T10:00:00`,
+      endTime: `${date}T11:00:00`,
+      available: true,
     },
     {
       id: `slot-${date}-1100`,
-      date,
-      time: '11:00',
-      isActive: true,
-      bookedBy: 'user-042',
+      startTime: `${date}T11:00:00`,
+      endTime: `${date}T12:00:00`,
+      available: false,
     },
     {
       id: `slot-${date}-1400`,
-      date,
-      time: '14:00',
-      isActive: true,
+      startTime: `${date}T14:00:00`,
+      endTime: `${date}T15:00:00`,
+      available: true,
     },
     {
       id: `slot-${date}-1500`,
-      date,
-      time: '15:00',
-      isActive: false,
+      startTime: `${date}T15:00:00`,
+      endTime: `${date}T16:00:00`,
+      available: false,
     },
     {
       id: `slot-${date}-1600`,
-      date,
-      time: '16:00',
-      isActive: true,
-      bookedBy: 'user-108',
+      startTime: `${date}T16:00:00`,
+      endTime: `${date}T17:00:00`,
+      available: true,
     },
   ];
 

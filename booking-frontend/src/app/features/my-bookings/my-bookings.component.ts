@@ -23,6 +23,7 @@ export interface AppointmentListItem {
   price?: number;
   taxRate?: number;
   taxIncludedAmount?: number;
+  appointmentNumber?: string;
 }
 
 type FilterValue = 'all' | string;
@@ -256,7 +257,8 @@ export class MyBookingsComponent implements OnInit {
     return `${fmt(start)} - ${fmt(end)}`;
   }
 
-  formatPrice(_serviceName: string): string {
-    return '';
+  formatPrice(price: number | undefined): string {
+    if (price == null) return '';
+    return '$' + price.toFixed(2);
   }
 }

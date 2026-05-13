@@ -193,9 +193,13 @@ export class ApiService {
     customerInfo?: Record<string, unknown>;
     notes?: string;
     overtimeMinutes?: number;
+    idempotencyKey?: string;
   }): Observable<ReservationResponse> {
+    const headers = dto.idempotencyKey
+      ? { 'X-Idempotency-Key': dto.idempotencyKey }
+      : undefined;
     return this.http
-      .post<ReservationResponse>(`${this.apiUrl}/appointments`, dto)
+      .post<ReservationResponse>(`${this.apiUrl}/appointments`, dto, { headers })
       .pipe(catchError(this.handleError));
   }
 
@@ -234,19 +238,16 @@ export class ApiService {
       );
   }
 
-  reserveSlot(
-    slotId: string,
-    preferSeq: number,
-    idempotencyKey?: string
-  ): Observable<ReservationResponse> {
-    const headers = idempotencyKey
-      ? { 'X-Idempotency-Key': idempotencyKey }
-      : undefined;
-    return this.http
-      .post<ReservationResponse>(`${this.apiUrl}/slots/${slotId}/reserve`, {
-        preferSeq,
-      }, { headers })
-      .pipe(catchError(this.handleError));
+  reserveSlot(dto: {
+    timeSlotId: string;
+    serviceId: string;
+    appointmentDate: string;
+    preferredSequence: number;
+    customerInfo?: Record<string, unknown>;
+    notes?: string;
+    overtimeMinutes?: number;
+  }): Observable<ReservationResponse> {
+    return this.createAppointment(dto);
   }
 
   cancelBooking(bookingId: string): Observable<void> {

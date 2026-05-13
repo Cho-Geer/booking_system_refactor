@@ -34,7 +34,6 @@ export interface StatCard {
 }
 
 export interface AdminStats {
-  totalBookings: StatCard;
   todayBookings: StatCard;
   pendingBookings: StatCard;
   activeUsers: StatCard;
@@ -57,6 +56,7 @@ export interface AdminUser {
   phone?: string;
   role: AdminUserRole;
   status: AdminUserStatus;
+  preferredTimezone?: string;
   createdAt: string;
 }
 
@@ -133,6 +133,7 @@ export interface AdminServicesQuery {
   limit?: number;
   search?: string;
   active?: boolean;
+  category?: string;
 }
 
 // ==========================================

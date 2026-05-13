@@ -15,6 +15,7 @@ export interface User {
   role: string;
   email?: string;   // masked value from backend (e.g., "us***@example.com")
   phone?: string;   // masked value from backend (e.g., "138****5678")
+  preferredTimezone?: string;
   createdAt?: string;
 }
 

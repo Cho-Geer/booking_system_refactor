@@ -143,6 +143,7 @@ export class ServiceManagementComponent implements OnInit, OnDestroy {
       active: this.statusFilter() === 'active' ? true :
               this.statusFilter() === 'inactive' ? false :
               undefined,
+      category: this.categoryFilter() || undefined,
     }).subscribe({
       next: (response) => {
         this.store.setServices(response.items, response.meta.total, response.meta.page);

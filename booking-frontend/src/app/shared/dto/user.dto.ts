@@ -21,16 +21,6 @@ export interface User {
   createdAt?: string;
 }
 
-export interface RegisterRequest {
-  email: string;
-  password: string;
-  name: string;
-}
-
-export interface RegisterResponse {
-  user: User;
-}
-
 export interface UpdateProfileRequest {
   name?: string;
   email?: string;

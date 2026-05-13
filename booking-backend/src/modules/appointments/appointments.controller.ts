@@ -84,6 +84,7 @@ export class AppointmentsController {
   }
 
   @Get("my")
+  @Roles(SystemRole.CUSTOMER)
   @RateLimit({ tier: "api", key: "user" })
   @ApiOperation({ summary: "Get my appointments" })
   @ApiResponse({ status: 200, description: "List of user appointments" })

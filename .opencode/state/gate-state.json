@@ -4360,12 +4360,15 @@
       "session_id": "cg_ses_1778648017317",
       "created_at": "2026-05-13T04:53:37.317Z",
       "task_description": "Execute Phase 2 (DTO/Validation Fixes) and Phase 3 (CSRF + Rate Limit Fixes) in parallel across backend controllers and DTOs.",
-      "gate_status": "armed",
+      "gate_status": "completed",
       "last_check_failed_items": [],
       "plan_summary": "Execute Phase 2 (BE DTO/Validation Fixes - 8 tasks) and Phase 3 (CSRF + Rate Limit Fixes - 4 tasks) in parallel via @Coder-BE.",
       "confirmed_at": "2026-05-13T04:53:41.070Z",
-      "consumed_at": null,
-      "audit": null
+      "consumed_at": "2026-05-13T04:55:36.435Z",
+      "audit": {
+        "execution_summary": "Phase 2 (8 DTO/Validation tasks) and Phase 3 (4 CSRF/Rate Limit tasks) completed in parallel. All class-validator decorators added, password complexity regexes synced, enum/date validations fixed, CSRF bypassPaths updated for auth endpoints, rate limits added to all missing admin endpoints, verify endpoint rate limit keys corrected.",
+        "completed_at": "2026-05-13T04:55:36.435Z"
+      }
     },
     "cg_ses_1778648047839": {
       "session_id": "cg_ses_1778648047839",
@@ -4393,6 +4396,59 @@
       "audit": {
         "execution_summary": "Phase 3 completed: 13 edits across 7 files — CSRF bypass added /v1/auth, 9 @RateLimit decorators added to admin endpoints, PUT business-hours limit reduced to 10, verify endpoint rate-limit keys changed from ip to email. TypeScript typecheck passes with zero errors in modified files.",
         "completed_at": "2026-05-13T04:54:56.785Z"
+      }
+    },
+    "cg_ses_1778648244363": {
+      "session_id": "cg_ses_1778648244363",
+      "created_at": "2026-05-13T04:57:24.363Z",
+      "task_description": "Execute Phase 4 (Frontend Core Fixes), Phase 5 (Frontend Appointment Flow), and Phase 6 (Security/Auth Fixes) in parallel.",
+      "gate_status": "armed",
+      "last_check_failed_items": [],
+      "plan_summary": "Execute Phase 4 (FE Core - 9 tasks), Phase 5 (FE Appointment - 9 tasks), and Phase 6 (Security/Auth - 4 tasks) in parallel.",
+      "confirmed_at": "2026-05-13T04:57:28.273Z",
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1778648278496": {
+      "session_id": "cg_ses_1778648278496",
+      "created_at": "2026-05-13T04:57:58.496Z",
+      "task_description": "Phase 4 — Frontend Core Fixes (9 tasks): Register interceptors, fix reserveSlot endpoint, add idempotency key, sync preferredTimezone, remove totalBookings, remove selectedSlotIds, add appointmentNumber, remove legacy auth DTOs in booking-frontend Angular app",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Phase 4 Frontend Core Fixes: 9 tasks across 8 files — register interceptors, fix reserveSlot, add idempotency-key, sync preferredTimezone, remove totalBookings, remove selectedSlotIds, add appointmentNumber, remove legacy auth DTOs",
+      "confirmed_at": "2026-05-13T04:58:46.773Z",
+      "consumed_at": "2026-05-13T04:59:14.237Z",
+      "audit": {
+        "execution_summary": "Phase 4 Frontend Core Fixes — 10 edits across 8 files: app.config.ts (registered errorInterceptor + loadingInterceptor), api.service.ts (reserveSlot delegates to createAppointment + idempotencyKey param on createAppointment), auth.store.ts (preferredTimezone on User), admin.dto.ts (preferredTimezone on AdminUser, removed totalBookings from AdminStats), booking.store.ts (removed selectedSlotIds from createAppointment dto), booking.dto.ts + my-bookings.component.ts (appointmentNumber on list DTOs), user.dto.ts (removed RegisterRequest, RegisterResponse). tsc --noEmit passes clean.",
+        "completed_at": "2026-05-13T04:59:14.237Z"
+      }
+    },
+    "cg_ses_1778648281776": {
+      "session_id": "cg_ses_1778648281776",
+      "created_at": "2026-05-13T04:58:01.777Z",
+      "task_description": "Phase 5 — Frontend Appointment Flow Fixes (9 tasks): Implement formatPrice, add bookingReference/Amount/Duration, add lastAppointment to BookingStore, fix estTaxAmount formula, add @Roles(CUSTOMER), fix role badge mapping, pass categoryFilter to API, fix getTimeDistribution usage, fix slot.resolver mock data",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Phase 5 — 9 Frontend Appointment Flow fixes: formatPrice, booking success page signals, BookingStore lastAppointment, tax formula fix, @Roles(CUSTOMER), role badge mapping, categoryFilter passthrough, time-distribution endpoint check, slot.resolver field rename",
+      "confirmed_at": "2026-05-13T04:58:45.036Z",
+      "consumed_at": "2026-05-13T04:59:50.044Z",
+      "audit": {
+        "execution_summary": "Phase 5 complete: 9 changes applied — 5.1 formatPrice implemented, 5.2 bookingSuccess signals/template updated, 5.3 lastAppointment added to BookingStore, 5.4 estTaxAmount formula fixed (removed /100), 5.5 @Roles(CUSTOMER) added to GET my, 5.6 role badge mapping fixed (ADMIN→processing, SUPER_ADMIN→confirmed), 5.7 categoryFilter passed to API (AdminServicesQuery + admin.service + service-management), 5.8 confirmed backend has time-distribution endpoint (no change needed), 5.9 slot.resolver fields renamed (date→startTime, time→endTime, isActive→available, removed bookedBy). Frontend tsc clean, backend tsc has only pre-existing spec errors.",
+        "completed_at": "2026-05-13T04:59:50.044Z"
+      }
+    },
+    "cg_ses_1778648283493": {
+      "session_id": "cg_ses_1778648283493",
+      "created_at": "2026-05-13T04:58:03.493Z",
+      "task_description": "Phase 6 — Security/Auth Fixes: Add @Roles(CUSTOMER) to getMyAppointments, fix rate limit keys in auth controller, expand CSP connect-src",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Phase 6 — Security/Auth Fixes: Add @Roles(CUSTOMER) to getMyAppointments, verify CSP connect-src expansion, note rate-limit keys already correct",
+      "confirmed_at": "2026-05-13T04:58:28.312Z",
+      "consumed_at": "2026-05-13T04:58:30.925Z",
+      "audit": {
+        "execution_summary": "Phase 6 complete. 6.1: Added @Roles(SystemRole.CUSTOMER) to getMyAppointments. 6.2/6.3: Both already key:\"email\" — no change. 6.4: Expanded connectSrc with api.booking.example.com + wss://ws.booking.example.com. tsc check: no new errors.",
+        "completed_at": "2026-05-13T04:58:30.925Z"
       }
     }
   }

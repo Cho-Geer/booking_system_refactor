@@ -290,8 +290,8 @@ export class UserManagementComponent implements OnInit {
   mapRoleToBadge(role: AdminUserRole): BadgeStatus {
     switch (role) {
       case 'CUSTOMER': return 'confirmed';
-      case 'ADMIN': return 'pending';
-      case 'SUPER_ADMIN': return 'pending';
+      case 'ADMIN': return 'processing';
+      case 'SUPER_ADMIN': return 'confirmed';
       default: return 'pending';
     }
   }

@@ -30,6 +30,18 @@
             <dt class="text-gray-500">{{ 'booking.timeLabel' | t }}</dt>
             <dd class="font-medium text-gray-900">{{ slot.startTime | date:'shortTime' }}</dd>
           </div>
+          @if (bookingDuration(); as duration) {
+            <div class="flex justify-between text-sm">
+              <dt class="text-gray-500">{{ 'booking.durationLabel' | t }}</dt>
+              <dd class="font-medium text-gray-900">{{ duration }} {{ 'booking.minutes' | t }}</dd>
+            </div>
+          }
+          @if (bookingAmount(); as amount) {
+            <div class="flex justify-between text-sm">
+              <dt class="text-gray-500">{{ 'booking.amountLabel' | t }}</dt>
+              <dd class="font-medium text-gray-900">{{ amount | currency:'USD':'symbol':'1.2-2' }}</dd>
+            </div>
+          }
         </dl>
       </div>
     } @else {
