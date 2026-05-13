@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../../common/database/prisma.service";
 import { CacheService } from "../cache/cache.service";
+import { NotificationsGateway } from "../notifications/notifications.gateway";
 import { seedDefaultTranslations as runSeed } from "./translations-seed.service";
 
 // ============================================================
@@ -45,6 +46,7 @@ export class TranslationService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly cache: CacheService,
+    private readonly notificationsGateway: NotificationsGateway,
   ) {}
 
   // ============================================================
@@ -181,6 +183,12 @@ export class TranslationService {
       }
     }
 
+    const firstEntry = entries[0];
+    this.notificationsGateway.sendTranslationsUpdated(
+      firstEntry?.domain,
+      firstEntry?.locale,
+    );
+
     return { updatedCount, createdCount };
   }
 
@@ -224,6 +232,8 @@ export class TranslationService {
     const count = await this.prisma.translationDictionary.count({
       where: { isCustom: false, locale: "en" },
     });
+
+    this.notificationsGateway.sendTranslationsUpdated();
 
     return { seeded: true, count };
   }

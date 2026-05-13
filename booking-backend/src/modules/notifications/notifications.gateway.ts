@@ -242,6 +242,25 @@ export class NotificationsGateway
       });
   }
 
+  sendSlotUpdate(slotId: string, isActive: boolean, bookedBy?: string): void {
+    this.logger.log(`Emitting slot-update to admin:broadcast`);
+    this.server.to("admin:broadcast").emit("slot-update", {
+      slotId,
+      isActive,
+      bookedBy: bookedBy ?? null,
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  sendTranslationsUpdated(domain?: string, locale?: string): void {
+    this.logger.log(`Emitting translations.updated to admin:broadcast`);
+    this.server.to("admin:broadcast").emit("translations.updated", {
+      domain: domain ?? null,
+      locale: locale ?? null,
+      timestamp: new Date().toISOString(),
+    });
+  }
+
   sendNewNotification(notification: {
     id: string;
     type: string;

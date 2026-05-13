@@ -170,6 +170,18 @@ export class SocketService {
     this.socket.on('stats.updated', callback);
   }
 
+  subscribeToAppointmentUpdated(callback: (data: { appointmentId: string; changes: Record<string, unknown>; timestamp: string }) => void): void {
+    this.socket.on('appointment_updated', callback);
+  }
+
+  subscribeToBookingConfirmed(callback: (data: { appointmentId: string; appointmentNumber: string; timestamp: string }) => void): void {
+    this.socket.on('booking_confirmed', callback);
+  }
+
+  subscribeToBookingCancelled(callback: (data: { appointmentId: string; reason?: string; timestamp: string }) => void): void {
+    this.socket.on('booking_cancelled', callback);
+  }
+
   joinAdminRoom(): void {
     this.socket.emit('join', { room: 'admin:broadcast' });
   }

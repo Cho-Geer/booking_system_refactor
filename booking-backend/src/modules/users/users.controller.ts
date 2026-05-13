@@ -161,17 +161,17 @@ export class UsersController {
     return this.usersService.remove(id);
   }
 
-  @Patch("profile/timezone")
-  @Roles(SystemRole.CUSTOMER, SystemRole.ADMIN, SystemRole.SUPER_ADMIN)
-  @RateLimit({ tier: "api", key: "ip" })
-  @ApiOperation({ summary: "Update preferred timezone" })
-  @ApiResponse({ status: 200, description: "Timezone updated" })
   @Put("profile")
   @Roles(SystemRole.CUSTOMER, SystemRole.ADMIN, SystemRole.SUPER_ADMIN)
   async updateProfile(@Req() req, @Body() dto: UpdateProfileDto) {
     return this.usersService.updateProfile(req.user.sub, dto);
   }
 
+  @Patch("profile/timezone")
+  @Roles(SystemRole.CUSTOMER, SystemRole.ADMIN, SystemRole.SUPER_ADMIN)
+  @RateLimit({ tier: "api", key: "ip" })
+  @ApiOperation({ summary: "Update preferred timezone" })
+  @ApiResponse({ status: 200, description: "Timezone updated" })
   async updateTimezone(@Body() dto: UpdateTimezoneDto, @Req() req: Request) {
     const user = req.user as JwtUser | undefined;
     if (!user) {

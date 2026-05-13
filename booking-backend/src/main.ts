@@ -23,7 +23,7 @@ async function bootstrap() {
   // CSRF protection (double-submit cookie pattern)
   // Exempt the token endpoint and Swagger docs from CSRF checks
   const csrfInstance = new CsrfMiddleware({
-    bypassPaths: ["/v1/csrf/token", "/api/docs", "/api/docs/*", "/v1/auth"],
+    bypassPaths: ["/v1/csrf/token", "/api/docs", "/api/docs/*", "/v1/auth/*"],
   });
   app.use(csrfInstance.use.bind(csrfInstance));
 
