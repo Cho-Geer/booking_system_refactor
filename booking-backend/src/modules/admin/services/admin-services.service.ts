@@ -170,7 +170,7 @@ export class AdminServicesService {
         }),
       ]);
 
-    const categoryIds = categoryGroups.map((g) => g.categoryId);
+    const categoryIds = categoryGroups.map((g) => g.categoryId).filter((id): id is string => id !== null);
     const categoryNames =
       categoryIds.length > 0
         ? await this.prisma.serviceCategory.findMany({
@@ -186,7 +186,7 @@ export class AdminServicesService {
       inactiveServicesCount: totalServices - activeServicesCount,
       averagePrice: Number(priceAgg._avg.price) || 0,
       categories: categoryGroups.map((g) => ({
-        category: categoryMap.get(g.categoryId) || g.categoryId,
+        category: categoryMap.get(g.categoryId ?? '') || (g.categoryId ?? ''),
         count: g._count.id,
       })),
     };

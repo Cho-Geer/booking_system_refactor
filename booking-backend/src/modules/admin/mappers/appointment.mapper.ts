@@ -2,6 +2,7 @@ import { AdminAppointmentDto } from "../dto/admin-appointment.dto";
 
 interface PrismaAppointment {
   id: string;
+  appointmentNumber: string;
   userId: string;
   serviceId: string;
   timeSlotId: string;
@@ -31,7 +32,7 @@ export function generateAppointmentNumber(): string {
 export function toAdminAppointmentDto(appt: PrismaAppointment): AdminAppointmentDto {
   return {
     id: appt.id,
-    appointmentNumber: generateAppointmentNumber(),
+    appointmentNumber: appt.appointmentNumber,
     userId: appt.userId,
     userName: appt.user?.name ?? "Unknown",
     serviceId: appt.serviceId,

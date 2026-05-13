@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { IsOptional, IsNumber, IsString, IsBoolean } from "class-validator";
+import { IsOptional, IsNumber, IsString, IsBoolean, Min } from "class-validator";
 import { Type } from "class-transformer";
 
 export class AdminServiceDto {
@@ -63,6 +63,12 @@ export class CreateAdminServiceDto {
 
   @ApiPropertyOptional()
   imageUrl?: string;
+
+  @ApiPropertyOptional({ description: "Tax rate" })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  taxRate?: number;
 }
 
 export class UpdateAdminServiceDto {

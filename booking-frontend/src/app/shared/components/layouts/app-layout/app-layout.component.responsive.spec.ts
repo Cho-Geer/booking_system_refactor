@@ -167,20 +167,20 @@ describe('AppLayoutComponent - AuthStore Integration', () => {
 
   describe('user display signals', () => {
     it('[Red] should derive userName from AuthStore.currentUser', () => {
-      (authStore as { setUserProfile: (u: { id: string; name: string; userType: string }) => void }).setUserProfile({
+      (authStore as { setUserProfile: (u: { id: string; name: string; role: string }) => void }).setUserProfile({
         id: '1',
         name: 'John Doe',
-        userType: 'CUSTOMER',
+        role: 'CUSTOMER',
       });
       fixture.detectChanges();
       expect(component.userName()).toBe('John Doe');
     });
 
     it('[Red] should derive userRole from AuthStore.currentUser', () => {
-      (authStore as { setUserProfile: (u: { id: string; name: string; userType: string }) => void }).setUserProfile({
+      (authStore as { setUserProfile: (u: { id: string; name: string; role: string }) => void }).setUserProfile({
         id: '2',
         name: 'Admin User',
-        userType: 'ADMIN',
+        role: 'ADMIN',
       });
       fixture.detectChanges();
       expect(component.userRole()).toBe('ADMIN');
@@ -195,31 +195,31 @@ describe('AppLayoutComponent - AuthStore Integration', () => {
   });
 
   describe('isAdmin computed signal', () => {
-    it('[Red] should be true for ADMIN userType', () => {
-      (authStore as { setUserProfile: (u: { id: string; name: string; userType: string }) => void }).setUserProfile({
+    it('[Red] should be true for ADMIN role', () => {
+      (authStore as { setUserProfile: (u: { id: string; name: string; role: string }) => void }).setUserProfile({
         id: '3',
         name: 'Admin',
-        userType: 'ADMIN',
+        role: 'ADMIN',
       });
       fixture.detectChanges();
       expect(component.isAdmin()).toBe(true);
     });
 
-    it('[Red] should be true for SUPER_ADMIN userType', () => {
-      (authStore as { setUserProfile: (u: { id: string; name: string; userType: string }) => void }).setUserProfile({
+    it('[Red] should be true for SUPER_ADMIN role', () => {
+      (authStore as { setUserProfile: (u: { id: string; name: string; role: string }) => void }).setUserProfile({
         id: '4',
         name: 'Super Admin',
-        userType: 'SUPER_ADMIN',
+        role: 'SUPER_ADMIN',
       });
       fixture.detectChanges();
       expect(component.isAdmin()).toBe(true);
     });
 
-    it('[Red] should be false for CUSTOMER userType', () => {
-      (authStore as { setUserProfile: (u: { id: string; name: string; userType: string }) => void }).setUserProfile({
+    it('[Red] should be false for CUSTOMER role', () => {
+      (authStore as { setUserProfile: (u: { id: string; name: string; role: string }) => void }).setUserProfile({
         id: '5',
         name: 'Customer',
-        userType: 'CUSTOMER',
+        role: 'CUSTOMER',
       });
       fixture.detectChanges();
       expect(component.isAdmin()).toBe(false);
@@ -228,10 +228,10 @@ describe('AppLayoutComponent - AuthStore Integration', () => {
 
   describe('navLinks computed signal', () => {
     it('[Red] should return customer nav links for CUSTOMER role', () => {
-      (authStore as { setUserProfile: (u: { id: string; name: string; userType: string }) => void }).setUserProfile({
+      (authStore as { setUserProfile: (u: { id: string; name: string; role: string }) => void }).setUserProfile({
         id: '6',
         name: 'Customer',
-        userType: 'CUSTOMER',
+        role: 'CUSTOMER',
       });
       fixture.detectChanges();
 
@@ -244,10 +244,10 @@ describe('AppLayoutComponent - AuthStore Integration', () => {
     });
 
     it('[Red] should return admin nav links for ADMIN role', () => {
-      (authStore as { setUserProfile: (u: { id: string; name: string; userType: string }) => void }).setUserProfile({
+      (authStore as { setUserProfile: (u: { id: string; name: string; role: string }) => void }).setUserProfile({
         id: '7',
         name: 'Admin',
-        userType: 'ADMIN',
+        role: 'ADMIN',
       });
       fixture.detectChanges();
 
@@ -262,10 +262,10 @@ describe('AppLayoutComponent - AuthStore Integration', () => {
 
   describe('sidebarItems computed signal', () => {
     it('[Red] should return customer sidebar items for CUSTOMER role', () => {
-      (authStore as { setUserProfile: (u: { id: string; name: string; userType: string }) => void }).setUserProfile({
+      (authStore as { setUserProfile: (u: { id: string; name: string; role: string }) => void }).setUserProfile({
         id: '8',
         name: 'Customer',
-        userType: 'CUSTOMER',
+        role: 'CUSTOMER',
       });
       fixture.detectChanges();
 
@@ -278,10 +278,10 @@ describe('AppLayoutComponent - AuthStore Integration', () => {
     });
 
     it('[Red] should return admin sidebar items for ADMIN role', () => {
-      (authStore as { setUserProfile: (u: { id: string; name: string; userType: string }) => void }).setUserProfile({
+      (authStore as { setUserProfile: (u: { id: string; name: string; role: string }) => void }).setUserProfile({
         id: '9',
         name: 'Admin',
-        userType: 'ADMIN',
+        role: 'ADMIN',
       });
       fixture.detectChanges();
 
@@ -296,10 +296,10 @@ describe('AppLayoutComponent - AuthStore Integration', () => {
       const router = TestBed.inject(await import('@angular/router').then((m) => m.Router));
       const navigateSpy = jest.spyOn(router, 'navigate').mockResolvedValue(true);
 
-      (authStore as { setUserProfile: (u: { id: string; name: string; userType: string }) => void }).setUserProfile({
+      (authStore as { setUserProfile: (u: { id: string; name: string; role: string }) => void }).setUserProfile({
         id: '10',
         name: 'Logout User',
-        userType: 'CUSTOMER',
+        role: 'CUSTOMER',
       });
       fixture.detectChanges();
 
@@ -307,6 +307,53 @@ describe('AppLayoutComponent - AuthStore Integration', () => {
 
       expect(component.userName()).toBeUndefined();
       expect(navigateSpy).toHaveBeenCalledWith(['/auth/login']);
+    });
+  });
+
+  // ==========================================
+  // [FE-ROLE-UNIFY] userType → role rename
+  // ==========================================
+
+  describe('[RoleRename] app-layout uses role not userType', () => {
+    it('userRole computed should read user()?.role [RED] fails because code reads user()?.userType', () => {
+      // TARGET: component.userRole reads this.user()?.role
+      // CURRENT: reads this.user()?.userType on line 31
+      const fs = require('fs');
+      const path = require('path');
+      const layoutPath = path.resolve(__dirname, './app-layout.component.ts');
+      const content = fs.readFileSync(layoutPath, 'utf-8');
+
+      const userRoleMatch = content.match(/readonly userRole = computed[^;]+/);
+      expect(userRoleMatch).not.toBeNull();
+      if (userRoleMatch) {
+        const line = userRoleMatch[0];
+        // TARGET: references `user()?.role`
+        // CURRENT: references `user()?.userType` → this FAILS
+        expect(line).not.toContain('userType');
+      }
+    });
+
+    it('isAdmin should work with role field [RED] fails because isAdmin checks userType', () => {
+      // TARGET: setUserProfile accepts user with role field
+      // CURRENT: setUserProfile uses userType in its type signature
+
+      // The responsive spec test helper has a hardcoded `userType` type
+      // in its setUserProfile signature. After rename, this should accept `role`.
+      // Since the current User interface uses userType, passing role-based user
+      // would satisfy the type check but... the isAdmin computed reads user()?.userType
+      // which would be undefined when the user has role instead
+
+      // Create user with role field
+      (authStore as any).setUserProfile({
+        id: '3',
+        name: 'Admin',
+        role: 'ADMIN',
+      });
+      fixture.detectChanges();
+
+      // TARGET: isAdmin should be true because role === 'ADMIN'
+      // CURRENT: user()?.userType is undefined → isAdmin is false → this FAILS
+      expect(component.isAdmin()).toBe(true);
     });
   });
 });

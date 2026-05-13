@@ -98,12 +98,12 @@ const mockFormattedTimeDistribution: TimeDistributionItem[] = [
   { hour: 9, count: 15 },
   { hour: 10, count: 25 },
   { hour: 11, count: 20 },
-  { hour: 5, count: 5 },
-  { hour: 10, count: 10 },
-  { hour: 30, count: 30 },
-  { hour: 22, count: 22 },
-  { hour: 18, count: 18 },
-  { hour: 8, count: 8 },
+  { hour: 12, count: 5 },
+  { hour: 13, count: 10 },
+  { hour: 14, count: 30 },
+  { hour: 15, count: 22 },
+  { hour: 16, count: 18 },
+  { hour: 17, count: 8 },
 ];
 
 describe('AdminStatsService', () => {

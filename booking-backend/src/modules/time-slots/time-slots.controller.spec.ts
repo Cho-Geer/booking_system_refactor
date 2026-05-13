@@ -203,6 +203,7 @@ describe('TimeSlotsController', () => {
         'service-1',
         new Date('2024-06-15'),
         new Date('2024-06-16'),
+        undefined,
       );
       expect(result).toEqual(mockAvailableSlots);
     });

@@ -361,8 +361,8 @@ export const AdminStore = signalStore(
         const response = await lastValueFrom(adminService.getUsers(query));
         patchState(store, {
           users: response.items,
-          usersTotal: response.total,
-          usersPage: response.page,
+          usersTotal: response.meta.total,
+          usersPage: response.meta.page,
           isLoading: false,
         });
       } catch (err) {
@@ -431,8 +431,8 @@ export const AdminStore = signalStore(
         const response = await lastValueFrom(adminService.getAdminServices(query));
         patchState(store, {
           services: response.items,
-          servicesTotal: response.total,
-          servicesPage: response.page,
+          servicesTotal: response.meta.total,
+          servicesPage: response.meta.page,
           isLoading: false,
         });
       } catch (err) {
@@ -501,8 +501,8 @@ export const AdminStore = signalStore(
         const response = await lastValueFrom(adminService.getAdminAppointments(query));
         patchState(store, {
           appointments: response.items,
-          appointmentsTotal: response.total,
-          appointmentsPage: response.page,
+          appointmentsTotal: response.meta.total,
+          appointmentsPage: response.meta.page,
           isLoading: false,
         });
       } catch (err) {

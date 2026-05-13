@@ -1,11 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Logger } from '@nestjs/common';
 import { EmailWorker, EmailJobData } from './email.worker';
+import { EmailProcessor } from './email.processor';
 import { Job } from 'bullmq';
 
 // Mock nodemailer Transporter
 const mockTransporter = {
   sendMail: jest.fn(),
+};
+
+// Mock EmailProcessor
+const mockEmailProcessor = {
+  sendVerificationEmail: jest.fn(),
 };
 
 // Mock Job
@@ -38,6 +44,10 @@ describe('EmailWorker', () => {
         {
           provide: 'EMAIL_TRANSPORTER',
           useValue: mockTransporter,
+        },
+        {
+          provide: EmailProcessor,
+          useValue: mockEmailProcessor,
         },
       ],
     }).compile();

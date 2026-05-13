@@ -5,11 +5,12 @@ import { BookingStore } from '../../../stores/booking/booking.store';
 import { AuthStore } from '../../../stores/auth/auth.store';
 import { AppButtonComponent } from '../../../shared/components/atoms/app-button/app-button.component';
 import { AppCardComponent } from '../../../shared/components/atoms/app-card/app-card.component';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-booking-success',
   standalone: true,
-  imports: [DatePipe, AppButtonComponent, AppCardComponent],
+  imports: [DatePipe, TranslatePipe, AppButtonComponent, AppCardComponent],
   templateUrl: './booking-success.component.html',
   styleUrl: './booking-success.component.scss',
 })

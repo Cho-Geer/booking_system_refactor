@@ -14,8 +14,8 @@ export class NotFoundPageComponent {
   private readonly authStore = inject(AuthStore);
 
   goHome(): void {
-    const userType = this.authStore.currentUser()?.userType;
-    const route = RouteResolver.getPostLoginRoute(userType);
+    const userRole = this.authStore.currentUser()?.role;
+    const route = RouteResolver.getPostLoginRoute(userRole);
     this.router.navigateByUrl(route);
   }
 }

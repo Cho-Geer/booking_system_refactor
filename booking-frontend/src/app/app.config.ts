@@ -11,6 +11,7 @@ import { requestIdInterceptor } from './core/interceptors/request-id.interceptor
 import { apiTransformInterceptor } from './core/interceptors/api-transform.interceptor';
 import { csrfInterceptor } from './core/interceptors/csrf.interceptor';
 import { AuthStore } from './stores/auth/auth.store';
+import { initializeTranslationFactory } from './core/services/translation.service';
 
 /**
  * App initializer that attempts to restore the user session on bootstrap.
@@ -32,6 +33,11 @@ export const appConfig: ApplicationConfig = {
     {
       provide: APP_INITIALIZER,
       useFactory: initializeAuth,
+      multi: true,
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initializeTranslationFactory,
       multi: true,
     },
     provideAnimationsAsync(),

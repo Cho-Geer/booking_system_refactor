@@ -2,11 +2,19 @@ import { ComponentFixture, TestBed, DeferBlockBehavior, DeferBlockState } from '
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { provideRouter } from '@angular/router';
 import { RegisterFormComponent, PasswordRequirements } from './register-form.component';
+import { TranslatePipe } from '../../../pipes/translate.pipe';
+import { TranslationService } from '../../../../core/services/translation.service';
 
 describe('RegisterFormComponent', () => {
   let component: RegisterFormComponent;
   let fixture: ComponentFixture<RegisterFormComponent>;
   let fb: FormBuilder;
+
+  const mockTranslationService = {
+    t: jest.fn((domain: string, key: string) => `{{${domain}.${key}}}`),
+    locale: jest.fn().mockReturnValue('en'),
+    translations: jest.fn().mockReturnValue({}),
+  };
 
   function setInputs(overrides?: {
     step2Form?: ReturnType<FormBuilder['group']>;
@@ -43,6 +51,7 @@ describe('RegisterFormComponent', () => {
 
   beforeEach(async () => {
     fb = new FormBuilder();
+    mockTranslationService.t.mockClear();
 
     await TestBed.configureTestingModule({
       imports: [
@@ -51,9 +60,14 @@ describe('RegisterFormComponent', () => {
       ],
       providers: [
         provideRouter([]),
+        { provide: TranslationService, useValue: mockTranslationService },
       ],
       deferBlockBehavior: DeferBlockBehavior.Manual,
-    }).compileComponents();
+    })
+    .overrideComponent(RegisterFormComponent, {
+      set: { imports: [ReactiveFormsModule, TranslatePipe] },
+    })
+    .compileComponents();
 
     fixture = TestBed.createComponent(RegisterFormComponent);
     component = fixture.componentInstance;
@@ -100,10 +114,10 @@ describe('RegisterFormComponent', () => {
       expect(confirmInput.type).toBe('password');
     });
 
-    it('should render resend code button', () => {
+    it('should render resend code button with translated text', () => {
       const buttons = fixture.nativeElement.querySelectorAll('button');
       const resendBtn = Array.from(buttons).find(
-        (btn: HTMLButtonElement) => btn.textContent?.includes('重新发送')
+        (btn: HTMLButtonElement) => btn.textContent?.includes('{{auth.login.resendCode}}')
       );
       expect(resendBtn).toBeTruthy();
     });
@@ -113,18 +127,18 @@ describe('RegisterFormComponent', () => {
       expect(termsLink).toBeTruthy();
     });
 
-    it('should render back button', () => {
+    it('should render back button with translated text', () => {
       const buttons = fixture.nativeElement.querySelectorAll('button');
       const backBtn = Array.from(buttons).find(
-        (btn: HTMLButtonElement) => btn.textContent?.includes('返回')
+        (btn: HTMLButtonElement) => btn.textContent?.includes('{{global.back}}')
       );
       expect(backBtn).toBeTruthy();
     });
 
-    it('should render submit button', () => {
+    it('should render submit button with translated text', () => {
       const buttons = fixture.nativeElement.querySelectorAll('button');
       const submitBtn = Array.from(buttons).find(
-        (btn: HTMLButtonElement) => btn.textContent?.includes('完成注册')
+        (btn: HTMLButtonElement) => btn.textContent?.includes('{{auth.register.complete}}')
       );
       expect(submitBtn).toBeTruthy();
     });
@@ -135,7 +149,7 @@ describe('RegisterFormComponent', () => {
       jest.spyOn(component.codeRequested, 'emit');
       const buttons = fixture.nativeElement.querySelectorAll('button');
       const resendBtn = Array.from(buttons).find(
-        (btn: HTMLButtonElement) => btn.textContent?.includes('重新发送')
+        (btn: HTMLButtonElement) => btn.textContent?.includes('{{auth.login.resendCode}}')
       ) as HTMLButtonElement;
       resendBtn.click();
       expect(component.codeRequested.emit).toHaveBeenCalled();
@@ -145,7 +159,7 @@ describe('RegisterFormComponent', () => {
       jest.spyOn(component.backRequested, 'emit');
       const buttons = fixture.nativeElement.querySelectorAll('button');
       const backBtn = Array.from(buttons).find(
-        (btn: HTMLButtonElement) => btn.textContent?.includes('返回')
+        (btn: HTMLButtonElement) => btn.textContent?.includes('{{global.back}}')
       ) as HTMLButtonElement;
       backBtn.click();
       expect(component.backRequested.emit).toHaveBeenCalled();
@@ -208,7 +222,7 @@ describe('RegisterFormComponent', () => {
       expect(requirementList).toBeTruthy();
     });
 
-    it('should display password min length requirement as 8 characters', async () => {
+    it('should display password requirements with translated text', async () => {
       setInputs({
         passwordRequirements: {
           hasMinLength: false,
@@ -226,10 +240,10 @@ describe('RegisterFormComponent', () => {
 
       const requirementItems = fixture.nativeElement.querySelectorAll('.password-requirements li span');
       const minLengthItem = Array.from(requirementItems).find(
-        (span: HTMLSpanElement) => span.textContent?.includes('至少')
+        (span: HTMLSpanElement) => span.textContent?.includes('{{validation.passwordHasMinLength}}')
       );
       expect(minLengthItem).toBeTruthy();
-      expect(minLengthItem!.textContent).toContain('至少 8 个字符');
+      expect(minLengthItem!.textContent).toContain('{{validation.passwordHasMinLength}}');
     });
   });
 
@@ -238,7 +252,7 @@ describe('RegisterFormComponent', () => {
       fixture.detectChanges();
       const buttons = fixture.nativeElement.querySelectorAll('button');
       const submitBtn = Array.from(buttons).find(
-        (btn: HTMLButtonElement) => btn.textContent?.includes('完成注册')
+        (btn: HTMLButtonElement) => btn.textContent?.includes('{{auth.register.complete}}')
       ) as HTMLButtonElement;
       expect(submitBtn.disabled).toBe(true);
     });
@@ -249,7 +263,7 @@ describe('RegisterFormComponent', () => {
 
       const buttons = fixture.nativeElement.querySelectorAll('button');
       const submitBtn = Array.from(buttons).find(
-        (btn: HTMLButtonElement) => btn.textContent?.includes('注册中')
+        (btn: HTMLButtonElement) => btn.textContent?.includes('{{auth.register.registering}}')
       ) as HTMLButtonElement;
       expect(submitBtn).toBeTruthy();
       expect(submitBtn.disabled).toBe(true);
@@ -267,7 +281,7 @@ describe('RegisterFormComponent', () => {
 
       const buttons = fixture.nativeElement.querySelectorAll('button');
       const submitBtn = Array.from(buttons).find(
-        (btn: HTMLButtonElement) => btn.textContent?.includes('完成注册')
+        (btn: HTMLButtonElement) => btn.textContent?.includes('{{auth.register.complete}}')
       ) as HTMLButtonElement;
       expect(submitBtn.disabled).toBe(true);
     });
@@ -284,7 +298,7 @@ describe('RegisterFormComponent', () => {
 
       const buttons = fixture.nativeElement.querySelectorAll('button');
       const submitBtn = Array.from(buttons).find(
-        (btn: HTMLButtonElement) => btn.textContent?.includes('完成注册')
+        (btn: HTMLButtonElement) => btn.textContent?.includes('{{auth.register.complete}}')
       ) as HTMLButtonElement;
       expect(submitBtn.disabled).toBe(false);
     });
@@ -302,23 +316,23 @@ describe('RegisterFormComponent', () => {
   });
 
   describe('loading state display', () => {
-    it('should show "注册中..." when loading', () => {
+    it('should show registering translation when loading', () => {
       setInputs({ isLoading: true });
       fixture.detectChanges();
 
       const buttons = fixture.nativeElement.querySelectorAll('button');
       const submitBtn = Array.from(buttons).find(
-        (btn: HTMLButtonElement) => btn.textContent?.includes('注册中')
+        (btn: HTMLButtonElement) => btn.textContent?.includes('{{auth.register.registering}}')
       ) as HTMLButtonElement;
       expect(submitBtn).toBeTruthy();
     });
 
-    it('should show "完成注册" when not loading', () => {
+    it('should show complete registration translation when not loading', () => {
       fixture.detectChanges();
 
       const buttons = fixture.nativeElement.querySelectorAll('button');
       const submitBtn = Array.from(buttons).find(
-        (btn: HTMLButtonElement) => btn.textContent?.includes('完成注册')
+        (btn: HTMLButtonElement) => btn.textContent?.includes('{{auth.register.complete}}')
       ) as HTMLButtonElement;
       expect(submitBtn).toBeTruthy();
     });
@@ -335,7 +349,7 @@ describe('RegisterFormComponent', () => {
     it('[RED] should have bg-accent-green class on submit button', () => {
       const buttons = fixture.nativeElement.querySelectorAll('button');
       const submitBtn = Array.from(buttons).find(
-        (btn: HTMLButtonElement) => btn.textContent?.includes('完成注册')
+        (btn: HTMLButtonElement) => btn.textContent?.includes('{{auth.register.complete}}')
       ) as HTMLButtonElement;
       expect(submitBtn.classList.contains('bg-accent-green')).toBe(true);
     });
@@ -343,7 +357,7 @@ describe('RegisterFormComponent', () => {
     it('[RED] should have border-border-color class on back button', () => {
       const buttons = fixture.nativeElement.querySelectorAll('button');
       const backBtn = Array.from(buttons).find(
-        (btn: HTMLButtonElement) => btn.textContent?.includes('返回')
+        (btn: HTMLButtonElement) => btn.textContent?.includes('{{global.back}}')
       ) as HTMLButtonElement;
       expect(backBtn.classList.contains('border-border-color')).toBe(true);
     });

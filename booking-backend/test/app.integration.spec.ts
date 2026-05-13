@@ -83,7 +83,7 @@ async function createTestUser(prisma: PrismaClient, userData: any) {
       phoneHash: hashValue(phone),
       name: userData.name || 'Test User',
       passwordHash,
-      userType: userData.userType || 'CUSTOMER',
+      role: userData.role || 'CUSTOMER',
       status: 'ACTIVE',
     },
   });
@@ -97,8 +97,8 @@ function generateTestToken(jwtService: JwtService, user: any) {
     {
       sub: user.id,
       email: user.email,
-      userType: user.userType || 'CUSTOMER',
-      roles: user.userType ? [user.userType] : ['CUSTOMER'],
+      role: user.role || 'CUSTOMER',
+      roles: user.role ? [user.role] : ['CUSTOMER'],
       name: user.name,
     },
     { secret: process.env.JWT_SECRET || 'test-jwt-secret-key-for-integration-tests' },
@@ -135,14 +135,14 @@ async function createTestService(prisma: PrismaClient, serviceData: any) {
 // Helper: Create test time slot
 // ============================================================
 async function createTimeSlot(prisma: PrismaClient, serviceId: string, offsetMinutes = 0) {
-  const slotTime = new Date(Date.now() + 24 * 60 * 60 * 1000 + offsetMinutes * 60 * 1000); // tomorrow + offset
-  // Use full ISO string to ensure uniqueness (slotTime is unique in schema)
-  const uniqueSlotTime = slotTime.toISOString();
+  const startTime = new Date(Date.now() + 24 * 60 * 60 * 1000 + offsetMinutes * 60 * 1000); // tomorrow + offset
+  const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // 1 hour duration
 
   return prisma.timeSlot.create({
     data: {
       serviceId,
-      slotTime: uniqueSlotTime,
+      startTime,
+      endTime,
       isActive: true,
     },
   });
@@ -896,10 +896,14 @@ describe('Booking System Integration Tests (Real DB)', () => {
       const startTime = new Date(Date.now() + 48 * 60 * 60 * 1000);
       const endTime = new Date(startTime.getTime() + 60 * 60 * 1000);
 
+      const slotStartTime = new Date(Date.now() + 48 * 60 * 60 * 1000);
+      const slotEndTime = new Date(slotStartTime.getTime() + 60 * 60 * 1000);
+
       await prisma.timeSlot.create({
         data: {
           serviceId: service.id,
-          slotTime: '09:00',
+          startTime: slotStartTime,
+          endTime: slotEndTime,
           isActive: true,
         },
       });
@@ -918,13 +922,14 @@ describe('Booking System Integration Tests (Real DB)', () => {
       const startDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
       const endDate = new Date(Date.now() + 72 * 60 * 60 * 1000);
 
-      const startTime = new Date(Date.now() + 48 * 60 * 60 * 1000);
-      const endTime = new Date(startTime.getTime() + 60 * 60 * 1000);
+      const slotStartTime = new Date(Date.now() + 48 * 60 * 60 * 1000);
+      const slotEndTime = new Date(slotStartTime.getTime() + 60 * 60 * 1000);
 
       await prisma.timeSlot.create({
         data: {
           serviceId: service.id,
-          slotTime: '09:00',
+          startTime: slotStartTime,
+          endTime: slotEndTime,
           isActive: true,
         },
       });
@@ -1106,11 +1111,11 @@ describe('Booking System Integration Tests (Real DB)', () => {
         .set('Authorization', `Bearer ${adminToken}`)
         .expect(200);
 
-      expect(extractDataBody(response)).toHaveProperty('usersByUserType');
+      expect(extractDataBody(response)).toHaveProperty('usersByRole');
       expect(extractDataBody(response)).toHaveProperty('usersByMonth');
       expect(extractDataBody(response)).toHaveProperty('activeUsers');
-      expect(extractDataBody(response).usersByUserType).toHaveProperty('CUSTOMER');
-      expect(extractDataBody(response).usersByUserType).toHaveProperty('ADMIN');
+      expect(extractDataBody(response).usersByRole).toHaveProperty('CUSTOMER');
+      expect(extractDataBody(response).usersByRole).toHaveProperty('ADMIN');
     });
 
     it('should get popular services', async () => {

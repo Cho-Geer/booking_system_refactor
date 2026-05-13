@@ -185,6 +185,19 @@ export class AppointmentsService {
             );
           }
 
+          // Fetch service for financial fields
+          const svc = await tx.service.findUnique({
+            where: { id: createAppointmentDto.serviceId },
+          });
+
+          if (!svc) {
+            throw new NotFoundException("Service not found");
+          }
+
+          const price = new Prisma.Decimal(svc.price ?? 0);
+          const taxRate = new Prisma.Decimal(svc.taxRate ?? 0);
+          const taxIncludedAmount = price.mul(new Prisma.Decimal(1).add(taxRate));
+
           // Slot claimed successfully — create appointment
           const newAppointment = await tx.appointment.create({
             data: {
@@ -199,6 +212,10 @@ export class AppointmentsService {
                 : new Date(),
               slotSequence: targetSeq,
               appointmentNumber: `APT-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+              durationMinutes: svc.durationMinutes,
+              price,
+              taxRate,
+              taxIncludedAmount,
             },
             include: {
               timeSlot: true,
@@ -235,6 +252,8 @@ export class AppointmentsService {
     limit = 10,
     status?: AppointmentStatus,
     userId?: string,
+    startDate?: string,
+    endDate?: string,
   ) {
     const skip = (page - 1) * limit;
     const where: Prisma.AppointmentWhereInput = {};
@@ -244,6 +263,12 @@ export class AppointmentsService {
     }
     if (userId) {
       where.userId = userId;
+    }
+    if (startDate) {
+      where.appointmentDate = { ...(where.appointmentDate as object || {}), gte: new Date(startDate) };
+    }
+    if (endDate) {
+      where.appointmentDate = { ...(where.appointmentDate as object || {}), lte: new Date(endDate + 'T23:59:59.999Z') };
     }
 
     const [appointments, total] = await Promise.all([

@@ -37,7 +37,7 @@ const mockCacheService = {
 describe('AppointmentsController', () => {
   let controller: AppointmentsController;
   let service: typeof mockAppointmentsService;
-  let mockReq: any;
+  let mockReq: Record<string, unknown>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -105,7 +105,7 @@ describe('AppointmentsController', () => {
       mockAppointmentsService.create.mockResolvedValue(mockAppointment);
 
       // Act: Call controller with the malicious DTO (no userId in DTO)
-      const result = await controller.create(maliciousDto, mockReq, undefined);
+      const result = await controller.create(maliciousDto, mockReq, 'test-key');
 
       // Assert: Verify service was called with the JWT userId as second argument
       const actualUserId = mockAppointmentsService.create.mock.calls[0][1];
@@ -137,7 +137,7 @@ describe('AppointmentsController', () => {
 
       mockAppointmentsService.create.mockResolvedValue(mockAppointment);
 
-      const result = await controller.create(createAppointmentDto, mockReq, undefined);
+      const result = await controller.create(createAppointmentDto, mockReq, 'test-key');
 
       expect(service.create).toHaveBeenCalledWith(createAppointmentDto, 'jwt-user-id');
       expect(result).toEqual(mockAppointment);
@@ -156,8 +156,8 @@ describe('AppointmentsController', () => {
         new NotFoundException('Time slot not found'),
       );
 
-      await expect(controller.create(createAppointmentDto, mockReq, undefined)).rejects.toThrow(NotFoundException);
-      await expect(controller.create(createAppointmentDto, mockReq, undefined)).rejects.toThrow('Time slot not found');
+      await expect(controller.create(createAppointmentDto, mockReq, 'test-key')).rejects.toThrow(NotFoundException);
+      await expect(controller.create(createAppointmentDto, mockReq, 'test-key')).rejects.toThrow('Time slot not found');
     });
 
     it('should propagate ConflictException from service.create', async () => {
@@ -176,7 +176,7 @@ describe('AppointmentsController', () => {
         })(),
       );
 
-      await expect(controller.create(createAppointmentDto, mockReq, undefined)).rejects.toThrow('Time slot is not available');
+      await expect(controller.create(createAppointmentDto, mockReq, 'test-key')).rejects.toThrow('Time slot is not available');
     });
   });
 
@@ -201,7 +201,7 @@ describe('AppointmentsController', () => {
 
       const result = await controller.findAll();
 
-      expect(service.findAll).toHaveBeenCalledWith(1, 20, undefined, undefined);
+      expect(service.findAll).toHaveBeenCalledWith(1, 20, undefined, undefined, undefined, undefined);
       expect(result.items).toEqual(mockAppointments);
       expect(result.meta.total).toBe(2);
     });
@@ -221,7 +221,7 @@ describe('AppointmentsController', () => {
 
       const result = await controller.findAll(2, 5);
 
-      expect(service.findAll).toHaveBeenCalledWith(2, 5, undefined, undefined);
+      expect(service.findAll).toHaveBeenCalledWith(2, 5, undefined, undefined, undefined, undefined);
       expect(result.meta.page).toBe(2);
       expect(result.meta.limit).toBe(5);
     });
@@ -241,7 +241,7 @@ describe('AppointmentsController', () => {
 
       await controller.findAll(1, 10, AppointmentStatus.PENDING);
 
-      expect(service.findAll).toHaveBeenCalledWith(1, 10, AppointmentStatus.PENDING, undefined);
+      expect(service.findAll).toHaveBeenCalledWith(1, 10, AppointmentStatus.PENDING, undefined, undefined, undefined);
     });
 
     // BUG-001 Test 4: Admin findAll endpoint still supports userId query param for filtering
@@ -260,7 +260,7 @@ describe('AppointmentsController', () => {
 
       await controller.findAll(1, 10, undefined, 'filter-user-id');
 
-      expect(service.findAll).toHaveBeenCalledWith(1, 10, undefined, 'filter-user-id');
+      expect(service.findAll).toHaveBeenCalledWith(1, 10, undefined, 'filter-user-id', undefined, undefined);
     });
 
     it('should call service.findAll with all filters', async () => {
@@ -278,7 +278,7 @@ describe('AppointmentsController', () => {
 
       await controller.findAll(1, 10, AppointmentStatus.CANCELLED, 'user-2');
 
-      expect(service.findAll).toHaveBeenCalledWith(1, 10, AppointmentStatus.CANCELLED, 'user-2');
+      expect(service.findAll).toHaveBeenCalledWith(1, 10, AppointmentStatus.CANCELLED, 'user-2', undefined, undefined);
     });
   });
 

@@ -73,7 +73,7 @@ describe('AuthStore', () => {
       id: '1',
       email: 'test@example.com',
       name: 'Test User',
-      userType: 'user',
+      role: 'user',
     };
 
     store.loginSuccess('jwt-token-123');
@@ -88,7 +88,7 @@ describe('AuthStore', () => {
       id: '1',
       email: 'test@example.com',
       name: 'Test User',
-      userType: 'user',
+      role: 'user',
     };
 
     store.loginSuccess('jwt-token-123');
@@ -126,7 +126,7 @@ describe('AuthStore', () => {
       id: '1',
       email: 'test@example.com',
       name: 'Test User',
-      userType: 'user',
+      role: 'user',
     };
 
     expect(store.currentUser()).toBeNull();
@@ -227,7 +227,7 @@ describe('AuthStore', () => {
           id: '1',
           name: 'Test User',
           email: 'tes***@example.com',
-          userType: 'CUSTOMER',
+          role: 'CUSTOMER',
           createdAt: '2026-01-01T00:00:00Z',
         })
       );
@@ -252,7 +252,7 @@ describe('AuthStore', () => {
           id: '1',
           name: 'Test User',
           email: 'tes***@example.com',
-          userType: 'CUSTOMER',
+          role: 'CUSTOMER',
           createdAt: '2026-01-01T00:00:00Z',
         })
       );
@@ -261,7 +261,7 @@ describe('AuthStore', () => {
 
       expect(apiServiceMock.getUserProfile).toHaveBeenCalled();
       expect(store.user()).toEqual(
-        expect.objectContaining({ id: '1', name: 'Test User', userType: 'CUSTOMER' })
+        expect.objectContaining({ id: '1', name: 'Test User', role: 'CUSTOMER' })
       );
     });
 
@@ -302,7 +302,7 @@ describe('AuthStore', () => {
           id: '1',
           name: 'Test User',
           email: 'tes***@example.com',
-          userType: 'CUSTOMER',
+          role: 'CUSTOMER',
           createdAt: '2026-01-01T00:00:00Z',
         })
       );
@@ -328,7 +328,7 @@ describe('AuthStore', () => {
           id: '1',
           name: 'Test User',
           email: 'tes***@example.com',
-          userType: 'CUSTOMER',
+          role: 'CUSTOMER',
           createdAt: '2026-01-01T00:00:00Z',
         })
       );
@@ -337,7 +337,7 @@ describe('AuthStore', () => {
 
       expect(apiServiceMock.getUserProfile).toHaveBeenCalled();
       expect(store.user()).toEqual(
-        expect.objectContaining({ id: '1', name: 'Test User', userType: 'CUSTOMER' })
+        expect.objectContaining({ id: '1', name: 'Test User', role: 'CUSTOMER' })
       );
     });
 
@@ -403,7 +403,7 @@ describe('AuthStore', () => {
           id: '1',
           name: 'Session User',
           email: 'ses***@example.com',
-          userType: 'CUSTOMER',
+          role: 'CUSTOMER',
           createdAt: '2026-01-01T00:00:00Z',
         })
       );
@@ -460,7 +460,7 @@ describe('AuthStore', () => {
         id: '1',
         email: 'tes***@example.com',
         name: 'Test User',
-        userType: 'CUSTOMER',
+        role: 'CUSTOMER',
       };
       store.loginSuccess('jwt-token');
       store.setUserProfile(mockUser);
@@ -498,7 +498,7 @@ describe('AuthStore', () => {
           id: '1',
           name: 'Test User',
           email: 'tes***@example.com',
-          userType: 'CUSTOMER',
+          role: 'CUSTOMER',
           createdAt: '2026-01-01T00:00:00Z',
         })
       );
@@ -507,7 +507,7 @@ describe('AuthStore', () => {
 
       expect(apiServiceMock.getUserProfile).toHaveBeenCalled();
       expect(store.user()).toEqual(
-        expect.objectContaining({ id: '1', name: 'Test User', userType: 'CUSTOMER' })
+        expect.objectContaining({ id: '1', name: 'Test User', role: 'CUSTOMER' })
       );
     });
 
@@ -519,6 +519,61 @@ describe('AuthStore', () => {
       await store.fetchUserProfile();
 
       expect(store.error()).toBe('Profile fetch failed');
+    });
+  });
+
+  // ==========================================
+  // [FE-ROLE-UNIFY] userType → role rename validation
+  // ==========================================
+
+  describe('[RoleRename] userType → role in AuthStore', () => {
+    it('fetchUserProfile should map role from API [RED] fails because code maps userType', async () => {
+      // TARGET: API returns role field, store maps it to user.role
+      // CURRENT: store.fetchUserProfile maps userType: profile.userType
+      // When profile has `role` instead of `userType`:
+      //   - profile.userType → undefined
+      //   - profile.role → 'CUSTOMER' (but NOT mapped)
+      // So user.role is undefined → this assertion FAILS
+      apiServiceMock.getUserProfile.mockReturnValue(
+        of({
+          id: '1',
+          name: 'Test User',
+          email: 'tes***@example.com',
+          role: 'CUSTOMER',
+          createdAt: '2026-01-01T00:00:00Z',
+        })
+      );
+
+      await store.fetchUserProfile();
+
+      expect(apiServiceMock.getUserProfile).toHaveBeenCalled();
+      const storedUser = store.user();
+      expect(storedUser).not.toBeNull();
+      // TARGET: user.role should be 'CUSTOMER'
+      // CURRENT: role is undefined because mapping uses profile.userType
+      expect(storedUser).toEqual(
+        expect.objectContaining({ role: 'CUSTOMER' })
+      );
+    });
+
+    it('User interface in source should use role not userType [RED] fails because source uses userType', () => {
+      // TARGET: auth.store.ts User interface has `role: string`
+      // CURRENT: auth.store.ts User interface has `userType: string`
+      // Read source file to verify
+      const fs = require('fs');
+      const path = require('path');
+      const storePath = path.resolve(__dirname, '../../stores/auth/auth.store.ts');
+      const content = fs.readFileSync(storePath, 'utf-8');
+
+      // Extract the User interface
+      const userIfaceMatch = content.match(/export interface User \{[\s\S]*?^\}/m);
+      expect(userIfaceMatch).not.toBeNull();
+      if (userIfaceMatch) {
+        const iface = userIfaceMatch[0];
+        // TARGET: interface has role, not userType
+        // CURRENT: has userType: string → this assertion FAILS
+        expect(iface).not.toContain('userType');
+      }
     });
   });
 });

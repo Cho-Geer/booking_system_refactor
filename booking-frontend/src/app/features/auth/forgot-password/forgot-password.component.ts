@@ -19,6 +19,7 @@ import {
 } from '../dto/auth.dto';
 import { AppCardComponent } from '../../../shared/components/atoms/app-card/app-card.component';
 import { AppButtonComponent } from '../../../shared/components/atoms/app-button/app-button.component';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_REGEX = /^1[3-9]\d{9}$/;
@@ -68,6 +69,7 @@ function contactFormatValidator(type: ContactType): ValidatorFn {
     FormsModule,
     AppCardComponent,
     AppButtonComponent,
+    TranslatePipe,
   ],
   templateUrl: './forgot-password.component.html',
   styleUrl: './forgot-password.component.scss',

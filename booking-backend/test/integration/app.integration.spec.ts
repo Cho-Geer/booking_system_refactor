@@ -12,7 +12,7 @@ import {
   createTestAppointment,
   cleanupAllTestData,
 } from '../fixtures/database.fixture';
-import { UserType, AppointmentStatus } from '@prisma/client';
+import { SystemRole, AppointmentStatus } from '@prisma/client';
 
 /**
  * Integration test example demonstrating the Testcontainers-based test module pattern.
@@ -97,7 +97,7 @@ describe('App Integration (Testcontainers)', () => {
 
     it('should reject registration with duplicate email', async () => {
       // Create a user directly in the database
-      await createTestUser(testModule.prisma, UserType.CUSTOMER, {
+      await createTestUser(testModule.prisma, SystemRole.CUSTOMER, {
         email: 'duplicate@example.com',
       });
 
@@ -112,7 +112,7 @@ describe('App Integration (Testcontainers)', () => {
   describe('Authentication Flow', () => {
     it('should login with valid credentials and return tokens', async () => {
       const password = 'LoginTest123!';
-      const user = await createTestUser(testModule.prisma, UserType.CUSTOMER, {
+      const user = await createTestUser(testModule.prisma, SystemRole.CUSTOMER, {
         email: 'login-test@example.com',
       });
 
@@ -134,7 +134,7 @@ describe('App Integration (Testcontainers)', () => {
   describe('Appointment Booking Flow', () => {
     it('should create an appointment when authenticated', async () => {
       // Create test data
-      const user = await createTestUser(testModule.prisma, UserType.CUSTOMER);
+      const user = await createTestUser(testModule.prisma, SystemRole.CUSTOMER);
       const service = await createTestService(testModule.prisma);
       const timeSlot = await createTestTimeSlot(testModule.prisma, service.id);
 
@@ -143,7 +143,7 @@ describe('App Integration (Testcontainers)', () => {
         {
           sub: user.id,
           email: user.email,
-          userType: user.userType,
+          role: user.role,
           name: user.name,
         },
         {
@@ -190,7 +190,7 @@ describe('App Integration (Testcontainers)', () => {
 
   describe('Database State Verification', () => {
     it('should persist appointment in database after creation', async () => {
-      const user = await createTestUser(testModule.prisma, UserType.CUSTOMER);
+      const user = await createTestUser(testModule.prisma, SystemRole.CUSTOMER);
       const service = await createTestService(testModule.prisma);
       const timeSlot = await createTestTimeSlot(testModule.prisma, service.id);
 
@@ -219,8 +219,8 @@ describe('App Integration (Testcontainers)', () => {
 
     it('should isolate test data between tests (resetDatabase works)', async () => {
       // Create test data
-      await createTestUser(testModule.prisma, UserType.CUSTOMER);
-      await createTestUser(testModule.prisma, UserType.ADMIN);
+      await createTestUser(testModule.prisma, SystemRole.CUSTOMER);
+      await createTestUser(testModule.prisma, SystemRole.ADMIN);
 
       const users = await testModule.prisma.user.findMany();
       expect(users.length).toBe(2);

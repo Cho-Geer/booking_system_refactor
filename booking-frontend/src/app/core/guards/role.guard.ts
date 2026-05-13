@@ -17,12 +17,12 @@ export function roleGuard(config: {
       return false;
     }
 
-    if (config.deny && config.deny.includes(user.userType)) {
+    if (config.deny && config.deny.includes(user.role)) {
       router.navigate([config.redirectTo || '/']);
       return false;
     }
 
-    if (config.allow && !config.allow.includes(user.userType)) {
+    if (config.allow && !config.allow.includes(user.role)) {
       router.navigate([config.redirectTo || '/']);
       return false;
     }

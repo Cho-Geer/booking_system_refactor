@@ -145,7 +145,7 @@ export class ServiceManagementComponent implements OnInit, OnDestroy {
               undefined,
     }).subscribe({
       next: (response) => {
-        this.store.setServices(response.items, response.total, response.page);
+        this.store.setServices(response.items, response.meta.total, response.meta.page);
         if (isFilterOperation) {
           this.isFiltering.set(false);
         } else {

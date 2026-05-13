@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { IsOptional, IsNumber, IsString, IsNotEmpty } from "class-validator";
+import { IsOptional, IsNumber, IsString, IsNotEmpty, IsInt, Min } from "class-validator";
 import { Type } from "class-transformer";
 
 export class AdminAppointmentDto {
@@ -98,6 +98,12 @@ export class CreateAdminAppointmentDto {
   @IsOptional()
   @IsString()
   notes?: string;
+
+  @ApiPropertyOptional({ description: "Overtime minutes" })
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  overtimeMinutes?: number;
 }
 
 export class AdminAppointmentsQueryDto {

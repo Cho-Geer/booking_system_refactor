@@ -15,15 +15,19 @@ import { VerificationService } from '../verification/verification.service';
 import { CacheService } from '../cache/cache.service';
 import { EncryptionService } from '../encryption/encryption.service';
 import { HashService } from '../encryption/hash.service';
-import { RegisterSendCodeDto, ContactType } from './dto/register-send-code.dto';
-import { RegisterCompleteDto } from './dto/register-complete.dto';
-import { LoginPasswordDto } from './dto/login-password.dto';
-import { LoginSendCodeDto } from './dto/login-send-code.dto';
-import { LoginVerifyCodeDto } from './dto/login-verify-code.dto';
-import { RefreshTokenRequestDto } from './dto/auth-response.dto';
 import { isIntegrationMode } from '../../../test/setup/test-env';
 import { createTestModule, TestModule } from '../../../test/helpers/create-test-module';
+
+// Helper function to access private members for testing without type assertions
+function expose<T extends object>(obj: T): T & Record<string, unknown> {
+
+// Mock type for Prisma client to avoid `any` while allowing arbitrary mock access
+type MockPrismaClient = Record<string, unknown> & { $transaction: jest.Mock & Record<string, unknown> };
+  return obj as T & Record<string, unknown>;
+}
 import { createTestUser } from '../../../test/fixtures/database.fixture';
+import { RegisterCompleteDto } from './dto/register-complete.dto';
+import { RefreshTokenRequestDto } from './dto/auth-response.dto';
 
 // Create a complete mock PrismaClient
 const createMockPrismaClient = () => ({
@@ -52,7 +56,7 @@ jest.mock('bcryptjs', () => ({
 describe('AuthService', () => {
   let service: AuthService;
   let jwtService: JwtService;
-  let mockPrismaClient: any;
+  let mockPrismaClient: MockPrismaClient;
 
   const mockJwtService = {
     sign: jest.fn(),
@@ -204,7 +208,7 @@ describe('AuthService', () => {
       const mockEmailService = {
         sendEmail: jest.fn().mockRejectedValue(new Error('SMTP error')),
       };
-      (service as any).emailService = mockEmailService;
+      expose(service).emailService = mockEmailService;
 
       const dto: RegisterSendCodeDto = {
         contact: 'test@example.com',
@@ -225,7 +229,7 @@ describe('AuthService', () => {
       const mockVerificationService = {
         verifyCode: jest.fn().mockResolvedValue({ success: false }),
       };
-      (service as any).verificationService = mockVerificationService;
+      expose(service).verificationService = mockVerificationService;
 
       const dto: RegisterCompleteDto = {
         contact: 'test@example.com',
@@ -602,7 +606,7 @@ describe('AuthService', () => {
       // Call the private method multiple times and verify random distribution
       for (let i = 0; i < 10; i++) {
         const start = Date.now();
-        await (service as any).constantTimeLoginDelay();
+        await expose(service).constantTimeLoginDelay();
         const elapsed = Date.now() - start;
         delayValues.push(elapsed);
       }
@@ -694,7 +698,7 @@ describe('AuthService', () => {
       const mockEmailService = {
         sendEmail: jest.fn().mockRejectedValue(new Error('SMTP error')),
       };
-      (service as any).emailService = mockEmailService;
+      expose(service).emailService = mockEmailService;
 
       const dto: LoginSendCodeDto = {
         contact: 'test@example.com',
@@ -770,7 +774,7 @@ describe('AuthService', () => {
       const mockVerificationService = {
         verifyCode: jest.fn().mockResolvedValue({ success: false }),
       };
-      (service as any).verificationService = mockVerificationService;
+      expose(service).verificationService = mockVerificationService;
 
       const dto: LoginVerifyCodeDto = {
         contact: 'test@example.com',
@@ -881,7 +885,7 @@ describe('AuthService', () => {
       const mockCacheService = {
         setSession: jest.fn().mockResolvedValue(undefined),
       };
-      (service as any).cacheService = mockCacheService;
+      expose(service).cacheService = mockCacheService;
 
       await service.logout('user-123', 'access-token', 'refresh-token');
 
@@ -917,7 +921,7 @@ describe('AuthService', () => {
       const mockCacheService = {
         setSession: jest.fn().mockResolvedValue(undefined),
       };
-      (service as any).cacheService = mockCacheService;
+      expose(service).cacheService = mockCacheService;
 
       // Act
       await service.logout(TEST_USER_ID, TEST_ACCESS_TOKEN, TEST_REFRESH_TOKEN);
@@ -934,7 +938,7 @@ describe('AuthService', () => {
       const mockCacheService = {
         setSession: jest.fn().mockResolvedValue(undefined),
       };
-      (service as any).cacheService = mockCacheService;
+      expose(service).cacheService = mockCacheService;
 
       // Act
       await service.logout(TEST_USER_ID, TEST_ACCESS_TOKEN, TEST_REFRESH_TOKEN);
@@ -949,7 +953,7 @@ describe('AuthService', () => {
       const mockCacheService = {
         setSession: jest.fn().mockResolvedValue(undefined),
       };
-      (service as any).cacheService = mockCacheService;
+      expose(service).cacheService = mockCacheService;
 
       // Act
       await service.logout(TEST_USER_ID, TEST_ACCESS_TOKEN, TEST_REFRESH_TOKEN);
@@ -976,7 +980,7 @@ describe('AuthService', () => {
       const mockCacheService = {
         setSession: jest.fn().mockResolvedValue(undefined),
       };
-      (service as any).cacheService = mockCacheService;
+      expose(service).cacheService = mockCacheService;
 
       // Act
       await service.logout(TEST_USER_ID, TEST_ACCESS_TOKEN, TEST_REFRESH_TOKEN);
@@ -1105,7 +1109,7 @@ describe('AuthService', () => {
       mockPrismaClient.userSession.findUnique.mockResolvedValue(mockSession);
 
       mockPrismaClient.$transaction.mockImplementation(
-        async (callback: (tx: any) => Promise<any>) => {
+        async (callback: (tx: Record<string, unknown>) => Promise<unknown>) => {
           return callback({
             userSession: {
               update: mockPrismaClient.userSession.update.mockResolvedValue({}),
@@ -1133,22 +1137,22 @@ describe('AuthService', () => {
 
   describe('mapUserTypeToRole', () => {
     it('should map CUSTOMER to CUSTOMER (per contract.yaml Role enum)', () => {
-      const result = (service as any).mapUserTypeToRole('CUSTOMER');
+      const result = expose(service).mapUserTypeToRole('CUSTOMER');
       expect(result).toBe('CUSTOMER');
     });
 
     it('should map ADMIN to ADMIN (per contract.yaml Role enum)', () => {
-      const result = (service as any).mapUserTypeToRole('ADMIN');
+      const result = expose(service).mapUserTypeToRole('ADMIN');
       expect(result).toBe('ADMIN');
     });
 
     it('should map SUPER_ADMIN to SUPER_ADMIN (per contract.yaml Role enum)', () => {
-      const result = (service as any).mapUserTypeToRole('SUPER_ADMIN');
+      const result = expose(service).mapUserTypeToRole('SUPER_ADMIN');
       expect(result).toBe('SUPER_ADMIN');
     });
 
     it('should map unknown type to CUSTOMER as default', () => {
-      const result = (service as any).mapUserTypeToRole('UNKNOWN_TYPE');
+      const result = expose(service).mapUserTypeToRole('UNKNOWN_TYPE');
       expect(result).toBe('CUSTOMER');
     });
   });
@@ -1234,9 +1238,9 @@ if (isIntegrationMode()) {
   describe('AuthService (Integration - Real Database)', () => {
     let testModule: TestModule;
     let authService: AuthService;
-    let mockJwtService: any;
-    let mockEncryptionService: any;
-    let mockHashService: any;
+    let mockJwtService: Record<string, jest.Mock>;
+    let mockEncryptionService: Record<string, jest.Mock>;
+    let mockHashService: Record<string, jest.Mock>;
 
     beforeAll(async () => {
       // Restore all mocks to ensure PrismaClient is the real implementation
@@ -1340,7 +1344,7 @@ if (isIntegrationMode()) {
       await testModule.resetDatabase();
 
       // Re-setup all mocks after resetMocks clears implementations
-      mockJwtService.sign.mockImplementation((payload: any, options: any) => {
+      mockJwtService.sign.mockImplementation((payload: unknown, options: unknown) => {
         if (options && options.secret === 'test-jwt-secret') {
           return 'mock-access-jwt-token';
         }
@@ -1376,7 +1380,7 @@ if (isIntegrationMode()) {
           verifyCode: jest.fn().mockResolvedValue({ success: true }),
           deleteCode: jest.fn(),
         };
-        (authService as any).verificationService = mockVerificationService;
+        expose(authService).verificationService = mockVerificationService;
 
         const result = await authService.registerComplete(dto);
 
@@ -1411,7 +1415,7 @@ if (isIntegrationMode()) {
             email: 'l***@example.com',
             emailHash: 'hash-login-test@example.com',
             passwordHash: 'hashed-password-for-tests',
-            userType: 'CUSTOMER',
+            role: 'CUSTOMER',
             status: 'ACTIVE',
           },
         });

@@ -82,7 +82,7 @@ export class ProfileComponent {
         this.authStore.setUserProfile({
           id: response.user.id,
           name: response.user.name,
-          userType: response.user.userType,
+          role: response.user.role,
           email: response.user.email,
           phone: response.user.phone,
           createdAt: (response.user as { createdAt?: string }).createdAt,

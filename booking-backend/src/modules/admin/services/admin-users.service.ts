@@ -93,7 +93,7 @@ export class AdminUsersService {
    * Delegates to UsersService.create.
    */
   async create(dto: CreateAdminUserDto): Promise<AdminUserDto> {
-    const createData = fromCreateAdminUserDto(dto) as Parameters<
+    const createData = fromCreateAdminUserDto(dto) as unknown as Parameters<
       typeof this.usersService.create
     >[0];
     const user = await this.usersService.create(createData);
@@ -105,7 +105,7 @@ export class AdminUsersService {
    * Delegates to UsersService.update.
    */
   async update(id: string, dto: UpdateAdminUserDto): Promise<AdminUserDto> {
-    const updateData = fromUpdateAdminUserDto(dto) as Parameters<
+    const updateData = fromUpdateAdminUserDto(dto) as unknown as Parameters<
       typeof this.usersService.update
     >[1];
     const user = await this.usersService.update(id, updateData);

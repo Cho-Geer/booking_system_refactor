@@ -39,6 +39,7 @@ export class AdminStatsService {
     timeRange?: string,
     startDate?: string,
     endDate?: string,
+    timezone?: string,
   ): Promise<AdminStatsDto> {
     const [
       overview,

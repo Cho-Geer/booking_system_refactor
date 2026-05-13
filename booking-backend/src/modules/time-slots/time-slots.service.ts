@@ -129,6 +129,7 @@ export class TimeSlotsService {
     startDate: Date,
     endDate: Date,
     overtimeMinutes?: number,
+    timezone?: string,
   ) {
     const service = await this.prisma.service.findUnique({
       where: { id: serviceId },

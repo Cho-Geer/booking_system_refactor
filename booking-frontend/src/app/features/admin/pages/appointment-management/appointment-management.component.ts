@@ -260,7 +260,7 @@ export class AppointmentManagementComponent implements OnInit {
       search: this.filterSearch() || undefined,
     }).subscribe({
       next: (response) => {
-        this.store.setAppointments(response.items, response.total, response.page);
+        this.store.setAppointments(response.items, response.meta.total, response.meta.page);
         if (isFilterOperation) {
           this.isFiltering.set(false);
         } else {

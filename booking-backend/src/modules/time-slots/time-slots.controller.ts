@@ -68,6 +68,7 @@ export class TimeSlotsController {
       new Date(startDate),
       new Date(endDate),
       overtimeMinutes,
+      timezone,
     );
   }
 

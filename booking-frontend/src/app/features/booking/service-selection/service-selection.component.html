@@ -1,18 +1,18 @@
 <div class="services-page page-enter">
   <!-- Header -->
   <div class="mb-6 sm:mb-8">
-    <h1 class="text-2xl font-bold gradient-text">选择服务</h1>
-    <p class="text-sm text-gray-500 mt-1">浏览并选择您需要的服务项目</p>
+    <h1 class="text-2xl font-bold gradient-text">{{ 'booking.selectService' | t }}</h1>
+    <p class="text-sm text-gray-500 mt-1">{{ 'booking.selectServiceSubtitle' | t }}</p>
   </div>
 
   <!-- Search Input -->
   <div class="mb-5">
     <app-input
       [value]="searchQuery()"
-      placeholder="搜索服务名称..."
+      [placeholder]="'booking.searchServices' | t"
       [fluid]="true"
       (valueChange)="onSearchInput($event)"
-      ariaLabel="搜索服务"
+      [ariaLabel]="'booking.searchAriaLabel' | t"
     />
   </div>
 
@@ -27,7 +27,7 @@
         role="tab"
         [attr.aria-selected]="activeCategory() === null"
       >
-        全部
+         {{ 'booking.allCategories' | t }}
       </button>
       @for (cat of categories(); track cat.id) {
         <button
@@ -68,8 +68,8 @@
   @if (!isLoading() && filteredServices().length === 0 && services().length > 0) {
     <app-empty-state
       icon="🔍"
-      title="未找到服务"
-      description="没有匹配您搜索条件的服务，请尝试其他关键词"
+      [title]="'booking.noServicesFound' | t"
+      [description]="'booking.noServicesFoundDesc' | t"
     />
   }
 
@@ -77,8 +77,8 @@
   @if (!isLoading() && services().length === 0) {
     <app-empty-state
       icon="📋"
-      title="暂无可用服务"
-      description="服务列表暂为空，请稍后再试"
+      [title]="'booking.noServicesAvailable' | t"
+      [description]="'booking.noServicesAvailableDesc' | t"
     />
   }
 
@@ -93,7 +93,7 @@
           (keydown.enter)="selectService(service)"
           tabindex="0"
           role="button"
-          [attr.aria-label]="'选择 ' + service.name"
+          [attr.aria-label]="'booking.selectServiceAria' | t : { name: service.name }"
           [attr.aria-pressed]="isSelected(service)"
         >
           <app-card
@@ -117,7 +117,7 @@
             <div class="flex items-center justify-between pt-3 border-t border-white/30">
               <div class="flex items-center gap-1.5 text-body-sm text-gray-500">
                 <span>🕐</span>
-                <span>{{ service.durationMinutes }} 分钟</span>
+                <span>{{ 'booking.durationMinutes' | t : { minutes: service.durationMinutes } }}</span>
               </div>
               <span class="text-h3 font-bold gradient-text">{{ service.price | currency }}</span>
             </div>

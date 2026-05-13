@@ -2,7 +2,7 @@
   <div class="flex items-center justify-between h-16 px-4 sm:px-6">
     <!-- Left: Hamburger + Logo -->
     <div class="flex items-center gap-3">
-      <button (click)="toggleSidebar()" class="lg:hidden w-10 h-10 flex items-center justify-center rounded-lg hover:bg-card-bg-light transition-colors" aria-label="Toggle menu">
+      <button (click)="toggleSidebar()" class="lg:hidden w-10 h-10 flex items-center justify-center rounded-lg hover:bg-card-bg-light transition-colors" [attr.aria-label]="'global.toggleMenu' | t">
         <i class="pi pi-bars text-text-secondary"></i>
       </button>
       <a routerLink="/" class="flex items-center gap-2 text-lg font-bold gradient-text">
@@ -18,7 +18,7 @@
       <div class="hidden md:block">
         <div class="relative">
           <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary text-sm"></i>
-          <input type="text" placeholder="Search..." class="w-64 pl-10 pr-4 py-2 rounded-lg border border-border-color bg-bg-primary text-text-primary text-sm focus:outline-none focus:border-accent-green focus:ring-1 focus:ring-accent-green/30 placeholder:text-text-disabled transition-colors">
+          <input type="text" [placeholder]="'global.search' | t" class="w-64 pl-10 pr-4 py-2 rounded-lg border border-border-color bg-bg-primary text-text-primary text-sm focus:outline-none focus:border-accent-green focus:ring-1 focus:ring-accent-green/30 placeholder:text-text-disabled transition-colors">
         </div>
       </div>
     }
@@ -31,7 +31,7 @@
       }
 
       <!-- Notifications -->
-      <button class="relative w-10 h-10 flex items-center justify-center rounded-lg hover:bg-card-bg-light transition-colors" aria-label="Notifications">
+      <button class="relative w-10 h-10 flex items-center justify-center rounded-lg hover:bg-card-bg-light transition-colors" [attr.aria-label]="'notifications.title' | t">
         <i class="pi pi-bell text-text-secondary text-lg"></i>
         @if (notificationCount() && notificationCount()! > 0) {
           <span data-testid="notification-badge" class="absolute top-1.5 right-1.5 min-w-[18px] h-[18px] flex items-center justify-center px-1 rounded-full text-[10px] font-bold bg-accent-red text-white">
@@ -41,12 +41,12 @@
       </button>
 
       <!-- Messages -->
-      <button class="relative hidden sm:flex w-10 h-10 items-center justify-center rounded-lg hover:bg-card-bg-light transition-colors" aria-label="Messages">
+      <button class="relative hidden sm:flex w-10 h-10 items-center justify-center rounded-lg hover:bg-card-bg-light transition-colors" [attr.aria-label]="'global.messages' | t">
         <i class="pi pi-envelope text-text-secondary text-lg"></i>
       </button>
 
       <!-- Settings -->
-      <button class="hidden sm:flex w-10 h-10 items-center justify-center rounded-lg hover:bg-card-bg-light transition-colors" aria-label="Settings">
+      <button class="hidden sm:flex w-10 h-10 items-center justify-center rounded-lg hover:bg-card-bg-light transition-colors" [attr.aria-label]="'global.settings' | t">
         <i class="pi pi-cog text-text-secondary text-lg"></i>
       </button>
 
@@ -58,7 +58,7 @@
         <div class="relative flex items-center gap-2">
           @if (isAdmin()) {
             <span data-testid="admin-badge" class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-accent-green/10 text-accent-green border border-accent-green/20">
-              ADMIN
+              {{ 'auth.role.admin' | t }}
             </span>
           }
           <button (click)="menu.toggle($event)" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-card-bg-light transition-colors">
@@ -71,7 +71,7 @@
         </div>
       } @else {
         <a routerLink="/auth/login" class="px-4 py-2 rounded-lg bg-accent-green hover:bg-accent-green-dark text-white text-sm font-medium transition-colors">
-          Sign In
+          {{ 'auth.login.title' | t }}
         </a>
       }
     </div>

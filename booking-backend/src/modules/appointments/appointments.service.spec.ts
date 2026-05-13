@@ -31,6 +31,9 @@ const mockPrismaService = {
     update: jest.fn(),
     updateMany: jest.fn(),
   },
+  activityLog: {
+    create: jest.fn(),
+  },
   $transaction: jest.fn(),
 };
 
@@ -308,7 +311,7 @@ describe('AppointmentsService', () => {
       });
 
       // Mock sleep to resolve immediately
-      jest.spyOn(service as any, 'sleep').mockResolvedValue(undefined);
+      jest.spyOn(service as unknown as { sleep: () => Promise<void> }, 'sleep').mockResolvedValue(undefined);
 
       const result = await service.create(createAppointmentDto, 'user-1');
 
@@ -336,7 +339,7 @@ describe('AppointmentsService', () => {
       });
 
       // Mock sleep to resolve immediately
-      jest.spyOn(service as any, 'sleep').mockResolvedValue(undefined);
+      jest.spyOn(service as unknown as { sleep: () => Promise<void> }, 'sleep').mockResolvedValue(undefined);
 
       await expect(service.create(createAppointmentDto, 'user-1')).rejects.toThrow(ConflictException);
       await expect(service.create(createAppointmentDto, 'user-1')).rejects.toThrow(/maximum retries exceeded/);
@@ -447,7 +450,7 @@ describe('AppointmentsService', () => {
       prisma.$transaction.mockImplementation(async (callback) => {
         attemptCount++;
         if (attemptCount < 2) {
-          const timeoutError: any = new Error('Transaction timeout');
+          const timeoutError = new Error('Transaction timeout') as Error & { code: string };
           timeoutError.code = 'P2034';
           throw timeoutError;
         }
@@ -463,7 +466,7 @@ describe('AppointmentsService', () => {
       });
 
       // Mock sleep to resolve immediately
-      jest.spyOn(service as any, 'sleep').mockResolvedValue(undefined);
+      jest.spyOn(service as unknown as { sleep: () => Promise<void> }, 'sleep').mockResolvedValue(undefined);
 
       const result = await service.create(createAppointmentDto, 'user-1');
       expect(result).toEqual(mockAppointment);
@@ -473,12 +476,12 @@ describe('AppointmentsService', () => {
     it('should throw ConflictException after transaction timeout and all retries exhausted', async () => {
       prisma.timeSlot.findUnique.mockResolvedValue({ ...mockTimeSlot, currentSequence: 0 });
 
-      const timeoutError: any = new Error('Transaction timeout');
+      const timeoutError = new Error('Transaction timeout') as Error & { code: string };
       timeoutError.code = 'P2034';
       prisma.$transaction.mockRejectedValue(timeoutError);
 
       // Mock sleep to resolve immediately
-      jest.spyOn(service as any, 'sleep').mockResolvedValue(undefined);
+      jest.spyOn(service as unknown as { sleep: () => Promise<void> }, 'sleep').mockResolvedValue(undefined);
 
       await expect(service.create(createAppointmentDto, 'user-1')).rejects.toThrow(ConflictException);
       await expect(service.create(createAppointmentDto, 'user-1')).rejects.toThrow(/Database timeout/);
@@ -505,7 +508,7 @@ describe('AppointmentsService', () => {
       });
 
       // Mock sleep to resolve immediately
-      jest.spyOn(service as any, 'sleep').mockResolvedValue(undefined);
+      jest.spyOn(service as unknown as { sleep: () => Promise<void> }, 'sleep').mockResolvedValue(undefined);
 
       const result = await service.create(createAppointmentDto, 'user-1');
       expect(result).toEqual(mockAppointment);

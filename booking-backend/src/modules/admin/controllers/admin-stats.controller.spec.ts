@@ -77,9 +77,6 @@ describe('AdminStatsController', () => {
     });
 
     const mockDashboard: AdminStatsDto = {
-      // HIGH-2: totalBookings field exists in current code but should be removed per contract.yaml v1.7.6
-      // RED phase: assertion below expects it to NOT be present → will fail
-      totalBookings: sc(850, 12, true, 1000, 85),
       todayBookings: sc(25, 25, true, 50, 50),
       pendingBookings: sc(5, 0, true, 50, 10),
       activeUsers: sc(85, -5, false, 1500, 6),
@@ -147,8 +144,6 @@ describe('AdminStatsController', () => {
     it('[RED] should handle empty dashboard data without totalBookings', async () => {
       const empty = (): StatCardDto => ({ value: 0, changePercentage: 0, isPositive: true, target: 0, progressPercentage: 0 });
       const emptyDashboard: AdminStatsDto = {
-        // HIGH-2: totalBookings removed per contract.yaml v1.7.6
-        totalBookings: empty(), // still exists in current DTO — test expects absence → will FAIL
         todayBookings: empty(),
         pendingBookings: empty(),
         activeUsers: empty(),

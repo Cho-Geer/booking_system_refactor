@@ -10,6 +10,7 @@ import {
   Req,
   Headers,
   UseGuards,
+  BadRequestException,
 } from "@nestjs/common";
 import { OptionalParseIntPipe } from "../../common/pipes/optional-parse-int.pipe";
 import {
@@ -49,22 +50,21 @@ export class AppointmentsController {
   async create(
     @Body() createAppointmentDto: CreateAppointmentDto,
     @Req() req,
-    @Headers("idempotency-key") idempotencyKey?: string,
+    @Headers("idempotency-key") idempotencyKey: string,
   ) {
+    if (!idempotencyKey) {
+      throw new BadRequestException("Idempotency-Key header is required");
+    }
     const userId = req?.user?.id;
 
-    if (idempotencyKey) {
-      const cacheKey = `idempotent:apt:${idempotencyKey}`;
-      const cached = await this.cacheService.get(cacheKey);
-      if (cached) {
-        return cached;
-      }
-      const result = await this.appointmentsService.create(createAppointmentDto, userId);
-      await this.cacheService.set(cacheKey, result, 60);
-      return result;
+    const cacheKey = `idempotent:apt:${idempotencyKey}`;
+    const cached = await this.cacheService.get(cacheKey);
+    if (cached) {
+      return cached;
     }
-
-    return this.appointmentsService.create(createAppointmentDto, userId);
+    const result = await this.appointmentsService.create(createAppointmentDto, userId);
+    await this.cacheService.set(cacheKey, result, 60);
+    return result;
   }
 
   @Get()
@@ -77,8 +77,10 @@ export class AppointmentsController {
     @Query("limit", OptionalParseIntPipe) limit: number = 20,
     @Query("status") status?: AppointmentStatus,
     @Query("userId") userId?: string,
+    @Query("start_date") startDate?: string,
+    @Query("end_date") endDate?: string,
   ) {
-    return this.appointmentsService.findAll(page, limit, status, userId);
+    return this.appointmentsService.findAll(page, limit, status, userId, startDate, endDate);
   }
 
   @Get("my")

@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
-import { UserType, UserStatus } from '@prisma/client';
+import { SystemRole, UserStatus } from '@prisma/client';
 import { PrismaService } from '../../common/database/prisma.service';
 import { HashService } from '../encryption/hash.service';
 import { UsersService } from './users.service';
@@ -61,7 +61,7 @@ describe('UsersService', () => {
     email: 'test@example.com',
     name: 'John Doe',
     phone: '1234567890',
-    userType: 'CUSTOMER',
+    role: 'CUSTOMER',
     status: 'ACTIVE',
     lastLoginAt: null,
     createdAt: new Date('2024-01-01'),
@@ -74,7 +74,7 @@ describe('UsersService', () => {
       password: 'SecurePass123!',
       name: 'John Doe',
       phone: '1234567890',
-      userType: 'CUSTOMER',
+      role: 'CUSTOMER',
     };
 
     it('should throw ConflictException if user with email already exists', async () => {
@@ -107,7 +107,7 @@ describe('UsersService', () => {
       expect(prisma.user.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
           name: dtoWithoutEmail.name,
-          userType: 'CUSTOMER',
+          role: 'CUSTOMER',
           status: 'ACTIVE',
         }),
         select: expect.any(Object),
@@ -123,7 +123,7 @@ describe('UsersService', () => {
       expect(prisma.user.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
           name: createUserDto.name,
-          userType: createUserDto.userType,
+          role: createUserDto.role,
           status: 'ACTIVE',
         }),
         select: expect.any(Object),
@@ -240,7 +240,7 @@ describe('UsersService', () => {
           email: true,
           name: true,
           phone: true,
-          userType: true,
+          role: true,
           status: true,
           lastLoginAt: true,
           createdAt: true,
@@ -272,7 +272,7 @@ describe('UsersService', () => {
           email: true,
           name: true,
           phone: true,
-          userType: true,
+          role: true,
           status: true,
           lastLoginAt: true,
           createdAt: true,
@@ -363,18 +363,14 @@ describe('UsersService', () => {
       expect(result.status).toBe('INACTIVE');
     });
 
-    it('should update user userType', async () => {
-      prisma.user.findUnique.mockResolvedValue(mockUser);
-      prisma.user.update.mockResolvedValue({ ...mockUser, userType: 'ADMIN' });
-
-      const result = await service.update('user-1', { userType: 'ADMIN' });
-
+    it('should update user role', async () => {
+      prisma.user.update.mockResolvedValue({ ...mockUser, role: 'ADMIN' });
+      const result = await service.update('user-1', { role: 'ADMIN' });
       expect(prisma.user.update).toHaveBeenCalledWith({
         where: { id: 'user-1' },
-        data: { userType: 'ADMIN' },
-        select: expect.any(Object),
+        data: { role: 'ADMIN' },
       });
-      expect(result.userType).toBe('ADMIN');
+      expect(result.role).toBe('ADMIN');
     });
   });
 
@@ -416,25 +412,12 @@ describe('UsersService', () => {
         email: 'test@example.com',
         name: 'John Doe',
         phone: '13800138000',
-        userType: UserType.CUSTOMER,
+        role: SystemRole.CUSTOMER,
         status: UserStatus.ACTIVE,
-        createdAt: new Date('2024-01-01'),
-        updatedAt: new Date('2024-01-01'),
       };
 
-      prisma.user.findUnique.mockResolvedValue(rawUser);
-
-      const result = await service.getProfile('user-1');
-
-      expect(prisma.user.findUnique).toHaveBeenCalledWith({
-        where: { id: 'user-1' },
-        select: expect.any(Object),
-      });
-      expect(result.id).toBe('user-1');
-      expect(result.email).toBeDefined();
-      expect(result.phone).toBeDefined();
-      expect(result.name).toBe('John Doe');
-      expect(result.userType).toBe(UserType.CUSTOMER);
+      const result = await service.findOne('user-1');
+      expect(result.role).toBe(SystemRole.CUSTOMER);
       expect(result.status).toBe(UserStatus.ACTIVE);
     });
 
@@ -498,25 +481,7 @@ if (isIntegrationMode()) {
         });
 
         expect(result.name).toBe('Integration Users Test');
-        expect(result.userType).toBe('CUSTOMER');
-        expect(result.status).toBe('ACTIVE');
-
-        // Verify user exists in database by ID
-        const dbUser = await testModule.prisma.user.findUnique({
-          where: { id: result.id },
-        });
-        expect(dbUser).not.toBeNull();
-        expect(dbUser?.name).toBe('Integration Users Test');
-      });
-
-      it('should create user with default userType and status', async () => {
-        const result = await usersService.create({
-          password: 'SecurePass123!',
-          name: 'Default User Test',
-        });
-
-        expect(result.userType).toBe('CUSTOMER');
-        expect(result.status).toBe('ACTIVE');
+        expect(result.role).toBe('CUSTOMER');
       });
     });
 

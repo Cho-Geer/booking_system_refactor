@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaClient, UserStatus, UserType, AppointmentStatus } from '@prisma/client';
+import { PrismaClient, UserStatus, SystemRole, AppointmentStatus } from '@prisma/client';
 import { AppModule } from '@/app.module';
 import { createTestModule, TestModule } from './helpers/create-test-module';
 import { UserFactory } from './factories';
@@ -52,7 +52,7 @@ describe('Appointments Module (Integration)', () => {
   });
 
   // Helper to generate JWT token for a user
-  function generateToken(userId: string, userType: UserType = UserType.CUSTOMER): string {
+  function generateToken(userId: string, userType: UserType = SystemRole.CUSTOMER): string {
     return jwtService.sign(
       { sub: userId, userType },
       { expiresIn: '15m', secret: process.env.JWT_SECRET },
@@ -73,7 +73,7 @@ describe('Appointments Module (Integration)', () => {
       });
       const user = await prisma.user.create({ data: userData as any });
       userId = user.id;
-      userToken = generateToken(userId, UserType.CUSTOMER);
+      userToken = generateToken(userId, SystemRole.CUSTOMER);
 
       // Create service
       const category = await prisma.serviceCategory.create({
@@ -186,11 +186,11 @@ describe('Appointments Module (Integration)', () => {
       const adminData = UserFactory.create({
         email: 'admin@example.com',
         phone: undefined,
-        userType: UserType.ADMIN,
+        userType: SystemRole.ADMIN,
       });
       const admin = await prisma.user.create({ data: adminData as any });
       adminId = admin.id;
-      adminToken = generateToken(adminId, UserType.ADMIN);
+      adminToken = generateToken(adminId, SystemRole.ADMIN);
     });
 
     it('should return 200 when admin fetches all appointments', async () => {
@@ -229,7 +229,7 @@ describe('Appointments Module (Integration)', () => {
       });
       const user = await prisma.user.create({ data: userData as any });
       userId = user.id;
-      userToken = generateToken(userId, UserType.CUSTOMER);
+      userToken = generateToken(userId, SystemRole.CUSTOMER);
     });
 
     it('should return 200 when fetching user appointments', async () => {
@@ -260,7 +260,7 @@ describe('Appointments Module (Integration)', () => {
       });
       const user = await prisma.user.create({ data: userData as any });
       userId = user.id;
-      userToken = generateToken(userId, UserType.CUSTOMER);
+      userToken = generateToken(userId, SystemRole.CUSTOMER);
 
       // Create service, time slot, and appointment
       const category = await prisma.serviceCategory.create({
@@ -332,7 +332,7 @@ describe('Appointments Module (Integration)', () => {
       });
       const user = await prisma.user.create({ data: userData as any });
       userId = user.id;
-      userToken = generateToken(userId, UserType.CUSTOMER);
+      userToken = generateToken(userId, SystemRole.CUSTOMER);
 
       const category = await prisma.serviceCategory.create({
         data: { name: 'Test Category', displayOrder: 1 },
@@ -399,7 +399,7 @@ describe('Appointments Module (Integration)', () => {
       });
       const user = await prisma.user.create({ data: userData as any });
       userId = user.id;
-      userToken = generateToken(userId, UserType.CUSTOMER);
+      userToken = generateToken(userId, SystemRole.CUSTOMER);
 
       const category = await prisma.serviceCategory.create({
         data: { name: 'Test Category', displayOrder: 1 },
@@ -478,11 +478,11 @@ describe('Appointments Module (Integration)', () => {
       const adminData = UserFactory.create({
         email: 'admin-delete@example.com',
         phone: undefined,
-        userType: UserType.ADMIN,
+        userType: SystemRole.ADMIN,
       });
       const admin = await prisma.user.create({ data: adminData as any });
       adminId = admin.id;
-      adminToken = generateToken(adminId, UserType.ADMIN);
+      adminToken = generateToken(adminId, SystemRole.ADMIN);
 
       const userData = UserFactory.create({
         email: 'appointment-delete@example.com',

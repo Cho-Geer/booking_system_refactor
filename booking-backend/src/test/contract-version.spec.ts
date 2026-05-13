@@ -16,7 +16,7 @@ describe('Contract.yaml v1.7.6', () => {
     const versionMatch = contractContent.match(/^# Version:\s*(\S+)$/m);
     expect(versionMatch).not.toBeNull();
     const version = versionMatch![1];
-    expect(version).toBe('v1.7.6');
+    expect(version).toBe('1.7.6');
   });
 
   it('[RED] should have keystone state hash header present', () => {

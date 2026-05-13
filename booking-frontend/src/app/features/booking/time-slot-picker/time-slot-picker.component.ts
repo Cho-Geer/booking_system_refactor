@@ -8,6 +8,7 @@ import { ApiService } from '../../../core/services/api.service';
 import { SocketService, SlotUpdateEvent } from '../../../core/services/socket.service';
 import { AppCardComponent } from '../../../shared/components/atoms/app-card/app-card.component';
 import { AppEmptyStateComponent } from '../../../shared/components/atoms/app-empty-state/app-empty-state.component';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { DatePicker } from 'primeng/datepicker';
 import { FormsModule } from '@angular/forms';
 
@@ -18,6 +19,7 @@ export type SlotAvailability = 'available' | 'few' | 'full' | 'unavailable';
   standalone: true,
   imports: [
     DatePipe,
+    TranslatePipe,
     AppCardComponent,
     AppEmptyStateComponent,
     DatePicker,

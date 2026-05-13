@@ -21,6 +21,7 @@ import {
 } from '../dto/auth.dto';
 import { AppCardComponent } from '../../../shared/components/atoms/app-card/app-card.component';
 import { AppButtonComponent } from '../../../shared/components/atoms/app-button/app-button.component';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_REGEX = /^1[3-9]\d{9}$/;
@@ -70,6 +71,7 @@ const passwordStrengthValidator: ValidatorFn = (control: AbstractControl): Valid
     FormsModule,
     AppCardComponent,
     AppButtonComponent,
+    TranslatePipe,
   ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',
@@ -205,14 +207,14 @@ export class RegisterComponent implements OnDestroy {
             this.authStore.setUserProfile({
               id: profile.id,
               name: profile.name,
-              userType: profile.userType,
+              role: profile.role,
               email: profile.email,
               phone: profile.phone,
               createdAt: profile.createdAt,
             });
 
             this.socketService.connect();
-            this.router.navigate([RouteResolver.getPostLoginRoute(profile.userType)]);
+            this.router.navigate([RouteResolver.getPostLoginRoute(profile.role)]);
           },
           error: () => {
             this.socketService.connect();

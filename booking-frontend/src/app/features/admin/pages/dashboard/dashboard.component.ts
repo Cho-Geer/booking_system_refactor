@@ -160,7 +160,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private loadRecentBookings(): void {
     this.adminService.getAdminAppointments({ limit: 5, page: 1 }).subscribe({
-      next: response => this.store.setAppointments(response.items, response.total, response.page),
+      next: response => this.store.setAppointments(response.items, response.meta.total, response.meta.page),
       error: () => {},
     });
   }

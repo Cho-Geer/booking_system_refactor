@@ -15,7 +15,6 @@ import { AdminServicesService } from "./services/admin-services.service";
 import { AdminAppointmentsService } from "./services/admin-appointments.service";
 import { AdminNotificationsService } from "./services/admin-notifications.service";
 import { AdminSettingsService } from "./services/admin-settings.service";
-import { AdminSettingsService } from "./services/admin-settings.service";
 
 @Module({
   imports: [
@@ -31,14 +30,6 @@ import { AdminSettingsService } from "./services/admin-settings.service";
     AdminAppointmentsController,
     AdminNotificationsController,
     AdminSettingsController,
-  ],
-  providers: [
-    AdminStatsService,
-    AdminUsersService,
-    AdminServicesService,
-    AdminAppointmentsService,
-    AdminNotificationsService,
-    AdminSettingsService,
   ],
   providers: [
     AdminStatsService,

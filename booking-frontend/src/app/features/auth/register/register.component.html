@@ -2,10 +2,10 @@
   <div class="max-w-[480px] w-full">
     <app-card variant="sharp" styleClass="w-full">
       <div class="p-6 lg:p-8">
-    <h2 class="text-2xl font-bold mb-1 gradient-text">欢迎注册</h2>
+    <h2 class="text-2xl font-bold mb-1 gradient-text">{{ 'auth.register.title' | t }}</h2>
     <p class="text-sm text-gray-500 mb-4">
-      已有账号?
-      <a routerLink="/auth/login" class="text-primary-start hover:underline">登录</a>
+      {{ 'auth.register.haveAccount' | t }}
+      <a routerLink="/auth/login" class="text-primary-start hover:underline">{{ 'auth.register.login' | t }}</a>
     </p>
 
     @if (error()) {
@@ -23,7 +23,7 @@
       <div class="step-connector" [class.completed]="currentStep() > 1"></div>
       <div class="step" [class.active]="currentStep() === 2">
         <span class="step-number">2</span>
-        <span class="step-label">完成注册</span>
+        <span class="step-label">{{ 'auth.register.submit' | t }}</span>
       </div>
     </div>
 
@@ -79,7 +79,7 @@
 
         <app-button
           type="submit"
-          label="发送验证码"
+          [label]="'auth.verificationCode.send' | t"
           variant="primary"
           class="w-full"
           [disabled]="step1Form.invalid || isLoading()"
@@ -98,7 +98,7 @@
 
       <form [formGroup]="step2Form" (ngSubmit)="onCompleteRegistration()">
         <div class="form-group">
-          <label for="code">验证码</label>
+          <label for="code">{{ 'auth.verificationCode.code' | t }}</label>
           <div class="verify-input-wrapper">
             <input
               id="code"
@@ -132,7 +132,7 @@
         </div>
 
         <div class="form-group">
-          <label for="name">姓名</label>
+          <label for="name">{{ 'auth.register.name' | t }}</label>
           <input
             id="name"
             class="sharp-input"
@@ -154,7 +154,7 @@
         </div>
 
         <div class="form-group">
-          <label for="password">密码</label>
+          <label for="password">{{ 'auth.register.password' | t }}</label>
           <input
             id="password"
             class="sharp-input"
@@ -173,7 +173,7 @@
         </div>
 
         <div class="form-group">
-          <label for="confirmPassword">确认密码</label>
+          <label for="confirmPassword">{{ 'auth.register.confirmPassword' | t }}</label>
           <input
             id="confirmPassword"
             class="sharp-input"
@@ -240,14 +240,14 @@
 
         <div class="step-actions">
           <app-button
-            label="返回"
+            [label]="'global.cancel' | t"
             variant="secondary"
             class="w-full sm:w-auto"
             (onClick)="goToStep1()"
           />
           <app-button
             type="submit"
-            label="完成注册"
+            [label]="'auth.register.submit' | t"
             variant="primary"
             class="w-full sm:w-auto"
             [disabled]="step2Form.invalid || isLoading() || !acceptTerms()"

@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaClient, UserStatus, UserType } from '@prisma/client';
+import { PrismaClient, UserStatus, SystemRole } from '@prisma/client';
 import { AppModule } from '@/app.module';
 import { createTestModule, TestModule } from './helpers/create-test-module';
 import { UserFactory } from './factories';
@@ -251,7 +251,7 @@ describe('Auth Module (Integration)', () => {
           name: 'Logout User',
           email: 'logout@example.com',
           phone: '+8613800138004',
-          userType: UserType.CUSTOMER,
+          role: SystemRole.CUSTOMER,
           passwordHash: hashedPassword,
           status: UserStatus.ACTIVE,
         },
@@ -259,7 +259,7 @@ describe('Auth Module (Integration)', () => {
 
       // Generate access token
       accessToken = jwtService.sign(
-        { sub: user.id, email: user.email, name: user.name, userType: user.userType },
+        { sub: user.id, email: user.email, name: user.name, role: user.role },
         { expiresIn: '15m', secret: process.env.JWT_SECRET },
       );
 

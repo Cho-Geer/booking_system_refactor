@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { Menu } from 'primeng/menu';
 import { ThemeToggleComponent } from '../../molecules/theme-toggle/theme-toggle.component';
+import { TranslatePipe } from '../../../pipes/translate.pipe';
 
 
 export interface NavLink {
@@ -15,7 +16,7 @@ export interface NavLink {
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [RouterLink, Menu, ThemeToggleComponent, NgTemplateOutlet],
+  imports: [RouterLink, Menu, ThemeToggleComponent, NgTemplateOutlet, TranslatePipe],
   templateUrl: './app-header.component.html',
   styleUrl: './app-header.component.scss',
   host: { class: 'z-50' },

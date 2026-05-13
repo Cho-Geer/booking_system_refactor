@@ -8,5 +8,5 @@ export const ROLE_ROUTES: Record<string, string> = {
 
 export function getDefaultRoute(user: User | null): string {
   if (!user) return '/auth/login';
-  return ROLE_ROUTES[user.userType] || '/';
+  return ROLE_ROUTES[user.role] || '/';
 }

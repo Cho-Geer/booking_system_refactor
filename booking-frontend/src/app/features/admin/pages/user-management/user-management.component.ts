@@ -126,7 +126,7 @@ export class UserManagementComponent implements OnInit {
       status: this.selectedStatusFilter() || undefined,
     }).subscribe({
       next: (response) => {
-        this.store.setUsers(response.items, response.total, response.page);
+        this.store.setUsers(response.items, response.meta.total, response.meta.page);
         if (isFilterOperation) {
           this.isFiltering.set(false);
         } else {

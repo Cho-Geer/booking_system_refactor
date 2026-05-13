@@ -20,7 +20,7 @@
         </button>
       </div>
       <h2 class="text-xl font-bold text-gray-900 mt-4" data-testid="user-name">{{ u.name }}</h2>
-      <app-badge [status]="u.userType === 'CUSTOMER' ? 'completed' : 'confirmed'" size="md" shape="pill" class="mt-2 inline-block">
+      <app-badge [status]="u.role === 'CUSTOMER' ? 'completed' : 'confirmed'" size="md" shape="pill" class="mt-2 inline-block">
       </app-badge>
     </app-card>
 
@@ -86,7 +86,7 @@
         <!-- Role field -->
         <div class="info-row">
           <label class="block text-sm text-gray-500 mb-1">角色</label>
-          <p class="text-base text-gray-900">{{ u.userType === 'CUSTOMER' ? '普通用户' : u.userType }}</p>
+          <p class="text-base text-gray-900">{{ u.role === 'CUSTOMER' ? '普通用户' : u.role }}</p>
         </div>
 
         <!-- Member Since -->

@@ -6,6 +6,7 @@ import {
 } from "@nestjs/common";
 import { PrismaService } from "../../common/database/prisma.service";
 import { CreateUserDto, UpdateUserDto } from "./dto/user.dto";
+import { UpdateProfileDto } from "./dto/update-profile.dto";
 import { UpdateTimezoneDto } from "./dto/update-timezone.dto";
 import { SystemRole, UserStatus } from "@prisma/client";
 import { HashService } from "../encryption/hash.service";
@@ -168,6 +169,14 @@ export class UsersService {
 
     await this.prisma.user.delete({ where: { id } });
     return { message: "User deleted successfully" };
+  }
+
+  async updateProfile(id: string, dto: UpdateProfileDto) {
+    return this.prisma.user.update({
+      where: { id },
+      data: dto,
+      select: this.getSafeUserSelect(),
+    });
   }
 
   async updateTimezone(

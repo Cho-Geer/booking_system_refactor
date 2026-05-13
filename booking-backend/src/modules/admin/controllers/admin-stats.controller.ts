@@ -42,7 +42,7 @@ export class AdminStatsController {
     @Query("endDate") endDate?: string,
     @Query("timezone") timezone?: string,
   ): Promise<AdminStatsDto> {
-    return this.adminStatsService.getDashboard(timeRange, startDate, endDate);
+    return this.adminStatsService.getDashboard(timeRange, startDate, endDate, timezone);
   }
 
   @Get("stats/booking-trends")

@@ -59,7 +59,7 @@ describe('RolesGuard', () => {
 
     it('should return true when user has required role', () => {
       jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['ADMIN']);
-      mockRequest.user = { id: 'user-1', userType: 'ADMIN' };
+      mockRequest.user = { id: 'user-1', role: 'ADMIN' };
 
       const result = guard.canActivate(mockExecutionContext);
 
@@ -68,14 +68,14 @@ describe('RolesGuard', () => {
 
     it('should throw ForbiddenException when user lacks required role', () => {
       jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['ADMIN']);
-      mockRequest.user = { id: 'user-1', userType: 'CUSTOMER' };
+      mockRequest.user = { id: 'user-1', role: 'CUSTOMER' };
 
       expect(() => guard.canActivate(mockExecutionContext)).toThrow(ForbiddenException);
     });
 
     it('should throw ForbiddenException with descriptive message listing required roles', () => {
       jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['ADMIN', 'SUPER_ADMIN']);
-      mockRequest.user = { id: 'user-1', userType: 'CUSTOMER' };
+      mockRequest.user = { id: 'user-1', role: 'CUSTOMER' };
 
       try {
         guard.canActivate(mockExecutionContext);
@@ -88,7 +88,7 @@ describe('RolesGuard', () => {
 
     it('should allow access when user matches first required role', () => {
       jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['CUSTOMER', 'ADMIN']);
-      mockRequest.user = { id: 'user-1', userType: 'CUSTOMER' };
+      mockRequest.user = { id: 'user-1', role: 'CUSTOMER' };
 
       const result = guard.canActivate(mockExecutionContext);
 
@@ -97,7 +97,7 @@ describe('RolesGuard', () => {
 
     it('should allow access when user matches second required role', () => {
       jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['CUSTOMER', 'ADMIN']);
-      mockRequest.user = { id: 'user-1', userType: 'ADMIN' };
+      mockRequest.user = { id: 'user-1', role: 'ADMIN' };
 
       const result = guard.canActivate(mockExecutionContext);
 
@@ -106,7 +106,7 @@ describe('RolesGuard', () => {
 
     it('should log access denied attempt on role mismatch', () => {
       jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['ADMIN']);
-      mockRequest.user = { id: 'user-1', userType: 'CUSTOMER' };
+      mockRequest.user = { id: 'user-1', role: 'CUSTOMER' };
       const warnSpy = jest.spyOn(console, 'warn').mockImplementation();
 
       expect(() => guard.canActivate(mockExecutionContext)).toThrow(ForbiddenException);
@@ -131,31 +131,31 @@ describe('RolesGuard', () => {
 
       expect(hierarchy).toBeInstanceOf(Map);
       expect(hierarchy.has('ADMIN')).toBe(true);
-      expect(hierarchy.has('USER')).toBe(true);
+      expect(hierarchy.has('CUSTOMER')).toBe(true);
     });
 
-    it('should define ADMIN role inheriting USER and ADMIN', () => {
+    it('should define ADMIN role inheriting CUSTOMER and ADMIN', () => {
       const hierarchy = (guard as any).getRoleHierarchy();
 
-      expect(hierarchy.get('ADMIN')).toEqual(['USER', 'ADMIN']);
+      expect(hierarchy.get('ADMIN')).toEqual(['CUSTOMER', 'ADMIN']);
     });
   });
 
   describe('hasHierarchicalAccess', () => {
     it('should return true when user role has hierarchical access', () => {
-      const result = (guard as any).hasHierarchicalAccess('ADMIN', 'USER');
+      const result = (guard as any).hasHierarchicalAccess('ADMIN', 'CUSTOMER');
 
       expect(result).toBe(true);
     });
 
     it('should return true when user role matches required role exactly', () => {
-      const result = (guard as any).hasHierarchicalAccess('USER', 'USER');
+      const result = (guard as any).hasHierarchicalAccess('CUSTOMER', 'CUSTOMER');
 
       expect(result).toBe(true);
     });
 
     it('should return false when user role lacks hierarchical access', () => {
-      const result = (guard as any).hasHierarchicalAccess('USER', 'ADMIN');
+      const result = (guard as any).hasHierarchicalAccess('CUSTOMER', 'ADMIN');
 
       expect(result).toBe(false);
     });

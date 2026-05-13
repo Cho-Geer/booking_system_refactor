@@ -75,6 +75,24 @@ export class SocketService {
     }
   }
 
+  /**
+   * Subscribe to real-time translation update events.
+   * Emits when translations are updated (e.g., from admin editing translations).
+   */
+  subscribeToTranslationUpdates(): Observable<{ type: string; timestamp: string }> {
+    return new Observable<{ type: string; timestamp: string }>((observer) => {
+      this.connect();
+
+      this.socket.on('translations.updated', (data: { type: string; timestamp: string }) => {
+        observer.next(data);
+      });
+
+      return () => {
+        this.socket.off('translations.updated');
+      };
+    });
+  }
+
   subscribeToSlotUpdates(): Observable<SlotUpdateEvent> {
     return new Observable<SlotUpdateEvent>((observer) => {
       this.connect();

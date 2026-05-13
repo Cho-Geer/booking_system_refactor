@@ -24,6 +24,7 @@ import { CreateUserDto, UpdateUserDto, UserResponseDto } from "./dto/user.dto";
 import { ProfileResponseDto } from "./dto/profile-response.dto";
 import { UpdatePasswordDto } from "./dto/update-password.dto";
 import { UpdateTimezoneDto } from "./dto/update-timezone.dto";
+import { UpdateProfileDto } from "./dto/update-profile.dto";
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../../common/guards/roles.guard";
 import { Roles } from "../../common/decorators/roles.decorator";
@@ -116,9 +117,7 @@ export class UsersController {
 
     const profile = await this.usersService.getProfile(user.id);
 
-    // ResponseInterceptor globally wraps all returns with envelope;
-    // return raw profile to avoid double-wrapping
-    return profile;
+    return { user: profile };
   }
 
   @Get(":id")
@@ -167,6 +166,12 @@ export class UsersController {
   @RateLimit({ tier: "api", key: "ip" })
   @ApiOperation({ summary: "Update preferred timezone" })
   @ApiResponse({ status: 200, description: "Timezone updated" })
+  @Put("profile")
+  @Roles(SystemRole.CUSTOMER, SystemRole.ADMIN, SystemRole.SUPER_ADMIN)
+  async updateProfile(@Req() req, @Body() dto: UpdateProfileDto) {
+    return this.usersService.updateProfile(req.user.sub, dto);
+  }
+
   async updateTimezone(@Body() dto: UpdateTimezoneDto, @Req() req: Request) {
     const user = req.user as JwtUser | undefined;
     if (!user) {

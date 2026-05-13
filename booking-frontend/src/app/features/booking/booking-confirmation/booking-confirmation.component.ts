@@ -6,6 +6,7 @@ import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AppCardComponent } from '../../../shared/components/atoms/app-card/app-card.component';
 import { AppButtonComponent } from '../../../shared/components/atoms/app-button/app-button.component';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-booking-confirmation',
@@ -13,6 +14,7 @@ import { AppButtonComponent } from '../../../shared/components/atoms/app-button/
   imports: [
     DatePipe,
     CurrencyPipe,
+    TranslatePipe,
     FormsModule,
     RouterLink,
     AppCardComponent,

@@ -10,7 +10,7 @@
         [class.active]="activeTab() === 'password'"
         (click)="switchTab('password')"
       >
-        密码登录
+        {{ 'auth.login.title' | t }}
       </button>
       <button
         type="button"
@@ -18,7 +18,7 @@
         [class.active]="activeTab() === 'code'"
         (click)="switchTab('code')"
       >
-        验证码登录
+        {{ 'auth.verificationCode.verify' | t }}
       </button>
     </div>
 
@@ -80,7 +80,7 @@
         </div>
 
         <div class="form-group">
-          <label for="password">密码</label>
+          <label for="password">{{ 'auth.login.password' | t }}</label>
           <input
             id="password"
             class="sharp-input"
@@ -130,7 +130,7 @@
 
         <app-button
           type="submit"
-          label="登录"
+          [label]="'auth.login.submit' | t"
           variant="primary"
           class="w-full"
           [disabled]="passwordForm.invalid || isLoading() || !acceptTerms()"
@@ -145,12 +145,12 @@
       <div class="step-indicator">
         <div class="step" [class.active]="codeLoginStep() === 1" [class.completed]="codeLoginStep() > 1">
           <span class="step-number">1</span>
-          <span class="step-label">发送验证码</span>
+          <span class="step-label">{{ 'auth.verificationCode.send' | t }}</span>
         </div>
         <div class="step-connector" [class.completed]="codeLoginStep() > 1"></div>
         <div class="step" [class.active]="codeLoginStep() === 2">
           <span class="step-number">2</span>
-          <span class="step-label">验证登录</span>
+          <span class="step-label">{{ 'auth.verificationCode.verify' | t }}</span>
         </div>
       </div>
 
@@ -214,7 +214,7 @@
         <!-- Step 2: Verification code -->
         @if (codeLoginStep() === 2) {
           <div class="form-group verify-group">
-            <label for="verify-code">验证码</label>
+            <label for="verify-code">{{ 'auth.verificationCode.code' | t }}</label>
             <div class="verify-input-wrapper">
               <input
                 id="verify-code"
@@ -266,7 +266,7 @@
         @if (codeLoginStep() === 1) {
           <app-button
             type="submit"
-            label="发送验证码"
+            [label]="'auth.verificationCode.send' | t"
             variant="primary"
             class="w-full"
             [disabled]="codeLoginForm.get('contact')?.invalid || isLoading() || !acceptTerms()"
@@ -277,14 +277,14 @@
         @if (codeLoginStep() === 2) {
           <div class="step-actions">
             <app-button
-              label="返回"
+              [label]="'global.cancel' | t"
               variant="secondary"
               class="w-full sm:w-auto"
               (onClick)="codeLoginStep.set(1)"
             />
             <app-button
               type="submit"
-              label="登录"
+              [label]="'auth.login.submit' | t"
               variant="primary"
               class="w-full sm:w-auto"
               [disabled]="codeLoginForm.invalid || isLoading() || !acceptTerms()"
@@ -297,7 +297,7 @@
 
     <!-- Register Link -->
     <div class="footer-links">
-      <a routerLink="/auth/register" class="register-link">注册新账号</a>
+      <a routerLink="/auth/register" class="register-link">{{ 'auth.login.register' | t }}</a>
     </div>
       </div>
   </app-card>

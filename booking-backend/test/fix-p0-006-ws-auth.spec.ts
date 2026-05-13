@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotificationsGateway } from '../src/modules/notifications/notifications.gateway';
+import { WsJwtGuard } from '../src/common/guards/ws-jwt.guard';
 import { JwtService } from '@nestjs/jwt';
 
 // Mock socket.io Server and Socket
@@ -60,6 +61,7 @@ describe('FIX-P0-006: WebSocket JWT Authentication (GREEN)', () => {
           provide: JwtService,
           useValue: mockJwtService,
         },
+        WsJwtGuard,
       ],
     }).compile();
 

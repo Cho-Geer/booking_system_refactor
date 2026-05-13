@@ -1,8 +1,8 @@
 <div class="time-slots-page page-enter">
   <!-- Header -->
   <div class="mb-6 sm:mb-8">
-    <h1 class="text-2xl font-bold gradient-text">选择时间</h1>
-    <p class="text-sm text-gray-500 mt-1">请选择您期望的预约日期和时间段</p>
+    <h1 class="text-2xl font-bold gradient-text">{{ 'booking.selectDateTime' | t }}</h1>
+    <p class="text-sm text-gray-500 mt-1">{{ 'booking.selectSlot' | t }}</p>
   </div>
 
   @if (isLoading()) {
@@ -30,21 +30,21 @@
       <div class="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
         <span class="text-2xl text-red-500">!</span>
       </div>
-      <h3 class="text-lg font-bold text-gray-900 mb-2">加载失败</h3>
+      <h3 class="text-lg font-bold text-gray-900 mb-2">{{ 'booking.loadFailed' | t }}</h3>
       <p class="text-sm text-gray-500 mb-6">{{ error() }}</p>
       <button
         class="px-6 py-2.5 rounded-lg bg-accent-green hover:bg-accent-green-dark text-white font-medium text-sm transition-colors active:scale-[0.98] min-h-[44px]"
         (click)="retryLoad()"
         aria-label="Retry loading time slots"
       >
-        重新加载
+        {{ 'booking.retry' | t }}
       </button>
     </div>
   } @else {
     <!-- Calendar Widget -->
     <app-card variant="sharp" class="mb-6">
       <div class="flex flex-col items-center">
-        <label class="text-sm font-medium text-gray-600 mb-3">选择日期</label>
+        <label class="text-sm font-medium text-gray-600 mb-3">{{ 'booking.selectDate' | t }}</label>
         <p-datepicker
           [(ngModel)]="selectedDate"
           (onSelect)="onDateSelect($event)"
@@ -61,19 +61,19 @@
     <div class="flex flex-wrap gap-4 mb-4 text-xs text-gray-500">
       <div class="flex items-center gap-1.5">
         <span class="w-3 h-3 rounded-full bg-green-400"></span>
-        <span>充足</span>
+        <span>{{ 'booking.available' | t }}</span>
       </div>
       <div class="flex items-center gap-1.5">
         <span class="w-3 h-3 rounded-full bg-yellow-400"></span>
-        <span>少量剩余</span>
+        <span>{{ 'booking.fewRemaining' | t }}</span>
       </div>
       <div class="flex items-center gap-1.5">
         <span class="w-3 h-3 rounded-full bg-red-400"></span>
-        <span>已满</span>
+        <span>{{ 'booking.full' | t }}</span>
       </div>
       <div class="flex items-center gap-1.5">
         <span class="w-3 h-3 rounded-full bg-gray-300"></span>
-        <span>不可用</span>
+        <span>{{ 'booking.unavailable' | t }}</span>
       </div>
     </div>
 
@@ -91,13 +91,13 @@
           [disabled]="availability === 'unavailable' || availability === 'full'"
           (click)="onSlotClick(slot)"
           type="button"
-          [attr.aria-label]="'Slot at ' + (slot.startTime | date:'shortTime')"
+          [attr.aria-label]="'booking.slotAria' | t : { time: (slot.startTime | date:'shortTime') ?? '' }"
         >
           <div class="flex items-center justify-between w-full">
             <div class="flex flex-col items-start">
               <span class="slot-time font-semibold">{{ slot.startTime | date:'shortTime' }}</span>
               @if (slot.maxOvertimeMinutes) {
-                <span class="text-[10px] text-text-secondary/60">+{{ slot.maxOvertimeMinutes }}min OT</span>
+                <span class="text-[10px] text-text-secondary/60">{{ 'booking.otSuffix' | t : { minutes: slot.maxOvertimeMinutes } }}</span>
               }
             </div>
             @if (availability === 'available' && !isSelected(slot)) {
@@ -107,16 +107,16 @@
               </span>
             }
             @if (isSelected(slot)) {
-              <span class="text-white text-sm font-medium">已选</span>
+              <span class="text-white text-sm font-medium">{{ 'booking.selected' | t }}</span>
             }
             @if (availability === 'unavailable') {
-              <span class="text-gray-400 text-xs">已预约</span>
+              <span class="text-gray-400 text-xs">{{ 'booking.booked' | t }}</span>
             }
             @if (availability === 'full') {
-              <span class="text-red-400 text-xs">已满</span>
+              <span class="text-red-400 text-xs">{{ 'booking.fullShort' | t }}</span>
             }
             @if (availability === 'few') {
-              <span class="text-yellow-600 text-xs">仅剩{{ slot.capacity - slot.bookedCount }}席</span>
+              <span class="text-yellow-600 text-xs">{{ 'booking.onlyLeft' | t : { count: slot.capacity - slot.bookedCount } }}</span>
             }
           </div>
         </button>
@@ -125,8 +125,8 @@
         <div class="col-span-full">
           <app-empty-state
             icon="📅"
-            title="暂无可用时间段"
-            description="所选日期暂无可用时间段，请选择其他日期"
+            [title]="'booking.noSlotsAvailable' | t"
+            [description]="'booking.noSlotsAvailableDesc' | t"
           />
         </div>
       }

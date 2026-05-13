@@ -22,7 +22,7 @@ describe('LoginComponent', () => {
     id: '1',
     email: 'test@example.com',
     name: 'Test User',
-    userType: 'user',
+    role: 'user',
   };
 
   const mockLoginResponse = {
@@ -413,6 +413,70 @@ describe('LoginComponent', () => {
       jest.spyOn(component, 'onSendCode');
       component.sendVerifyCode();
       expect(component.onSendCode).toHaveBeenCalled();
+    });
+  });
+
+  // ==========================================
+  // [FE-ROLE-UNIFY] userType → role rename
+  // ==========================================
+
+  describe('[RoleRename] onPasswordLogin with role field', () => {
+    it('should use profile.role not profile.userType in setUserProfile [RED] fails because code uses userType', () => {
+      // TARGET: onPasswordLogin passes role: profile.role to setUserProfile
+      // CURRENT: passes userType: profile.userType on line 178
+
+      // Mock successful password login with role-based profile
+      const mockProfileWithRole = {
+        id: '1',
+        name: 'Test User',
+        role: 'CUSTOMER',
+        email: 'test@example.com',
+        createdAt: '2026-01-01T00:00:00Z',
+      };
+
+      component.passwordForm.patchValue({
+        contact: 'test@example.com',
+        password: 'password123',
+      });
+      component.acceptTerms.set(true);
+      apiServiceMock.loginPassword.mockReturnValue(of(mockLoginResponse));
+      apiServiceMock.getUserProfile.mockReturnValue(of(mockProfileWithRole));
+
+      component.onPasswordLogin();
+
+      // TARGET: setUserProfile called with role field
+      // CURRENT: setUserProfile called with userType field from profile.userType (undefined)
+      expect(authStoreMock.setUserProfile).toHaveBeenCalledWith(
+        expect.objectContaining({ role: 'CUSTOMER' })
+      );
+    });
+
+    it('should route ADMIN role to /admin/dashboard [RED] fails because code reads userType', () => {
+      // TARGET: ADMIN role → getPostLoginRoute('ADMIN') → '/admin/dashboard'
+      // CURRENT: profile.userType is undefined → getPostLoginRoute(undefined) → '/booking'
+      const navigateSpy = jest.spyOn(router, 'navigate');
+      const mockAdminProfileWithRole = {
+        id: '2',
+        name: 'Admin User',
+        role: 'ADMIN',
+        email: 'admin@test.com',
+        createdAt: '2026-01-01T00:00:00Z',
+      };
+
+      component.passwordForm.patchValue({
+        contact: 'admin@test.com',
+        password: 'password123',
+      });
+      component.acceptTerms.set(true);
+      apiServiceMock.loginPassword.mockReturnValue(of(mockLoginResponse));
+      apiServiceMock.getUserProfile.mockReturnValue(of(mockAdminProfileWithRole));
+
+      component.onPasswordLogin();
+
+      expect(navigateSpy).toHaveBeenCalled();
+      // TARGET: ADMIN → /admin/dashboard
+      // CURRENT: undefined → /booking (fallback) → this FAILS
+      expect(navigateSpy).toHaveBeenCalledWith(['/admin/dashboard']);
     });
   });
 

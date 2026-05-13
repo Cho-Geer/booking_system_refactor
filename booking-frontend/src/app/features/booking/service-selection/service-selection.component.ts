@@ -6,6 +6,7 @@ import { Service, ApiService } from '../../../core/services/api.service';
 import { AppCardComponent } from '../../../shared/components/atoms/app-card/app-card.component';
 import { AppInputComponent } from '../../../shared/components/atoms/app-input/app-input.component';
 import { AppEmptyStateComponent } from '../../../shared/components/atoms/app-empty-state/app-empty-state.component';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 
 export interface ServiceCategory {
   id: string;
@@ -17,6 +18,7 @@ export interface ServiceCategory {
   standalone: true,
   imports: [
     CurrencyPipe,
+    TranslatePipe,
     AppCardComponent,
     AppInputComponent,
     AppEmptyStateComponent,

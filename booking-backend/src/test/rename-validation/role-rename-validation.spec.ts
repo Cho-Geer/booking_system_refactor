@@ -17,6 +17,8 @@ import { ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { UsersService } from '../../modules/users/users.service';
+import { PrismaService } from '../../common/database/prisma.service';
+import { HashService } from '../../modules/encryption/hash.service';
 import { CreateUserDto, UpdateUserDto, UserResponseDto } from '../../modules/users/dto/user.dto';
 import { ProfileResponseDto } from '../../modules/users/dto/profile-response.dto';
 
@@ -115,7 +117,7 @@ describe('[RoleRename] Service Contract (RED-phase)', () => {
         providers: [
           UsersService,
           {
-            provide: 'PrismaService',
+            provide: PrismaService,
             useValue: {
               user: {
                 create: jest.fn(),
@@ -129,7 +131,7 @@ describe('[RoleRename] Service Contract (RED-phase)', () => {
             },
           },
           {
-            provide: 'HashService',
+            provide: HashService,
             useValue: { hashWithPepper: jest.fn() },
           },
         ],
@@ -368,7 +370,7 @@ describe('[RoleRename] field_mappings no userType', () => {
     // Read and check schema.prisma for userType references
     const fs = require('fs');
     const path = require('path');
-    const schemaPath = path.join(__dirname, '..', '..', '..', '..', 'prisma', 'schema.prisma');
+    const schemaPath = path.join(__dirname, '..', '..', '..', '..', 'booking-backend', 'prisma', 'schema.prisma');
     const schemaContent = fs.readFileSync(schemaPath, 'utf-8');
     
     // TARGET: schema has enum SystemRole, not UserType

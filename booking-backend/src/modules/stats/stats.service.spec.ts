@@ -311,7 +311,7 @@ describe('StatsService', () => {
 
       const result = await service.getUserStats();
 
-      expect(result.usersByUserType).toEqual({
+      expect(result.usersByRole).toEqual({
         CUSTOMER: 100,
         ADMIN: 40,
         SUPER_ADMIN: 10,
@@ -331,7 +331,7 @@ describe('StatsService', () => {
 
       const result = await service.getUserStats();
 
-      expect(result.usersByUserType).toEqual({
+      expect(result.usersByRole).toEqual({
         CUSTOMER: 0,
         ADMIN: 0,
         SUPER_ADMIN: 0,
@@ -349,7 +349,7 @@ describe('StatsService', () => {
 
       const result = await service.getUserStats();
 
-      expect(result.usersByUserType).toEqual({
+      expect(result.usersByRole).toEqual({
         CUSTOMER: 50,
         ADMIN: 0,
         SUPER_ADMIN: 0,
@@ -663,7 +663,7 @@ describe('StatsService', () => {
 
       const result = await service.getUserStats();
 
-      expect(Object.values(result.usersByUserType).every(v => v === 0)).toBe(true);
+      expect(Object.values(result.usersByRole).every(v => v === 0)).toBe(true);
       expect(result.activeUsers).toBe(0);
       expect(result.usersByMonth).toEqual([]);
     });

@@ -7,6 +7,7 @@ import { AppEmptyStateComponent } from '../../shared/components/atoms/app-empty-
 import { AppCardComponent } from '../../shared/components/atoms/app-card/app-card.component';
 import { AppButtonComponent } from '../../shared/components/atoms/app-button/app-button.component';
 import { AppModalComponent } from '../../shared/components/atoms/app-modal/app-modal.component';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 export type PullToRefreshState = 'idle' | 'pulling' | 'refreshing';
 
@@ -31,6 +32,7 @@ type FilterValue = 'all' | string;
   standalone: true,
   imports: [
     CommonModule,
+    TranslatePipe,
     AppBadgeComponent,
     AppEmptyStateComponent,
     AppCardComponent,

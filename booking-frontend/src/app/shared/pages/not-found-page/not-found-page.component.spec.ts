@@ -59,4 +59,54 @@ describe('NotFoundPageComponent', () => {
 
     expect(navigateSpy).toHaveBeenCalledWith('/booking');
   });
+
+  // ==========================================
+  // [FE-ROLE-UNIFY] userType → role rename
+  // ==========================================
+
+  describe('[RoleRename] goHome() should use role-based routing', () => {
+    it('goHome() should read user.role not user.userType [RED] fails because code uses userType', () => {
+      // TARGET: goHome reads `this.authStore.currentUser()?.role`
+      // CURRENT: reads `this.authStore.currentUser()?.userType` on line 17
+      const fs = require('fs');
+      const path = require('path');
+      const componentPath = path.resolve(__dirname, './not-found-page.component.ts');
+      const content = fs.readFileSync(componentPath, 'utf-8');
+
+      const goHomeMatch = content.match(/goHome\(\).*?\{[\s\S]*?^\s*\}/m);
+      expect(goHomeMatch).not.toBeNull();
+      if (goHomeMatch) {
+        const goHomeBody = goHomeMatch[0];
+        // TARGET: should reference `role` not `userType`
+        // CURRENT: references `userType` → this FAILS
+        expect(goHomeBody).not.toContain('userType');
+      }
+    });
+
+    it('goHome() should redirect ADMIN role to /admin/dashboard [RED] fails because code reads userType', () => {
+      // Inject AuthStore into the component's injector context
+      // TARGET: Admin user with role=ADMIN → redirect to /admin/dashboard
+      // CURRENT: goHome reads userType which is undefined when role is set → redirects to default /booking
+
+      // We need a fresh TestBed with the AuthStore that has an ADMIN user with role field
+      // This test checks the TARGET behavior
+      const navigateSpy = spyOn(router, 'navigateByUrl');
+
+      // Force-set the AuthStore through the injector
+      const authStore = (component as any).authStore;
+      // Set user with role (TARGET shape) instead of userType
+      jest.spyOn(authStore, 'currentUser').mockReturnValue({
+        id: '1',
+        name: 'Admin User',
+        role: 'ADMIN',
+        email: 'admin@test.com',
+      });
+
+      component.goHome();
+
+      // TARGET: ADMIN role → /admin/dashboard
+      // CURRENT: userType is undefined → falls back to /booking → this FAILS
+      expect(navigateSpy).toHaveBeenCalledWith('/admin/dashboard');
+    });
+  });
 });
