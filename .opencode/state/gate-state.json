@@ -4332,12 +4332,15 @@
       "session_id": "cg_ses_1778647664873",
       "created_at": "2026-05-13T04:47:44.873Z",
       "task_description": "Execute Phase 1 Backend Core Fixes: PUT /v1/users/profile, profile user wrapper, start_date/end_date params, financial fields on appointment create, appointment.mapper fix, overtimeMinutes, taxRate, timezone params, Idempotency-Key required.",
-      "gate_status": "armed",
+      "gate_status": "completed",
       "last_check_failed_items": [],
       "plan_summary": "Execute Phase 1 Backend Core Fixes (10 tasks): PUT /v1/users/profile endpoint, profile user wrapper, start_date/end_date params, financial fields on appointment create, appointment.mapper fix, overtimeMinutes, taxRate, timezone params, Idempotency-Key required.",
       "confirmed_at": "2026-05-13T04:47:48.938Z",
-      "consumed_at": null,
-      "audit": null
+      "consumed_at": "2026-05-13T04:51:54.767Z",
+      "audit": {
+        "execution_summary": "Phase 1 executed: All 10 backend core fixes completed — PUT /v1/users/profile endpoint, profile user wrapper, start_date/end_date params on appointments, financial fields on create, appointment.mapper fix, overtimeMinutes/taxRate DTO fields, timezone param linking, Idempotency-Key required. Additionally, TranslationDictionary module (model, migrations, controller, service, FE services/pipes) was implemented as part of the contract v1.7.7 additions.",
+        "completed_at": "2026-05-13T04:51:54.767Z"
+      }
     },
     "cg_ses_1778647701615": {
       "session_id": "cg_ses_1778647701615",
@@ -4351,6 +4354,45 @@
       "audit": {
         "execution_summary": "Phase 1 Backend Core Fixes: Added PUT /v1/users/profile endpoint with UpdateProfileDto, wrapped profile response in {user}, added start_date/end_date query params to GET /v1/appointments, set financial fields (durationMinutes/price/taxRate/taxIncludedAmount) on appointment creation, fixed appointment mapper to use appointmentNumber directly, added overtimeMinutes to CreateAdminAppointmentDto, added taxRate to CreateAdminServiceDto, linked timezone param through time-slots and admin-stats, made Idempotency-Key required. Updated tests accordingly.",
         "completed_at": "2026-05-13T04:51:22.874Z"
+      }
+    },
+    "cg_ses_1778648017317": {
+      "session_id": "cg_ses_1778648017317",
+      "created_at": "2026-05-13T04:53:37.317Z",
+      "task_description": "Execute Phase 2 (DTO/Validation Fixes) and Phase 3 (CSRF + Rate Limit Fixes) in parallel across backend controllers and DTOs.",
+      "gate_status": "armed",
+      "last_check_failed_items": [],
+      "plan_summary": "Execute Phase 2 (BE DTO/Validation Fixes - 8 tasks) and Phase 3 (CSRF + Rate Limit Fixes - 4 tasks) in parallel via @Coder-BE.",
+      "confirmed_at": "2026-05-13T04:53:41.070Z",
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1778648047839": {
+      "session_id": "cg_ses_1778648047839",
+      "created_at": "2026-05-13T04:54:07.839Z",
+      "task_description": "Phase 2 — Backend DTO/Validation Fixes: Add/update class-validator decorators across 5 DTO files in booking-backend",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Backend DTO/Validation Fixes: Add class-validator decorators (IsOptional, IsString, IsEnum, Matches, IsDateString, MinLength, IsNumber, IsBoolean, Min) to admin-user.dto.ts, admin-service.dto.ts, admin-appointment.dto.ts, reset-password.dto.ts, update-timezone.dto.ts, create-appointment.dto.ts",
+      "confirmed_at": "2026-05-13T04:54:10.731Z",
+      "consumed_at": "2026-05-13T04:55:22.265Z",
+      "audit": {
+        "execution_summary": "Phase 2 Backend DTO/Validation Fixes: Updated 6 files — admin-user.dto.ts (imports, password validation with @IsString/@MinLength/@Matches/@IsOptional, UpdateAdminUserDto decorators, AdminUsersQueryDto @IsEnum fix), admin-service.dto.ts (UpdateAdminServiceDto all-field validation), admin-appointment.dto.ts (imports, @IsEnum for status, @IsDateString for appointmentDate, @IsOptional/@IsString for reason), reset-password.dto.ts (@Matches regex on newPassword), update-timezone.dto.ts (@Matches IANA timezone regex), appointment.dto.ts (@IsDateString for appointmentDate). Zero new TSC errors.",
+        "completed_at": "2026-05-13T04:55:22.265Z"
+      }
+    },
+    "cg_ses_1778648049100": {
+      "session_id": "cg_ses_1778648049100",
+      "created_at": "2026-05-13T04:54:09.100Z",
+      "task_description": "Phase 3 — CSRF + Rate Limit Fixes: Add /v1/auth to CSRF bypassPaths, add @RateLimit to 9 missing admin endpoints, fix rate limit on PUT business-hours, fix rate limit keys on verify endpoints",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Phase 3: Add /v1/auth to CSRF bypassPaths, add @RateLimit to 9 admin endpoints, fix PUT business-hours limit to 10, fix verify endpoint keys to email",
+      "confirmed_at": "2026-05-13T04:54:19.795Z",
+      "consumed_at": "2026-05-13T04:54:56.785Z",
+      "audit": {
+        "execution_summary": "Phase 3 completed: 13 edits across 7 files — CSRF bypass added /v1/auth, 9 @RateLimit decorators added to admin endpoints, PUT business-hours limit reduced to 10, verify endpoint rate-limit keys changed from ip to email. TypeScript typecheck passes with zero errors in modified files.",
+        "completed_at": "2026-05-13T04:54:56.785Z"
       }
     }
   }

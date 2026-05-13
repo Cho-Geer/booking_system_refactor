@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { IsOptional, IsNumber, IsString, IsNotEmpty, IsInt, Min } from "class-validator";
+import { IsOptional, IsNumber, IsString, IsNotEmpty, IsInt, Min, IsEnum, IsDateString } from "class-validator";
 import { Type } from "class-transformer";
+import { AppointmentStatus } from "@prisma/client";
 
 export class AdminAppointmentDto {
   @ApiProperty()
@@ -48,9 +49,12 @@ export class AdminAppointmentDto {
 
 export class UpdateAppointmentStatusDto {
   @ApiProperty({ enum: ["PENDING", "CONFIRMED", "COMPLETED", "CANCELLED", "EXPIRED"] })
-  status!: string;
+  @IsEnum(AppointmentStatus)
+  status!: AppointmentStatus;
 
   @ApiPropertyOptional({ description: "Reason for status change" })
+  @IsOptional()
+  @IsString()
   reason?: string;
 }
 
@@ -85,7 +89,7 @@ export class CreateAdminAppointmentDto {
   serviceId!: string;
 
   @ApiProperty({ format: "date-time", description: "Appointment date and time" })
-  @IsString()
+  @IsDateString()
   @IsNotEmpty()
   appointmentDate!: string;
 
@@ -121,8 +125,8 @@ export class AdminAppointmentsQueryDto {
 
   @ApiPropertyOptional({ enum: ["PENDING", "CONFIRMED", "COMPLETED", "CANCELLED", "EXPIRED"] })
   @IsOptional()
-  @IsString()
-  status?: string;
+  @IsEnum(AppointmentStatus)
+  status?: AppointmentStatus;
 
   @ApiPropertyOptional({ format: "date" })
   @IsOptional()

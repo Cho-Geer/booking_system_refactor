@@ -9,6 +9,7 @@ import {
   Max,
   MaxLength,
   IsUUID,
+  IsDateString,
 } from "class-validator";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { AppointmentStatus } from "@prisma/client";
@@ -47,7 +48,7 @@ export class CreateAppointmentDto {
   overtimeMinutes?: number;
 
   @ApiProperty({ description: "Appointment date-time string" })
-  @IsString()
+  @IsDateString()
   appointmentDate: string;
 }
 

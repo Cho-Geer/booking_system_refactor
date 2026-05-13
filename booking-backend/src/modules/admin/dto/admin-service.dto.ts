@@ -73,24 +73,41 @@ export class CreateAdminServiceDto {
 
 export class UpdateAdminServiceDto {
   @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
   name?: string;
 
   @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
   description?: string;
 
   @ApiPropertyOptional({ description: "Duration in minutes" })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
   duration?: number;
 
   @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
   price?: number;
 
   @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
   active?: boolean;
 
   @ApiPropertyOptional({ description: "Price per minute (auto-calculated)" })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
   pricePerMinute?: number;
 
   @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
   imageUrl?: string;
 }
 

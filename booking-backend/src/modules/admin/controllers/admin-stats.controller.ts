@@ -135,6 +135,7 @@ export class AdminStatsController {
 
   @Get("system/health")
   @Roles("ADMIN", "SUPER_ADMIN")
+  @RateLimit({ tier: "api", key: "ip" })
   @ApiOperation({ summary: "Get system health status for dashboard" })
   async getSystemStatus(): Promise<SystemStatusDto> {
     return this.adminStatsService.getSystemStatus();
@@ -142,6 +143,7 @@ export class AdminStatsController {
 
   @Get("system/metrics")
   @Roles("ADMIN", "SUPER_ADMIN")
+  @RateLimit({ tier: "api", key: "ip" })
   @ApiOperation({ summary: "Get detailed system metrics (CPU, memory, disk)" })
   async getSystemMetrics(): Promise<SystemMetricsDto> {
     return this.adminStatsService.getSystemMetrics();

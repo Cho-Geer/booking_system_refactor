@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { IsOptional, IsNumber, IsString } from "class-validator";
+import { IsOptional, IsNumber, IsString, IsEnum, MinLength, Matches } from "class-validator";
 import { Type } from "class-transformer";
+import { SystemRole, UserStatus } from "@prisma/client";
 
 export class AdminUserDto {
   @ApiProperty()
@@ -39,18 +40,30 @@ export class CreateAdminUserDto {
   role!: string;
 
   @ApiPropertyOptional({ minLength: 8 })
+  @IsString()
+  @MinLength(8)
+  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, {
+    message: "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+  })
+  @IsOptional()
   password?: string;
 }
 
 export class UpdateAdminUserDto {
   @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
   name?: string;
 
   @ApiPropertyOptional({ enum: ["CUSTOMER", "ADMIN", "SUPER_ADMIN"] })
-  role?: string;
+  @IsOptional()
+  @IsEnum(SystemRole)
+  role?: SystemRole;
 
   @ApiPropertyOptional({ enum: ["ACTIVE", "INACTIVE", "BLOCKED"] })
-  status?: string;
+  @IsOptional()
+  @IsEnum(UserStatus)
+  status?: UserStatus;
 }
 
 export class AdminUsersQueryDto {
@@ -73,11 +86,11 @@ export class AdminUsersQueryDto {
 
   @ApiPropertyOptional({ enum: ["CUSTOMER", "ADMIN", "SUPER_ADMIN"] })
   @IsOptional()
-  @IsString()
-  role?: string;
+  @IsEnum(SystemRole)
+  role?: SystemRole;
 
   @ApiPropertyOptional({ enum: ["ACTIVE", "INACTIVE", "BLOCKED"] })
   @IsOptional()
-  @IsString()
-  status?: string;
+  @IsEnum(UserStatus)
+  status?: UserStatus;
 }

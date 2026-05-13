@@ -23,6 +23,7 @@ import {
 import { JwtAuthGuard } from "../../../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../../../common/guards/roles.guard";
 import { Roles } from "../../../common/decorators/roles.decorator";
+import { RateLimit } from "../../rate-limiter/rate-limiter.decorator";
 
 @ApiTags("Admin Notifications")
 @Controller("admin")
@@ -35,6 +36,7 @@ export class AdminNotificationsController {
 
   @Get("notifications")
   @Roles("ADMIN", "SUPER_ADMIN")
+  @RateLimit({ tier: "api", key: "ip" })
   @ApiOperation({ summary: "Get paginated notification list (SYS-002)" })
   @ApiQuery({ name: "page", required: false, type: Number })
   @ApiQuery({ name: "limit", required: false, type: Number })
@@ -61,6 +63,7 @@ export class AdminNotificationsController {
 
   @Post("notifications/:id/read")
   @Roles("ADMIN", "SUPER_ADMIN")
+  @RateLimit({ tier: "api", key: "ip" })
   @ApiOperation({ summary: "Mark a notification as read (SYS-003)" })
   async markAsRead(
     @Req() req: Request,
@@ -73,6 +76,7 @@ export class AdminNotificationsController {
 
   @Get("messages/unread-count")
   @Roles("ADMIN", "SUPER_ADMIN")
+  @RateLimit({ tier: "api", key: "ip" })
   @ApiOperation({ summary: "Get unread notification count for bell badge (MSG-004)" })
   async getUnreadCount(
     @Req() req: Request,

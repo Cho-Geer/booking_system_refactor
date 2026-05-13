@@ -46,6 +46,7 @@ export class AdminAppointmentsController {
   }
 
   @Put(":id/status")
+  @RateLimit({ tier: "api", key: "ip" })
   @ApiOperation({ summary: "Update appointment status" })
   @ApiResponse({ status: 200, description: "Status updated" })
   @ApiResponse({ status: 400, description: "Invalid status transition" })
@@ -70,6 +71,7 @@ export class AdminAppointmentsController {
   }
 
   @Post("batch-cancel")
+  @RateLimit({ tier: "api", key: "ip" })
   @ApiOperation({ summary: "Batch cancel appointments" })
   @ApiResponse({ status: 200, description: "Batch cancel result" })
   async batchCancel(@Body() dto: BatchCancelDto) {

@@ -40,7 +40,7 @@ export class AdminSettingsController {
 
   @Put("business-hours")
   @Roles("SUPER_ADMIN")
-  @RateLimit({ tier: "api", key: "ip", limit: 30 })
+  @RateLimit({ tier: "api", key: "ip", limit: 10 })
   @ApiOperation({ summary: "Update business hours settings" })
   @ApiResponse({ status: 200, description: "营业时间已更新" })
   async updateBusinessHours(

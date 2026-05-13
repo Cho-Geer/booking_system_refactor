@@ -105,6 +105,7 @@ export class AdminServicesController {
 
   @Post(":id/image")
   @Roles("ADMIN", "SUPER_ADMIN")
+  @RateLimit({ tier: "api", key: "ip" })
   @UseInterceptors(FileInterceptor("image"))
   @ApiConsumes("multipart/form-data")
   @ApiOperation({ summary: "Upload service image" })
@@ -119,6 +120,7 @@ export class AdminServicesController {
 
   @Delete(":id")
   @Roles("ADMIN", "SUPER_ADMIN")
+  @RateLimit({ tier: "api", key: "ip", limit: 20 })
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: "Delete a service (SUPER_ADMIN only)" })
   @ApiResponse({ status: 204, description: "Service deleted (no content)" })
