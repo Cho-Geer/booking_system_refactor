@@ -97,7 +97,7 @@
           </div>
         }
 
-        @if (currentUser()?.preferredTimezone; as tz) {
+        @if (user()?.preferredTimezone; as tz) {
           <div class="profile-field">
             <span class="field-label">Timezone</span>
             <span class="field-value">{{ tz }}</span>
