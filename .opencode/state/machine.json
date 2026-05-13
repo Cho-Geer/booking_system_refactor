@@ -4,7 +4,7 @@
     "version": "2.1.0",
     "project": "appointment-booking-system",
     "description": "强制校验契约哈希 + 任务生命周期证据链。涉及角色：@Architect(定义), @Coder-BE(实现), @Coder-FE(适配), @Guardian(审查), @Orchestrator(调度)。",
-    "lastUpdated": "2026-05-12T13:43:53.636Z"
+    "lastUpdated": "2026-05-13T04:33:13.739Z"
   },
   "currentTask": {
     "id": "TIMESLOTS-PAGINATION-FIX",
@@ -15,20 +15,20 @@
   "contracts": {
     "backend-api": {
       "file": "contract.yaml",
-      "hash": "sha256-f2f022ea81c9b3b2a605f69337f4de3725e3b514c149a69953b991092f9e14de",
-      "lastValidated": "2026-05-12T13:43:53.636Z",
+      "hash": "sha256-2c706051793289dd3bab3e1b6d26b177fa8f1c14ca3667ad8e165c389ce46b46",
+      "lastValidated": "2026-05-13T04:33:13.739Z",
       "owner": "@Architect"
     },
     "prisma-schema": {
       "file": "booking-backend/prisma/schema.prisma",
-      "hash": "sha256-8acbade40ce6ff75237ea4806021243fb7719c9e40e744e4a77c804c52b21aa0",
-      "lastValidated": "2026-05-12T13:43:53.636Z",
+      "hash": "sha256-7505db7af86df4efa49441a46555c0d2ac41fd4768c5cc8c8349fda3275902b2",
+      "lastValidated": "2026-05-13T00:55:38.124Z",
       "owner": "@Coder-BE"
     },
     "frontend-dto": {
       "file": "booking-frontend/src/app/shared/dto/",
-      "hash": "sha256-fa3db6dee37b311c6a62cd9e12c090d6b7dff25fa89d94cb688e5015726f8c1a",
-      "lastValidated": "2026-05-12T13:43:53.636Z",
+      "hash": "sha256-25fc059382a28e30e27da484e9c7c11c5d46fbd2473bdbdd7f84cfb1b26f565f",
+      "lastValidated": "2026-05-12T14:57:25.637Z",
       "owner": "@Coder-FE",
       "description": "前端类型定义，须与 backend-api 一致"
     },
@@ -587,6 +587,41 @@
       "action": "HASH_UPDATE",
       "target": "frontend-dto",
       "details": "Hash updated from sha256-64117d14d17fa... to sha256-fa3db6dee37b3..."
+    },
+    {
+      "timestamp": "2026-05-12T14:57:25.637Z",
+      "agent": "@Orchestrator",
+      "action": "HASH_UPDATE",
+      "target": "backend-api",
+      "details": "Hash updated from sha256-f2f022ea81c9b... to sha256-67c22fd5c8766..."
+    },
+    {
+      "timestamp": "2026-05-12T14:57:25.637Z",
+      "agent": "@Orchestrator",
+      "action": "HASH_UPDATE",
+      "target": "prisma-schema",
+      "details": "Hash updated from sha256-8acbade40ce6f... to sha256-64273ffccc920..."
+    },
+    {
+      "timestamp": "2026-05-12T14:57:25.637Z",
+      "agent": "@Orchestrator",
+      "action": "HASH_UPDATE",
+      "target": "frontend-dto",
+      "details": "Hash updated from sha256-fa3db6dee37b3... to sha256-25fc059382a28..."
+    },
+    {
+      "timestamp": "2026-05-13T00:55:38.124Z",
+      "agent": "@Orchestrator",
+      "action": "HASH_UPDATE",
+      "target": "prisma-schema",
+      "details": "Hash updated from sha256-64273ffccc920... to sha256-7505db7af86df..."
+    },
+    {
+      "timestamp": "2026-05-13T04:33:13.739Z",
+      "agent": "@Orchestrator",
+      "action": "HASH_UPDATE",
+      "target": "backend-api",
+      "details": "Hash updated from sha256-67c22fd5c8766... to sha256-2c70605179328..."
     }
   ]
 }
