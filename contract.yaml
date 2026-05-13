@@ -1333,8 +1333,8 @@ api:
       list:
         method: "GET"
         path: "/v1/translations"
-        authentication: true
-        description: "获取前端 UI 翻译字典列表。支持按 domain 和 locale 筛选，支持增量更新"
+        authentication: false
+        description: "公开端点 — 获取前端 UI 翻译字典列表。支持按 domain 和 locale 筛选，支持增量更新。无需登录，前端在应用启动时作为 APP_INITIALIZER 加载"
         query_parameters:
           domain: { type: "string", required: false, description: "筛选特定域（如 admin, booking, auth）" }
           locale: { type: "string", required: false, description: "语言代码（如 zh-CN, en-US）" }

@@ -1,7 +1,9 @@
 import { Controller, Get, Query, UseGuards } from "@nestjs/common";
 import { TranslationService, TranslationResult } from "./translations.service";
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
+import { Public } from "../../common/decorators/public.decorator";
 
+@Public()
 @UseGuards(JwtAuthGuard)
 @Controller("translations")
 export class TranslationsController {
