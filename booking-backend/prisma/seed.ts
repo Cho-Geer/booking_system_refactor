@@ -100,8 +100,7 @@ async function main() {
         await prisma.service.create({ data: service });
       }
     }
-    console.log('✅ Created sample services');
-  }
+  console.log('✅ Created sample services');
 
   console.log('🎉 Database seeding completed successfully!');
 }

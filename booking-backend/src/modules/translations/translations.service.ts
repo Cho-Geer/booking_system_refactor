@@ -78,10 +78,12 @@ export class TranslationService {
   ): Promise<TranslationResult> {
     const cacheKey = `translations:${locale}`;
 
-    // Try cache first
-    const cached = await this.cache.get<TranslationResult>(cacheKey);
-    if (cached) {
-      return cached;
+    // Try cache first (only use cache for full responses, not incremental)
+    if (!since) {
+      const cached = await this.cache.get<TranslationResult>(cacheKey);
+      if (cached) {
+        return cached;
+      }
     }
 
     // Build the Prisma where clause
@@ -116,9 +118,6 @@ export class TranslationService {
         changes,
         deleted: [],
       };
-
-      // Cache the result
-      await this.cache.set(cacheKey, result, CACHE_TTL);
 
       return result;
     }
