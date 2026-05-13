@@ -7,6 +7,7 @@ import { AppCardComponent } from '../../shared/components/atoms/app-card/app-car
 import { AppButtonComponent } from '../../shared/components/atoms/app-button/app-button.component';
 import { AppModalComponent } from '../../shared/components/atoms/app-modal/app-modal.component';
 import { AppBadgeComponent } from '../../shared/components/atoms/app-badge/app-badge.component';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-profile',
@@ -18,6 +19,7 @@ import { AppBadgeComponent } from '../../shared/components/atoms/app-badge/app-b
     AppButtonComponent,
     AppModalComponent,
     AppBadgeComponent,
+    TranslatePipe,
   ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',

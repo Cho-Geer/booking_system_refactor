@@ -4674,6 +4674,45 @@
         "execution_summary": "Guardian Quality Gate review completed. Reviewed last 5 commits (documentation-only), cumulative codebase against contract.yaml v1.7.7. Verified TSC (BE/FE both PASS), contract compliance (6/8 PASS), coding standards (7 lint issues), test execution evidence (critical FAIL - no test_report.json found), test suites (BE 110 failed, FE 280 failed), and security (12 vulnerabilities). Final verdict: ❌ FAIL due to missing test execution evidence, failing tests, and contract compliance issues.",
         "completed_at": "2026-05-13T07:32:11.686Z"
       }
+    },
+    "cg_ses_1778663097958": {
+      "session_id": "cg_ses_1778663097958",
+      "created_at": "2026-05-13T09:04:57.958Z",
+      "task_description": "Large-scale i18n remediation: add missing translation keys to seed data, convert hardcoded text to TranslatePipe across 30+ templates (auth pages, profile, admin, 404, legal, app-layout).",
+      "gate_status": "armed",
+      "last_check_failed_items": [],
+      "plan_summary": "i18n remediation Phase 1: seed translation keys + convert auth pages. Phase 2: profile/404/legal/app-layout. Phase 3: admin templates. All sent in parallel.",
+      "confirmed_at": "2026-05-13T09:05:10.206Z",
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1778663172842": {
+      "session_id": "cg_ses_1778663172842",
+      "created_at": "2026-05-13T09:06:12.842Z",
+      "task_description": "i18n remediation: update seed translation data with auth+global keys, convert auth HTML templates to TranslatePipe, verify backend TypeScript",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "i18n remediation: (1) Update translations-seed.service.ts — replace auth section (28→87 keys) with full auth.login.*, auth.register.*, auth.forgot.*, auth.verificationCode.*, and auth keys from spec; (2) Convert login/register/forgot-password HTML templates to use TranslatePipe for all hardcoded text; (3) Run tsc --noEmit on backend to verify",
+      "confirmed_at": "2026-05-13T09:10:11.279Z",
+      "consumed_at": "2026-05-13T09:17:41.635Z",
+      "audit": {
+        "execution_summary": "i18n remediation: (1) translations-seed.service.ts: replaced 28 auth entries with 87 full i18n keys covering auth.login (26), auth.register (30), auth.forgot (26), auth.verificationCode (3), auth.general (2); total seed count updated from ~205 to ~258. (2) login.component.html: 40 hardcoded strings converted to TranslatePipe. (3) register.component.html: 32 hardcoded strings converted. (4) forgot-password.component.html: 30 hardcoded strings converted. (5) Backend tsc --noEmit passed with zero errors.",
+        "completed_at": "2026-05-13T09:17:41.635Z"
+      }
+    },
+    "cg_ses_1778663469989": {
+      "session_id": "cg_ses_1778663469989",
+      "created_at": "2026-05-13T09:11:09.989Z",
+      "task_description": "i18n remediation for profile, 404, legal, and app-layout: convert hardcoded text to translation pipes, update menu items, add English fallback map to TranslationService",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "i18n remediation: (1) Profile page - convert all hardcoded CN/EN text to t pipe, add TranslatePipe import; (2) 404 page - convert hardcoded text to t pipe, add TranslatePipe import; (3) App-layout menuItems - inject TranslationService, replace CN labels with sidebar.* keys; (4) TranslationService.t() - add hardcoded English fallback map for critical error keys; verify with tsc --noEmit",
+      "confirmed_at": "2026-05-13T09:11:22.786Z",
+      "consumed_at": "2026-05-13T09:16:40.214Z",
+      "audit": {
+        "execution_summary": "i18n remediation completed: 40 hardcoded strings converted across 4 components, 4 English fallback keys added to TranslationService, tsc --noEmit passes clean. Files changed: profile.component.ts/html, not-found-page.component.ts/html, app-layout.component.ts, translation.service.ts.",
+        "completed_at": "2026-05-13T09:16:40.214Z"
+      }
     }
   }
 }

@@ -39,6 +39,16 @@ export class TranslationService implements OnDestroy {
   /** Subscription to WebSocket translation update events. */
   private wsSubscription?: Subscription;
 
+  /** Hardcoded English fallbacks for critical keys when translations are not loaded. */
+  private static readonly FALLBACK_MAP: Record<string, Record<string, string>> = {
+    errors: {
+      sessionExpired: 'Session expired. Please log in again.',
+      unauthorized: 'You do not have permission.',
+      serverError: 'Server error. Please try again later.',
+      networkError: 'Network error. Please check your connection.',
+    },
+  };
+
   constructor() {
     this.loadFromLocalStorage();
     this.startPolling();
@@ -125,7 +135,8 @@ export class TranslationService implements OnDestroy {
   ): string {
     const value = this.translations()?.[domain]?.[key];
     if (value === undefined) {
-      return `{{${domain}.${key}}}`;
+      const fallback = TranslationService.FALLBACK_MAP[domain]?.[key];
+      return fallback ?? `{{${domain}.${key}}}`;
     }
     if (params && Object.keys(params).length > 0) {
       return value.replace(

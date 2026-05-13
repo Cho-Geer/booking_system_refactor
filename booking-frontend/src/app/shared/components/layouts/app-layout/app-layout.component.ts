@@ -9,6 +9,7 @@ import { SocketService } from '../../../../core/services/socket.service';
 import { AdminStore } from '../../../../features/admin/stores/admin.store';
 import { AppHeaderComponent, NavLink } from '../app-header/app-header.component';
 import { AppSidebarComponent, SidebarItem, SidebarSection } from '../app-sidebar/app-sidebar.component';
+import { TranslationService } from '../../../../core/services/translation.service';
 
 @Component({
   selector: 'app-layout',
@@ -23,6 +24,7 @@ export class AppLayoutComponent implements OnInit {
   private router = inject(Router);
   private socketService = inject(SocketService);
   private adminStore = inject(AdminStore);
+  private translationService = inject(TranslationService);
 
   readonly user = this.authStore.currentUser;
   readonly isAuthenticated = this.authStore.isAuthenticated;
@@ -97,18 +99,18 @@ export class AppLayoutComponent implements OnInit {
       label: this.userName() ?? 'User',
       items: [
         {
-          label: '个人资料',
+          label: this.translationService.t('sidebar', 'profile'),
           icon: 'pi pi-user',
           routerLink: '/profile',
         },
         {
-          label: '安全设置',
+          label: this.translationService.t('sidebar', 'security'),
           icon: 'pi pi-lock',
           command: () => this.router.navigate(['/profile']),
         },
         { separator: true },
         {
-          label: '退出登录',
+          label: this.translationService.t('sidebar', 'logout'),
           icon: 'pi pi-sign-out',
           command: () => this.onLogout(),
         },

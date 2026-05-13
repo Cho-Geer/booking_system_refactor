@@ -33,7 +33,7 @@
     @if (activeTab() === 'password') {
       <form [formGroup]="passwordForm" (ngSubmit)="onPasswordLogin()">
         <div class="form-group">
-          <label>联系方式类型</label>
+          <label>{{ 'auth.login.contactType' | t }}</label>
           <div class="contact-type-selector">
             <button
               type="button"
@@ -41,7 +41,7 @@
               [class.active]="contactType() === ContactType.EMAIL"
               (click)="setContactType(ContactType.EMAIL)"
             >
-              邮箱
+              {{ 'auth.login.email' | t }}
             </button>
             <button
               type="button"
@@ -49,31 +49,31 @@
               [class.active]="contactType() === ContactType.PHONE"
               (click)="setContactType(ContactType.PHONE)"
             >
-              手机号
+              {{ 'auth.login.phone' | t }}
             </button>
           </div>
         </div>
 
         <div class="form-group">
-          <label for="password-contact">{{ contactType() === ContactType.EMAIL ? '邮箱' : '手机号' }}</label>
+          <label for="password-contact">{{ contactType() === ContactType.EMAIL ? ('auth.login.email' | t) : ('auth.login.phone' | t) }}</label>
           <input
             id="password-contact"
             class="sharp-input"
             [type]="contactType() === ContactType.EMAIL ? 'email' : 'tel'"
             formControlName="contact"
-            [placeholder]="contactType() === ContactType.EMAIL ? 'Enter your email' : 'Enter your phone number'"
+            [placeholder]="(contactType() === ContactType.EMAIL ? 'auth.login.enterEmail' : 'auth.login.enterPhone') | t"
             [class.error]="isPasswordFieldInvalid('contact')"
           />
           @if (isPasswordFieldInvalid('contact')) {
             <div class="error-message">
               @if (passwordForm.get('contact')?.errors?.['required']) {
-                <span>联系方式不能为空</span>
+                <span>{{ 'auth.login.contactRequired' | t }}</span>
               }
               @if (passwordForm.get('contact')?.errors?.['emailFormat']) {
-                <span>请输入有效的邮箱地址</span>
+                <span>{{ 'auth.login.invalidEmail' | t }}</span>
               }
               @if (passwordForm.get('contact')?.errors?.['phoneFormat']) {
-                <span>请输入有效的手机号</span>
+                <span>{{ 'auth.login.invalidPhone' | t }}</span>
               }
             </div>
           }
@@ -86,28 +86,28 @@
             class="sharp-input"
             type="password"
             formControlName="password"
-            placeholder="Enter your password"
+            [placeholder]="'auth.login.enterPassword' | t"
             [class.error]="isPasswordFieldInvalid('password')"
           />
           @if (isPasswordFieldInvalid('password')) {
             <div class="error-message">
               @if (passwordForm.get('password')?.errors?.['required']) {
-                <span>密码不能为空</span>
+                <span>{{ 'auth.login.passwordRequired' | t }}</span>
               }
               @if (getPasswordStrengthError('isValidLength')) {
-                <span>密码至少需要8个字符</span>
+                <span>{{ 'auth.login.passwordMinLength' | t }}</span>
               }
               @if (getPasswordStrengthError('hasUpperCase')) {
-                <span>需要至少一个大写字母</span>
+                <span>{{ 'auth.login.passwordUppercase' | t }}</span>
               }
               @if (getPasswordStrengthError('hasLowerCase')) {
-                <span>需要至少一个小写字母</span>
+                <span>{{ 'auth.login.passwordLowercase' | t }}</span>
               }
               @if (getPasswordStrengthError('hasNumber')) {
-                <span>需要至少一个数字</span>
+                <span>{{ 'auth.login.passwordDigit' | t }}</span>
               }
               @if (getPasswordStrengthError('hasSpecialChar')) {
-                <span>需要至少一个特殊字符 (@$!%*?&)</span>
+                <span>{{ 'auth.login.passwordSpecial' | t }}</span>
               }
             </div>
           }
@@ -121,10 +121,10 @@
               [ngModelOptions]="{standalone: true}"
               (ngModelChange)="acceptTerms.set($event)"
             />
-            <span>我已阅读并同意</span>
-            <a routerLink="/legal/terms" target="_blank">服务条款</a>
+            <span>{{ 'auth.login.agreeTerms' | t }}</span>
+            <a routerLink="/legal/terms" target="_blank">{{ 'auth.login.termsOfService' | t }}</a>
             <span>和</span>
-            <a routerLink="/legal/privacy" target="_blank">隐私政策</a>
+            <a routerLink="/legal/privacy" target="_blank">{{ 'auth.login.privacyPolicy' | t }}</a>
           </label>
         </div>
 
@@ -156,7 +156,7 @@
 
       @if (showAntiEnumMessage()) {
         <div class="sharp-card p-3 mb-4 border-l-4 border-green-500">
-          <span class="text-sm text-green-700">如果该账号存在，验证码已发送至您的{{ contactType() === ContactType.EMAIL ? '邮箱' : '手机号' }}</span>
+          <span class="text-sm text-green-700">{{ 'auth.login.codeSent' | t }}</span>
         </div>
       }
 
@@ -164,7 +164,7 @@
         <!-- Step 1: Contact info -->
         @if (codeLoginStep() === 1) {
           <div class="form-group">
-            <label>联系方式类型</label>
+            <label>{{ 'auth.login.contactType' | t }}</label>
             <div class="contact-type-selector">
               <button
                 type="button"
@@ -172,7 +172,7 @@
                 [class.active]="contactType() === ContactType.EMAIL"
                 (click)="setContactType(ContactType.EMAIL)"
               >
-                邮箱
+                {{ 'auth.login.email' | t }}
               </button>
               <button
                 type="button"
@@ -180,31 +180,31 @@
                 [class.active]="contactType() === ContactType.PHONE"
                 (click)="setContactType(ContactType.PHONE)"
               >
-                手机号
+                {{ 'auth.login.phone' | t }}
               </button>
             </div>
           </div>
 
           <div class="form-group">
-            <label for="code-contact">{{ contactType() === ContactType.EMAIL ? '邮箱' : '手机号' }}</label>
+            <label for="code-contact">{{ contactType() === ContactType.EMAIL ? ('auth.login.email' | t) : ('auth.login.phone' | t) }}</label>
             <input
               id="code-contact"
               class="sharp-input"
               [type]="contactType() === ContactType.EMAIL ? 'email' : 'tel'"
               formControlName="contact"
-              [placeholder]="contactType() === ContactType.EMAIL ? 'Enter your email' : 'Enter your phone number'"
+              [placeholder]="(contactType() === ContactType.EMAIL ? 'auth.login.enterEmail' : 'auth.login.enterPhone') | t"
               [class.error]="isCodeFieldInvalid('contact')"
             />
             @if (isCodeFieldInvalid('contact')) {
               <div class="error-message">
                 @if (codeLoginForm.get('contact')?.errors?.['required']) {
-                  <span>联系方式不能为空</span>
+                  <span>{{ 'auth.login.contactRequired' | t }}</span>
                 }
                 @if (codeLoginForm.get('contact')?.errors?.['emailFormat']) {
-                  <span>请输入有效的邮箱地址</span>
+                  <span>{{ 'auth.login.invalidEmail' | t }}</span>
                 }
                 @if (codeLoginForm.get('contact')?.errors?.['phoneFormat']) {
-                  <span>请输入有效的手机号</span>
+                  <span>{{ 'auth.login.invalidPhone' | t }}</span>
                 }
               </div>
             }
@@ -223,7 +223,7 @@
                 inputmode="numeric"
                 pattern="\d{6}"
                 formControlName="code"
-                placeholder="Enter 6-digit code"
+                [placeholder]="'auth.login.enterCode' | t"
                 maxlength="6"
                 [class.error]="isCodeFieldInvalid('code')"
               />
@@ -236,13 +236,13 @@
                 @if (countdown() > 0) {
                   {{ countdown() }}s
                 } @else {
-                  重新发送
+                  {{ 'auth.login.resend' | t }}
                 }
               </button>
             </div>
             @if (isCodeFieldInvalid('code')) {
               <div class="error-message">
-                <span>请输入6位数字验证码</span>
+                <span>{{ 'auth.login.codeRequired' | t }}</span>
               </div>
             }
           </div>
@@ -256,10 +256,10 @@
               [ngModelOptions]="{standalone: true}"
               (ngModelChange)="acceptTerms.set($event)"
             />
-            <span>我已阅读并同意</span>
-            <a routerLink="/legal/terms" target="_blank">服务条款</a>
+            <span>{{ 'auth.login.agreeTerms' | t }}</span>
+            <a routerLink="/legal/terms" target="_blank">{{ 'auth.login.termsOfService' | t }}</a>
             <span>和</span>
-            <a routerLink="/legal/privacy" target="_blank">隐私政策</a>
+            <a routerLink="/legal/privacy" target="_blank">{{ 'auth.login.privacyPolicy' | t }}</a>
           </label>
         </div>
 

@@ -1,8 +1,8 @@
 <div class="profile-page page-enter">
   <!-- Header -->
   <div class="mb-6 sm:mb-8">
-    <h1 class="text-2xl font-bold gradient-text">个人资料</h1>
-    <p class="text-sm text-gray-500 mt-1">管理您的个人信息和账户安全</p>
+    <h1 class="text-2xl font-bold gradient-text">{{ 'profile.title' | t }}</h1>
+    <p class="text-sm text-gray-500 mt-1">{{ 'profile.subtitle' | t }}</p>
   </div>
 
   @if (user(); as u) {
@@ -14,7 +14,7 @@
         </div>
         <button
           class="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center text-sm border border-gray-100 hover:bg-gray-50 transition-all min-h-[44px] min-w-[44px]"
-          aria-label="更换头像"
+          [attr.aria-label]="'profile.changeAvatar' | t"
         >
           📷
         </button>
@@ -25,11 +25,11 @@
     </app-card>
 
     <!-- Profile Info Card -->
-    <app-card variant="sharp" header="基本信息" headerIcon="pi pi-user" class="mb-6">
+    <app-card variant="sharp" [header]="'profile.basicInfo' | t" headerIcon="pi pi-user" class="mb-6">
       <div class="flex items-center justify-between mb-4">
         <div></div>
         <app-button
-          [label]="isEditing() ? '取消' : '编辑资料'"
+          [label]="(isEditing() ? 'global.cancel' : 'profile.editProfile') | t"
           variant="ghost"
           size="sm"
           (onClick)="toggleEdit()"
@@ -40,7 +40,7 @@
       <div class="space-y-5">
         <!-- Name field -->
         <div class="info-row">
-          <label class="block text-sm text-gray-500 mb-1">姓名</label>
+          <label class="block text-sm text-gray-500 mb-1">{{ 'profile.name' | t }}</label>
           @if (isEditing()) {
             <div>
               <input
@@ -48,8 +48,8 @@
                 class="sharp-input w-full min-h-[44px]"
                 [ngModel]="editName()"
                 (ngModelChange)="editName.set($event)"
-                placeholder="请输入您的姓名"
-                aria-label="编辑姓名"
+                [placeholder]="'profile.namePlaceholder' | t"
+                [attr.aria-label]="'profile.editName' | t"
                 data-testid="name-input"
               />
               @if (saveError()) {
@@ -63,43 +63,47 @@
 
         <!-- Email field (read-only) -->
         <div class="info-row">
-          <label class="block text-sm text-gray-500 mb-1">邮箱</label>
+          <label class="block text-sm text-gray-500 mb-1">{{ 'profile.email' | t }}</label>
           <div class="flex items-center gap-2">
-            <p class="text-base text-gray-900" data-testid="user-email">{{ u.email || '未设置' }}</p>
+            <p class="text-base text-gray-900" data-testid="user-email">{{ u.email || ('global.notSet' | t) }}</p>
             @if (u.email) {
-              <app-badge status="confirmed" size="sm" customLabel="已验证" />
+              <app-badge status="confirmed" size="sm" [customLabel]="'global.verified' | t" />
             }
           </div>
         </div>
 
         <!-- Phone field (read-only) -->
         <div class="info-row">
-          <label class="block text-sm text-gray-500 mb-1">手机号</label>
+          <label class="block text-sm text-gray-500 mb-1">{{ 'profile.phone' | t }}</label>
           <div class="flex items-center gap-2">
-            <p class="text-base text-gray-900" data-testid="user-phone">{{ u.phone || '未设置' }}</p>
+            <p class="text-base text-gray-900" data-testid="user-phone">{{ u.phone || ('global.notSet' | t) }}</p>
             @if (u.phone) {
-              <app-badge status="confirmed" size="sm" customLabel="已验证" />
+              <app-badge status="confirmed" size="sm" [customLabel]="'global.verified' | t" />
             }
           </div>
         </div>
 
         <!-- Role field -->
         <div class="info-row">
-          <label class="block text-sm text-gray-500 mb-1">角色</label>
-          <p class="text-base text-gray-900">{{ u.role === 'CUSTOMER' ? '普通用户' : u.role }}</p>
+          <label class="block text-sm text-gray-500 mb-1">{{ 'profile.role' | t }}</label>
+          @if (u.role === 'CUSTOMER') {
+            <p class="text-base text-gray-900">{{ 'profile.customerRole' | t }}</p>
+          } @else {
+            <p class="text-base text-gray-900">{{ u.role }}</p>
+          }
         </div>
 
         <!-- Member Since -->
         @if (u.createdAt) {
           <div class="info-row">
-            <label class="block text-sm text-gray-500 mb-1">注册时间</label>
+            <label class="block text-sm text-gray-500 mb-1">{{ 'profile.memberSince' | t }}</label>
             <p class="text-base text-gray-900">{{ formatDate(u.createdAt) }}</p>
           </div>
         }
 
         @if (user()?.preferredTimezone; as tz) {
           <div class="profile-field">
-            <span class="field-label">Timezone</span>
+            <span class="field-label">{{ 'profile.timezone' | t }}</span>
             <span class="field-value">{{ tz }}</span>
           </div>
         }
@@ -109,14 +113,14 @@
       @if (isEditing()) {
         <div class="flex flex-col-reverse sm:flex-row gap-3 mt-6 pt-4 border-t border-white/30">
           <app-button
-            label="取消"
+            [label]="'global.cancel' | t"
             variant="secondary"
             class="w-full sm:flex-1"
             (onClick)="cancelEdit()"
             data-testid="cancel-button"
           />
           <app-button
-            label="保存"
+            [label]="'global.save' | t"
             variant="primary"
             class="w-full sm:flex-1"
             [disabled]="!editName().trim() || isSaving()"
@@ -129,14 +133,14 @@
     </app-card>
 
     <!-- Account Security Card -->
-    <app-card variant="sharp" header="账户安全" headerIcon="pi pi-shield" class="mb-6">
+    <app-card variant="sharp" [header]="'profile.accountSecurity' | t" headerIcon="pi pi-shield" class="mb-6">
       <div class="flex items-center justify-between py-3">
         <div>
-          <p class="text-sm font-medium text-gray-900">登录密码</p>
-          <p class="text-xs text-gray-500">建议定期更换密码以保障账户安全</p>
+          <p class="text-sm font-medium text-gray-900">{{ 'profile.loginPassword' | t }}</p>
+          <p class="text-xs text-gray-500">{{ 'profile.passwordHint' | t }}</p>
         </div>
         <app-button
-          label="修改"
+          [label]="'global.edit' | t"
           variant="ghost"
           size="sm"
           (onClick)="showPasswordDialog()"
@@ -159,7 +163,7 @@
 <!-- Password Change Dialog using AppModal -->
 <app-modal
   [visible]="passwordDialogVisible()"
-  header="修改密码"
+  [header]="'profile.changePassword' | t"
   [closable]="true"
   [dismissableMask]="true"
   (visibleChange)="closePasswordDialog()"
@@ -167,38 +171,38 @@
   <div class="space-y-4 p-2">
     @if (passwordSuccess()) {
       <div class="text-sm text-accent-green bg-accent-green/5 rounded-lg px-3 py-2 text-center">
-        Password updated successfully!
+        {{ 'profile.passwordUpdated' | t }}
       </div>
     }
 
     <div>
-      <label class="block text-sm font-medium text-text-primary mb-1">Current Password</label>
+      <label class="block text-sm font-medium text-text-primary mb-1">{{ 'profile.currentPassword' | t }}</label>
       <input
         type="password"
         class="sharp-input w-full"
         [ngModel]="currentPassword()"
         (ngModelChange)="currentPassword.set($event)"
-        placeholder="Enter current password"
+        [placeholder]="'profile.currentPasswordPlaceholder' | t"
       />
     </div>
     <div>
-      <label class="block text-sm font-medium text-text-primary mb-1">New Password</label>
+      <label class="block text-sm font-medium text-text-primary mb-1">{{ 'profile.newPassword' | t }}</label>
       <input
         type="password"
         class="sharp-input w-full"
         [ngModel]="newPassword()"
         (ngModelChange)="newPassword.set($event)"
-        placeholder="Enter new password"
+        [placeholder]="'profile.newPasswordPlaceholder' | t"
       />
     </div>
     <div>
-      <label class="block text-sm font-medium text-text-primary mb-1">Confirm New Password</label>
+      <label class="block text-sm font-medium text-text-primary mb-1">{{ 'profile.confirmNewPassword' | t }}</label>
       <input
         type="password"
         class="sharp-input w-full"
         [ngModel]="confirmNewPassword()"
         (ngModelChange)="confirmNewPassword.set($event)"
-        placeholder="Confirm new password"
+        [placeholder]="'profile.confirmNewPasswordPlaceholder' | t"
       />
     </div>
 
@@ -208,13 +212,13 @@
 
     <div class="flex flex-col-reverse sm:flex-row gap-3 justify-end pt-2">
       <app-button
-        label="Cancel"
+        [label]="'global.cancel' | t"
         variant="secondary"
         class="w-full sm:w-auto"
         (onClick)="closePasswordDialog()"
       />
       <app-button
-        label="Update Password"
+        [label]="'profile.updatePassword' | t"
         variant="primary"
         class="w-full sm:w-auto"
         [disabled]="isPasswordSaving() || passwordSuccess()"

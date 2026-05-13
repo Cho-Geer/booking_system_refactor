@@ -23,12 +23,12 @@ interface TranslationSeedEntry {
 }
 
 // ============================================================
-// Seed data — ~205 default English records
+// Seed data — ~302 default English records
 // ============================================================
 
 const DEFAULT_TRANSLATIONS: TranslationSeedEntry[] = [
   // ============================================================
-  // 1. global — 25 entries
+  // 1. global — 26 entries
   // ============================================================
   { domain: 'global', key: 'save', locale: 'en', value: 'Save', isCustom: false, tenantId: null },
   { domain: 'global', key: 'cancel', locale: 'en', value: 'Cancel', isCustom: false, tenantId: null },
@@ -55,38 +55,113 @@ const DEFAULT_TRANSLATIONS: TranslationSeedEntry[] = [
   { domain: 'global', key: 'print', locale: 'en', value: 'Print', isCustom: false, tenantId: null },
   { domain: 'global', key: 'export', locale: 'en', value: 'Export', isCustom: false, tenantId: null },
   { domain: 'global', key: 'import', locale: 'en', value: 'Import', isCustom: false, tenantId: null },
+  { domain: 'global', key: 'backToHome', locale: 'en', value: 'Back to Home', isCustom: false, tenantId: null },
 
   // ============================================================
-  // 2. auth — 28 entries
+  // 2. auth — 87 entries
   // ============================================================
+  // -- auth.login
   { domain: 'auth', key: 'login.title', locale: 'en', value: 'Sign In', isCustom: false, tenantId: null },
-  { domain: 'auth', key: 'login.email', locale: 'en', value: 'Email Address', isCustom: false, tenantId: null },
   { domain: 'auth', key: 'login.password', locale: 'en', value: 'Password', isCustom: false, tenantId: null },
-  { domain: 'auth', key: 'login.submit', locale: 'en', value: 'Sign In', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'login.email', locale: 'en', value: 'Email', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'login.phone', locale: 'en', value: 'Phone', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'login.contactType', locale: 'en', value: 'Contact Type', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'login.enterEmail', locale: 'en', value: 'Enter your email', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'login.enterPhone', locale: 'en', value: 'Enter your phone number', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'login.enterPassword', locale: 'en', value: 'Enter your password', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'login.passwordRequired', locale: 'en', value: 'Password is required', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'login.passwordMinLength', locale: 'en', value: 'Password must be at least 8 characters', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'login.passwordUppercase', locale: 'en', value: 'At least one uppercase letter', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'login.passwordLowercase', locale: 'en', value: 'At least one lowercase letter', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'login.passwordDigit', locale: 'en', value: 'At least one digit', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'login.passwordSpecial', locale: 'en', value: 'At least one special character (@$!%*?&)', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'login.contactRequired', locale: 'en', value: 'Contact is required', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'login.invalidEmail', locale: 'en', value: 'Please enter a valid email address', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'login.invalidPhone', locale: 'en', value: 'Please enter a valid phone number', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'login.agreeTerms', locale: 'en', value: 'I have read and agree to the', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'login.termsOfService', locale: 'en', value: 'Terms of Service', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'login.privacyPolicy', locale: 'en', value: 'Privacy Policy', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'login.codeSent', locale: 'en', value: 'If this account exists, a verification code has been sent to your email/phone', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'login.enterCode', locale: 'en', value: 'Enter 6-digit code', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'login.resend', locale: 'en', value: 'Resend', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'login.codeRequired', locale: 'en', value: '6-digit verification code is required', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'login.loginSuccess', locale: 'en', value: 'Login successful', isCustom: false, tenantId: null },
   { domain: 'auth', key: 'login.forgotPassword', locale: 'en', value: 'Forgot Password?', isCustom: false, tenantId: null },
-  { domain: 'auth', key: 'login.noAccount', locale: 'en', value: "Don't have an account?", isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'login.submit', locale: 'en', value: 'Sign In', isCustom: false, tenantId: null },
   { domain: 'auth', key: 'login.register', locale: 'en', value: 'Create Account', isCustom: false, tenantId: null },
-  { domain: 'auth', key: 'login.rememberMe', locale: 'en', value: 'Remember Me', isCustom: false, tenantId: null },
-  { domain: 'auth', key: 'login.twoFactor', locale: 'en', value: 'Two-Factor Authentication', isCustom: false, tenantId: null },
+  // -- auth.register
   { domain: 'auth', key: 'register.title', locale: 'en', value: 'Create Account', isCustom: false, tenantId: null },
-  { domain: 'auth', key: 'register.name', locale: 'en', value: 'Full Name', isCustom: false, tenantId: null },
-  { domain: 'auth', key: 'register.email', locale: 'en', value: 'Email Address', isCustom: false, tenantId: null },
-  { domain: 'auth', key: 'register.password', locale: 'en', value: 'Password', isCustom: false, tenantId: null },
-  { domain: 'auth', key: 'register.confirmPassword', locale: 'en', value: 'Confirm Password', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'register.contact', locale: 'en', value: 'Contact', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'register.contactType', locale: 'en', value: 'Contact Type', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'register.email', locale: 'en', value: 'Email', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'register.phone', locale: 'en', value: 'Phone', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'register.enterEmail', locale: 'en', value: 'Enter your email', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'register.enterPhone', locale: 'en', value: 'Enter your phone number', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'register.emailRequired', locale: 'en', value: 'Email is required', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'register.phoneRequired', locale: 'en', value: 'Phone number is required', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'register.invalidEmail', locale: 'en', value: 'Please enter a valid email address', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'register.invalidPhone', locale: 'en', value: 'Please enter a valid 11-digit phone number', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'register.codeSent', locale: 'en', value: 'Verification code sent to', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'register.enterCode', locale: 'en', value: 'Enter 6-digit code', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'register.resend', locale: 'en', value: 'Resend', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'register.codeRequired', locale: 'en', value: '6-digit verification code is required', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'register.name', locale: 'en', value: 'Name', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'register.enterName', locale: 'en', value: 'Enter your name', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'register.nameRequired', locale: 'en', value: 'Name is required', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'register.nameMinLength', locale: 'en', value: 'Name must be at least 2 characters', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'register.password', locale: 'en', value: 'Set login password', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'register.passwordInvalid', locale: 'en', value: 'Password does not meet requirements', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'register.passwordUppercase', locale: 'en', value: 'Contains uppercase letter', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'register.passwordLowercase', locale: 'en', value: 'Contains lowercase letter', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'register.passwordDigit', locale: 'en', value: 'Contains digit', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'register.passwordSpecial', locale: 'en', value: 'Contains special character (@$!%*?&)', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'register.passwordMinLength', locale: 'en', value: 'At least 8 characters', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'register.confirmPassword', locale: 'en', value: 'Confirm your password', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'register.passwordMismatch', locale: 'en', value: 'Passwords do not match', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'register.agreeTerms', locale: 'en', value: 'I have read and agree to the', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'register.termsOfService', locale: 'en', value: 'Terms of Service', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'register.privacyPolicy', locale: 'en', value: 'Privacy Policy', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'register.registerSuccess', locale: 'en', value: 'Registration successful', isCustom: false, tenantId: null },
   { domain: 'auth', key: 'register.submit', locale: 'en', value: 'Create Account', isCustom: false, tenantId: null },
   { domain: 'auth', key: 'register.haveAccount', locale: 'en', value: 'Already have an account?', isCustom: false, tenantId: null },
   { domain: 'auth', key: 'register.login', locale: 'en', value: 'Sign In', isCustom: false, tenantId: null },
-  { domain: 'auth', key: 'register.phone', locale: 'en', value: 'Phone Number', isCustom: false, tenantId: null },
-  { domain: 'auth', key: 'register.terms', locale: 'en', value: 'I agree to the Terms of Service', isCustom: false, tenantId: null },
-  { domain: 'auth', key: 'logout', locale: 'en', value: 'Sign Out', isCustom: false, tenantId: null },
-  { domain: 'auth', key: 'forgotPassword.title', locale: 'en', value: 'Reset Password', isCustom: false, tenantId: null },
-  { domain: 'auth', key: 'forgotPassword.email', locale: 'en', value: 'Enter your email', isCustom: false, tenantId: null },
-  { domain: 'auth', key: 'forgotPassword.sendCode', locale: 'en', value: 'Send Code', isCustom: false, tenantId: null },
-  { domain: 'auth', key: 'forgotPassword.resetPassword', locale: 'en', value: 'Reset Password', isCustom: false, tenantId: null },
-  { domain: 'auth', key: 'forgotPassword.success', locale: 'en', value: 'Password reset email sent', isCustom: false, tenantId: null },
+  // -- auth.forgot
+  { domain: 'auth', key: 'forgot.title', locale: 'en', value: 'Forgot Password', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'forgot.step1', locale: 'en', value: 'Reset Password', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'forgot.step2', locale: 'en', value: 'Verify Identity', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'forgot.contactType', locale: 'en', value: 'Contact Type', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'forgot.email', locale: 'en', value: 'Email', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'forgot.phone', locale: 'en', value: 'Phone', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'forgot.enterEmail', locale: 'en', value: 'Enter your email', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'forgot.enterPhone', locale: 'en', value: 'Enter your phone number', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'forgot.emailRequired', locale: 'en', value: 'Email is required', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'forgot.phoneRequired', locale: 'en', value: 'Phone number is required', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'forgot.invalidEmail', locale: 'en', value: 'Please enter a valid email address', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'forgot.invalidPhone', locale: 'en', value: 'Please enter a valid 11-digit phone number', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'forgot.codeSent', locale: 'en', value: 'Verification code sent to', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'forgot.enterCode', locale: 'en', value: 'Enter 6-digit code', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'forgot.resend', locale: 'en', value: 'Resend', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'forgot.codeRequired', locale: 'en', value: '6-digit verification code is required', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'forgot.sendCode', locale: 'en', value: 'Send Code', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'forgot.newPassword', locale: 'en', value: 'Enter new password', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'forgot.passwordInvalid', locale: 'en', value: 'Password does not meet requirements', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'forgot.passwordUppercase', locale: 'en', value: 'Contains uppercase letter', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'forgot.passwordLowercase', locale: 'en', value: 'Contains lowercase letter', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'forgot.passwordDigit', locale: 'en', value: 'Contains digit', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'forgot.passwordSpecial', locale: 'en', value: 'Contains special character (@$!%*?&)', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'forgot.passwordMinLength', locale: 'en', value: 'At least 8 characters', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'forgot.confirmPassword', locale: 'en', value: 'Confirm your password', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'forgot.passwordMismatch', locale: 'en', value: 'Passwords do not match', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'forgot.resetSuccess', locale: 'en', value: 'Password Reset Successful', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'forgot.resetSuccessMsg', locale: 'en', value: 'Your password has been successfully reset. Please use your new password to log in.', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'forgot.backToLogin', locale: 'en', value: 'Back to Login', isCustom: false, tenantId: null },
+  { domain: 'auth', key: 'forgot.rememberPassword', locale: 'en', value: 'Remember your password?', isCustom: false, tenantId: null },
+  // -- auth.verificationCode
   { domain: 'auth', key: 'verificationCode.send', locale: 'en', value: 'Send Verification Code', isCustom: false, tenantId: null },
   { domain: 'auth', key: 'verificationCode.verify', locale: 'en', value: 'Verify Code', isCustom: false, tenantId: null },
   { domain: 'auth', key: 'verificationCode.code', locale: 'en', value: 'Verification Code', isCustom: false, tenantId: null },
+  // -- auth general
+  { domain: 'auth', key: 'logout', locale: 'en', value: 'Sign Out', isCustom: false, tenantId: null },
 
   // ============================================================
   // 3. booking — 26 entries
@@ -221,7 +296,7 @@ const DEFAULT_TRANSLATIONS: TranslationSeedEntry[] = [
   { domain: 'notifications', key: 'systemAlerts', locale: 'en', value: 'System Alerts', isCustom: false, tenantId: null },
 
   // ============================================================
-  // 9. errors — 16 entries
+  // 9. errors — 19 entries
   // ============================================================
   { domain: 'errors', key: 'general', locale: 'en', value: 'Something went wrong', isCustom: false, tenantId: null },
   { domain: 'errors', key: 'network', locale: 'en', value: 'Network error. Please check your connection.', isCustom: false, tenantId: null },
@@ -239,6 +314,9 @@ const DEFAULT_TRANSLATIONS: TranslationSeedEntry[] = [
   { domain: 'errors', key: 'accountLocked', locale: 'en', value: 'Account locked. Please contact support.', isCustom: false, tenantId: null },
   { domain: 'errors', key: 'missingRequiredField', locale: 'en', value: 'Please fill in all required fields', isCustom: false, tenantId: null },
   { domain: 'errors', key: 'dataConflict', locale: 'en', value: 'Data conflict. Please refresh and try again.', isCustom: false, tenantId: null },
+  { domain: 'errors', key: 'pageNotFound', locale: 'en', value: 'Page Not Found', isCustom: false, tenantId: null },
+  { domain: 'errors', key: 'pageNotFoundDesc', locale: 'en', value: 'The page you are looking for does not exist.', isCustom: false, tenantId: null },
+  { domain: 'errors', key: 'networkError', locale: 'en', value: 'Network error. Please check your connection.', isCustom: false, tenantId: null },
 
   // ============================================================
   // 10. validation — 12 entries
@@ -275,6 +353,48 @@ const DEFAULT_TRANSLATIONS: TranslationSeedEntry[] = [
   { domain: 'email', key: 'bookingReminder.tomorrow', locale: 'en', value: 'You have an appointment tomorrow.', isCustom: false, tenantId: null },
   { domain: 'email', key: 'feedback.request', locale: 'en', value: 'We would love to hear your feedback!', isCustom: false, tenantId: null },
   { domain: 'email', key: 'feedback.subject', locale: 'en', value: 'Share Your Feedback', isCustom: false, tenantId: null },
+
+  // ============================================================
+  // 12. profile — 23 entries
+  // ============================================================
+  { domain: 'profile', key: 'title', locale: 'en', value: 'My Profile', isCustom: false, tenantId: null },
+  { domain: 'profile', key: 'subtitle', locale: 'en', value: 'Manage your personal information and account security', isCustom: false, tenantId: null },
+  { domain: 'profile', key: 'basicInfo', locale: 'en', value: 'Basic Information', isCustom: false, tenantId: null },
+  { domain: 'profile', key: 'name', locale: 'en', value: 'Name', isCustom: false, tenantId: null },
+  { domain: 'profile', key: 'email', locale: 'en', value: 'Email', isCustom: false, tenantId: null },
+  { domain: 'profile', key: 'phone', locale: 'en', value: 'Phone Number', isCustom: false, tenantId: null },
+  { domain: 'profile', key: 'role', locale: 'en', value: 'Role', isCustom: false, tenantId: null },
+  { domain: 'profile', key: 'memberSince', locale: 'en', value: 'Member Since', isCustom: false, tenantId: null },
+  { domain: 'profile', key: 'accountSecurity', locale: 'en', value: 'Account Security', isCustom: false, tenantId: null },
+  { domain: 'profile', key: 'loginPassword', locale: 'en', value: 'Login Password', isCustom: false, tenantId: null },
+  { domain: 'profile', key: 'passwordHint', locale: 'en', value: 'It is recommended to change your password regularly to protect your account', isCustom: false, tenantId: null },
+  { domain: 'profile', key: 'changePassword', locale: 'en', value: 'Change Password', isCustom: false, tenantId: null },
+  { domain: 'profile', key: 'passwordUpdated', locale: 'en', value: 'Password updated successfully!', isCustom: false, tenantId: null },
+  { domain: 'profile', key: 'currentPassword', locale: 'en', value: 'Current Password', isCustom: false, tenantId: null },
+  { domain: 'profile', key: 'currentPasswordPlaceholder', locale: 'en', value: 'Enter current password', isCustom: false, tenantId: null },
+  { domain: 'profile', key: 'newPassword', locale: 'en', value: 'New Password', isCustom: false, tenantId: null },
+  { domain: 'profile', key: 'newPasswordPlaceholder', locale: 'en', value: 'Enter new password', isCustom: false, tenantId: null },
+  { domain: 'profile', key: 'confirmNewPassword', locale: 'en', value: 'Confirm New Password', isCustom: false, tenantId: null },
+  { domain: 'profile', key: 'confirmNewPasswordPlaceholder', locale: 'en', value: 'Confirm new password', isCustom: false, tenantId: null },
+  { domain: 'profile', key: 'updatePassword', locale: 'en', value: 'Update Password', isCustom: false, tenantId: null },
+  { domain: 'profile', key: 'changeAvatar', locale: 'en', value: 'Change Avatar', isCustom: false, tenantId: null },
+  { domain: 'profile', key: 'verified', locale: 'en', value: 'Verified', isCustom: false, tenantId: null },
+  { domain: 'profile', key: 'customerRole', locale: 'en', value: 'Regular User', isCustom: false, tenantId: null },
+
+  // ============================================================
+  // 13. sidebar — 11 entries
+  // ============================================================
+  { domain: 'sidebar', key: 'profile', locale: 'en', value: 'Profile', isCustom: false, tenantId: null },
+  { domain: 'sidebar', key: 'security', locale: 'en', value: 'Security Settings', isCustom: false, tenantId: null },
+  { domain: 'sidebar', key: 'logout', locale: 'en', value: 'Sign Out', isCustom: false, tenantId: null },
+  { domain: 'sidebar', key: 'bookingServices', locale: 'en', value: 'Booking Services', isCustom: false, tenantId: null },
+  { domain: 'sidebar', key: 'myBookings', locale: 'en', value: 'My Bookings', isCustom: false, tenantId: null },
+  { domain: 'sidebar', key: 'dashboard', locale: 'en', value: 'Dashboard', isCustom: false, tenantId: null },
+  { domain: 'sidebar', key: 'bookings', locale: 'en', value: 'Bookings', isCustom: false, tenantId: null },
+  { domain: 'sidebar', key: 'users', locale: 'en', value: 'Users', isCustom: false, tenantId: null },
+  { domain: 'sidebar', key: 'services', locale: 'en', value: 'Services', isCustom: false, tenantId: null },
+  { domain: 'sidebar', key: 'settings', locale: 'en', value: 'Settings', isCustom: false, tenantId: null },
+  { domain: 'sidebar', key: 'notifications', locale: 'en', value: 'Notifications', isCustom: false, tenantId: null },
 ];
 
 // ============================================================
