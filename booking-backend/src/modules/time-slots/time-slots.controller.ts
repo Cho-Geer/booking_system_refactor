@@ -21,6 +21,7 @@ import { CreateTimeSlotDto, UpdateTimeSlotDto } from "./dto/time-slot.dto";
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../../common/guards/roles.guard";
 import { Roles } from "../../common/decorators/roles.decorator";
+import { Public } from "../../common/decorators/public.decorator";
 import { SystemRole } from "@prisma/client";
 import { RateLimit } from "../rate-limiter/rate-limiter.decorator";
 
@@ -53,6 +54,7 @@ export class TimeSlotsController {
     return this.timeSlotsService.findAll(serviceId, isActive, page, limit);
   }
 
+  @Public()
   @Get("available")
   @ApiOperation({ summary: "Get available time slots for a service" })
   @ApiResponse({ status: 200, description: "List of available time slots" })

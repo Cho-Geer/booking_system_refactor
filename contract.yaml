@@ -537,7 +537,8 @@ api:
       list:
         method: "GET"
         path: "/v1/services"
-        authentication: true
+        authentication: false
+        description: "公开端点 — 获取服务列表。未登录用户（访客）也可浏览服务"
         response:
           success:
             status: 200
@@ -560,7 +561,8 @@ api:
       available:
         method: "GET"
         path: "/v1/time-slots/available"
-        authentication: true
+        authentication: false
+        description: "公开端点 — 获取可用时间段。未登录用户（访客）也可查询可用时段"
         query_parameters:
           service_id: { type: "string", required: true }
           startDate: { type: "string", format: "date", required: true, description: "起始日期 (ISO 8601)。传入单一日期：startDate=2026-05-12&endDate=2026-05-12 查询单日可用时段" }

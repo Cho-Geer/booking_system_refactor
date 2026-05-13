@@ -19,6 +19,7 @@ import {
 import { ServicesService } from "./services.service";
 import { CreateServiceDto, UpdateServiceDto } from "./dto/service.dto";
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
+import { Public } from "../../common/decorators/public.decorator";
 import { Roles } from "../../common/decorators/roles.decorator";
 import { SystemRole } from "@prisma/client";
 import { RateLimit } from "../rate-limiter/rate-limiter.decorator";
@@ -39,6 +40,7 @@ export class ServicesController {
     return this.servicesService.create(createServiceDto);
   }
 
+  @Public()
   @Get()
   @ApiOperation({ summary: "Get all services with pagination" })
   @ApiResponse({ status: 200, description: "List of services" })
@@ -50,6 +52,7 @@ export class ServicesController {
     return this.servicesService.findAll(page, limit, isActive);
   }
 
+  @Public()
   @Get(":id")
   @ApiOperation({ summary: "Get service by ID (convenience endpoint, not explicitly in contract)" })
   @ApiResponse({ status: 200, description: "Service found" })
