@@ -2,6 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RecentServicesPanelComponent } from './recent-services-panel.component';
 import { RouterTestingModule } from '@angular/router/testing';
 import { By } from '@angular/platform-browser';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+import { TranslationService } from '../../../../core/services/translation.service';
 
 describe('RecentServicesPanelComponent', () => {
   let component: RecentServicesPanelComponent;
@@ -14,9 +16,21 @@ describe('RecentServicesPanelComponent', () => {
     },
   ];
 
+  const mockTranslationService = {
+    t: jest.fn((domain: string, key: string) => {
+      const translations: Record<string, Record<string, string>> = {
+        admin: { 'dashboard.popularServices': 'Recent Services' },
+      };
+      return translations?.[domain]?.[key] ?? `{{${domain}.${key}}}`;
+    }),
+  };
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RecentServicesPanelComponent, RouterTestingModule],
+      imports: [RecentServicesPanelComponent, RouterTestingModule, TranslatePipe],
+      providers: [
+        { provide: TranslationService, useValue: mockTranslationService },
+      ],
     }).compileComponents();
     fixture = TestBed.createComponent(RecentServicesPanelComponent);
     component = fixture.componentInstance;
@@ -26,7 +40,7 @@ describe('RecentServicesPanelComponent', () => {
 
   it('should create', () => expect(component).toBeTruthy());
 
-  it('[Red] should display "Recent Services" heading', () => {
+  it('[Red] should display "Recent Services" heading via translate pipe', () => {
     expect(fixture.nativeElement.textContent).toContain('Recent Services');
   });
 

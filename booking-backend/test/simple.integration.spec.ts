@@ -117,7 +117,7 @@ describe('Simple Database Integration Tests', () => {
       expect(columns).toContain('phone');
       expect(columns).toContain('password_hash');
       expect(columns).toContain('name');
-      expect(columns).toContain('user_type');
+      expect(columns).toContain('role');
       expect(columns).toContain('status');
     });
 
@@ -169,7 +169,8 @@ describe('Simple Database Integration Tests', () => {
       const columns = (result as any[]).map(r => r.column_name);
       expect(columns).toContain('id');
       expect(columns).toContain('service_id');
-      expect(columns).toContain('slot_time');
+      expect(columns).toContain('start_time');
+      expect(columns).toContain('end_time');
       expect(columns).toContain('is_active');
     });
 
@@ -297,7 +298,7 @@ describe('Simple Database Integration Tests', () => {
       const email = `test.${Date.now()}@example.com`;
       
       await prisma.$executeRawUnsafe(
-        `INSERT INTO users (id, email, phone, password_hash, name, user_type, status, created_at, updated_at) 
+        `INSERT INTO users (id, email, phone, password_hash, name, role, status, created_at, updated_at) 
          VALUES (gen_random_uuid(), $1, $2, $3, $4, 'CUSTOMER', 'ACTIVE', NOW(), NOW())`,
         email,
         `+1${Date.now()}`,
@@ -306,7 +307,7 @@ describe('Simple Database Integration Tests', () => {
       );
 
       const result = await prisma.$queryRawUnsafe(
-        `SELECT id, email, name, user_type, status FROM users WHERE email = $1`,
+        `SELECT id, email, name, role, status FROM users WHERE email = $1`,
         email
       );
       const user = (result as any[])[0];
@@ -314,7 +315,7 @@ describe('Simple Database Integration Tests', () => {
       expect(user).toBeDefined();
       expect(user.email).toBe(email);
       expect(user.name).toBe('Test User');
-      expect(user.user_type).toBe('CUSTOMER');
+      expect(user.role).toBe('CUSTOMER');
 
       // Cleanup
       await prisma.$executeRawUnsafe(
@@ -455,7 +456,7 @@ describe('Simple Database Integration Tests', () => {
       const email = `unique.test.${Date.now()}@example.com`;
       
       await prisma.$executeRawUnsafe(
-        `INSERT INTO users (id, email, phone, password_hash, name, user_type, status, created_at, updated_at) 
+        `INSERT INTO users (id, email, phone, password_hash, name, role, status, created_at, updated_at) 
          VALUES (gen_random_uuid(), $1, $2, 'hash', 'First Last', 'CUSTOMER', 'ACTIVE', NOW(), NOW())`,
         email,
         `+1${Date.now()}`
@@ -463,7 +464,7 @@ describe('Simple Database Integration Tests', () => {
 
       await expect(
         prisma.$executeRawUnsafe(
-          `INSERT INTO users (id, email, phone, password_hash, name, user_type, status, created_at, updated_at) 
+          `INSERT INTO users (id, email, phone, password_hash, name, role, status, created_at, updated_at) 
            VALUES (gen_random_uuid(), $1, $2, 'hash', 'First2 Last2', 'CUSTOMER', 'ACTIVE', NOW(), NOW())`,
           email,
           `+2${Date.now()}`

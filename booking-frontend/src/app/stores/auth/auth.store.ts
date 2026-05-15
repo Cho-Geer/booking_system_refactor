@@ -12,9 +12,10 @@ import { RegisterSendCodeDto, RegisterCompleteDto, LoginPasswordDto } from '../.
 export interface User {
   id: string;
   name: string;
-  userType: string;
+  role: string;
   email?: string;   // masked value from backend (e.g., "us***@example.com")
   phone?: string;   // masked value from backend (e.g., "138****5678")
+  preferredTimezone?: string;
   createdAt?: string;
 }
 
@@ -184,9 +185,10 @@ export const AuthStore = signalStore(
         const user: User = {
           id: profile.id,
           name: profile.name,
-          userType: profile.userType,
+          role: profile.role,
           email: profile.email,
           phone: profile.phone,
+          preferredTimezone: profile.preferredTimezone,
           createdAt: profile.createdAt,
         };
         patchState(store, { user, isLoading: false });

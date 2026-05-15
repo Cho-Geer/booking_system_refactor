@@ -64,7 +64,7 @@ describe('JwtStrategy', () => {
     const mockPayload = {
       sub: 'user-123',
       email: 'user@example.com',
-      userType: 'CUSTOMER',
+      roles: undefined,
       iat: 1704067200,
       exp: 1704070800,
     };
@@ -73,7 +73,7 @@ describe('JwtStrategy', () => {
       id: 'user-123',
       email: 'user@example.com',
       name: 'John Doe',
-      userType: 'CUSTOMER',
+      role: 'CUSTOMER',
       status: 'ACTIVE',
       phone: '1234567890',
       createdAt: new Date('2024-01-01'),
@@ -94,7 +94,7 @@ describe('JwtStrategy', () => {
         name: mockUser.name,
         phone: mockUser.phone,
         email: mockUser.email,
-        userType: mockUser.userType,
+        role: mockUser.role,
         roles: undefined,
       });
     });
@@ -122,8 +122,8 @@ describe('JwtStrategy', () => {
     });
 
     it('should return correct user fields for ADMIN type', async () => {
-      const adminPayload = { ...mockPayload, sub: 'admin-1', userType: 'ADMIN', roles: ['ADMIN'] };
-      const adminUser = { ...mockUser, id: 'admin-1', userType: 'ADMIN', name: 'Admin User' };
+      const adminPayload = { ...mockPayload, sub: 'admin-1', roles: ['ADMIN'] };
+      const adminUser = { ...mockUser, id: 'admin-1', role: 'ADMIN', name: 'Admin User' };
       mockPrisma.user.findUnique.mockResolvedValue(adminUser);
 
       const result = await strategy.validate(adminPayload);
@@ -133,14 +133,14 @@ describe('JwtStrategy', () => {
         name: 'Admin User',
         phone: adminUser.phone,
         email: adminUser.email,
-        userType: 'ADMIN',
+        role: 'ADMIN',
         roles: ['ADMIN'],
       });
     });
 
     it('should return correct user fields for STAFF type', async () => {
-      const staffPayload = { ...mockPayload, sub: 'staff-1', userType: 'STAFF', roles: ['STAFF'] };
-      const staffUser = { ...mockUser, id: 'staff-1', userType: 'STAFF', name: 'Staff Member' };
+      const staffPayload = { ...mockPayload, sub: 'staff-1', roles: ['STAFF'] };
+      const staffUser = { ...mockUser, id: 'staff-1', role: 'STAFF', name: 'Staff Member' };
       mockPrisma.user.findUnique.mockResolvedValue(staffUser);
 
       const result = await strategy.validate(staffPayload);
@@ -150,7 +150,7 @@ describe('JwtStrategy', () => {
         name: 'Staff Member',
         phone: staffUser.phone,
         email: staffUser.email,
-        userType: 'STAFF',
+        role: 'STAFF',
         roles: ['STAFF'],
       });
     });

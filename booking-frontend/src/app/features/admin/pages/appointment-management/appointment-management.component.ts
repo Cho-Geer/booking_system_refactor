@@ -15,7 +15,6 @@ import { AdminService } from '../../services/admin.service';
 import { ApiService } from '../../../../core/services/api.service';
 import {
   AdminAppointment,
-  AdminUser,
   AdminServiceItem,
   AppointmentStatus,
   UpdateAppointmentStatusRequest,
@@ -31,6 +30,7 @@ import { AppSpinnerComponent } from '../../../../shared/components/atoms/app-spi
 import { AppFilterBarComponent } from '../../../../shared/components/molecules/app-filter-bar/app-filter-bar.component';
 import { AppTableWrapperComponent } from '../../../../shared/components/molecules/app-table-wrapper/app-table-wrapper.component';
 import { AppModalComponent } from '../../../../shared/components/atoms/app-modal/app-modal.component';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 export type ViewMode = 'list' | 'calendar';
 
@@ -49,7 +49,7 @@ export interface CalendarEvent {
     InputTextModule, InputNumberModule, MultiSelectModule, Textarea, DatePicker, DatePipe,
     AppCardComponent, AppButtonComponent, AppBadgeComponent,
     AppSearchInputComponent, AppDropdownComponent, AppSpinnerComponent,
-    AppFilterBarComponent, AppTableWrapperComponent, AppModalComponent, Tooltip,
+    AppFilterBarComponent, AppTableWrapperComponent, AppModalComponent, Tooltip, TranslatePipe,
   ],
   templateUrl: './appointment-management.component.html',
   styleUrl: './appointment-management.component.scss',
@@ -138,6 +138,9 @@ export class AppointmentManagementComponent implements OnInit {
     this.vm().allAppointmentsForStats.map(a => ({ label: a.userName, value: a.id }))
   );
 
+  // Calendar day headers
+  readonly dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
   // Calendar events computed from full dataset
   readonly calendarEvents = computed<CalendarEvent[]>(() =>
     this.vm().allAppointmentsForStats.map(a => ({
@@ -204,14 +207,26 @@ export class AppointmentManagementComponent implements OnInit {
   readonly formErrors = signal<{ userId?: string; serviceId?: string; appointmentDate?: string; timeSlotId?: string }>({});
   readonly customerOptions = signal<{ label: string; value: string }[]>([]);
   readonly serviceOptions = signal<{ label: string; value: string }[]>([]);
-  readonly availableTimeSlots = signal<{ label: string; value: string }[]>([]);
+  readonly availableTimeSlots = signal<{ label: string; value: string; disabled: boolean }[]>([]);
   readonly timeSlotUnavailable = signal(false);
+  readonly timeSlotLoading = signal(false);
   readonly formSubmitted = signal(false);
+
+  /** Browser timezone label displayed above time slot dropdown */
+  readonly timezoneLabel = computed(() => {
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const offset = new Date().getTimezoneOffset();
+    const sign = offset <= 0 ? '+' : '-';
+    const absOffset = Math.abs(offset);
+    const hours = Math.floor(absOffset / 60);
+    const minutes = absOffset % 60;
+    const formattedOffset = `UTC${sign}${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    return `(${timeZone} ${formattedOffset})`;
+  });
 
   // Raw service items with pricing for cost estimation
   readonly rawServiceItems = signal<AdminServiceItem[]>([]);
   readonly formOvertimeMinutes = signal<number>(0);
-  readonly formSelectedSlotIds = signal<string[]>([]);
   readonly formSelectedServiceData = signal<AdminServiceItem | null>(null);
 
   /** Estimate total cost: pricePerMinute × (duration + overtime) × (1 + taxRate) */
@@ -261,7 +276,7 @@ export class AppointmentManagementComponent implements OnInit {
       search: this.filterSearch() || undefined,
     }).subscribe({
       next: (response) => {
-        this.store.setAppointments(response.items, response.total, response.page);
+        this.store.setAppointments(response.items, response.meta.total, response.meta.page);
         if (isFilterOperation) {
           this.isFiltering.set(false);
         } else {
@@ -291,9 +306,9 @@ export class AppointmentManagementComponent implements OnInit {
     this.formNotes.set('');
     this.availableTimeSlots.set([]);
     this.timeSlotUnavailable.set(false);
+    this.timeSlotLoading.set(false);
     this.formSubmitted.set(false);
     this.formOvertimeMinutes.set(0);
-    this.formSelectedSlotIds.set([]);
     this.formSelectedServiceData.set(null);
     this.bookingDialogVisible.set(true);
   }
@@ -326,7 +341,6 @@ export class AppointmentManagementComponent implements OnInit {
       timeSlotId,
       appointmentDate: appointmentDate.toISOString(),
       notes: this.formNotes() || undefined,
-      selectedSlotIds: this.formSelectedSlotIds().length > 0 ? this.formSelectedSlotIds() : undefined,
       overtimeMinutes: this.formOvertimeMinutes() > 0 ? this.formOvertimeMinutes() : undefined,
     };
 
@@ -372,7 +386,6 @@ export class AppointmentManagementComponent implements OnInit {
     this.availableTimeSlots.set([]);
     this.formTimeSlotId.set('');
     this.timeSlotUnavailable.set(false);
-    this.formSelectedSlotIds.set([]);
     this.formOvertimeMinutes.set(0);
     // Look up full service data for cost estimation
     const service = this.rawServiceItems().find(s => s.id === serviceId) ?? null;
@@ -382,28 +395,61 @@ export class AppointmentManagementComponent implements OnInit {
     }
   }
 
+  onDateChange(): void {
+    const serviceId = this.formServiceId();
+    if (serviceId) {
+      this.availableTimeSlots.set([]);
+      this.formTimeSlotId.set('');
+      this.loadAvailableTimeSlots(serviceId);
+    }
+  }
+
   private loadAvailableTimeSlots(serviceId: string): void {
+    const selectedDate = this.formAppointmentDate();
+    if (!selectedDate) {
+      // No date selected yet — clear slots and wait for date pick
+      this.availableTimeSlots.set([]);
+      this.timeSlotUnavailable.set(false);
+      this.timeSlotLoading.set(false);
+      return;
+    }
+
     const now = new Date();
-    const startDate = now.toISOString().split('T')[0];
-    const end = new Date();
-    end.setMonth(end.getMonth() + 2);
-    end.setHours(23, 59, 59, 999);
-    const endDate = end.toISOString().split('T')[0];
-    this.apiService.getAvailableSlots(serviceId, startDate, endDate).subscribe({
+    const startDate = selectedDate.toISOString().split('T')[0];
+    this.timeSlotLoading.set(true);
+
+    this.apiService.getAvailableSlots(serviceId, startDate, startDate).subscribe({
       next: (slots: TimeSlot[]) => {
-        const available = slots.filter(s => s.available);
-        if (available.length === 0) {
+        // Filter out past time slots where endTime <= now
+        const futureSlots = slots.filter(s => new Date(s.endTime) > now);
+        if (futureSlots.length === 0) {
           this.timeSlotUnavailable.set(true);
           this.availableTimeSlots.set([]);
         } else {
           this.timeSlotUnavailable.set(false);
           this.availableTimeSlots.set(
-            available.map(s => ({ label: `${s.startTime} - ${s.endTime} (${s.capacity - s.bookedCount} available)`, value: s.id }))
+            futureSlots.map(s => ({
+              label: `${this.formatTime(s.startTime)} - ${this.formatTime(s.endTime)}`,
+              value: s.id,
+              disabled: !s.available,
+            }))
           );
         }
+        this.timeSlotLoading.set(false);
       },
-      error: (err) => this.store.setError(err.message ?? 'Failed to load time slots'),
+      error: (err) => {
+        this.store.setError(err.message ?? 'Failed to load time slots');
+        this.timeSlotLoading.set(false);
+      },
     });
+  }
+
+  /** Format an ISO timestamp to 'HH:mm' string */
+  private formatTime(isoString: string): string {
+    const date = new Date(isoString);
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
   }
 
   viewAppointment(appointment: AdminAppointment): void {

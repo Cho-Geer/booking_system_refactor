@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import {
   Injectable,
   NotFoundException,
@@ -57,6 +58,10 @@ export class AdminAppointmentsService {
       throw new NotFoundException(`Service with ID ${dto.serviceId} not found`);
     }
 
+    const price = new Prisma.Decimal(service.price ?? 0);
+    const taxRate = new Prisma.Decimal(service.taxRate ?? 0);
+    const taxIncludedAmount = price.mul(new Prisma.Decimal(1).add(taxRate));
+
     let timeSlotId = dto.timeSlotId;
     if (!timeSlotId) {
       const slot = await this.prisma.timeSlot.findFirst({
@@ -85,6 +90,10 @@ export class AdminAppointmentsService {
         appointmentNumber: generateAppointmentNumber(),
         customerInfo: {},
         status: "PENDING",
+        durationMinutes: service.durationMinutes,
+        price,
+        taxRate,
+        taxIncludedAmount,
         remarks: dto.notes ?? null,
       },
       include: {

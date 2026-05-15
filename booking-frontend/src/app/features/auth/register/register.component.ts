@@ -21,6 +21,21 @@ import {
 } from '../dto/auth.dto';
 import { AppCardComponent } from '../../../shared/components/atoms/app-card/app-card.component';
 import { AppButtonComponent } from '../../../shared/components/atoms/app-button/app-button.component';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_REGEX = /^1[3-9]\d{9}$/;
+
+function contactFormatValidator(type: ContactType): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const value = control.value;
+    if (!value) return null;
+    if (type === ContactType.EMAIL) {
+      return EMAIL_REGEX.test(value) ? null : { emailFormat: true };
+    }
+    return PHONE_REGEX.test(value) ? null : { phoneFormat: true };
+  };
+}
 
 // Password strength validator matching backend requirements
 const passwordStrengthValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
@@ -56,6 +71,7 @@ const passwordStrengthValidator: ValidatorFn = (control: AbstractControl): Valid
     FormsModule,
     AppCardComponent,
     AppButtonComponent,
+    TranslatePipe,
   ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',
@@ -76,6 +92,9 @@ export class RegisterComponent implements OnDestroy {
 
   // Terms acceptance
   acceptTerms = signal(false);
+
+  // Masked contact from send-code response
+  maskedContact = signal<string | null>(null);
 
   // Countdown state
   countdown = signal(0);
@@ -100,6 +119,22 @@ export class RegisterComponent implements OnDestroy {
   // Signal references from store
   isLoading = this.authStore.isLoading;
   error = this.authStore.error;
+
+  constructor() {
+    this.updateContactValidators();
+  }
+
+  private updateContactValidators(): void {
+    const type = this.contactType();
+    const formatValidator = contactFormatValidator(type);
+    this.step1Form.get('contact')?.setValidators([Validators.required, formatValidator]);
+    this.step1Form.get('contact')?.updateValueAndValidity({ emitEvent: false });
+  }
+
+  setContactType(type: ContactType): void {
+    this.contactType.set(type);
+    this.updateContactValidators();
+  }
 
   ngOnDestroy(): void {
     this.clearCountdown();
@@ -127,10 +162,13 @@ export class RegisterComponent implements OnDestroy {
     };
 
     this.api.registerSendCode(dto).subscribe({
-      next: () => {
+      next: (response) => {
         this.authStore.setLoading(false);
         this.currentStep.set(2);
         this.startCountdown();
+        if (response?.maskedContact) {
+          this.maskedContact.set(response.maskedContact);
+        }
       },
       error: (err) => {
         this.authStore.setLoading(false);
@@ -169,14 +207,14 @@ export class RegisterComponent implements OnDestroy {
             this.authStore.setUserProfile({
               id: profile.id,
               name: profile.name,
-              userType: profile.userType,
+              role: profile.role,
               email: profile.email,
               phone: profile.phone,
               createdAt: profile.createdAt,
             });
 
             this.socketService.connect();
-            this.router.navigate([RouteResolver.getPostLoginRoute(profile.userType)]);
+            this.router.navigate([RouteResolver.getPostLoginRoute(profile.role)]);
           },
           error: () => {
             this.socketService.connect();

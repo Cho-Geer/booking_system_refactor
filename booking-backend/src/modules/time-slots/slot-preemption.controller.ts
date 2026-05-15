@@ -6,7 +6,6 @@ import {
   Headers,
   HttpCode,
   HttpStatus,
-  Logger,
   UseGuards,
   BadRequestException,
   Req,
@@ -40,27 +39,27 @@ export class ReserveSlotDto {
    * Preferred sequence number (0-9).
    * Generated randomly by the frontend to distribute load.
    */
-  preferSeq: number;
+  preferSeq!: number;
 
   /**
    * Service ID for the appointment.
    */
-  serviceId: string;
+  serviceId!: string;
 
   /**
    * Customer name.
    */
-  customerName: string;
+  customerName!: string;
 
   /**
    * Customer email address.
    */
-  customerEmail: string;
+  customerEmail!: string;
 
   /**
    * Customer phone number.
    */
-  customerPhone: string;
+  customerPhone!: string;
 
   /**
    * Optional notes for the appointment.
@@ -78,8 +77,6 @@ export class ReserveSlotDto {
 @Controller("slots")
 @UseGuards(JwtAuthGuard)
 export class SlotPreemptionController {
-  private readonly logger = new Logger(SlotPreemptionController.name);
-
   constructor(private readonly slotPreemptionService: SlotPreemptionService) {}
 
   /**

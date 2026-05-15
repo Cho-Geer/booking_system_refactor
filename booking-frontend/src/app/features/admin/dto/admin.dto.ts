@@ -21,7 +21,7 @@ export interface ServicePopularityItem {
 }
 
 export interface TimeDistributionItem {
-  hour: string;
+  hour: number;
   count: number;
 }
 
@@ -34,7 +34,6 @@ export interface StatCard {
 }
 
 export interface AdminStats {
-  totalBookings: StatCard;
   todayBookings: StatCard;
   pendingBookings: StatCard;
   activeUsers: StatCard;
@@ -57,6 +56,7 @@ export interface AdminUser {
   phone?: string;
   role: AdminUserRole;
   status: AdminUserStatus;
+  preferredTimezone?: string;
   createdAt: string;
 }
 
@@ -96,7 +96,14 @@ export interface AdminServiceItem {
   imageUrl?: string;
   pricePerMinute?: number;
   taxRate?: number;
+  category?: string;
   createdAt: string;
+}
+
+export interface ServicesSummary {
+  total: number;
+  active: number;
+  averagePrice: number;
 }
 
 export interface CreateAdminServiceRequest {
@@ -126,6 +133,7 @@ export interface AdminServicesQuery {
   limit?: number;
   search?: string;
   active?: boolean;
+  category?: string;
 }
 
 // ==========================================
@@ -148,7 +156,6 @@ export interface AdminAppointment {
   price?: number;
   taxRate?: number;
   taxIncludedAmount?: number;
-  bookingGroupId?: string;
   createdAt: string;
 }
 
@@ -185,7 +192,6 @@ export interface CreateAdminAppointmentRequest {
   appointmentDate: string;
   timeSlotId?: string;
   notes?: string;
-  selectedSlotIds?: string[];
   overtimeMinutes?: number;
 }
 
@@ -295,9 +301,16 @@ export interface UnreadCount {
 // Paginated Response
 // ==========================================
 
-export interface PaginatedResponse<T> {
-  items: T[];
+export interface PaginatedMeta {
   total: number;
   page: number;
   limit: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+}
+
+export interface PaginatedResponse<T> {
+  items: T[];
+  meta: PaginatedMeta;
 }

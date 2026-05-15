@@ -602,13 +602,13 @@ describe('NotificationsGateway', () => {
   });
 
   describe('sendAppointmentStatusChanged', () => {
-    it('should call sendAdminBroadcast with appointment.status_changed event', () => {
-      const sendAdminBroadcastSpy = jest.spyOn(gateway, 'sendAdminBroadcast');
+    it('should emit appointment.status_changed event to admin:broadcast room', () => {
       const data = { appointmentId: 'apt-123', status: 'CONFIRMED', previousStatus: 'PENDING', timestamp: '2024-01-01T00:00:00.000Z' };
 
       gateway.sendAppointmentStatusChanged(data);
 
-      expect(sendAdminBroadcastSpy).toHaveBeenCalledWith('appointment.status_changed', data);
+      expect(mockServer.to).toHaveBeenCalledWith('admin:broadcast');
+      expect(mockEmit).toHaveBeenCalledWith('appointment.status_changed', data);
     });
 
     it('should log the broadcast action', () => {

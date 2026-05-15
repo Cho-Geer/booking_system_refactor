@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, HttpStatus } from '@nestjs/common';
-import { PrismaClient, UserType, UserStatus } from '@prisma/client';
+import { PrismaClient, SystemRole, UserStatus } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
@@ -9,7 +9,7 @@ import {
   cleanupAllTestData,
 } from './fixtures/database.fixture';
 import { UserFactory } from './factories';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 
 // ============================================================
 // Users Module E2E Tests
@@ -61,19 +61,19 @@ describe('Users Module (E2E)', () => {
     // Create test users with password hashes for auth flow
     const passwordHash = await bcrypt.hash('TestPassword123!', 10);
 
-    customerUser = await createTestUser(prisma, UserType.CUSTOMER, {
+    customerUser = await createTestUser(prisma, SystemRole.CUSTOMER, {
       email: `customer-${Date.now()}@e2e.com`,
       name: 'E2E Customer User',
       passwordHash,
     });
 
-    adminUser = await createTestUser(prisma, UserType.ADMIN, {
+    adminUser = await createTestUser(prisma, SystemRole.ADMIN, {
       email: `admin-${Date.now()}@e2e.com`,
       name: 'E2E Admin User',
       passwordHash,
     });
 
-    superAdminUser = await createTestUser(prisma, UserType.SUPER_ADMIN, {
+    superAdminUser = await createTestUser(prisma, SystemRole.SUPER_ADMIN, {
       email: `superadmin-${Date.now()}@e2e.com`,
       name: 'E2E Super Admin User',
       passwordHash,
@@ -90,9 +90,9 @@ describe('Users Module (E2E)', () => {
   // ============================================================
 
   /** Generate a JWT token for a test user */
-  function generateTestToken(userId: string, email: string | null, userType: string): string {
+  function generateTestToken(userId: string, email: string | null, role: string): string {
     return jwtService.sign(
-      { sub: userId, email: email ?? '', userType, name: 'Test User' },
+      { sub: userId, email: email ?? '', role, name: 'Test User' },
       { secret: process.env.JWT_SECRET || 'test-jwt-secret-key-for-e2e-tests-only' },
     );
   }
@@ -174,7 +174,7 @@ describe('Users Module (E2E)', () => {
       expect(response.body.phone).toBe(updatePayload.phone);
       // Should retain original values for unchanged fields
       expect(response.body.email).toBe(customerUser.email);
-      expect(response.body.userType).toBe(UserType.CUSTOMER);
+      expect(response.body.role).toBe(SystemRole.CUSTOMER);
       expect(response.body.status).toBe(UserStatus.ACTIVE);
 
       // Verify persistence in database
@@ -241,7 +241,7 @@ describe('Users Module (E2E)', () => {
       // Create additional users for pagination test
       await Promise.all(
         Array.from({ length: 5 }, (_, i) =>
-          createTestUser(prisma, UserType.CUSTOMER, {
+          createTestUser(prisma, SystemRole.CUSTOMER, {
             email: `pagination-user-${i}-${Date.now()}@e2e.com`,
             name: `Pagination User ${i}`,
           }),
@@ -266,7 +266,7 @@ describe('Users Module (E2E)', () => {
       // Create 15 users for pagination
       await Promise.all(
         Array.from({ length: 15 }, (_, i) =>
-          createTestUser(prisma, UserType.CUSTOMER, {
+          createTestUser(prisma, SystemRole.CUSTOMER, {
             email: `page-user-${i}-${Date.now()}@e2e.com`,
             name: `Page User ${i}`,
           }),
@@ -312,7 +312,7 @@ describe('Users Module (E2E)', () => {
 
   describe('Admin Status Change', () => {
     it('should allow admin to change a user status from ACTIVE to BLOCKED', async () => {
-      const targetUser = await createTestUser(prisma, UserType.CUSTOMER, {
+      const targetUser = await createTestUser(prisma, SystemRole.CUSTOMER, {
         email: `block-target-${Date.now()}@e2e.com`,
         name: 'Block Target User',
         status: UserStatus.ACTIVE,
@@ -335,7 +335,7 @@ describe('Users Module (E2E)', () => {
     });
 
     it('should allow admin to change status from BLOCKED back to ACTIVE', async () => {
-      const targetUser = await createTestUser(prisma, UserType.CUSTOMER, {
+      const targetUser = await createTestUser(prisma, SystemRole.CUSTOMER, {
         email: `unblock-target-${Date.now()}@e2e.com`,
         name: 'Unblock Target User',
         status: UserStatus.BLOCKED,
@@ -350,21 +350,21 @@ describe('Users Module (E2E)', () => {
     });
 
     it('should allow admin to change user type', async () => {
-      const targetUser = await createTestUser(prisma, UserType.CUSTOMER, {
+      const targetUser = await createTestUser(prisma, SystemRole.CUSTOMER, {
         email: `type-change-${Date.now()}@e2e.com`,
         name: 'Type Change User',
       });
 
       const response = await authenticatedRequest(adminToken)
         .patch(`/users/${targetUser.id}`)
-        .send({ userType: UserType.ADMIN });
+        .send({ role: SystemRole.ADMIN });
 
       expect(response.status).toBe(HttpStatus.OK);
-      expect(response.body.userType).toBe(UserType.ADMIN);
+      expect(response.body.role).toBe(SystemRole.ADMIN);
     });
 
     it('should allow admin to update multiple fields at once', async () => {
-      const targetUser = await createTestUser(prisma, UserType.CUSTOMER, {
+      const targetUser = await createTestUser(prisma, SystemRole.CUSTOMER, {
         email: `multi-update-${Date.now()}@e2e.com`,
         name: 'Multi Update User',
       });
@@ -399,7 +399,7 @@ describe('Users Module (E2E)', () => {
 
   describe('Super-Admin User Deletion', () => {
     it('should allow super-admin to delete a user', async () => {
-      const targetUser = await createTestUser(prisma, UserType.CUSTOMER, {
+      const targetUser = await createTestUser(prisma, SystemRole.CUSTOMER, {
         email: `delete-target-${Date.now()}@e2e.com`,
         name: 'Delete Target User',
       });
@@ -426,7 +426,7 @@ describe('Users Module (E2E)', () => {
     });
 
     it('should return 404 when trying to delete an already deleted user', async () => {
-      const targetUser = await createTestUser(prisma, UserType.CUSTOMER, {
+      const targetUser = await createTestUser(prisma, SystemRole.CUSTOMER, {
         email: `double-delete-${Date.now()}@e2e.com`,
         name: 'Double Delete User',
       });
@@ -456,7 +456,7 @@ describe('Users Module (E2E)', () => {
     });
 
     it('should return 403 when customer tries to DELETE /users/:id', async () => {
-      const targetUser = await createTestUser(prisma, UserType.CUSTOMER, {
+      const targetUser = await createTestUser(prisma, SystemRole.CUSTOMER, {
         email: `forbidden-delete-${Date.now()}@e2e.com`,
         name: 'Forbidden Delete Target',
       });
@@ -476,7 +476,7 @@ describe('Users Module (E2E)', () => {
     });
 
     it('should return 403 when customer tries to update another user profile', async () => {
-      const otherUser = await createTestUser(prisma, UserType.CUSTOMER, {
+      const otherUser = await createTestUser(prisma, SystemRole.CUSTOMER, {
         email: `other-user-${Date.now()}@e2e.com`,
         name: 'Other User',
       });
@@ -497,7 +497,7 @@ describe('Users Module (E2E)', () => {
     });
 
     it('should allow admin to DELETE /users/:id (not forbidden)', async () => {
-      const targetUser = await createTestUser(prisma, UserType.CUSTOMER, {
+      const targetUser = await createTestUser(prisma, SystemRole.CUSTOMER, {
         email: `admin-delete-${Date.now()}@e2e.com`,
         name: 'Admin Delete Target',
       });
@@ -523,7 +523,7 @@ describe('Users Module (E2E)', () => {
       expect(response.body.id).toBe(customerUser.id);
       expect(response.body.name).toBe(customerUser.name);
       expect(response.body.email).toBe(customerUser.email);
-      expect(response.body.userType).toBe(UserType.CUSTOMER);
+      expect(response.body.role).toBe(SystemRole.CUSTOMER);
       expect(response.body.status).toBe(UserStatus.ACTIVE);
       // Should not include sensitive fields
       expect(response.body.passwordHash).toBeUndefined();
@@ -555,7 +555,7 @@ describe('Users Module (E2E)', () => {
       const newUser = UserFactory.create({
         email: `new-created-${Date.now()}@e2e.com`,
         name: 'Newly Created User',
-        userType: UserType.CUSTOMER,
+        role: SystemRole.CUSTOMER,
       });
 
       const response = await authenticatedRequest(adminToken)
@@ -565,7 +565,7 @@ describe('Users Module (E2E)', () => {
       expect(response.status).toBe(HttpStatus.CREATED);
       expect(response.body.name).toBe(newUser.name);
       expect(response.body.email).toBe(newUser.email);
-      expect(response.body.userType).toBe(UserType.CUSTOMER);
+      expect(response.body.role).toBe(SystemRole.CUSTOMER);
       expect(response.body.status).toBe(UserStatus.ACTIVE);
       expect(response.body.id).toBeDefined();
 
@@ -599,11 +599,11 @@ describe('Users Module (E2E)', () => {
         .post('/users')
         .send(UserFactory.create({
           email: `admin-created-${Date.now()}@e2e.com`,
-          userType: UserType.ADMIN,
+          role: SystemRole.ADMIN,
         }));
 
       expect(response.status).toBe(HttpStatus.CREATED);
-      expect(response.body.userType).toBe(UserType.ADMIN);
+      expect(response.body.role).toBe(SystemRole.ADMIN);
     });
   });
 
@@ -613,7 +613,7 @@ describe('Users Module (E2E)', () => {
 
   describe('Data Integrity', () => {
     it('should preserve unchanged fields when partially updating', async () => {
-      const originalUser = await createTestUser(prisma, UserType.CUSTOMER, {
+      const originalUser = await createTestUser(prisma, SystemRole.CUSTOMER, {
         email: `integrity-${Date.now()}@e2e.com`,
         name: 'Integrity Test User',
         phone: '+15550001111',
@@ -632,11 +632,11 @@ describe('Users Module (E2E)', () => {
       expect(updatedUser!.name).toBe('Updated Name');
       expect(updatedUser!.email).toBe(originalUser.email);
       expect(updatedUser!.phone).toBe(originalUser.phone);
-      expect(updatedUser!.userType).toBe(UserType.CUSTOMER);
+      expect(updatedUser!.role).toBe(SystemRole.CUSTOMER);
     });
 
     it('should handle concurrent updates to the same user correctly', async () => {
-      const targetUser = await createTestUser(prisma, UserType.CUSTOMER, {
+      const targetUser = await createTestUser(prisma, SystemRole.CUSTOMER, {
         email: `concurrent-update-${Date.now()}@e2e.com`,
         name: 'Concurrent Update User',
       });
@@ -674,7 +674,7 @@ describe('Users Module (E2E)', () => {
     it('should not allow setting invalid user type', async () => {
       const response = await authenticatedRequest(adminToken)
         .patch(`/users/${customerUser.id}`)
-        .send({ userType: 'INVALID_TYPE' });
+        .send({ role: 'INVALID_TYPE' });
 
       expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });

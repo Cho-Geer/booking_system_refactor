@@ -1,7 +1,7 @@
 <div class="sharp-card card-lift bg-card-bg">
   <div class="flex items-center justify-between p-5 pb-0">
-    <h3 class="text-base font-bold text-text-primary">Recent Services</h3>
-    <a routerLink="/admin/services" class="text-accent-green text-sm hover:underline">View All</a>
+    <h3 class="text-base font-bold text-text-primary">{{ 'admin.dashboard.popularServices' | t }}</h3>
+    <a routerLink="/admin/services" class="text-accent-green text-sm hover:underline">{{ 'admin.recent.viewAll' | t }}</a>
   </div>
   <div class="p-5">
     <app-recent-services-table [rows]="rows()" (rowClick)="rowClick.emit($event)" />

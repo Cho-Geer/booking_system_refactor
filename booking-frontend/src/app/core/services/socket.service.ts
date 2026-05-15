@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { AuthStore } from '../../stores/auth/auth.store';
 
 /** Socket reconnection delay in milliseconds */
 const SOCKET_RECONNECT_DELAY_MS = 1000;
@@ -35,9 +36,10 @@ export interface AppointmentStatusEvent {
 export class SocketService {
   private socket: Socket;
   private connected = false;
+  private readonly authStore = inject(AuthStore);
 
   constructor() {
-    this.socket = io(environment.socketUrl, {
+    this.socket = io(`${environment.socketUrl}/notifications`, {
       autoConnect: false,
       reconnection: true,
       reconnectionDelay: SOCKET_RECONNECT_DELAY_MS,
@@ -55,14 +57,40 @@ export class SocketService {
 
   connect(): void {
     if (!this.connected) {
+      const token = this.authStore.token();
+      if (token) {
+        this.socket.auth = { token };
+      }
       this.socket.connect();
     }
+
+    this.socket.on('ping', () => {
+      this.socket.emit('pong');
+    });
   }
 
   disconnect(): void {
     if (this.connected) {
       this.socket.disconnect();
     }
+  }
+
+  /**
+   * Subscribe to real-time translation update events.
+   * Emits when translations are updated (e.g., from admin editing translations).
+   */
+  subscribeToTranslationUpdates(): Observable<{ type: string; timestamp: string }> {
+    return new Observable<{ type: string; timestamp: string }>((observer) => {
+      this.connect();
+
+      this.socket.on('translations.updated', (data: { type: string; timestamp: string }) => {
+        observer.next(data);
+      });
+
+      return () => {
+        this.socket.off('translations.updated');
+      };
+    });
   }
 
   subscribeToSlotUpdates(): Observable<SlotUpdateEvent> {
@@ -107,16 +135,63 @@ export class SocketService {
     });
   }
 
+  subscribeToSlotBooked(
+    callback: (data: {
+      timeSlotId: string;
+      appointmentDate: string;
+      remainingCapacity: number;
+      timestamp: string;
+    }) => void,
+  ): void {
+    this.socket.on('slot.booked', callback);
+  }
+
+  subscribeToNewNotification(
+    callback: (data: {
+      id: string;
+      type: string;
+      title: string;
+      body: string;
+      createdAt: string;
+    }) => void,
+  ): void {
+    this.socket.on('notification.new', callback);
+  }
+
+  subscribeToStatsUpdated(
+    callback: (data: {
+      totalBookings: number;
+      todayBookings: number;
+      pendingBookings: number;
+      activeUsers: number;
+      totalRevenue: number;
+    }) => void,
+  ): void {
+    this.socket.on('stats.updated', callback);
+  }
+
+  subscribeToAppointmentUpdated(callback: (data: { appointmentId: string; changes: Record<string, unknown>; timestamp: string }) => void): void {
+    this.socket.on('appointment_updated', callback);
+  }
+
+  subscribeToBookingConfirmed(callback: (data: { appointmentId: string; appointmentNumber: string; timestamp: string }) => void): void {
+    this.socket.on('booking_confirmed', callback);
+  }
+
+  subscribeToBookingCancelled(callback: (data: { appointmentId: string; reason?: string; timestamp: string }) => void): void {
+    this.socket.on('booking_cancelled', callback);
+  }
+
   joinAdminRoom(): void {
     this.socket.emit('join', { room: 'admin:broadcast' });
   }
 
   joinRoom(room: string): void {
-    this.socket.emit('join-room', room);
+    this.socket.emit('join', { room });
   }
 
   leaveRoom(room: string): void {
-    this.socket.emit('leave-room', room);
+    this.socket.emit('leave', { room });
   }
 
   isConnected(): boolean {

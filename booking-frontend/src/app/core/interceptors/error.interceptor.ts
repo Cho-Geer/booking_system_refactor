@@ -3,23 +3,39 @@ import { inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { NotificationService } from '../services/notification.service';
+import { TranslationService } from '../services/translation.service';
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   const notification = inject(NotificationService);
+  const translation = inject(TranslationService);
 
   return next(req).pipe(
     catchError((err) => {
       if (err.status === 401) {
-        notification.error('登录已过期', '请重新登录');
+        notification.error(
+          translation.t('errors', 'sessionExpired'),
+          translation.t('errors', 'sessionExpired.message'),
+        );
         router.navigate(['/auth/login']);
       } else if (err.status === 403) {
-        notification.error('权限不足', '您无权执行此操作');
+        notification.error(
+          translation.t('errors', 'forbidden'),
+          translation.t('errors', 'forbidden.message'),
+        );
       } else if (err.status === 429) {
         const retryAfter = err.headers?.get('Retry-After');
-        notification.warning('操作过于频繁', retryAfter ? `请在 ${retryAfter} 秒后重试` : '请稍后重试');
+        notification.warning(
+          translation.t('errors', 'rateLimited'),
+          retryAfter
+            ? translation.t('errors', 'rateLimited.message', { seconds: retryAfter })
+            : translation.t('errors', 'tryAgain'),
+        );
       } else if (err.status >= 500) {
-        notification.error('服务器错误', '请稍后重试或联系客服');
+        notification.error(
+          translation.t('errors', 'serverError'),
+          translation.t('errors', 'serverError.message'),
+        );
       }
       return throwError(() => err);
     })

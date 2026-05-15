@@ -5,6 +5,7 @@ import { AppointmentsService } from './appointments.service';
 import { CreateAppointmentDto, UpdateAppointmentDto } from './dto/appointment.dto';
 import { AppointmentStatus } from '@prisma/client';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { CacheService, REDIS_CONFIG_TOKEN } from '../cache/cache.service';
 
 // Mock the JwtAuthGuard to always pass, but we can inspect what it attaches to req
 const mockJwtAuthGuard = {
@@ -26,10 +27,17 @@ const mockAppointmentsService = {
   remove: jest.fn(),
 };
 
+// Mock CacheService
+const mockCacheService = {
+  get: jest.fn().mockResolvedValue(null),
+  set: jest.fn().mockResolvedValue(undefined),
+  isAvailable: jest.fn().mockReturnValue(true),
+};
+
 describe('AppointmentsController', () => {
   let controller: AppointmentsController;
   let service: typeof mockAppointmentsService;
-  let mockReq: any;
+  let mockReq: Record<string, unknown>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -38,6 +46,14 @@ describe('AppointmentsController', () => {
         {
           provide: AppointmentsService,
           useValue: mockAppointmentsService,
+        },
+        {
+          provide: REDIS_CONFIG_TOKEN,
+          useValue: { host: 'localhost', port: 6379, keyPrefix: 'test:', ttlDefault: 300, ttlSession: 604800 },
+        },
+        {
+          provide: CacheService,
+          useValue: mockCacheService,
         },
       ],
     })
@@ -68,10 +84,9 @@ describe('AppointmentsController', () => {
       const maliciousDto: CreateAppointmentDto = {
         timeSlotId: 'slot-1',
         serviceId: 'service-1',
-        customerName: 'John Doe',
-        customerEmail: 'john@example.com',
-        customerPhone: '1234567890',
+        customerInfo: { name: 'John Doe', email: 'john@example.com', phone: '1234567890' },
         notes: 'Test appointment',
+        appointmentDate: '2024-01-15T10:00:00Z',
       };
 
       const mockAppointment = {
@@ -90,7 +105,7 @@ describe('AppointmentsController', () => {
       mockAppointmentsService.create.mockResolvedValue(mockAppointment);
 
       // Act: Call controller with the malicious DTO (no userId in DTO)
-      const result = await controller.create(maliciousDto, mockReq);
+      const result = await controller.create(maliciousDto, mockReq, 'test-key');
 
       // Assert: Verify service was called with the JWT userId as second argument
       const actualUserId = mockAppointmentsService.create.mock.calls[0][1];
@@ -102,10 +117,9 @@ describe('AppointmentsController', () => {
       const createAppointmentDto: CreateAppointmentDto = {
         timeSlotId: 'slot-1',
         serviceId: 'service-1',
-        customerName: 'John Doe',
-        customerEmail: 'john@example.com',
-        customerPhone: '1234567890',
+        customerInfo: { name: 'John Doe', email: 'john@example.com', phone: '1234567890' },
         notes: 'Test appointment',
+        appointmentDate: '2024-01-15T10:00:00Z',
       };
 
       const mockAppointment = {
@@ -123,7 +137,7 @@ describe('AppointmentsController', () => {
 
       mockAppointmentsService.create.mockResolvedValue(mockAppointment);
 
-      const result = await controller.create(createAppointmentDto, mockReq);
+      const result = await controller.create(createAppointmentDto, mockReq, 'test-key');
 
       expect(service.create).toHaveBeenCalledWith(createAppointmentDto, 'jwt-user-id');
       expect(result).toEqual(mockAppointment);
@@ -133,28 +147,26 @@ describe('AppointmentsController', () => {
       const createAppointmentDto: CreateAppointmentDto = {
         timeSlotId: 'slot-1',
         serviceId: 'service-1',
-        customerName: 'John Doe',
-        customerEmail: 'john@example.com',
-        customerPhone: '1234567890',
+        customerInfo: { name: 'John Doe', email: 'john@example.com', phone: '1234567890' },
         notes: 'Test appointment',
+        appointmentDate: '2024-01-15T10:00:00Z',
       };
 
       mockAppointmentsService.create.mockRejectedValue(
         new NotFoundException('Time slot not found'),
       );
 
-      await expect(controller.create(createAppointmentDto, mockReq)).rejects.toThrow(NotFoundException);
-      await expect(controller.create(createAppointmentDto, mockReq)).rejects.toThrow('Time slot not found');
+      await expect(controller.create(createAppointmentDto, mockReq, 'test-key')).rejects.toThrow(NotFoundException);
+      await expect(controller.create(createAppointmentDto, mockReq, 'test-key')).rejects.toThrow('Time slot not found');
     });
 
     it('should propagate ConflictException from service.create', async () => {
       const createAppointmentDto: CreateAppointmentDto = {
         timeSlotId: 'slot-1',
         serviceId: 'service-1',
-        customerName: 'John Doe',
-        customerEmail: 'john@example.com',
-        customerPhone: '1234567890',
+        customerInfo: { name: 'John Doe', email: 'john@example.com', phone: '1234567890' },
         notes: 'Test appointment',
+        appointmentDate: '2024-01-15T10:00:00Z',
       };
 
       mockAppointmentsService.create.mockRejectedValue(
@@ -164,7 +176,7 @@ describe('AppointmentsController', () => {
         })(),
       );
 
-      await expect(controller.create(createAppointmentDto, mockReq)).rejects.toThrow('Time slot is not available');
+      await expect(controller.create(createAppointmentDto, mockReq, 'test-key')).rejects.toThrow('Time slot is not available');
     });
   });
 
@@ -189,7 +201,7 @@ describe('AppointmentsController', () => {
 
       const result = await controller.findAll();
 
-      expect(service.findAll).toHaveBeenCalledWith(1, 20, undefined, undefined);
+      expect(service.findAll).toHaveBeenCalledWith(1, 20, undefined, undefined, undefined, undefined);
       expect(result.items).toEqual(mockAppointments);
       expect(result.meta.total).toBe(2);
     });
@@ -209,7 +221,7 @@ describe('AppointmentsController', () => {
 
       const result = await controller.findAll(2, 5);
 
-      expect(service.findAll).toHaveBeenCalledWith(2, 5, undefined, undefined);
+      expect(service.findAll).toHaveBeenCalledWith(2, 5, undefined, undefined, undefined, undefined);
       expect(result.meta.page).toBe(2);
       expect(result.meta.limit).toBe(5);
     });
@@ -229,7 +241,7 @@ describe('AppointmentsController', () => {
 
       await controller.findAll(1, 10, AppointmentStatus.PENDING);
 
-      expect(service.findAll).toHaveBeenCalledWith(1, 10, AppointmentStatus.PENDING, undefined);
+      expect(service.findAll).toHaveBeenCalledWith(1, 10, AppointmentStatus.PENDING, undefined, undefined, undefined);
     });
 
     // BUG-001 Test 4: Admin findAll endpoint still supports userId query param for filtering
@@ -248,7 +260,7 @@ describe('AppointmentsController', () => {
 
       await controller.findAll(1, 10, undefined, 'filter-user-id');
 
-      expect(service.findAll).toHaveBeenCalledWith(1, 10, undefined, 'filter-user-id');
+      expect(service.findAll).toHaveBeenCalledWith(1, 10, undefined, 'filter-user-id', undefined, undefined);
     });
 
     it('should call service.findAll with all filters', async () => {
@@ -266,7 +278,7 @@ describe('AppointmentsController', () => {
 
       await controller.findAll(1, 10, AppointmentStatus.CANCELLED, 'user-2');
 
-      expect(service.findAll).toHaveBeenCalledWith(1, 10, AppointmentStatus.CANCELLED, 'user-2');
+      expect(service.findAll).toHaveBeenCalledWith(1, 10, AppointmentStatus.CANCELLED, 'user-2', undefined, undefined);
     });
   });
 

@@ -31,6 +31,9 @@ const mockPrismaService = {
     update: jest.fn(),
     updateMany: jest.fn(),
   },
+  activityLog: {
+    create: jest.fn(),
+  },
   $transaction: jest.fn(),
 };
 
@@ -145,10 +148,9 @@ describe('AppointmentsService', () => {
     const createAppointmentDto: CreateAppointmentDto = {
       timeSlotId: 'slot-1',
       serviceId: 'service-1',
-      customerName: 'John Doe',
-      customerEmail: 'john@example.com',
-      customerPhone: '1234567890',
+      customerInfo: { name: 'John Doe', email: 'john@example.com', phone: '1234567890' },
       notes: 'Test notes',
+      appointmentDate: '2024-01-15T10:00:00Z',
     };
 
     it('should throw NotFoundException if time slot does not exist', async () => {
@@ -195,11 +197,7 @@ describe('AppointmentsService', () => {
           userId: 'user-1',
           timeSlotId: createAppointmentDto.timeSlotId,
           serviceId: createAppointmentDto.serviceId,
-          customerInfo: {
-            name: createAppointmentDto.customerName,
-            email: createAppointmentDto.customerEmail,
-            phone: createAppointmentDto.customerPhone,
-          },
+          customerInfo: createAppointmentDto.customerInfo,
           remarks: createAppointmentDto.notes,
           status: AppointmentStatus.PENDING,
           appointmentDate: expect.any(Date),
@@ -263,9 +261,8 @@ describe('AppointmentsService', () => {
       const dtoWithoutNotes: CreateAppointmentDto = {
         timeSlotId: 'slot-1',
         serviceId: 'service-1',
-        customerName: 'John Doe',
-        customerEmail: 'john@example.com',
-        customerPhone: '1234567890',
+        customerInfo: { name: 'John Doe', email: 'john@example.com', phone: '1234567890' },
+        appointmentDate: '2024-01-15T10:00:00Z',
       };
       prisma.timeSlot.findUnique.mockResolvedValue(mockTimeSlot);
       const mockTx = {
@@ -314,7 +311,7 @@ describe('AppointmentsService', () => {
       });
 
       // Mock sleep to resolve immediately
-      jest.spyOn(service as any, 'sleep').mockResolvedValue(undefined);
+      jest.spyOn(service as unknown as { sleep: () => Promise<void> }, 'sleep').mockResolvedValue(undefined);
 
       const result = await service.create(createAppointmentDto, 'user-1');
 
@@ -342,7 +339,7 @@ describe('AppointmentsService', () => {
       });
 
       // Mock sleep to resolve immediately
-      jest.spyOn(service as any, 'sleep').mockResolvedValue(undefined);
+      jest.spyOn(service as unknown as { sleep: () => Promise<void> }, 'sleep').mockResolvedValue(undefined);
 
       await expect(service.create(createAppointmentDto, 'user-1')).rejects.toThrow(ConflictException);
       await expect(service.create(createAppointmentDto, 'user-1')).rejects.toThrow(/maximum retries exceeded/);
@@ -453,7 +450,7 @@ describe('AppointmentsService', () => {
       prisma.$transaction.mockImplementation(async (callback) => {
         attemptCount++;
         if (attemptCount < 2) {
-          const timeoutError: any = new Error('Transaction timeout');
+          const timeoutError = new Error('Transaction timeout') as Error & { code: string };
           timeoutError.code = 'P2034';
           throw timeoutError;
         }
@@ -469,7 +466,7 @@ describe('AppointmentsService', () => {
       });
 
       // Mock sleep to resolve immediately
-      jest.spyOn(service as any, 'sleep').mockResolvedValue(undefined);
+      jest.spyOn(service as unknown as { sleep: () => Promise<void> }, 'sleep').mockResolvedValue(undefined);
 
       const result = await service.create(createAppointmentDto, 'user-1');
       expect(result).toEqual(mockAppointment);
@@ -479,12 +476,12 @@ describe('AppointmentsService', () => {
     it('should throw ConflictException after transaction timeout and all retries exhausted', async () => {
       prisma.timeSlot.findUnique.mockResolvedValue({ ...mockTimeSlot, currentSequence: 0 });
 
-      const timeoutError: any = new Error('Transaction timeout');
+      const timeoutError = new Error('Transaction timeout') as Error & { code: string };
       timeoutError.code = 'P2034';
       prisma.$transaction.mockRejectedValue(timeoutError);
 
       // Mock sleep to resolve immediately
-      jest.spyOn(service as any, 'sleep').mockResolvedValue(undefined);
+      jest.spyOn(service as unknown as { sleep: () => Promise<void> }, 'sleep').mockResolvedValue(undefined);
 
       await expect(service.create(createAppointmentDto, 'user-1')).rejects.toThrow(ConflictException);
       await expect(service.create(createAppointmentDto, 'user-1')).rejects.toThrow(/Database timeout/);
@@ -511,7 +508,7 @@ describe('AppointmentsService', () => {
       });
 
       // Mock sleep to resolve immediately
-      jest.spyOn(service as any, 'sleep').mockResolvedValue(undefined);
+      jest.spyOn(service as unknown as { sleep: () => Promise<void> }, 'sleep').mockResolvedValue(undefined);
 
       const result = await service.create(createAppointmentDto, 'user-1');
       expect(result).toEqual(mockAppointment);
@@ -1186,9 +1183,8 @@ if (isIntegrationMode()) {
         const result = await appointmentsService.create({
           serviceId: service.id,
           timeSlotId: timeSlot.id,
-          customerName: user.name,
-          customerEmail: user.email || 'test@example.com',
-          customerPhone: user.phone || '1234567890',
+          customerInfo: { name: user.name, email: user.email || 'test@example.com', phone: user.phone || '1234567890' },
+          appointmentDate: '2024-01-15T10:00:00Z',
         }, user.id);
 
         expect(result).toHaveProperty('id');

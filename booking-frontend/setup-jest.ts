@@ -24,7 +24,13 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 });
 
-TestBed.initTestEnvironment(
-  BrowserDynamicTestingModule,
-  platformBrowserDynamicTesting()
-);
+// Prevent double initialization error (NG0400) when jest-preset-angular
+// already initializes the test environment
+try {
+  TestBed.initTestEnvironment(
+    BrowserDynamicTestingModule,
+    platformBrowserDynamicTesting()
+  );
+} catch {
+  // Test environment already initialized by jest-preset-angular
+}

@@ -17,6 +17,6 @@ export const guestGuard: CanActivateFn = () => {
     return true;
   }
 
-  router.navigate([RouteResolver.getPostLoginRoute(authStore.currentUser()?.userType)]);
+  router.navigate([RouteResolver.getPostLoginRoute(authStore.currentUser()?.role)]);
   return false;
 };

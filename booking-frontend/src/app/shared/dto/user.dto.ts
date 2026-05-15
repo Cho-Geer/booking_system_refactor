@@ -5,8 +5,9 @@
  */
 
 export enum UserRole {
-  USER = 'USER',
-  ADMIN = 'ADMIN'
+  CUSTOMER = 'CUSTOMER',
+  ADMIN = 'ADMIN',
+  SUPER_ADMIN = 'SUPER_ADMIN'
 }
 
 export interface User {
@@ -14,28 +15,10 @@ export interface User {
   email: string;
   name: string;
   role: UserRole;
+  phone?: string;
+  status?: string;
+  preferredTimezone?: string;
   createdAt?: string;
-}
-
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-export interface LoginResponse {
-  accessToken: string;
-  refreshToken: string;
-  user: User;
-}
-
-export interface RegisterRequest {
-  email: string;
-  password: string;
-  name: string;
-}
-
-export interface RegisterResponse {
-  user: User;
 }
 
 export interface UpdateProfileRequest {

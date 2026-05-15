@@ -258,6 +258,67 @@ describe('ServicesController', () => {
     });
   });
 
+  // ============================================================
+  // [TDD-RED] BE-CATEGORY-NULLABLE: Controller tests for nullable categoryId
+  // These tests are expected to FAIL because CreateServiceDto.categoryId is required (string).
+  // ============================================================
+  describe('categoryId nullable [RED phase - expected failures]', () => {
+    it('should create service without categoryId in request body [RED - categoryId required]', async () => {
+      // This test should FAIL because CreateServiceDto.categoryId is required.
+      const createDto: CreateServiceDto = {
+        name: 'Controller No Category',
+        description: 'Created without category',
+        durationMinutes: 30,
+        price: 75.00,
+        maxCapacity: 1,
+        // categoryId intentionally omitted — TypeScript error
+      };
+
+      const expectedService = {
+        id: 'svc-no-cat',
+        ...createDto,
+        categoryId: null,
+        isActive: true,
+        createdAt: new Date('2024-01-01'),
+        updatedAt: new Date('2024-01-01'),
+      };
+
+      mockServicesService.create.mockResolvedValue(expectedService);
+
+      const result = await controller.create(createDto);
+
+      expect(service.create).toHaveBeenCalledWith(createDto);
+      expect(result.categoryId).toBeNull();
+    });
+
+    it('should handle null categoryId from request body [RED - null not assignable]', async () => {
+      // This test should FAIL because null is not assignable to CreateServiceDto.categoryId (string).
+      const createDto: CreateServiceDto = {
+        categoryId: null, // TypeScript error: null is not assignable to string
+        name: 'Null Category Service',
+        description: 'Service with explicitly null category',
+        durationMinutes: 60,
+        price: 120.00,
+        maxCapacity: 2,
+      };
+
+      const expectedService = {
+        id: 'svc-null-cat',
+        ...createDto,
+        categoryId: null,
+        isActive: true,
+        createdAt: new Date('2024-01-01'),
+        updatedAt: new Date('2024-01-01'),
+      };
+
+      mockServicesService.create.mockResolvedValue(expectedService);
+
+      const result = await controller.create(createDto);
+
+      expect(result.categoryId).toBeNull();
+    });
+  });
+
   describe('remove', () => {
     it('should call service.remove and return success message', async () => {
       mockServicesService.remove.mockResolvedValue({ message: 'Service deleted successfully' });

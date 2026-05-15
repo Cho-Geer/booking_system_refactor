@@ -24,6 +24,7 @@ import {
   TimeDistributionItem,
   SystemHealth,
   SystemHealthDetail,
+  ServicesSummary,
   TimeRange,
   NotificationList,
   UnreadCount,
@@ -88,6 +89,7 @@ export class AdminService {
     if (query.limit) params = params.set('limit', query.limit.toString());
     if (query.search) params = params.set('search', query.search);
     if (query.active !== undefined) params = params.set('active', query.active.toString());
+    if (query.category) params = params.set('category', query.category);
 
     return this.http.get<ApiResponse<PaginatedResponse<AdminServiceItem>>>(`${this.apiUrl}/admin/services`, { params })
       .pipe(map(response => response.data), catchError(this.handleError));
@@ -196,11 +198,31 @@ export class AdminService {
 
   markNotificationRead(id: string): Observable<null> {
     return this.http.post<ApiResponse<null>>(`${this.apiUrl}/admin/notifications/${id}/read`, {})
-      .pipe(map(response => null), catchError(this.handleError));
+      .pipe(map(_response => null), catchError(this.handleError));
   }
 
   getUnreadCount(): Observable<UnreadCount> {
     return this.http.get<ApiResponse<UnreadCount>>(`${this.apiUrl}/admin/messages/unread-count`)
+      .pipe(map(response => response.data), catchError(this.handleError));
+  }
+
+  // ==========================================
+  // Services Summary
+  // ==========================================
+
+  getServicesSummary(): Observable<ServicesSummary> {
+    return this.http.get<ApiResponse<ServicesSummary>>(`${this.apiUrl}/admin/services/summary`)
+      .pipe(map(response => response.data), catchError(this.handleError));
+  }
+
+  // ==========================================
+  // Service Image Upload
+  // ==========================================
+
+  uploadServiceImage(id: string, file: File): Observable<{ imageUrl: string }> {
+    const formData = new FormData();
+    formData.append('image', file);
+    return this.http.post<ApiResponse<{ imageUrl: string }>>(`${this.apiUrl}/admin/services/${id}/image`, formData)
       .pipe(map(response => response.data), catchError(this.handleError));
   }
 

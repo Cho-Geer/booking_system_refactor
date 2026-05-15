@@ -6,6 +6,7 @@ import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AppCardComponent } from '../../../shared/components/atoms/app-card/app-card.component';
 import { AppButtonComponent } from '../../../shared/components/atoms/app-button/app-button.component';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-booking-confirmation',
@@ -13,6 +14,7 @@ import { AppButtonComponent } from '../../../shared/components/atoms/app-button/
   imports: [
     DatePipe,
     CurrencyPipe,
+    TranslatePipe,
     FormsModule,
     RouterLink,
     AppCardComponent,
@@ -46,6 +48,11 @@ export class BookingConfirmationComponent {
   serviceDuration = computed(() => this.selectedService()?.durationMinutes ?? 30);
   servicePrice = computed(() => this.selectedService()?.price ?? 0);
 
+  /** Tax computation */
+  taxRate = computed(() => this.selectedService()?.taxRate ?? 0);
+  estTaxAmount = computed(() => this.servicePrice() * this.taxRate());
+  estTaxIncludedTotal = computed(() => this.servicePrice() + this.estTaxAmount());
+
   confirmBooking(): void {
     const slot = this.selectedSlot();
     const user = this.authStore.user();
@@ -54,11 +61,31 @@ export class BookingConfirmationComponent {
       return;
     }
 
-    // Book the slot
-    this.bookingStore.bookSlot(slot.id, user.id);
+    this.bookingStore.setLoading(true);
 
-    // Navigate to success page
-    this.router.navigate(['/booking/success']);
+    const serviceId = this.bookingStore.selectedServiceId();
+    if (!serviceId) {
+      this.bookingStore.setError('No service selected');
+      return;
+    }
+
+    this.bookingStore.createAppointment({
+      timeSlotId: slot.id,
+      serviceId,
+      appointmentDate: new Date().toISOString(),
+      preferredSequence: Math.floor(Math.random() * 100),
+      notes: undefined,
+    }).then((response) => {
+      if (response.status === 'SUCCESS') {
+        this.bookingStore.bookSlot(slot.id, user.id);
+        this.router.navigate(['/booking/success']);
+      } else if (response.message?.includes('409') || response.message?.includes('Conflict')) {
+        this.bookingStore.setError('This slot was just booked by someone else. Please choose another.');
+        this.router.navigate(['/booking']);
+      } else {
+        this.bookingStore.setError(response.message || 'Booking failed. Please try again.');
+      }
+    });
   }
 
   cancelBooking(): void {

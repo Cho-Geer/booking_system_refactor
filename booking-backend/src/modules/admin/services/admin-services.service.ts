@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../../../common/database/prisma.service";
 import { ServicesService } from "../../services/services.service";
 import {
@@ -49,11 +49,19 @@ export class AdminServicesService {
       ];
     }
 
+    // Category filter: match by category name
+    if (query.category) {
+      where.category = { name: { contains: query.category, mode: "insensitive" } };
+    }
+
     const [services, total] = await Promise.all([
       this.prisma.service.findMany({
         skip,
         take: limit,
         where,
+        include: {
+          category: true,
+        },
         orderBy: { createdAt: "desc" },
       }),
       this.prisma.service.count({ where }),
@@ -118,7 +126,69 @@ export class AdminServicesService {
     return mapToDto(service as any);
   }
 
+  async uploadImage(
+    id: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    file: any,
+  ): Promise<{ image_url: string }> {
+    const service = await this.prisma.service.findUnique({ where: { id } });
+    if (!service) {
+      throw new NotFoundException(`Service with ID ${id} not found`);
+    }
+
+    const imageUrl = `/uploads/services/${file.filename ?? file.originalname}`;
+
+    await this.prisma.service.update({
+      where: { id },
+      data: { imageUrl },
+    });
+
+    return { image_url: imageUrl };
+  }
+
   async remove(id: string): Promise<void> {
     await this.servicesService.remove(id);
+  }
+
+  async getSummary(): Promise<{
+    totalServices: number;
+    activeServicesCount: number;
+    inactiveServicesCount: number;
+    averagePrice: number;
+    categories: { category: string; count: number }[];
+  }> {
+    const [totalServices, activeServicesCount, priceAgg, categoryGroups] =
+      await Promise.all([
+        this.prisma.service.count(),
+        this.prisma.service.count({ where: { isActive: true } }),
+        this.prisma.service.aggregate({
+          _avg: { price: true },
+        }),
+        this.prisma.service.groupBy({
+          by: ["categoryId"],
+          _count: { id: true },
+        }),
+      ]);
+
+    const categoryIds = categoryGroups.map((g) => g.categoryId).filter((id): id is string => id !== null);
+    const categoryNames =
+      categoryIds.length > 0
+        ? await this.prisma.serviceCategory.findMany({
+            where: { id: { in: categoryIds } },
+            select: { id: true, name: true },
+          })
+        : [];
+    const categoryMap = new Map(categoryNames.map((c) => [c.id, c.name]));
+
+    return {
+      totalServices,
+      activeServicesCount,
+      inactiveServicesCount: totalServices - activeServicesCount,
+      averagePrice: Number(priceAgg._avg.price) || 0,
+      categories: categoryGroups.map((g) => ({
+        category: categoryMap.get(g.categoryId ?? '') || (g.categoryId ?? ''),
+        count: g._count.id,
+      })),
+    };
   }
 }

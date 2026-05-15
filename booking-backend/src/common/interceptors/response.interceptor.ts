@@ -8,6 +8,7 @@ import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { ClsService } from "nestjs-cls";
 import * as crypto from "crypto";
+import { formatTimestampWithTimezone } from "../utils/timezone.util";
 
 export interface StandardResponse<T> {
   statusCode: number;
@@ -39,15 +40,31 @@ export class ResponseInterceptor<T> implements NestInterceptor<
   ): Observable<StandardResponse<T>> {
     const requestId =
       this.cls.get<string>("requestId") ?? `req-${crypto.randomUUID()}`;
+    const response = context.switchToHttp().getResponse();
+    const request = context.switchToHttp().getRequest();
+    const statusCode = response.statusCode;
+    const timezone = request.headers?.["x-timezone"] as string | undefined;
 
     return next.handle().pipe(
-      map((data) => ({
-        statusCode: 200,
-        message: "OK",
-        data,
-        timestamp: new Date().toISOString(),
-        requestId,
-      })),
+      map((data) => {
+        let message = "OK";
+        let cleanData = data;
+
+        if (data && typeof data === "object" && "_message" in (data as Record<string, unknown>)) {
+          const d = data as Record<string, unknown>;
+          message = (d._message as string) ?? "OK";
+          const { _message, ...rest } = d;
+          cleanData = rest as T;
+        }
+
+        return {
+          statusCode,
+          message,
+          data: cleanData,
+          timestamp: formatTimestampWithTimezone(timezone),
+          requestId,
+        };
+      }),
     );
   }
 }

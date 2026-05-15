@@ -3,6 +3,8 @@ import { AppSidebarComponent, SidebarItem, SidebarSection } from './app-sidebar.
 import { provideRouter, RouterLink, RouterLinkActive } from '@angular/router';
 import { Component, input } from '@angular/core';
 import { NgClass } from '@angular/common';
+import { TranslatePipe } from '../../../pipes/translate.pipe';
+import { TranslationService } from '../../../../core/services/translation.service';
 
 // Stub p-avatar
 @Component({
@@ -39,14 +41,29 @@ describe('AppSidebarComponent', () => {
   ];
 
   beforeEach(async () => {
+    const mockTranslationService = {
+      t: jest.fn((domain: string, key: string) => {
+        const translations: Record<string, Record<string, string>> = {
+          sidebar: {
+            dashboard: 'Dashboard',
+            services: 'Services',
+          },
+        };
+        return translations?.[domain]?.[key] ?? `{{${domain}.${key}}}`;
+      }),
+      locale: jest.fn().mockReturnValue('en'),
+      translations: jest.fn().mockReturnValue({}),
+    };
+
     await TestBed.configureTestingModule({
-      imports: [AppSidebarComponent, StubAvatarComponent],
+      imports: [AppSidebarComponent, StubAvatarComponent, TranslatePipe],
       providers: [
         provideRouter([]),
+        { provide: TranslationService, useValue: mockTranslationService },
       ],
     }).overrideComponent(AppSidebarComponent, {
       set: {
-        imports: [NgClass, RouterLink, RouterLinkActive, StubAvatarComponent],
+        imports: [NgClass, RouterLink, RouterLinkActive, StubAvatarComponent, TranslatePipe],
       },
     }).compileComponents();
 

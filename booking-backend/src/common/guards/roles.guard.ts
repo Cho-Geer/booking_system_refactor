@@ -8,7 +8,7 @@ import { Reflector } from "@nestjs/core";
 
 interface RequestUser {
   id: string;
-  userType: string;
+  role: string;
   roles?: string[];
   [key: string]: unknown;
 }
@@ -55,8 +55,8 @@ export class RolesGuard implements CanActivate {
     }
 
     // Check if user has at least one of the required roles
-    // Prefer roles array over userType when available
-    const userRoles = Array.isArray(user.roles) ? user.roles : [user.userType];
+    // Prefer roles array over role when available
+    const userRoles = Array.isArray(user.roles) ? user.roles : [user.role];
     const hasRole = requiredRoles.some((role) => userRoles.includes(role));
 
     if (!hasRole) {
@@ -81,7 +81,7 @@ export class RolesGuard implements CanActivate {
     const logData = {
       timestamp: new Date().toISOString(),
       userId: user.id,
-      userRole: user.userType,
+      userRole: user.role,
       requiredRoles,
       endpoint: `${request.method} ${request.url}`,
       ipAddress: request.ip,
@@ -92,30 +92,4 @@ export class RolesGuard implements CanActivate {
     console.warn("Access denied - insufficient role:", logData);
   }
 
-  /**
-   * Get hierarchical role precedence (optional)
-   *
-   * This can be used to define role hierarchies where higher roles
-   * automatically have permissions of lower roles.
-   */
-  private getRoleHierarchy(): Map<string, string[]> {
-    // Define role hierarchy (higher roles inherit lower role permissions)
-    return new Map([
-      ["ADMIN", ["USER", "ADMIN"]],
-      ["USER", ["USER"]],
-    ]);
-  }
-
-  /**
-   * Check if user role has hierarchical access to required role
-   */
-  private hasHierarchicalAccess(
-    userRole: string,
-    requiredRole: string,
-  ): boolean {
-    const hierarchy = this.getRoleHierarchy();
-    const userInheritedRoles = hierarchy.get(userRole) || [userRole];
-
-    return userInheritedRoles.includes(requiredRole);
-  }
 }

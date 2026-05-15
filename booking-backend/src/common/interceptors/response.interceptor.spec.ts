@@ -27,12 +27,23 @@ describe('ResponseInterceptor', () => {
     expect(interceptor).toBeDefined();
   });
 
+  function createMockContext(): ExecutionContext {
+    return {
+      switchToHttp: () => ({
+        getResponse: () => ({ statusCode: 200 }),
+        getRequest: () => ({}),
+      }),
+      getHandler: () => ({}),
+      getClass: () => ({}),
+    } as ExecutionContext;
+  }
+
   it('should wrap successful response in standard format with statusCode', (done) => {
     const mockData = { id: 'user-1', name: 'Test User' };
     const mockCallHandler: CallHandler = {
       handle: () => of(mockData),
     };
-    const mockContext = {} as ExecutionContext;
+    const mockContext = createMockContext();
 
     interceptor.intercept(mockContext, mockCallHandler).subscribe((result) => {
       const resultAny = result as unknown as Record<string, unknown>;
@@ -50,7 +61,7 @@ describe('ResponseInterceptor', () => {
   it('should get requestId from ClsService', (done) => {
     mockClsService.get.mockReturnValue('cls-request-id');
     const mockCallHandler: CallHandler = { handle: () => of({}) };
-    const mockContext = {} as ExecutionContext;
+    const mockContext = createMockContext();
 
     interceptor.intercept(mockContext, mockCallHandler).subscribe((result) => {
       expect(mockClsService.get).toHaveBeenCalledWith('requestId');
@@ -62,7 +73,7 @@ describe('ResponseInterceptor', () => {
   it('should fallback to generated requestId when CLS has no requestId', (done) => {
     mockClsService.get.mockReturnValue(undefined);
     const mockCallHandler: CallHandler = { handle: () => of({}) };
-    const mockContext = {} as ExecutionContext;
+    const mockContext = createMockContext();
 
     interceptor.intercept(mockContext, mockCallHandler).subscribe((result) => {
       expect(result.requestId).toMatch(/^req-/);
@@ -72,7 +83,7 @@ describe('ResponseInterceptor', () => {
 
   it('should include ISO timestamp in response', (done) => {
     const mockCallHandler: CallHandler = { handle: () => of({}) };
-    const mockContext = {} as ExecutionContext;
+    const mockContext = createMockContext();
 
     interceptor.intercept(mockContext, mockCallHandler).subscribe((result) => {
       expect(new Date(result.timestamp).toISOString()).toBe(result.timestamp);

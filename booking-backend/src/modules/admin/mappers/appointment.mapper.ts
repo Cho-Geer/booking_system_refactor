@@ -2,11 +2,19 @@ import { AdminAppointmentDto } from "../dto/admin-appointment.dto";
 
 interface PrismaAppointment {
   id: string;
+  appointmentNumber: string;
   userId: string;
   serviceId: string;
   timeSlotId: string;
   appointmentDate: Date;
   status: string;
+  durationMinutes?: number | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  price?: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  taxRate?: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  taxIncludedAmount?: any;
   createdAt: Date;
   user?: { name: string };
   service?: { name: string };
@@ -24,7 +32,7 @@ export function generateAppointmentNumber(): string {
 export function toAdminAppointmentDto(appt: PrismaAppointment): AdminAppointmentDto {
   return {
     id: appt.id,
-    appointmentNumber: generateAppointmentNumber(),
+    appointmentNumber: appt.appointmentNumber,
     userId: appt.userId,
     userName: appt.user?.name ?? "Unknown",
     serviceId: appt.serviceId,
@@ -32,6 +40,10 @@ export function toAdminAppointmentDto(appt: PrismaAppointment): AdminAppointment
     timeSlotId: appt.timeSlotId,
     appointmentDate: appt.appointmentDate?.toISOString?.() ?? String(appt.appointmentDate),
     status: appt.status,
+    durationMinutes: appt.durationMinutes ?? undefined,
+    price: appt.price ? Number(appt.price) : undefined,
+    taxRate: appt.taxRate ? Number(appt.taxRate) : undefined,
+    taxIncludedAmount: appt.taxIncludedAmount ? Number(appt.taxIncludedAmount) : undefined,
     createdAt: appt.createdAt,
   };
 }

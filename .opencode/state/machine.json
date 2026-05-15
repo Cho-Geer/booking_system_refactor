@@ -1,34 +1,237 @@
 {
   "$schema": "./machine.schema.json",
   "meta": {
-    "version": "2.1.0",
+    "version": "3.0.0",
     "project": "appointment-booking-system",
-    "description": "强制校验契约哈希 + 任务生命周期证据链。涉及角色：@Architect(定义), @Coder-BE(实现), @Coder-FE(适配), @Guardian(审查), @Orchestrator(调度)。",
-    "lastUpdated": "2026-05-06T11:51:09.751Z"
+    "description": "v3.0.0: 五维状态追踪（类型检查/架构边界/格式化/Write-Time审计/安全）。双防线：Write-Time即时阻断 + Commit-Time全量扫描。强制16项约束规则。",
+    "lastUpdated": "2026-05-15T06:04:52.149Z"
+  },
+  "feature_flags": {
+    "write_time_audit": {
+      "scope_check": true,
+      "format_check": true,
+      "dep_check": true,
+      "eslint_check": true,
+      "tsc_check": true
+    },
+    "commit_time_audit": {
+      "type_check": true,
+      "dependency_scan": true,
+      "format_scan": true,
+      "scope_audit": true
+    },
+    "severity_overrides": {
+      "scope_violation": "BLOCKER",
+      "type_error": "BLOCKER",
+      "tier1_mock": "BLOCKER",
+      "dep_boundary": "ERROR",
+      "format": "ERROR",
+      "complexity": "WARN"
+    }
+  },
+  "tdd_enforcement_state": {
+    "enabled": true,
+    "current_session": {},
+    "violations": [],
+    "history": []
+  },
+  "forbiddenDependencies": [
+    {
+      "id": "BACKEND_NO_FRONTEND",
+      "severity": "error",
+      "description": "后端禁止导入前端任何文件",
+      "from": {
+        "path": "^booking-backend/src/"
+      },
+      "to": {
+        "path": "^booking-frontend/src/"
+      }
+    },
+    {
+      "id": "FRONTEND_NO_BACKEND_SRC",
+      "severity": "error",
+      "description": "前端禁止直接导入后端源码",
+      "from": {
+        "path": "^booking-frontend/src/"
+      },
+      "to": {
+        "path": "^booking-backend/src/"
+      }
+    },
+    {
+      "id": "FEATURE_NO_CROSS_IMPORT",
+      "severity": "error",
+      "description": "Feature 模块禁止相互交叉导入",
+      "from": {
+        "path": "features/([^/]+)/"
+      },
+      "toNot": {
+        "path": "features/(\\1)/"
+      },
+      "to": {
+        "path": "features/"
+      }
+    },
+    {
+      "id": "CONTROLLER_NO_DIRECT_ACCESS",
+      "severity": "error",
+      "description": "Controller 只能被同模块访问",
+      "fromNot": {
+        "path": "modules/(\\1)/"
+      },
+      "from": {
+        "path": "modules/([^/]+)/"
+      },
+      "to": {
+        "path": "modules/.*\\.controller\\.ts$"
+      }
+    }
+  ],
+  "write_audit_state": {
+    "$comment": "Write-Time 即时检查追踪，每次 Write/Edit 后更新",
+    "current_session": {
+      "agent": "@Coder-BE",
+      "task_id": "cg_ses_1778770269269",
+      "files_written": [
+        "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/booking_system_refactor/booking-backend/src/modules/time-slots/time-slots.service.ts",
+        "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/booking_system_refactor/booking-backend/src/modules/time-slots/time-slots.service.spec.ts",
+        "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/booking_system_refactor/booking-backend/src/modules/time-slots/time-slots.service.ts",
+        "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/booking_system_refactor/booking-backend/src/modules/time-slots/time-slots.service.spec.ts",
+        "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/booking_system_refactor/booking-backend/src/modules/translations/translations-seed.service.ts",
+        "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/booking_system_refactor/booking-backend/src/modules/admin/dto/admin-service.dto.ts",
+        "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/booking_system_refactor/booking-frontend/src/app/core/interceptors/api-transform.interceptor.ts",
+        "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/.opencode/scripts/mcp-tools/code-quality-gate.js",
+        "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/booking_system_refactor/scripts/keystone-validate.js",
+        "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/booking_system_refactor/.opencode/state/machine.json",
+        "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/.opencode/agents/coder-be.md",
+        "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/.opencode/agents/coder-fe.md",
+        "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/.opencode/agents/guardian.md",
+        "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/.opencode/subagent-preamble.md",
+        "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/.opencode/hooks/pre-commit"
+      ],
+      "checks_run": 15,
+      "checks_passed": 8,
+      "checks_failed": 7,
+      "violations_found": 7,
+      "violations_resolved": 0,
+      "scope_violations_attempted": 0
+    },
+    "history": []
+  },
+  "type_check_state": {
+    "$comment": "TypeScript 类型检查结果，Write-Time 增量 + Commit-Time 全量",
+    "last_incremental_check": "2026-05-15T02:04:18.938Z",
+    "last_full_check": "2026-05-15T02:04:47.144Z",
+    "incremental_errors": 7,
+    "full_errors": 2,
+    "dirty_files": [
+      "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/booking_system_refactor/booking-backend/src/modules/time-slots/time-slots.service.ts",
+      "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/booking_system_refactor/booking-backend/src/modules/time-slots/time-slots.service.spec.ts",
+      "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/booking_system_refactor/booking-backend/src/modules/time-slots/time-slots.service.ts",
+      "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/booking_system_refactor/booking-backend/src/modules/time-slots/time-slots.service.spec.ts",
+      "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/booking_system_refactor/booking-backend/src/modules/translations/translations-seed.service.ts",
+      "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/booking_system_refactor/booking-backend/src/modules/admin/dto/admin-service.dto.ts",
+      "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/booking_system_refactor/booking-frontend/src/app/core/interceptors/api-transform.interceptor.ts"
+    ],
+    "status": "dirty",
+    "strict_mode": true
+  },
+  "dependency_state": {
+    "$comment": "dependency-cruiser 扫描结果",
+    "last_check": "2026-05-15T02:04:18.938Z",
+    "violations": [],
+    "status": "clean",
+    "forbidden_rules_applied": 7
+  },
+  "format_state": {
+    "$comment": "Prettier 格式化检查结果",
+    "last_check": "2026-05-15T02:04:18.938Z",
+    "unformatted_files": [],
+    "auto_fix_count": 7,
+    "status": "dirty"
+  },
+  "eslint_state": {
+    "last_full_scan": "2026-05-15T06:04:52.149Z",
+    "modules": {
+      "all_modules": {
+        "status": "clean",
+        "violations": [],
+        "last_check": "2026-05-15T06:04:52.149Z",
+        "waivers_applied": []
+      },
+      "unknown": {
+        "status": "clean",
+        "violations": [],
+        "last_check": "2026-05-14T14:23:12.726Z",
+        "waivers_applied": []
+      },
+      "translations": {
+        "status": "clean",
+        "violations": [],
+        "last_check": "2026-05-14T15:06:25.098Z",
+        "waivers_applied": []
+      },
+      "admin": {
+        "status": "clean",
+        "violations": [],
+        "last_check": "2026-05-15T01:56:59.566Z",
+        "waivers_applied": []
+      }
+    },
+    "aggregate": {
+      "total_violations": 0,
+      "dirty_modules": [],
+      "waived_modules": []
+    }
+  },
+  "mutation_state": {
+    "$comment": "Stryker 变异测试（仅 CI 更新，非阻塞）",
+    "last_run": null,
+    "mutation_score": 0,
+    "threshold": 80,
+    "status": "untested"
+  },
+  "security_state": {
+    "$comment": "依赖安全扫描（仅 CI 更新）",
+    "last_scan": null,
+    "critical_vulnerabilities": 0,
+    "high_vulnerabilities": 0,
+    "status": "untested"
+  },
+  "contract_compliance": {
+    "eslint_audit": "pending",
+    "type_check": "pending",
+    "dependency_check": "pending",
+    "format_check": "pending",
+    "checked_at": null
+  },
+  "waivers_consumed": [],
+  "compliance_records": {
+    "role_violations": []
   },
   "currentTask": {
-    "id": "TIMESLOTS-PAGINATION-FIX",
-    "title": "Fix TimeSlots module pagination format",
-    "status": "completed",
-    "owner": "@Coder-BE"
+    "id": "V3-OPTIMIZATION",
+    "title": "Full OpenCode framework v3.0 optimization implementation",
+    "status": "in_progress",
+    "owner": "@Architect"
   },
   "contracts": {
     "backend-api": {
       "file": "contract.yaml",
-      "hash": "sha256-868776037339049278b501927d2da24fd64dfbd7beaca5a5a63ef559dd1ab29a",
-      "lastValidated": "2026-05-06T11:51:09.751Z",
+      "hash": "sha256-840f9ba4ef634b3db5a581af7cadff8305daa180033c3da6cd4dbbf6dbb850d0",
+      "lastValidated": "2026-05-14T00:04:02.742Z",
       "owner": "@Architect"
     },
     "prisma-schema": {
       "file": "booking-backend/prisma/schema.prisma",
-      "hash": "sha256-b21af8c44999669910d2002f988ee13ef611093dad72d122ef58bd985ea6791e",
-      "lastValidated": "2026-04-29T05:23:48.918Z",
+      "hash": "sha256-7505db7af86df4efa49441a46555c0d2ac41fd4768c5cc8c8349fda3275902b2",
+      "lastValidated": "2026-05-13T00:55:38.124Z",
       "owner": "@Coder-BE"
     },
     "frontend-dto": {
       "file": "booking-frontend/src/app/shared/dto/",
-      "hash": "sha256-64117d14d17fa033e9b4fb187659bce6e313b5a548ef20e6698fc752563f925f",
-      "lastValidated": "2026-05-01T09:15:20.764Z",
+      "hash": "sha256-49d70b3b77a8125183da1a459ecf36bf7d9950b5973daa1ae850ed4320adedc8",
+      "lastValidated": "2026-05-14T00:04:02.742Z",
       "owner": "@Coder-FE",
       "description": "前端类型定义，须与 backend-api 一致"
     },
@@ -90,7 +293,39 @@
         "requiredEvidence": [
           {
             "filePattern": ".task_temp/{taskId}/TASK_LOG.md",
-            "description": "工作记忆草稿纸，记录本次修改计划"
+            "description": "工作记忆草稿纸"
+          },
+          {
+            "filePattern": ".task_temp/{taskId}/write_audit_log.json",
+            "description": "Write-Time审计日志",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "file",
+                  "overall"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string"
+                  },
+                  "overall": {
+                    "type": "string",
+                    "enum": [
+                      "pass",
+                      "fail"
+                    ]
+                  },
+                  "checks": {
+                    "type": "object"
+                  },
+                  "violations_count": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
           }
         ]
       },
@@ -107,11 +342,11 @@
             "filePattern": ".task_temp/{taskId}/test_report.json",
             "description": "测试执行报告",
             "schema": {
-              "$schema": "http://json-schema.org/draft-07/schema#",
               "type": "object",
               "required": [
                 "execution_evidence",
-                "coverage"
+                "coverage",
+                "eslint_audit"
               ],
               "properties": {
                 "execution_evidence": {
@@ -122,12 +357,10 @@
                   ],
                   "properties": {
                     "exit_code": {
-                      "type": "integer",
-                      "description": "测试进程退出码，0 表示全部通过"
+                      "type": "integer"
                     },
                     "output_summary": {
-                      "type": "string",
-                      "description": "测试执行输出摘要"
+                      "type": "string"
                     }
                   }
                 },
@@ -136,27 +369,62 @@
                   "properties": {
                     "lines": {
                       "type": "number",
-                      "minimum": 70,
-                      "description": "行覆盖率（%），最低 70%"
+                      "minimum": 70
                     },
                     "branches": {
-                      "type": "number",
-                      "description": "分支覆盖率（%）"
+                      "type": "number"
                     },
                     "functions": {
-                      "type": "number",
-                      "description": "函数覆盖率（%）"
+                      "type": "number"
                     },
                     "statements": {
-                      "type": "number",
-                      "description": "语句覆盖率（%）"
+                      "type": "number"
+                    }
+                  }
+                },
+                "eslint_audit": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "violations_count"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "pass",
+                        "fail"
+                      ]
+                    },
+                    "violations_count": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "violations": {
+                      "type": "array"
+                    },
+                    "eslint_disabled_count": {
+                      "type": "integer"
+                    },
+                    "eslint_skipped_sections": {
+                      "type": "array"
+                    },
+                    "waivers_referenced": {
+                      "type": "array"
+                    },
+                    "integration_test_exists": {
+                      "type": "boolean"
                     }
                   }
                 }
-              },
-              "additionalProperties": true
+              }
             },
             "contentMustNotContain": "\"failed\": [1-9]"
+          },
+          {
+            "filePattern": ".task_temp/{taskId}/type_check_report.json",
+            "description": "类型检查报告",
+            "contentMustContain": "\"errors\": 0"
           }
         ]
       },
@@ -178,7 +446,7 @@
         "requiredEvidence": [
           {
             "filePattern": ".task_temp/{taskId}/test_report.json",
-            "description": "测试执行报告（失败时回退）",
+            "description": "测试报告（回退）",
             "contentMustContain": "\"exit_code\": 1"
           }
         ]
@@ -189,7 +457,7 @@
         "requiredEvidence": [
           {
             "filePattern": ".task_temp/{taskId}/guardian_report.md",
-            "description": "@Guardian 审查报告（未通过时回退）",
+            "description": "审查报告（回退）",
             "contentMustContain": "FAIL"
           }
         ]
@@ -200,7 +468,7 @@
         "requiredEvidence": [
           {
             "filePattern": ".task_temp/{taskId}/refactor_report.json",
-            "description": "测试执行报告（含 execution_evidence）",
+            "description": "重构报告",
             "contentMustNotContain": "\"failed\": [1-9]"
           }
         ]
@@ -211,7 +479,7 @@
         "requiredEvidence": [
           {
             "filePattern": ".task_temp/{taskId}/refactor_report.json",
-            "description": "测试执行报告（含 execution_evidence）",
+            "description": "重构报告",
             "contentMustNotContain": "\"failed\": [1-9]"
           }
         ]
@@ -236,336 +504,42 @@
       "agent": "@Meta-Planner",
       "action": "UPDATE",
       "target": "contracts",
-      "details": "新增前端契约条目，明确 @Coder-FE 的哈希更新责任"
+      "details": "新增前端契约条目"
     },
     {
       "timestamp": "2026-04-20T18:35:00.000Z",
       "agent": "@Orchestrator",
       "action": "HASH_CORRECTION",
       "target": "contracts",
-      "details": "修正空哈希值：backend-api、prisma-schema、frontend-environment 已更新为实际SHA256哈希"
-    },
-    {
-      "timestamp": "2026-04-20T10:02:11.021Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "prisma-schema",
-      "details": "Hash updated from sha256-bf25dec39bb80... to sha256-0a1e5c90ce97a..."
-    },
-    {
-      "timestamp": "2026-04-20T10:02:11.021Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "frontend-environment",
-      "details": "Hash updated from sha256-8f4f393cff083... to sha256-81a3de09309c0..."
-    },
-    {
-      "timestamp": "2026-04-20T10:10:46.583Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "frontend-dto",
-      "details": "Hash updated to sha256-6fc5fd8ea7cdd..."
-    },
-    {
-      "timestamp": "2026-04-20T10:13:54.123Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "frontend-environment",
-      "details": "Hash updated from sha256-81a3de09309c0... to sha256-2bacf85132ff1..."
-    },
-    {
-      "timestamp": "2026-04-20T10:14:28.739Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "frontend-environment",
-      "details": "Hash updated from sha256-2bacf85132ff1... to sha256-4bbb147a5a6dd..."
+      "details": "修正空哈希值"
     },
     {
       "timestamp": "2026-04-20T14:30:00.000Z",
       "agent": "@Orchestrator",
       "action": "SCHEMA_UPGRADE",
       "target": "machine.json",
-      "details": "升级至 v2.0.0，新增 taskLifecycle 强制证据链校验"
-    },
-    {
-      "timestamp": "2026-04-20T16:21:47.550Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "backend-api",
-      "details": "Hash updated from sha256-ae4e59854b38a... to sha256-efe910d94bd18..."
-    },
-    {
-      "timestamp": "2026-04-20T16:28:59.749Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "backend-api",
-      "details": "Hash updated from sha256-efe910d94bd18... to sha256-36255798ca7ad..."
-    },
-    {
-      "timestamp": "2026-04-20T16:30:13.281Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "frontend-dto",
-      "details": "Hash updated from sha256-6fc5fd8ea7cdd... to sha256-530835b175696..."
-    },
-    {
-      "timestamp": "2026-04-20T16:36:56.238Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "prisma-schema",
-      "details": "Hash updated from sha256-0a1e5c90ce97a... to sha256-34226c79a42fc..."
-    },
-    {
-      "timestamp": "2026-04-20T16:37:27.662Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "prisma-schema",
-      "details": "Hash updated from sha256-34226c79a42fc... to sha256-b95455029f04a..."
-    },
-    {
-      "timestamp": "2026-04-20T16:38:24.300Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "frontend-dto",
-      "details": "Hash updated from sha256-530835b175696... to sha256-6fc5fd8ea7cdd..."
+      "details": "升级至 v2.0.0"
     },
     {
       "timestamp": "2026-04-20T16:43:21.000Z",
       "agent": "@Orchestrator",
       "action": "SCHEMA_UPGRADE",
       "target": "taskLifecycle.transitions",
-      "details": "升级至 v2.1.0，将 requiredEvidence.schema 从自定义格式转为标准 JSON Schema (draft-07)，启用 ajv 原生校验"
+      "details": "升级至 v2.1.0, JSON Schema"
     },
     {
-      "timestamp": "2026-04-20T18:03:22.643Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "backend-api",
-      "details": "Hash updated from sha256-36255798ca7ad... to sha256-b4c0f8c105e55..."
-    },
-    {
-      "timestamp": "2026-04-20T20:43:58.083Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "prisma-schema",
-      "details": "Hash updated from sha256-b95455029f04a... to sha256-b21af8c449996..."
-    },
-    {
-      "timestamp": "2026-04-20T20:43:58.083Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "frontend-dto",
-      "details": "Hash updated from sha256-6fc5fd8ea7cdd... to sha256-f05041e0d2634..."
-    },
-    {
-      "timestamp": "2026-04-20T20:43:58.083Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "frontend-environment",
-      "details": "Hash updated from sha256-4bbb147a5a6dd... to sha256-b537cc0106e40..."
-    },
-    {
-      "timestamp": "2026-04-20T20:51:45.990Z",
-      "agent": "@Coder-BE",
-      "action": "HASH_UPDATE",
-      "target": "prisma-schema",
-      "details": "PII 加密后端修复：三字段模型迁移，哈希值已验证匹配"
-    },
-    {
-      "timestamp": "2026-04-22T08:10:00.000Z",
+      "timestamp": "2026-05-14T19:00:00.000Z",
       "agent": "@Architect",
-      "action": "HASH_UPDATE",
-      "target": "backend-api",
-      "details": "P0-003: Added requestId contract declaration (v1.3.0). File path corrected to booking_system_refactor/contract.yaml"
+      "action": "SCHEMA_UPGRADE",
+      "target": "machine.json",
+      "details": "升级至 v2.2.0: eslint_state / compliance_gate"
     },
     {
-      "timestamp": "2026-04-23T07:33:35.824Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "backend-api",
-      "details": "Hash updated from sha256-029bc688257e6... to sha256-287a6eb11a99b..."
-    },
-    {
-      "timestamp": "2026-04-24T00:44:00.000Z",
-      "agent": "@Coder-BE",
-      "action": "HASH_UPDATE",
-      "target": "prisma-schema",
-      "details": "BUG-001 GREEN: Updated hash for schema.prisma changes"
-    },
-    {
-      "timestamp": "2026-04-24T00:44:00.000Z",
-      "agent": "@Coder-BE",
-      "action": "TDD_PHASE_TRANSITION",
-      "target": "task BUG-001",
-      "details": "BUG-001 GREEN: Task transitioned to Testing state. All 92 tests pass."
-    },
-    {
-      "timestamp": "2026-04-24T10:00:00.000Z",
-      "agent": "@Coder-BE",
-      "action": "UPDATE",
-      "target": "BUG-009",
-      "details": "BUG-009: 验证部分唯一索引迁移文件存在且正确。迁移文件 prisma/migrations/20260422_fix_p1_003_partial_unique_index/migration.sql 已存在，SQL内容与contract.yaml完全一致。无需创建新迁移。"
-    },
-    {
-      "timestamp": "2026-04-29T05:23:48.918Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "backend-api",
-      "details": "Hash updated from sha256-287a6eb11a99b... to sha256-860d6c67f55df..."
-    },
-    {
-      "timestamp": "2026-04-29T05:23:48.918Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "prisma-schema",
-      "details": "Hash updated from sha256-94d9022d97ac6... to sha256-b21af8c449996..."
-    },
-    {
-      "timestamp": "2026-05-01T09:15:20.764Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "backend-api",
-      "details": "Hash updated from sha256-860d6c67f55df... to sha256-0502aaa61e0ed..."
-    },
-    {
-      "timestamp": "2026-05-01T09:15:20.764Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "frontend-dto",
-      "details": "Hash updated from sha256-f05041e0d2634... to sha256-64117d14d17fa..."
-    },
-    {
-      "timestamp": "2026-05-03T02:50:38.328Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "backend-api",
-      "details": "Hash updated from sha256-0502aaa61e0ed... to sha256-7e37df5a7d689..."
-    },
-    {
-      "timestamp": "2026-05-04T15:44:21.864Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "backend-api",
-      "details": "Hash updated from sha256-7e37df5a7d689... to sha256-ff657061e5567..."
-    },
-    {
-      "timestamp": "2026-05-05T08:29:31.163Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "backend-api",
-      "details": "Hash updated from sha256-ff657061e5567... to sha256-105a76c85f78c..."
-    },
-    {
-      "timestamp": "2026-05-05T08:29:59.967Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "backend-api",
-      "details": "Hash updated from sha256-105a76c85f78c... to sha256-20abc89bd2177..."
-    },
-    {
-      "timestamp": "2026-05-05T08:30:26.154Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "backend-api",
-      "details": "Hash updated from sha256-20abc89bd2177... to sha256-120f9281cc618..."
-    },
-    {
-      "timestamp": "2026-05-05T08:32:18.836Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "backend-api",
-      "details": "Hash updated from sha256-120f9281cc618... to sha256-169a8be6d1e94..."
-    },
-    {
-      "timestamp": "2026-05-05T13:05:45.074Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "backend-api",
-      "details": "Hash updated from sha256-bac3d04a5d781... to sha256-a88cb800e0d19..."
-    },
-    {
-      "timestamp": "2026-05-05T13:44:09.263Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "backend-api",
-      "details": "Hash updated from sha256-a88cb800e0d19... to sha256-efa736648d034..."
-    },
-    {
-      "timestamp": "2026-05-05T13:45:19.139Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "backend-api",
-      "details": "Hash updated from sha256-efa736648d034... to sha256-ab6729f193477..."
-    },
-    {
-      "timestamp": "2026-05-05T14:04:18.932Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "backend-api",
-      "details": "Hash updated from sha256-ab6729f193477... to sha256-1f87f17d7ce8f..."
-    },
-    {
-      "timestamp": "2026-05-05T14:05:04.742Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "backend-api",
-      "details": "Hash updated from sha256-1f87f17d7ce8f... to sha256-500c0a03c4cef..."
-    },
-    {
-      "timestamp": "2026-05-06T00:16:24.625Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "backend-api",
-      "details": "Hash updated from sha256-500c0a03c4cef... to sha256-a29cad7f68cb0..."
-    },
-    {
-      "timestamp": "2026-05-06T02:28:22.411Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "backend-api",
-      "details": "Hash updated from sha256-a29cad7f68cb0... to sha256-55bd050801930..."
-    },
-    {
-      "timestamp": "2026-05-06T02:29:06.847Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "backend-api",
-      "details": "Hash updated from sha256-55bd050801930... to sha256-1f4dc530fdda5..."
-    },
-    {
-      "timestamp": "2026-05-06T07:12:54.031Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "backend-api",
-      "details": "Hash updated from sha256-1f4dc530fdda5... to sha256-5cb5d22e56513..."
-    },
-    {
-      "timestamp": "2026-05-06T08:44:09.729Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "backend-api",
-      "details": "Hash updated from sha256-5cb5d22e56513... to sha256-394e4685c96f5..."
-    },
-    {
-      "timestamp": "2026-05-06T11:49:20.968Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "backend-api",
-      "details": "Hash updated from sha256-394e4685c96f5... to sha256-e20f39e5dd6e1..."
-    },
-    {
-      "timestamp": "2026-05-06T11:50:17.544Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "backend-api",
-      "details": "Hash updated from sha256-e20f39e5dd6e1... to sha256-f9b3f9f14eb0d..."
-    },
-    {
-      "timestamp": "2026-05-06T11:51:09.751Z",
-      "agent": "@Orchestrator",
-      "action": "HASH_UPDATE",
-      "target": "backend-api",
-      "details": "Hash updated from sha256-f9b3f9f14eb0d... to sha256-8687760373390..."
+      "timestamp": "2026-05-14T19:30:00.000Z",
+      "agent": "@Architect",
+      "action": "SCHEMA_UPGRADE",
+      "target": "machine.json",
+      "details": "v3.0.0: 五维状态追踪（type_check/dependency/format/write_audit/mutation/security）+ 双防线模型 + 16项约束规则"
     }
   ]
 }

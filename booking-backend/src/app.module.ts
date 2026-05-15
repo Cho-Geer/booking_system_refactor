@@ -25,6 +25,7 @@ import { AdminModule } from "./modules/admin/admin.module";
 import { RetentionModule } from "./modules/retention/retention.module";
 import { VerificationModule } from "./modules/verification/verification.module";
 import { EncryptionModule } from "./modules/encryption/encryption.module";
+import { TranslationsModule } from "./modules/translations/translations.module";
 
 @Module({
   imports: [
@@ -88,6 +89,7 @@ import { EncryptionModule } from "./modules/encryption/encryption.module";
     RetentionModule,
     VerificationModule,
     EncryptionModule,
+    TranslationsModule,
   ],
   providers: [
     {

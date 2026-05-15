@@ -2,10 +2,10 @@
   <div class="max-w-[480px] w-full">
     <app-card variant="sharp" styleClass="w-full">
       <div class="p-6 lg:p-8">
-    <h2 class="text-2xl font-bold mb-1 gradient-text">欢迎注册</h2>
+    <h2 class="text-2xl font-bold mb-1 gradient-text">{{ 'auth.register.title' | t }}</h2>
     <p class="text-sm text-gray-500 mb-4">
-      已有账号?
-      <a routerLink="/auth/login" class="text-primary-start hover:underline">登录</a>
+      {{ 'auth.register.haveAccount' | t }}
+      <a routerLink="/auth/login" class="text-primary-start hover:underline">{{ 'auth.register.login' | t }}</a>
     </p>
 
     @if (error()) {
@@ -18,12 +18,12 @@
     <div class="step-indicator">
       <div class="step" [class.active]="currentStep() === 1" [class.completed]="currentStep() > 1">
         <span class="step-number">1</span>
-        <span class="step-label">联系方式</span>
+        <span class="step-label">{{ 'auth.register.contact' | t }}</span>
       </div>
       <div class="step-connector" [class.completed]="currentStep() > 1"></div>
       <div class="step" [class.active]="currentStep() === 2">
         <span class="step-number">2</span>
-        <span class="step-label">完成注册</span>
+        <span class="step-label">{{ 'auth.register.submit' | t }}</span>
       </div>
     </div>
 
@@ -31,41 +31,47 @@
     @if (currentStep() === 1) {
       <form [formGroup]="step1Form" (ngSubmit)="onSendCode()">
         <div class="form-group">
-          <label>联系方式类型</label>
+          <label>{{ 'auth.register.contactType' | t }}</label>
           <div class="contact-type-selector">
             <button
               type="button"
               class="type-btn min-touch-target"
               [class.active]="contactType() === ContactType.EMAIL"
-              (click)="contactType.set(ContactType.EMAIL)"
+              (click)="setContactType(ContactType.EMAIL)"
             >
-              邮箱
+              {{ 'auth.register.email' | t }}
             </button>
             <button
               type="button"
               class="type-btn min-touch-target"
               [class.active]="contactType() === ContactType.PHONE"
-              (click)="contactType.set(ContactType.PHONE)"
+              (click)="setContactType(ContactType.PHONE)"
             >
-              手机号
+              {{ 'auth.register.phone' | t }}
             </button>
           </div>
         </div>
 
         <div class="form-group">
-          <label for="contact">{{ contactType() === ContactType.EMAIL ? '邮箱' : '手机号' }}</label>
+          <label for="contact">{{ contactType() === ContactType.EMAIL ? ('auth.register.email' | t) : ('auth.register.phone' | t) }}</label>
           <input
             id="contact"
             class="sharp-input"
             [type]="contactType() === ContactType.EMAIL ? 'email' : 'tel'"
             formControlName="contact"
-            [placeholder]="contactType() === ContactType.EMAIL ? 'Enter your email' : 'Enter your phone number'"
+            [placeholder]="(contactType() === ContactType.EMAIL ? 'auth.register.enterEmail' : 'auth.register.enterPhone') | t"
             [class.error]="isStep1FieldInvalid('contact')"
           />
           @if (isStep1FieldInvalid('contact')) {
             <div class="error-message">
               @if (step1Form.get('contact')?.errors?.['required']) {
-                <span>{{ contactType() === ContactType.EMAIL ? 'Email is required' : 'Phone number is required' }}</span>
+                <span>{{ contactType() === ContactType.EMAIL ? ('auth.register.emailRequired' | t) : ('auth.register.phoneRequired' | t) }}</span>
+              }
+              @if (step1Form.get('contact')?.errors?.['emailFormat']) {
+                <span>{{ 'auth.register.invalidEmail' | t }}</span>
+              }
+              @if (step1Form.get('contact')?.errors?.['phoneFormat']) {
+                <span>{{ 'auth.register.invalidPhone' | t }}</span>
               }
             </div>
           }
@@ -73,7 +79,7 @@
 
         <app-button
           type="submit"
-          label="发送验证码"
+          [label]="'auth.verificationCode.send' | t"
           variant="primary"
           class="w-full"
           [disabled]="step1Form.invalid || isLoading()"
@@ -84,9 +90,15 @@
 
     <!-- Step 2: Complete Registration -->
     @if (currentStep() === 2) {
+      @if (maskedContact()) {
+        <div class="sharp-card p-3 mb-4 text-sm text-text-secondary bg-bg-secondary rounded-lg">
+          {{ 'auth.register.codeSent' | t }} <strong class="text-text-primary">{{ maskedContact() }}</strong>
+        </div>
+      }
+
       <form [formGroup]="step2Form" (ngSubmit)="onCompleteRegistration()">
         <div class="form-group">
-          <label for="code">验证码</label>
+          <label for="code">{{ 'auth.verificationCode.code' | t }}</label>
           <div class="verify-input-wrapper">
             <input
               id="code"
@@ -95,7 +107,7 @@
               inputmode="numeric"
               pattern="\d{6}"
               formControlName="code"
-              placeholder="Enter 6-digit code"
+              [placeholder]="'auth.register.enterCode' | t"
               maxlength="6"
               [class.error]="isStep2FieldInvalid('code')"
             />
@@ -108,75 +120,75 @@
               @if (countdown() > 0) {
                 {{ countdown() }}s
               } @else {
-                重新发送
+                {{ 'auth.register.resend' | t }}
               }
             </button>
           </div>
           @if (isStep2FieldInvalid('code')) {
             <div class="error-message">
-              <span>请输入6位数字验证码</span>
+              <span>{{ 'auth.register.codeRequired' | t }}</span>
             </div>
           }
         </div>
 
         <div class="form-group">
-          <label for="name">姓名</label>
+          <label for="name">{{ 'auth.register.name' | t }}</label>
           <input
             id="name"
             class="sharp-input"
             type="text"
             formControlName="name"
-            placeholder="Enter your name"
+            [placeholder]="'auth.register.enterName' | t"
             [class.error]="isStep2FieldInvalid('name')"
           />
           @if (isStep2FieldInvalid('name')) {
             <div class="error-message">
               @if (step2Form.get('name')?.errors?.['required']) {
-                <span>姓名不能为空</span>
+                <span>{{ 'auth.register.nameRequired' | t }}</span>
               }
               @if (step2Form.get('name')?.errors?.['minlength']) {
-                <span>姓名至少2个字符</span>
+                <span>{{ 'auth.register.nameMinLength' | t }}</span>
               }
             </div>
           }
         </div>
 
         <div class="form-group">
-          <label for="password">密码</label>
+          <label for="password">{{ 'auth.register.password' | t }}</label>
           <input
             id="password"
             class="sharp-input"
             type="password"
             formControlName="password"
-            placeholder="Set login password"
+            [placeholder]="'auth.register.password' | t"
             [class.error]="isStep2FieldInvalid('password')"
           />
           @if (isStep2FieldInvalid('password')) {
             <div class="error-message">
               @if (step2Form.get('password')?.errors?.['passwordStrength']) {
-                <span>密码不符合要求</span>
+                <span>{{ 'auth.register.passwordInvalid' | t }}</span>
               }
             </div>
           }
         </div>
 
         <div class="form-group">
-          <label for="confirmPassword">确认密码</label>
+          <label for="confirmPassword">{{ 'auth.register.confirmPassword' | t }}</label>
           <input
             id="confirmPassword"
             class="sharp-input"
             type="password"
             formControlName="confirmPassword"
-            placeholder="Confirm your password"
+            [placeholder]="'auth.register.confirmPassword' | t"
             [class.error]="isStep2FieldInvalid('confirmPassword')"
           />
           @if (isStep2FieldInvalid('confirmPassword')) {
             <div class="error-message">
               @if (step2Form.get('confirmPassword')?.errors?.['required']) {
-                <span>请确认密码</span>
+                <span>{{ 'auth.register.confirmPassword' | t }}</span>
               }
               @if (step2Form.get('confirmPassword')?.errors?.['passwordMismatch']) {
-                <span>两次密码输入不一致</span>
+                <span>{{ 'auth.register.passwordMismatch' | t }}</span>
               }
             </div>
           }
@@ -187,23 +199,23 @@
           <ul>
             <li [class.valid]="passwordRequirements.hasMinLength">
               <input type="checkbox" [attr.checked]="passwordRequirements.hasMinLength ? '' : null" disabled />
-              <span>至少 8 个字符</span>
+              <span>{{ 'auth.register.passwordMinLength' | t }}</span>
             </li>
             <li [class.valid]="passwordRequirements.hasUpperCase">
               <input type="checkbox" [attr.checked]="passwordRequirements.hasUpperCase ? '' : null" disabled />
-              <span>至少一个大写字母 (A-Z)</span>
+              <span>{{ 'auth.register.passwordUppercase' | t }}</span>
             </li>
             <li [class.valid]="passwordRequirements.hasLowerCase">
               <input type="checkbox" [attr.checked]="passwordRequirements.hasLowerCase ? '' : null" disabled />
-              <span>至少一个小写字母 (a-z)</span>
+              <span>{{ 'auth.register.passwordLowercase' | t }}</span>
             </li>
             <li [class.valid]="passwordRequirements.hasNumber">
               <input type="checkbox" [attr.checked]="passwordRequirements.hasNumber ? '' : null" disabled />
-              <span>至少一个数字 (0-9)</span>
+              <span>{{ 'auth.register.passwordDigit' | t }}</span>
             </li>
             <li [class.valid]="passwordRequirements.hasSpecialChar">
               <input type="checkbox" [attr.checked]="passwordRequirements.hasSpecialChar ? '' : null" disabled />
-              <span>至少一个特殊字符 (@$!%?&)</span>
+              <span>{{ 'auth.register.passwordSpecial' | t }}</span>
             </li>
           </ul>
         </div>
@@ -217,25 +229,25 @@
               (ngModelChange)="acceptTerms.set($event)"
             />
             <span class="terms-text">
-              我已阅读并同意
-              <a routerLink="/legal/terms" target="_blank">服务条款</a>、
+              {{ 'auth.register.agreeTerms' | t }}
+              <a routerLink="/legal/terms" target="_blank">{{ 'auth.register.termsOfService' | t }}</a>、
               <a routerLink="/legal/child-protection" target="_blank">儿童保护政策</a>
               和
-              <a routerLink="/legal/privacy" target="_blank">隐私政策</a>
+              <a routerLink="/legal/privacy" target="_blank">{{ 'auth.register.privacyPolicy' | t }}</a>
             </span>
           </label>
         </div>
 
         <div class="step-actions">
           <app-button
-            label="返回"
+            [label]="'global.cancel' | t"
             variant="secondary"
             class="w-full sm:w-auto"
             (onClick)="goToStep1()"
           />
           <app-button
             type="submit"
-            label="完成注册"
+            [label]="'auth.register.submit' | t"
             variant="primary"
             class="w-full sm:w-auto"
             [disabled]="step2Form.invalid || isLoading() || !acceptTerms()"

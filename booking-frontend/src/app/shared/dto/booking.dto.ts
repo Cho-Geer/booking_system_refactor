@@ -23,16 +23,18 @@ export interface Booking {
   price?: number;
   taxRate?: number;
   taxIncludedAmount?: number;
-  bookingGroupId?: string;
   createdAt?: string;
   notes?: string;
+  appointmentNumber?: string;
+  serviceId?: string;
 }
 
 export interface CreateBookingRequest {
   timeSlotId: string;
+  serviceId: string;
   appointmentDate: string;
+  preferredSequence: number;
   notes?: string;
-  selectedSlotIds?: string[];
   overtimeMinutes?: number;
 }
 
@@ -52,7 +54,7 @@ export interface BookingListItem {
   price?: number;
   taxRate?: number;
   taxIncludedAmount?: number;
-  bookingGroupId?: string;
+  appointmentNumber?: string;
 }
 
 export interface BookingListQuery {

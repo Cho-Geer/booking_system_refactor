@@ -8,6 +8,7 @@ import {
   AdminAppointment,
   BookingTrendItem,
   ServicePopularityItem,
+  ServicesSummary,
   UpdateAdminUserRequest,
   UpdateAdminServiceRequest,
   AdminUsersQuery,
@@ -56,6 +57,9 @@ export interface AdminState {
   // Recent Services (dashboard only, isolated from paginated list)
   recentServices: AdminServiceItem[];
 
+  // Services Summary (for stats cards, replaces allServicesForStats)
+  servicesSummary: ServicesSummary | null;
+
   // Services (full dataset for stats computation, isolated from paginated list)
   allServicesForStats: AdminServiceItem[];
 
@@ -90,6 +94,7 @@ export const initialAdminState: AdminState = {
   servicesTotal: 0,
   servicesPage: 1,
   recentServices: [],
+  servicesSummary: null,
   allServicesForStats: [],
   allAppointmentsForStats: [],
   appointments: [],
@@ -103,7 +108,7 @@ export const initialAdminState: AdminState = {
 export const AdminStore = signalStore(
   { providedIn: 'root' },
   withState<AdminState>(initialAdminState),
-  withComputed(({ isLoading, error, stats, servicePopularity, bookingTrend, timeDistribution, systemHealth, users, usersTotal, usersPage, recentUsers, allUsersForStats, services, servicesTotal, servicesPage, recentServices, allServicesForStats, allAppointmentsForStats, appointments, appointmentsTotal, appointmentsPage, unreadCount }) => ({
+  withComputed(({ isLoading, error, stats, servicePopularity, bookingTrend, timeDistribution, systemHealth, users, usersTotal, usersPage, recentUsers, allUsersForStats, services, servicesTotal, servicesPage, recentServices, servicesSummary, allServicesForStats, allAppointmentsForStats, appointments, appointmentsTotal, appointmentsPage, unreadCount }) => ({
     vm: computed(() => ({
       isLoading: isLoading(),
       error: error(),
@@ -121,6 +126,7 @@ export const AdminStore = signalStore(
       servicesTotal: servicesTotal(),
       servicesPage: servicesPage(),
       recentServices: recentServices(),
+      servicesSummary: servicesSummary(),
       allServicesForStats: allServicesForStats(),
       allAppointmentsForStats: allAppointmentsForStats(),
       appointments: appointments(),
@@ -228,6 +234,10 @@ export const AdminStore = signalStore(
 
     setAllServicesForStats(services: AdminServiceItem[]): void {
       patchState(store, { allServicesForStats: services });
+    },
+
+    setServicesSummary(summary: ServicesSummary): void {
+      patchState(store, { servicesSummary: summary });
     },
 
     setAllAppointmentsForStats(appointments: AdminAppointment[]): void {
@@ -351,8 +361,8 @@ export const AdminStore = signalStore(
         const response = await lastValueFrom(adminService.getUsers(query));
         patchState(store, {
           users: response.items,
-          usersTotal: response.total,
-          usersPage: response.page,
+          usersTotal: response.meta.total,
+          usersPage: response.meta.page,
           isLoading: false,
         });
       } catch (err) {
@@ -421,8 +431,8 @@ export const AdminStore = signalStore(
         const response = await lastValueFrom(adminService.getAdminServices(query));
         patchState(store, {
           services: response.items,
-          servicesTotal: response.total,
-          servicesPage: response.page,
+          servicesTotal: response.meta.total,
+          servicesPage: response.meta.page,
           isLoading: false,
         });
       } catch (err) {
@@ -491,8 +501,8 @@ export const AdminStore = signalStore(
         const response = await lastValueFrom(adminService.getAdminAppointments(query));
         patchState(store, {
           appointments: response.items,
-          appointmentsTotal: response.total,
-          appointmentsPage: response.page,
+          appointmentsTotal: response.meta.total,
+          appointmentsPage: response.meta.page,
           isLoading: false,
         });
       } catch (err) {

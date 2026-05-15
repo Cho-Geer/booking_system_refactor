@@ -419,4 +419,87 @@ describe('RegisterComponent', () => {
       expect(buttons.length).toBeGreaterThan(0);
     });
   });
+
+  // ==========================================
+  // [FE-ROLE-UNIFY] userType → role rename
+  // ==========================================
+
+  describe('[RoleRename] register uses role not userType', () => {
+    it('onCompleteRegistration should pass role to setUserProfile [RED] fails because code uses userType', () => {
+      // TARGET: register sends role: profile.role to setUserProfile
+      // CURRENT: sends userType: profile.userType (undefined)
+      const mockProfileWithRole = {
+        id: '1',
+        name: 'New User',
+        role: 'CUSTOMER',
+        email: 'new@test.com',
+        createdAt: '2026-01-01T00:00:00Z',
+      };
+
+      // Fill step 1
+      component.step1Form.get('contact')?.setValue('new@test.com');
+      component.currentStep.set(2);
+      component.onSendCode = jest.fn(); // prevent actual API call
+
+      // Fill step 2
+      component.step2Form.patchValue({
+        code: '123456',
+        password: 'Str0ng!Pass',
+        name: 'New User',
+      });
+      component.acceptTerms.set(true);
+
+      apiServiceMock.registerComplete.mockReturnValue(of({
+        accessToken: 'jwt-token',
+        expiresIn: 900,
+        tokenType: 'Bearer',
+      }));
+      apiServiceMock.getUserProfile.mockReturnValue(of(mockProfileWithRole));
+
+      component.onCompleteRegistration();
+
+      // TARGET: setUserProfile called with role field
+      // CURRENT: setUserProfile called with userType field (undefined) → this FAILS
+      expect(authStoreMock.setUserProfile).toHaveBeenCalledWith(
+        expect.objectContaining({ role: 'CUSTOMER' })
+      );
+    });
+
+    it('onCompleteRegistration should navigate based on role [RED] fails because code reads userType', () => {
+      // TARGET: ADMIN role → /admin/dashboard
+      // CURRENT: userType undefined → /booking (fallback)
+      const navigateSpy = jest.spyOn(router, 'navigate');
+      const mockAdminProfile = {
+        id: '2',
+        name: 'Admin User',
+        role: 'ADMIN',
+        email: 'admin@test.com',
+        createdAt: '2026-01-01T00:00:00Z',
+      };
+
+      component.step1Form.get('contact')?.setValue('admin@test.com');
+      component.currentStep.set(2);
+      component.onSendCode = jest.fn();
+
+      component.step2Form.patchValue({
+        code: '123456',
+        password: 'Str0ng!Pass',
+        name: 'Admin User',
+      });
+      component.acceptTerms.set(true);
+
+      apiServiceMock.registerComplete.mockReturnValue(of({
+        accessToken: 'jwt-token',
+        expiresIn: 900,
+        tokenType: 'Bearer',
+      }));
+      apiServiceMock.getUserProfile.mockReturnValue(of(mockAdminProfile));
+
+      component.onCompleteRegistration();
+
+      // TARGET: ADMIN → /admin/dashboard
+      // CURRENT: undefined → /booking (fallback) → this FAILS
+      expect(navigateSpy).toHaveBeenCalledWith(['/admin/dashboard']);
+    });
+  });
 });

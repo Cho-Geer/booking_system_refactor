@@ -3,7 +3,7 @@ import { computed, inject } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
 import { ApiService } from '../../core/services/api.service';
 import { TimeSlot } from '../../shared/dto/time-slot.dto';
-import { ReservationResponse, BookingListItem } from '../../shared/dto/booking.dto';
+import { ReservationResponse, BookingListItem, Booking, BookingStatus } from '../../shared/dto/booking.dto';
 import { Service } from '../../shared/dto/service.dto';
 
 export interface BookingState {
@@ -15,8 +15,8 @@ export interface BookingState {
   activeBookings: string[];
   services: Service[];
   bookings: BookingListItem[];
-  selectedSlotIds: string[];
   overtimeMinutes: number;
+  lastAppointment: Booking | null;
 }
 
 export const initialBookingState: BookingState = {
@@ -28,14 +28,14 @@ export const initialBookingState: BookingState = {
   activeBookings: [],
   services: [],
   bookings: [],
-  selectedSlotIds: [],
   overtimeMinutes: 0,
+  lastAppointment: null,
 };
 
 export const BookingStore = signalStore(
   { providedIn: 'root' },
   withState<BookingState>(initialBookingState),
-  withComputed(({ slots, selectedSlot, activeBookings, services, bookings }) => ({
+  withComputed(({ slots, selectedSlot }) => ({
     availableSlots: computed(() => slots().filter(slot => slot.available)),
     bookedSlots: computed(() => slots().filter(slot => !slot.available)),
     hasSelection: computed(() => selectedSlot() !== null),
@@ -214,7 +214,25 @@ export const BookingStore = signalStore(
       patchState(store, { isLoading: true, error: null });
       try {
         const response = await lastValueFrom(apiService.createAppointment(dto));
-        patchState(store, { isLoading: false });
+        if (response.status === 'SUCCESS') {
+          const selectedService = store.services().find(s => s.id === dto.serviceId);
+          patchState(store, {
+            isLoading: false,
+            lastAppointment: {
+              id: response.slot?.id ?? '',
+              userId: '',
+              timeSlotId: dto.timeSlotId,
+              appointmentDate: dto.appointmentDate,
+              status: BookingStatus.CONFIRMED,
+              durationMinutes: selectedService?.durationMinutes ?? 0,
+              price: selectedService?.price ?? 0,
+              appointmentNumber: response.slot?.id ?? '',
+              serviceId: dto.serviceId,
+            },
+          });
+        } else {
+          patchState(store, { isLoading: false });
+        }
         return response;
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Failed to create appointment';

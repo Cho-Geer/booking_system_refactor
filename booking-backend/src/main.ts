@@ -1,8 +1,10 @@
 import { NestFactory } from "@nestjs/core";
 import { ValidationPipe } from "@nestjs/common";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
+import { Request, Response } from "express";
 import { AppModule } from "./app.module";
-import helmet from "helmet";
+import { HelmetMiddleware } from "./common/middleware/helmet.middleware";
+import { CsrfMiddleware } from "./common/middleware/csrf.middleware";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const cookieParser = require("cookie-parser");
 
@@ -11,9 +13,31 @@ async function bootstrap() {
     logger: ["error", "warn", "log", "debug", "verbose"],
   });
 
-  // Security
-  app.use(helmet());
+  // Security: Helmet (CSP, HSTS, X-Frame-Options, etc.)
+  const helmetInstance = new HelmetMiddleware();
+  app.use(helmetInstance.use.bind(helmetInstance));
+
+  // cookieParser must be registered BEFORE CsrfMiddleware
   app.use(cookieParser());
+
+  // CSRF protection (double-submit cookie pattern)
+  // Exempt the token endpoint and Swagger docs from CSRF checks
+  const csrfInstance = new CsrfMiddleware({
+    bypassPaths: ["/v1/csrf/token", "/api/docs", "/api/docs/*", "/v1/auth/*"],
+  });
+  app.use(csrfInstance.use.bind(csrfInstance));
+
+  // CSRF token endpoint — generates token/secret pair, sets XSRF-TOKEN cookie
+  app.use("/v1/csrf/token", (_req: Request, res: Response) => {
+    const { token, secret } = csrfInstance.generateToken();
+    res.cookie("XSRF-TOKEN", secret, {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+    });
+    res.json({ token });
+  });
 
   // FIX-P2-004: 严格 CORS 配置
   const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:4200")

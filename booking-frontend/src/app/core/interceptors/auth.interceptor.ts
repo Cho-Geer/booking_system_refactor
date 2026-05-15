@@ -31,6 +31,7 @@ const publicEndpoints = [
   '/auth/refresh',
   '/auth/send-code',
   '/auth/verify-code',
+  '/translations',
 ];
 
 function isPublicEndpoint(url: string): boolean {

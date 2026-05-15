@@ -2,6 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AppHeaderComponent } from './app-header.component';
 import { Component, input, TemplateRef } from '@angular/core';
 import { MenuItem } from 'primeng/api';
+import { TranslationService } from '../../../../core/services/translation.service';
+import { TranslatePipe } from '../../../pipes/translate.pipe';
 
 // Stub ThemeToggleComponent
 @Component({
@@ -32,11 +34,20 @@ describe('AppHeaderComponent', () => {
   ];
 
   beforeEach(async () => {
+    const mockTranslationService = {
+      t: jest.fn((domain: string, key: string) => `{{${domain}.${key}}}`),
+      locale: jest.fn().mockReturnValue('en'),
+      translations: jest.fn().mockReturnValue({}),
+    };
+
     await TestBed.configureTestingModule({
       imports: [AppHeaderComponent, StubThemeToggleComponent],
+      providers: [
+        { provide: TranslationService, useValue: mockTranslationService },
+      ],
     }).overrideComponent(AppHeaderComponent, {
       set: {
-        imports: [StubThemeToggleComponent],
+        imports: [StubThemeToggleComponent, TranslatePipe],
       },
     }).compileComponents();
 
@@ -95,28 +106,28 @@ describe('AppHeaderComponent', () => {
     expect(fixture.nativeElement.textContent).toContain('Test User');
   });
 
-  it('should render admin badge when user is admin', () => {
+  it('should render admin badge with translated text', () => {
     setupDefaultInputs();
     const adminBadge = fixture.nativeElement.querySelector('[data-testid="admin-badge"]');
     expect(adminBadge).toBeTruthy();
-    expect(adminBadge.textContent.trim()).toBe('ADMIN');
+    expect(adminBadge.textContent.trim()).toBe('{{auth.role.admin}}');
   });
 
   it('should emit menuToggle when hamburger button is clicked', () => {
     setupDefaultInputs();
     const menuToggleSpy = jest.spyOn(component.menuToggle, 'emit');
-    const hamburgerBtn = fixture.nativeElement.querySelector('button[aria-label="Toggle menu"]');
+    const hamburgerBtn = fixture.nativeElement.querySelector('button[aria-label="{{global.toggleMenu}}"]');
     hamburgerBtn.click();
     expect(menuToggleSpy).toHaveBeenCalledTimes(1);
   });
 
-  it('should render login button when no user', () => {
+  it('should render login button with translated text when no user', () => {
     fixture.componentRef.setInput('navLinks', defaultNavLinks);
     fixture.componentRef.setInput('userName', undefined);
     fixture.componentRef.setInput('menuItems', defaultMenuItems);
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.textContent).toContain('Sign In');
+    expect(fixture.nativeElement.textContent).toContain('{{auth.login.title}}');
   });
 
   it('should apply shadow-md class when scrolled', () => {
@@ -133,19 +144,20 @@ describe('AppHeaderComponent', () => {
     expect(header.classList.contains('shadow-md')).toBe(true);
   });
 
-  it('should show search bar when showSearch is true', () => {
+  it('should show search bar with translated placeholder when showSearch is true', () => {
     fixture.componentRef.setInput('showSearch', true);
     fixture.detectChanges();
 
-    const searchInput = fixture.nativeElement.querySelector('input[placeholder="Search..."]');
+    const searchInput = fixture.nativeElement.querySelector('input');
     expect(searchInput).toBeTruthy();
+    expect(searchInput.getAttribute('placeholder')).toBe('{{global.search}}');
   });
 
   it('should hide search bar when showSearch is false', () => {
     fixture.componentRef.setInput('showSearch', false);
     fixture.detectChanges();
 
-    const searchInput = fixture.nativeElement.querySelector('input[placeholder="Search..."]');
+    const searchInput = fixture.nativeElement.querySelector('input');
     expect(searchInput).toBeFalsy();
   });
 });

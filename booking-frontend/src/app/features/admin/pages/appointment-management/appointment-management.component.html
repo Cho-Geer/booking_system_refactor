@@ -2,14 +2,14 @@
   <!-- Page Header -->
   <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
     <div>
-      <h1 class="text-2xl sm:text-display font-bold text-text-primary">Appointment Management</h1>
-      <p class="text-sm text-text-secondary mt-1">View and manage all appointments</p>
+      <h1 class="text-2xl sm:text-display font-bold text-text-primary">{{ 'admin.appointments.title' | t }}</h1>
+      <p class="text-sm text-text-secondary mt-1">{{ 'admin.appointments.subtitle' | t }}</p>
     </div>
     <div class="flex gap-2">
-      <app-button label="New Appointment" variant="primary" icon="pi pi-plus" (onClick)="openBooking()"></app-button>
+      <app-button [label]="'admin.appointments.newAppointment' | t" variant="primary" icon="pi pi-plus" (onClick)="openBooking()"></app-button>
       @if (selectedAppointments().length > 0) {
         <app-button
-          label="Batch Cancel ({{ selectedAppointments().length }})"
+          [label]="'admin.appointments.batchCancel' | t : { count: selectedAppointments().length }"
           variant="danger"
           icon="pi pi-times"
           (onClick)="batchCancel()"
@@ -33,7 +33,7 @@
           </div>
           <div>
             <p class="text-3xl font-bold text-text-primary">{{ todayCount() }}</p>
-            <p class="text-sm text-text-secondary">Today</p>
+            <p class="text-sm text-text-secondary">{{ 'admin.appointments.today' | t }}</p>
           </div>
         </div>
       </app-card>
@@ -45,7 +45,7 @@
           </div>
           <div>
             <p class="text-3xl font-bold text-text-primary">{{ pendingCount() }}</p>
-            <p class="text-sm text-text-secondary">Pending</p>
+            <p class="text-sm text-text-secondary">{{ 'admin.appointments.pending' | t }}</p>
           </div>
         </div>
       </app-card>
@@ -57,7 +57,7 @@
           </div>
           <div>
             <p class="text-3xl font-bold text-text-primary">{{ confirmedCount() }}</p>
-            <p class="text-sm text-text-secondary">Confirmed</p>
+            <p class="text-sm text-text-secondary">{{ 'admin.appointments.confirmed' | t }}</p>
           </div>
         </div>
       </app-card>
@@ -69,7 +69,7 @@
           </div>
           <div>
             <p class="text-3xl font-bold text-text-primary">{{ cancelledCount() }}</p>
-            <p class="text-sm text-text-secondary">Cancelled</p>
+            <p class="text-sm text-text-secondary">{{ 'admin.appointments.cancelled' | t }}</p>
           </div>
         </div>
       </app-card>
@@ -86,7 +86,7 @@
     <app-filter-bar>
       <app-search-input
         [value]="filterSearch()"
-        placeholder="Search customer..."
+        [placeholder]="'admin.appointments.searchPlaceholder' | t"
         [suggestions]="searchSuggestions()"
         [debounceMs]="300"
         [minLength]="1"
@@ -98,20 +98,20 @@
         [options]="statusOptions"
         optionLabel="label"
         optionValue="value"
-        placeholder="All Statuses"
+        [placeholder]="'admin.appointments.allStatuses' | t"
         styleClass="w-full sm:w-36"
         (valueChange)="onStatusFilterChange($event)"
       ></app-dropdown>
       <div class="flex items-center gap-2">
-        <label class="text-sm text-text-secondary hidden sm:inline">From:</label>
+        <label class="text-sm text-text-secondary hidden sm:inline">{{ 'admin.distribution.from' | t }}:</label>
         <p-datepicker [ngModel]="filterStartDate()" (ngModelChange)="filterStartDate.set($event)" dateFormat="yy-mm-dd" [showIcon]="true" (onSelect)="applyFilter()" appendTo="body" />
       </div>
       <div class="flex items-center gap-2">
-        <label class="text-sm text-text-secondary hidden sm:inline">To:</label>
+        <label class="text-sm text-text-secondary hidden sm:inline">{{ 'admin.distribution.to' | t }}:</label>
         <p-datepicker [ngModel]="filterEndDate()" (ngModelChange)="filterEndDate.set($event)" dateFormat="yy-mm-dd" [showIcon]="true" (onSelect)="applyFilter()" appendTo="body" />
       </div>
       <app-button
-        label="Clear"
+        [label]="'global.clear' | t"
         variant="ghost"
         icon="pi pi-filter-slash"
         size="sm"
@@ -140,10 +140,10 @@
 
     <!-- Calendar View -->
     @if (viewMode() === 'calendar') {
-      <app-card variant="sharp" header="Appointment Calendar">
+      <app-card variant="sharp" [header]="'admin.appointments.calendar' | t">
         <div class="p-2">
           <div class="grid grid-cols-7 gap-1 mb-2">
-            @for (day of ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']; track day) {
+            @for (day of dayHeaders; track day) {
               <div class="text-center text-sm font-medium text-text-secondary py-1">{{ day }}</div>
             }
           </div>
@@ -181,7 +181,7 @@
           [totalRecords]="vm().appointmentsTotal"
           [rowsPerPageOptions]="[10, 25, 50]"
           [showCurrentPageReport]="true"
-          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} appointments"
+          [currentPageReportTemplate]="'admin.appointments.pageReport' | t : { first: '{first}', last: '{last}', totalRecords: '{totalRecords}' }"
           [(selection)]="selectedAppointments"
           [rowHover]="true"
           dataKey="id"
@@ -193,12 +193,12 @@
               <th style="width: 3rem">
                 <p-tableHeaderCheckbox />
               </th>
-              <th pSortableColumn="appointmentNumber">Number <p-sortIcon field="appointmentNumber" /></th>
-              <th pSortableColumn="userName">Customer <p-sortIcon field="userName" /></th>
-              <th pSortableColumn="serviceName">Service <p-sortIcon field="serviceName" /></th>
-              <th pSortableColumn="appointmentDate">Date <p-sortIcon field="appointmentDate" /></th>
-              <th pSortableColumn="status">Status <p-sortIcon field="status" /></th>
-              <th>Actions</th>
+              <th pSortableColumn="appointmentNumber">{{ 'admin.appointments.number' | t }} <p-sortIcon field="appointmentNumber" /></th>
+              <th pSortableColumn="userName">{{ 'admin.table.customer' | t }} <p-sortIcon field="userName" /></th>
+              <th pSortableColumn="serviceName">{{ 'admin.table.service' | t }} <p-sortIcon field="serviceName" /></th>
+              <th pSortableColumn="appointmentDate">{{ 'admin.table.date' | t }} <p-sortIcon field="appointmentDate" /></th>
+              <th pSortableColumn="status">{{ 'admin.table.status' | t }} <p-sortIcon field="status" /></th>
+              <th>{{ 'admin.table.actions' | t }}</th>
             </tr>
           </ng-template>
           <ng-template #body let-appointment>
@@ -218,7 +218,7 @@
                   ></app-button>
                   <app-button icon="pi pi-refresh" variant="ghost" size="sm" [iconOnly]="true"
                     (onClick)="openStatusDialog(appointment)"
-                    [pTooltip]="'Update Status'"
+                    [pTooltip]="'admin.appointments.updateStatus' | t"
                   ></app-button>
                 </div>
               </td>
@@ -226,7 +226,7 @@
           </ng-template>
           <ng-template #emptymessage>
             <tr>
-              <td colspan="7" class="text-center py-8 text-text-secondary">No appointments found.</td>
+              <td colspan="7" class="text-center py-8 text-text-secondary">{{ 'admin.appointments.noAppointments' | t }}</td>
             </tr>
           </ng-template>
         </p-table>
@@ -238,7 +238,7 @@
   <app-modal
     [visible]="viewDialogVisible()"
     (visibleChange)="viewDialogVisible.set($event)"
-    header="View Appointment"
+    [header]="'admin.appointments.viewAppointment' | t"
     [modal]="true"
     [closable]="true"
     [styleClass]="'rounded-xl w-[450px]'"
@@ -247,34 +247,34 @@
       <div class="flex flex-col gap-4 p-4">
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-text-primary mb-1">Appointment Number</label>
+            <label class="block text-sm font-medium text-text-primary mb-1">{{ 'admin.appointments.number' | t }}</label>
             <p class="text-text-primary">{{ appointmentForView()?.appointmentNumber }}</p>
           </div>
           <div>
-            <label class="block text-sm font-medium text-text-primary mb-1">Status</label>
+            <label class="block text-sm font-medium text-text-primary mb-1">{{ 'admin.table.status' | t }}</label>
             <app-badge [status]="getStatusBadge(appointmentForView()?.status ?? 'PENDING')" [customLabel]="appointmentForView()?.status ?? ''" size="sm"></app-badge>
           </div>
           <div class="col-span-2">
-            <label class="block text-sm font-medium text-text-primary mb-1">Customer</label>
+            <label class="block text-sm font-medium text-text-primary mb-1">{{ 'admin.table.customer' | t }}</label>
             <p class="text-text-primary">{{ appointmentForView()?.userName }}</p>
           </div>
           <div class="col-span-2">
-            <label class="block text-sm font-medium text-text-primary mb-1">Service</label>
+            <label class="block text-sm font-medium text-text-primary mb-1">{{ 'admin.table.service' | t }}</label>
             <p class="text-text-primary">{{ appointmentForView()?.serviceName }}</p>
           </div>
           <div>
-            <label class="block text-sm font-medium text-text-primary mb-1">Date & Time</label>
+            <label class="block text-sm font-medium text-text-primary mb-1">{{ 'admin.table.date' | t }}</label>
             <p class="text-text-primary">{{ appointmentForView()?.appointmentDate | date:'medium' }}</p>
           </div>
           <div class="flex items-end pb-2">
-            <p class="text-sm text-text-primary">Created: {{ appointmentForView()?.createdAt | date:'short' }}</p>
+            <p class="text-sm text-text-primary">{{ 'admin.appointments.created' | t }}: {{ appointmentForView()?.createdAt | date:'short' }}</p>
           </div>
         </div>
       </div>
     }
     <div app-modal-footer>
       <div class="flex flex-col-reverse sm:flex-row gap-2 sm:gap-2">
-        <app-button label="Close" variant="primary" (onClick)="viewDialogVisible.set(false)"></app-button>
+        <app-button [label]="'global.close' | t" variant="primary" (onClick)="viewDialogVisible.set(false)"></app-button>
       </div>
     </div>
   </app-modal>
@@ -283,7 +283,7 @@
   <app-modal
     [visible]="statusDialogVisible()"
     (visibleChange)="statusDialogVisible.set($event)"
-    header="Update Appointment Status"
+    [header]="'admin.appointments.updateStatus' | t"
     [modal]="true"
     [closable]="true"
     [styleClass]="'rounded-xl w-[400px]'"
@@ -291,12 +291,12 @@
     @if (selectedAppointment()) {
       <div class="flex flex-col gap-4 p-4">
         <div>
-          <p class="text-sm text-text-secondary">Appointment: <strong class="text-text-primary">{{ selectedAppointment()?.appointmentNumber }}</strong></p>
-          <p class="text-sm text-text-secondary">Customer: <strong class="text-text-primary">{{ selectedAppointment()?.userName }}</strong></p>
-          <p class="text-sm text-text-secondary">Service: <strong class="text-text-primary">{{ selectedAppointment()?.serviceName }}</strong></p>
+          <p class="text-sm text-text-secondary">{{ 'admin.appointments.number' | t }}: <strong class="text-text-primary">{{ selectedAppointment()?.appointmentNumber }}</strong></p>
+          <p class="text-sm text-text-secondary">{{ 'admin.table.customer' | t }}: <strong class="text-text-primary">{{ selectedAppointment()?.userName }}</strong></p>
+          <p class="text-sm text-text-secondary">{{ 'admin.table.service' | t }}: <strong class="text-text-primary">{{ selectedAppointment()?.serviceName }}</strong></p>
         </div>
         <div>
-          <label class="block font-medium mb-1 text-text-primary">New Status</label>
+          <label class="block font-medium mb-1 text-text-primary">{{ 'admin.appointments.newStatus' | t }}</label>
           <p-select
             [(ngModel)]="newStatus"
             [options]="updateStatusOptions"
@@ -305,15 +305,15 @@
           />
         </div>
         <div>
-          <label class="block font-medium mb-1 text-text-primary">Reason (optional)</label>
-          <input pInputText [(ngModel)]="statusUpdateReason" class="w-full" placeholder="Reason for status change..." />
+          <label class="block font-medium mb-1 text-text-primary">{{ 'admin.appointments.reason' | t }}</label>
+          <input pInputText [(ngModel)]="statusUpdateReason" class="w-full" [placeholder]="'admin.appointments.reasonPlaceholder' | t" />
         </div>
       </div>
     }
     <div app-modal-footer>
       <div class="flex flex-col-reverse sm:flex-row gap-2 sm:gap-2">
-        <app-button label="Cancel" variant="secondary" (onClick)="statusDialogVisible.set(false)"></app-button>
-        <app-button label="Update" variant="primary" (onClick)="updateStatus()"></app-button>
+        <app-button [label]="'global.cancel' | t" variant="secondary" (onClick)="statusDialogVisible.set(false)"></app-button>
+        <app-button [label]="'admin.appointments.update' | t" variant="primary" (onClick)="updateStatus()"></app-button>
       </div>
     </div>
   </app-modal>
@@ -322,7 +322,7 @@
   <app-modal
     [visible]="bookingDialogVisible()"
     (visibleChange)="bookingDialogVisible.set($event); !$event && closeBooking()"
-    header="New Appointment"
+    [header]="'admin.appointments.newAppointment' | t"
     [modal]="true"
     [closable]="true"
     [styleClass]="'rounded-xl w-[480px]'"
@@ -330,15 +330,15 @@
     <div class="flex flex-col gap-4 p-4">
       @if (timeSlotUnavailable()) {
         <div class="text-sm text-accent-red bg-accent-red/5 border border-accent-red/20 rounded-lg px-3 py-2">
-          No available time slots for the selected service. Please choose a different service.
+          {{ 'admin.appointments.noTimeSlots' | t }}
         </div>
       }
       <div>
-        <label class="block font-medium mb-1 text-text-primary">Customer *</label>
+        <label class="block font-medium mb-1 text-text-primary">{{ 'admin.table.customer' | t }} *</label>
         <p-select
           [(ngModel)]="formUserId"
           [options]="customerOptions()"
-          placeholder="Select customer..."
+          [placeholder]="'admin.appointments.selectCustomer' | t"
           class="w-full"
           appendTo="body"
           [class.ng-invalid]="formSubmitted() && formErrors().userId"
@@ -348,11 +348,11 @@
         }
       </div>
       <div>
-        <label class="block font-medium mb-1 text-text-primary">Service *</label>
+        <label class="block font-medium mb-1 text-text-primary">{{ 'admin.table.service' | t }} *</label>
         <p-select
           [(ngModel)]="formServiceId"
           [options]="serviceOptions()"
-          placeholder="Select service..."
+          [placeholder]="'admin.appointments.selectService' | t"
           class="w-full"
           appendTo="body"
           [class.ng-invalid]="formSubmitted() && formErrors().serviceId"
@@ -363,52 +363,41 @@
         }
       </div>
       <div>
-        <label class="block font-medium mb-1 text-text-primary">Appointment Date *</label>
+        <label class="block font-medium mb-1 text-text-primary">{{ 'admin.table.date' | t }} *</label>
         <p-datepicker
           [(ngModel)]="formAppointmentDate"
           [showIcon]="true"
           styleClass="w-full"
-          placeholder="Select date..."
+          [placeholder]="'admin.appointments.selectDate' | t"
           appendTo="body"
           [minDate]="minAppointmentDate()"
           [maxDate]="maxAppointmentDate()"
           [class.ng-invalid]="formSubmitted() && formErrors().appointmentDate"
+          (onSelect)="onDateChange()"
         />
         @if (formSubmitted() && formErrors().appointmentDate) {
           <small class="text-danger">{{ formErrors().appointmentDate }}</small>
         }
       </div>
       <div>
-        <label class="block font-medium mb-1 text-text-primary">Time Slot *</label>
+        <label class="block font-medium mb-1 text-text-primary">{{ 'admin.quickBooking.timeSlot' | t }} *</label>
+        <p class="text-xs text-text-secondary mb-1">{{ timezoneLabel() }}</p>
         <p-select
           [(ngModel)]="formTimeSlotId"
           [options]="availableTimeSlots()"
-          placeholder="Select time slot..."
+          optionDisabled="disabled"
+          [placeholder]="'admin.quickBooking.selectTimeSlot' | t"
           class="w-full"
           appendTo="body"
           [disabled]="!formServiceId()"
+          [loading]="timeSlotLoading()"
         />
         @if (!formServiceId()) {
-          <p class="text-xs text-text-secondary mt-1">Please select a service first.</p>
+          <p class="text-xs text-text-secondary mt-1">{{ 'admin.appointments.selectServiceFirst' | t }}</p>
         }
       </div>
       <div>
-        <label class="block font-medium mb-1 text-text-primary">Additional Time Slots (optional)</label>
-        <p-multiSelect
-          [(ngModel)]="formSelectedSlotIds"
-          [options]="availableTimeSlots()"
-          placeholder="Select additional slots..."
-          display="chip"
-          class="w-full"
-          appendTo="body"
-          [disabled]="!formServiceId()"
-        />
-        @if (!formServiceId()) {
-          <p class="text-xs text-text-secondary mt-1">Please select a service first.</p>
-        }
-      </div>
-      <div>
-        <label class="block font-medium mb-1 text-text-primary">Overtime Minutes</label>
+        <label class="block font-medium mb-1 text-text-primary">{{ 'admin.quickBooking.overtime' | t }}</label>
         <p-inputNumber
           [(ngModel)]="formOvertimeMinutes"
           [min]="0"
@@ -428,37 +417,37 @@
           </ng-template>
         </p-inputNumber>
         @if (!formServiceId()) {
-          <p class="text-xs text-text-secondary mt-1">Please select a service first.</p>
+          <p class="text-xs text-text-secondary mt-1">{{ 'admin.appointments.selectServiceFirst' | t }}</p>
         }
       </div>
       <div>
-        <label class="block font-medium mb-1 text-text-primary">Notes (optional)</label>
+        <label class="block font-medium mb-1 text-text-primary">{{ 'admin.quickBooking.notes' | t }}</label>
         <textarea
           pTextarea
           [(ngModel)]="formNotes"
           rows="3"
           class="w-full"
-          placeholder="Additional notes..."
+          [placeholder]="'admin.quickBooking.notesPlaceholder' | t"
         ></textarea>
       </div>
       @if (estTotalCost(); as cost) {
         <div class="border-t border-border-light pt-3 space-y-1">
           <div class="text-sm text-text-secondary">
-            Base ({{ cost.totalMinutes }} min @ ${{ cost.pricePerMinute.toFixed(2) }}/min) — ${{ cost.baseCost.toFixed(2) }}
+            {{ 'admin.appointments.costBase' | t : { minutes: cost.totalMinutes, rate: cost.pricePerMinute.toFixed(2), amount: cost.baseCost.toFixed(2) } }}
           </div>
           <div class="text-sm text-text-secondary">
-            Tax ({{ cost.taxRate }}%) — ${{ cost.tax.toFixed(2) }}
+            {{ 'admin.appointments.costTax' | t : { rate: cost.taxRate, amount: cost.tax.toFixed(2) } }}
           </div>
           <div class="font-bold text-text-primary text-base pt-1 border-t border-border-light">
-            Total — ${{ cost.total.toFixed(2) }}
+            {{ 'admin.appointments.costTotal' | t : { amount: cost.total.toFixed(2) } }}
           </div>
         </div>
       }
     </div>
     <div app-modal-footer>
       <div class="flex flex-col-reverse sm:flex-row gap-2 sm:gap-2">
-        <app-button label="Cancel" variant="secondary" (onClick)="closeBooking()"></app-button>
-        <app-button label="Save" variant="primary" (onClick)="saveBooking()"></app-button>
+        <app-button [label]="'global.cancel' | t" variant="secondary" (onClick)="closeBooking()"></app-button>
+        <app-button [label]="'global.save' | t" variant="primary" (onClick)="saveBooking()"></app-button>
       </div>
     </div>
   </app-modal>

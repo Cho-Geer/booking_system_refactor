@@ -16,6 +16,7 @@ import {
 import { JwtAuthGuard } from "../../../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../../../common/guards/roles.guard";
 import { Roles } from "../../../common/decorators/roles.decorator";
+import { RateLimit } from "../../rate-limiter/rate-limiter.decorator";
 
 @ApiTags("Admin Stats")
 @Controller("admin")
@@ -26,13 +27,27 @@ export class AdminStatsController {
 
   @Get("stats")
   @Roles("ADMIN", "SUPER_ADMIN")
+  @RateLimit({ tier: "api", key: "ip", limit: 30 })
   @ApiOperation({ summary: "Get admin dashboard stats" })
-  async getStats(): Promise<AdminStatsDto> {
-    return this.adminStatsService.getDashboard();
+  @ApiQuery({
+    name: "timeRange",
+    required: false,
+    enum: ["last24h", "last7d", "last30d", "thisMonth", "lastMonth", "custom"],
+  })
+  @ApiQuery({ name: "startDate", required: false })
+  @ApiQuery({ name: "endDate", required: false })
+  async getStats(
+    @Query("timeRange") timeRange?: string,
+    @Query("startDate") startDate?: string,
+    @Query("endDate") endDate?: string,
+    @Query("timezone") timezone?: string,
+  ): Promise<AdminStatsDto> {
+    return this.adminStatsService.getDashboard(timeRange, startDate, endDate, timezone);
   }
 
   @Get("stats/booking-trends")
   @Roles("ADMIN", "SUPER_ADMIN")
+  @RateLimit({ tier: "api", key: "ip", limit: 30 })
   @ApiOperation({ summary: "Get booking trend data filtered by time range" })
   @ApiQuery({
     name: "timeRange",
@@ -69,6 +84,7 @@ export class AdminStatsController {
 
   @Get("stats/service-distribution")
   @Roles("ADMIN", "SUPER_ADMIN")
+  @RateLimit({ tier: "api", key: "ip", limit: 30 })
   @ApiOperation({
     summary: "Get service distribution with percentages (DASH-003)",
   })
@@ -93,6 +109,7 @@ export class AdminStatsController {
 
   @Get("stats/time-distribution")
   @Roles("ADMIN", "SUPER_ADMIN")
+  @RateLimit({ tier: "api", key: "ip", limit: 30 })
   @ApiOperation({
     summary:
       "Get hourly time distribution with formatted hour strings (DASH-004)",
@@ -118,6 +135,7 @@ export class AdminStatsController {
 
   @Get("system/health")
   @Roles("ADMIN", "SUPER_ADMIN")
+  @RateLimit({ tier: "api", key: "ip" })
   @ApiOperation({ summary: "Get system health status for dashboard" })
   async getSystemStatus(): Promise<SystemStatusDto> {
     return this.adminStatsService.getSystemStatus();
@@ -125,6 +143,7 @@ export class AdminStatsController {
 
   @Get("system/metrics")
   @Roles("ADMIN", "SUPER_ADMIN")
+  @RateLimit({ tier: "api", key: "ip" })
   @ApiOperation({ summary: "Get detailed system metrics (CPU, memory, disk)" })
   async getSystemMetrics(): Promise<SystemMetricsDto> {
     return this.adminStatsService.getSystemMetrics();

@@ -21,7 +21,7 @@ setup('authenticate as user', async ({ page }) => {
   await page.getByRole('checkbox').check();
 
   // Submit login form
-  await page.getByRole('button', { name: 'Submit login form' }).click();
+  await page.getByRole('button', { name: 'Sign In' }).last().click();
 
   // Wait for successful login - redirect to home
   await page.waitForURL('**/home', { timeout: 10000 }).catch(() => {
@@ -45,14 +45,14 @@ setup('authenticate as admin', async ({ page }) => {
   await page.goto('/auth/login');
 
   // Fill admin credentials
-  await page.getByLabel('Email').fill('admin@booking.com');
+  await page.getByLabel('Email').fill('zhaoge.tzx@gmail.com');
   await page.getByLabel('Password').fill('Admin@123456');
 
   // Accept terms and conditions
   await page.getByRole('checkbox').check();
 
-  // Submit login form
-  await page.getByRole('button', { name: 'Submit login form' }).click();
+  // Submit login form (the "Sign In" button rendered by app-button)
+  await page.getByRole('button', { name: 'Sign In' }).last().click();
 
   // Wait for successful login
   await page.waitForURL('**/home', { timeout: 10000 }).catch(() => {});

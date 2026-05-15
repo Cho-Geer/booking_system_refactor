@@ -7,6 +7,7 @@ import { AppEmptyStateComponent } from '../../shared/components/atoms/app-empty-
 import { AppCardComponent } from '../../shared/components/atoms/app-card/app-card.component';
 import { AppButtonComponent } from '../../shared/components/atoms/app-button/app-button.component';
 import { AppModalComponent } from '../../shared/components/atoms/app-modal/app-modal.component';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 export type PullToRefreshState = 'idle' | 'pulling' | 'refreshing';
 
@@ -18,6 +19,11 @@ export interface AppointmentListItem {
   serviceName: string;
   timeSlotStart: string;
   timeSlotEnd: string;
+  durationMinutes?: number;
+  price?: number;
+  taxRate?: number;
+  taxIncludedAmount?: number;
+  appointmentNumber?: string;
 }
 
 type FilterValue = 'all' | string;
@@ -27,6 +33,7 @@ type FilterValue = 'all' | string;
   standalone: true,
   imports: [
     CommonModule,
+    TranslatePipe,
     AppBadgeComponent,
     AppEmptyStateComponent,
     AppCardComponent,
@@ -44,6 +51,12 @@ export class MyBookingsComponent implements OnInit {
   activeFilter = signal<FilterValue>('all');
   isLoading = signal(true);
   loadError = signal<string | null>(null);
+
+  // Pagination state
+  page = signal(1);
+  total = signal(0);
+  totalPages = signal(1);
+  limit = signal(10);
 
   // Pull-to-refresh state
   pullToRefreshState = signal<PullToRefreshState>('idle');
@@ -124,9 +137,15 @@ export class MyBookingsComponent implements OnInit {
     this.isLoading.set(true);
     this.loadError.set(null);
 
-    this.api.getMyAppointments().subscribe({
+    this.api.getMyAppointmentsPaginated({
+      page: this.page(),
+      limit: this.limit(),
+      status: this.activeFilter() === 'all' ? undefined : this.activeFilter(),
+    }).subscribe({
       next: (data) => {
-        this.appointments.set(data);
+        this.appointments.set(data.items);
+        this.total.set(data.meta.total);
+        this.totalPages.set(data.meta.totalPages);
         this.isLoading.set(false);
         this.pullToRefreshState.set('idle');
         this.pullProgress.set(0);
@@ -156,6 +175,14 @@ export class MyBookingsComponent implements OnInit {
 
   setFilter(filter: FilterValue): void {
     this.activeFilter.set(filter);
+    this.page.set(1);
+    this.loadAppointments();
+  }
+
+  goToPage(p: number): void {
+    if (p < 1 || p > this.totalPages()) return;
+    this.page.set(p);
+    this.loadAppointments();
   }
 
   getFilterCount(filter: FilterValue): number {
@@ -230,7 +257,8 @@ export class MyBookingsComponent implements OnInit {
     return `${fmt(start)} - ${fmt(end)}`;
   }
 
-  formatPrice(_serviceName: string): string {
-    return '';
+  formatPrice(price: number | undefined): string {
+    if (price == null) return '';
+    return '$' + price.toFixed(2);
   }
 }

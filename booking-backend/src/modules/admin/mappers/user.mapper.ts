@@ -5,7 +5,7 @@ interface PrismaUser {
   name: string;
   email?: string | null;
   phone?: string | null;
-  userType: string;
+  role: string;
   status: string;
   createdAt: Date;
 }
@@ -16,26 +16,29 @@ export function toAdminUserDto(user: PrismaUser): AdminUserDto {
     name: user.name,
     email: user.email ?? undefined,
     phone: user.phone ?? undefined,
-    role: user.userType,
+    role: user.role,
     status: user.status,
     createdAt: user.createdAt,
   };
 }
 
 export function fromCreateAdminUserDto(dto: CreateAdminUserDto) {
-  return {
+  const data: Record<string, unknown> = {
     name: dto.name,
     email: dto.email,
     phone: dto.phone,
-    userType: dto.role,
-    password: dto.password,
+    role: dto.role,
   };
+  if (dto.password !== undefined) {
+    data.password = dto.password;
+  }
+  return data;
 }
 
 export function fromUpdateAdminUserDto(dto: UpdateAdminUserDto) {
   const update: Record<string, unknown> = {};
   if (dto.name !== undefined) update.name = dto.name;
-  if (dto.role !== undefined) update.userType = dto.role;
+  if (dto.role !== undefined) update.role = dto.role;
   if (dto.status !== undefined) update.status = dto.status;
   return update;
 }

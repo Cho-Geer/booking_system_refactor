@@ -10,6 +10,7 @@ import {
 } from "@nestjs/common";
 import { Request, Response } from "express";
 import { ClsService } from "nestjs-cls";
+import { formatTimestampWithTimezone } from "../utils/timezone.util";
 
 interface PrismaError {
   code: string;
@@ -46,6 +47,10 @@ const PRISMA_ERROR_MAP: Record<
   P2005: { status: HttpStatus.BAD_REQUEST, message: "Invalid field value" },
   P2006: { status: HttpStatus.BAD_REQUEST, message: "Invalid field value" },
   P2011: { status: HttpStatus.BAD_REQUEST, message: "Required field missing" },
+  P2021: {
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    message: "Database table not found. Please run database migrations.",
+  },
   P2012: { status: HttpStatus.BAD_REQUEST, message: "Required field missing" },
   P2025: { status: HttpStatus.NOT_FOUND, message: "Resource not found" },
   P2034: {
@@ -71,17 +76,29 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     let message = "Internal server error";
     let error = "Unknown error";
 
+    const errors: Array<{ field: string; message: string; code: string }> = [];
+
     if (exception instanceof HttpException) {
       status = exception.getStatus();
       const exceptionResponse = exception.getResponse();
-      message =
-        typeof exceptionResponse === "string"
-          ? exceptionResponse
-          : ((exceptionResponse as Record<string, unknown>)
-              .message as string) || message;
-      // For contract compliance, use the exception message as the error field
-      error =
-        typeof exceptionResponse === "string" ? exceptionResponse : message;
+      const rawMessage = (exceptionResponse as Record<string, unknown>).message;
+
+      if (Array.isArray(rawMessage)) {
+        message = rawMessage[0] || message;
+        error = "Validation Error";
+        rawMessage.forEach((msg: string) => {
+          const spaceIdx = msg.indexOf(" ");
+          const field = spaceIdx > 0 ? msg.substring(0, spaceIdx) : "unknown";
+          errors.push({ field, message: msg, code: "VALIDATION_ERROR" });
+        });
+      } else {
+        message =
+          typeof rawMessage === "string"
+            ? rawMessage
+            : (rawMessage as string) || message;
+        error =
+          typeof exceptionResponse === "string" ? exceptionResponse : message;
+      }
     } else if (isPrismaError(exception)) {
       // Handle Prisma errors using mapping table
       const mapping = PRISMA_ERROR_MAP[exception.code];
@@ -116,7 +133,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       statusCode: status,
       message,
       error,
-      timestamp: new Date().toISOString(),
+      errors: errors.length > 0 ? errors : undefined,
+      timestamp: formatTimestampWithTimezone(
+        request.headers?.["x-timezone"] as string | undefined,
+      ),
       path: request.url,
       requestId,
     });

@@ -1,0 +1,74 @@
+#!/usr/bin/env sh
+# =============================================================================
+# .husky/pre-commit — Test Architecture v2.0
+# =============================================================================
+# Fast pre-commit checks (<10s total). For comprehensive validation,
+# push to CI (test-gates.yml).
+#
+# Checks (in order):
+#   1. tsc --noEmit          → TypeScript type checking (2-5s)
+#   2. keystone:hash:verify  → Contract hash integrity (0.5s)
+#   3. eslint --rule mock-audit → Mock policy enforcement (1-2s)
+#   4. jest --onlyChanged --bail → Changed-file tests in Fake mode (2-5s)
+#
+# ALL MUST PASS → commit allowed
+# ANY FAILURE → commit blocked, fix and retry
+# =============================================================================
+
+set -e
+
+echo ""
+echo "╔══════════════════════════════════════════════════╗"
+echo "║       Pre-commit Checks (v2.0)                   ║"
+echo "╚══════════════════════════════════════════════════╝"
+echo ""
+
+# ── Check 1: TypeScript Type Checking ────────────────────────────────
+echo "[1/4] TypeScript type checking..."
+cd booking-backend
+npx tsc --noEmit --project tsconfig.json
+cd ..
+echo "  [1/4] TypeScript type checking passed"
+echo ""
+
+# ── Check 2: Contract Hash Integrity ──────────────────────────────────
+echo "[2/4] Contract hash verification..."
+npm run keystone:hash:verify
+echo "  [2/4] Contract hash verified"
+echo ""
+
+# ── Check 3: Mock Policy Audit ───────────────────────────────────────
+echo "[3/4] Mock policy audit (TIER1/2/3 enforcement)..."
+STAGED_SPECS=$(git diff --cached --name-only --diff-filter=ACM | grep '\.spec\.ts$' || true)
+if [ -n "$STAGED_SPECS" ]; then
+  cd booking-backend
+  npx eslint --config .eslintrc.mock-rules.js --no-eslintrc $STAGED_SPECS
+  cd ..
+  echo "  [3/4] Mock policy audit passed"
+else
+  echo "  [3/4] No staged spec files -- skipped"
+fi
+echo ""
+
+# ── Check 4: Changed-File Tests (Fake Mode) ──────────────────────────
+echo "[4/4] Running tests for changed files (Fake mode)..."
+STAGED_SRC=$(git diff --cached --name-only --diff-filter=ACM | grep '\.ts$' | grep -v '\.spec\.ts$' || true)
+if [ -n "$STAGED_SRC" ]; then
+  cd booking-backend
+  FORCE_FAKE=true npx jest \
+    --config jest.config.unit.js \
+    --onlyChanged \
+    --bail \
+    --maxWorkers=2 \
+    --testTimeout=10000
+  cd ..
+  echo "  [4/4] Changed-file tests passed (Fake mode)"
+else
+  echo "  [4/4] No staged source files -- skipped"
+fi
+echo ""
+
+echo "╔══════════════════════════════════════════════════╗"
+echo "║  All pre-commit checks passed!                   ║"
+echo "╚══════════════════════════════════════════════════╝"
+echo ""

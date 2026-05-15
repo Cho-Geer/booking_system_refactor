@@ -1,14 +1,12 @@
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { ApiProperty } from "@nestjs/swagger";
 import {
   IsString,
   IsNumber,
-  IsInt,
   IsBoolean,
-  IsOptional,
 } from "class-validator";
 
 export interface TimeDistributionItem {
-  hour: string;
+  hour: number;
   count: number;
 }
 
@@ -16,12 +14,6 @@ export interface ServiceDistributionItem {
   serviceName: string;
   count: number;
   percentage: number;
-}
-
-export interface StaffWorkloadItem {
-  serviceName: string;
-  workloadPercentage: number;
-  appointmentCount: number;
 }
 
 export class StatCardDto {
@@ -47,9 +39,6 @@ export class StatCardDto {
 }
 
 export class AdminStatsDto {
-  @ApiProperty({ description: "Total bookings stat card" })
-  totalBookings!: StatCardDto;
-
   @ApiProperty({ description: "Today's bookings stat card" })
   todayBookings!: StatCardDto;
 
@@ -82,8 +71,6 @@ export class AdminStatsDto {
   })
   timeDistribution!: TimeDistributionItem[];
 
-  @ApiProperty({ description: "Staff workload distribution by service" })
-  staffWorkload!: StaffWorkloadItem[];
 }
 
 export class SystemStatusDto {

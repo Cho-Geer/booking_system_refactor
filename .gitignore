@@ -47,8 +47,10 @@ pnpm-debug.log*
 tmp/
 .*temp/
 out-tsc/
+*.tsbuildinfo
 
 # Multi-agent transient artifacts (all under .task_temp/)
+.task_temp/
 test_report.json
 TASK_LOG.md
 HANDOVER.md

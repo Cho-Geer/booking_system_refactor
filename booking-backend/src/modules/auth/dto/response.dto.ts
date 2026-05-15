@@ -2,10 +2,10 @@ import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 
 export class UserSummaryDto {
   @ApiProperty({ description: "User ID" })
-  id: string;
+  id!: string;
 
   @ApiProperty({ description: "User name" })
-  name: string;
+  name!: string;
 
   @ApiPropertyOptional({ description: "User email" })
   email?: string;
@@ -14,10 +14,10 @@ export class UserSummaryDto {
   phone?: string;
 
   @ApiProperty({ description: "User role" })
-  role: string;
+  role!: string;
 
   @ApiProperty({ description: "Created at timestamp" })
-  createdAt: Date;
+  createdAt!: Date;
 }
 
 export class LoginResponseDto {

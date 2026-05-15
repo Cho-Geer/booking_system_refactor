@@ -1,8 +1,8 @@
 <div class="sharp-card card-lift p-5 bg-card-bg h-full">
   <div class="flex items-center justify-between mb-5">
-    <h3 class="text-base font-bold text-text-primary">Booking Distribution</h3>
+    <h3 class="text-base font-bold text-text-primary">{{ 'admin.distribution.title' | t }}</h3>
     <div class="flex gap-2 no-click-feedback relative">
-      <app-button label="Services" variant="primary" size="sm" />
+      <app-button [label]="'admin.distribution.services' | t" variant="primary" size="sm" />
       <div class="relative">
         <app-button
           [label]="displayTimeRangeLabel()"
@@ -51,7 +51,7 @@
             [class.ease-out]="true"
           >
             <div class="flex items-center justify-between mb-4">
-              <h4 class="text-sm font-semibold text-text-primary">Select Date Range</h4>
+              <h4 class="text-sm font-semibold text-text-primary">{{ 'admin.distribution.selectDateRange' | t }}</h4>
               <button
                 class="text-text-secondary hover:text-text-primary transition-colors"
                 (click)="closeCustomPanel()"
@@ -61,7 +61,7 @@
             </div>
             <div class="space-y-3 mb-4">
               <div>
-                <label class="block text-xs text-text-secondary mb-1">From</label>
+                <label class="block text-xs text-text-secondary mb-1">{{ 'admin.distribution.from' | t }}</label>
                 <p-datepicker
                   [(ngModel)]="customStartDateObj"
                   dateFormat="yy-mm-dd"
@@ -70,7 +70,7 @@
                 />
               </div>
               <div>
-                <label class="block text-xs text-text-secondary mb-1">To</label>
+                <label class="block text-xs text-text-secondary mb-1">{{ 'admin.distribution.to' | t }}</label>
                 <p-datepicker
                   [(ngModel)]="customEndDateObj"
                   dateFormat="yy-mm-dd"
@@ -82,13 +82,13 @@
             </div>
             <div class="flex gap-2 justify-end">
               <app-button
-                label="Cancel"
+                [label]="'global.cancel' | t"
                 variant="ghost"
                 size="sm"
                 (onClick)="closeCustomPanel()"
               />
               <app-button
-                label="Apply"
+                [label]="'global.apply' | t"
                 variant="primary"
                 size="sm"
                 [disabled]="!customStartDateObj() || !customEndDateObj()"

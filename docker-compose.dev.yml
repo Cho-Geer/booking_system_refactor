@@ -55,12 +55,7 @@ services:
       JWT_REFRESH_EXPIRATION: 7d
       PORT: 3000
       CORS_ORIGIN: http://localhost:4200
-      SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
-      SMTP_PORT: ${SMTP_PORT:-587}
-      SMTP_SECURE: ${SMTP_SECURE:-false}
-      SMTP_USER: ${SMTP_USER:-}
-      SMTP_PASS: ${SMTP_PASS:-}
-      SMTP_FROM: ${SMTP_FROM:-noreply@bookingsystem.com}
+      LOG_LEVEL: ${LOG_LEVEL:-log}
     ports:
       - '3000:3000'
     volumes:
@@ -73,7 +68,9 @@ services:
         condition: service_healthy
     networks:
       - booking-network
-    command: npm run start:dev
+    command: sh -c 'npx prisma migrate deploy && (npx prisma db seed || true) && npm run start:dev'
+    env_file:
+      - ./booking-backend/.env
 
 volumes:
   postgres-data:

@@ -10,7 +10,7 @@ import { AuthStore } from '../../stores/auth/auth.store';
  *   authenticated, so the login flow can send the user back to the page
  *   they originally requested.
  */
-export const authGuard: CanActivateFn = (route, state) => {
+export const authGuard: CanActivateFn = (_route, state) => {
   const authStore = inject(AuthStore);
   const router = inject(Router);
 

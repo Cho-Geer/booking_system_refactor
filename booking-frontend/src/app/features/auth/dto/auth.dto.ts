@@ -68,6 +68,26 @@ export interface LoginSendCodeResponse {
   expiresIn: number;
 }
 
+// Reset Password Step 1: Send verification code
+export interface ResetPasswordSendCodeDto {
+  contact: string;
+  contactType: ContactType;
+}
+
+// Reset Password send code response
+export interface ResetPasswordSendCodeResponse {
+  maskedContact?: string;
+  expiresIn: number;
+}
+
+// Reset Password Step 2: Verify code and reset password
+export interface ResetPasswordVerifyDto {
+  contact: string;
+  contactType: ContactType;
+  code: string;
+  newPassword: string;
+}
+
 // Logout response
 export interface LogoutResponse {
   message: string;

@@ -1,10 +1,10 @@
 <div class="sharp-card card-lift p-5 bg-card-bg h-full">
   <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-5">
-    <h3 class="text-base font-bold text-text-primary mb-3 sm:mb-0">Booking Trends</h3>
+    <h3 class="text-base font-bold text-text-primary mb-3 sm:mb-0">{{ 'admin.charts.bookingTrends' | t }}</h3>
     <div class="flex gap-2">
-      <app-button label="Weekly" [variant]="selectedPeriod() === 'weekly' ? 'primary' : 'secondary'" size="sm" (onClick)="selectedPeriod.set('weekly'); periodChange.emit('weekly')" />
-      <app-button label="Monthly" [variant]="selectedPeriod() === 'monthly' ? 'primary' : 'secondary'" size="sm" (onClick)="selectedPeriod.set('monthly'); periodChange.emit('monthly')" />
-      <app-button label="Yearly" [variant]="selectedPeriod() === 'yearly' ? 'primary' : 'secondary'" size="sm" (onClick)="selectedPeriod.set('yearly'); periodChange.emit('yearly')" />
+      <app-button [label]="'admin.charts.weekly' | t" [variant]="selectedPeriod() === 'weekly' ? 'primary' : 'secondary'" size="sm" (onClick)="selectedPeriod.set('weekly'); periodChange.emit('weekly')" />
+      <app-button [label]="'admin.charts.monthly' | t" [variant]="selectedPeriod() === 'monthly' ? 'primary' : 'secondary'" size="sm" (onClick)="selectedPeriod.set('monthly'); periodChange.emit('monthly')" />
+      <app-button [label]="'admin.charts.yearly' | t" [variant]="selectedPeriod() === 'yearly' ? 'primary' : 'secondary'" size="sm" (onClick)="selectedPeriod.set('yearly'); periodChange.emit('yearly')" />
     </div>
   </div>
   <div class="h-72">

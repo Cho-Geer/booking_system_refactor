@@ -62,6 +62,8 @@ import { AppCardComponent } from '../../../../shared/components/atoms/app-card/a
 import { AppBadgeComponent } from '../../../../shared/components/atoms/app-badge/app-badge.component';
 import { AppButtonComponent } from '../../../../shared/components/atoms/app-button/app-button.component';
 import { AppChartComponent } from '../../../../shared/components/atoms/app-chart/app-chart.component';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+import { TranslationService } from '../../../../core/services/translation.service';
 
 describe('DashboardComponent', () => {
   let component: DashboardComponent;
@@ -153,11 +155,35 @@ describe('DashboardComponent', () => {
       batchCancelAppointments: jest.fn(),
       getSystemStatus: jest.fn().mockReturnValue(of(mockSystemHealth)),
       getTimeDistribution: jest.fn(),
+      getUnreadCount: jest.fn().mockReturnValue(of({ count: 0 })),
+      getNotifications: jest.fn().mockReturnValue(of({ items: [], total: 0, page: 1, limit: 5 })),
+      getSystemMetrics: jest.fn().mockReturnValue(of({ cpuUsage: 0, memoryUsage: 0, diskUsage: 0 })),
+      markNotificationRead: jest.fn().mockReturnValue(of(undefined)),
     } as unknown as jest.Mocked<AdminService>;
 
+    const mockTranslationService = {
+      t: jest.fn((domain: string, key: string) => {
+        const translations: Record<string, Record<string, string>> = {
+          admin: {
+            'dashboard.title': 'Welcome back, Admin!',
+            'dashboard.totalBookings': "Today's Bookings",
+            'dashboard.activeUsers': 'Total Customers',
+            'dashboard.revenue': 'Total Revenue',
+            'dashboard.appointments': 'Recent Appointments',
+            'dashboard.popularServices': 'Recent Services',
+          },
+        };
+        return translations?.[domain]?.[key] ?? `{{${domain}.${key}}}`;
+      }),
+    };
+
     TestBed.configureTestingModule({
-      imports: [DashboardComponent, RouterTestingModule],
-      providers: [AdminStore, { provide: AdminService, useValue: mockAdminService }],
+      imports: [DashboardComponent, RouterTestingModule, TranslatePipe],
+      providers: [
+        AdminStore,
+        { provide: AdminService, useValue: mockAdminService },
+        { provide: TranslationService, useValue: mockTranslationService },
+      ],
     });
 
     fixture = TestBed.createComponent(DashboardComponent);
@@ -202,12 +228,12 @@ describe('DashboardComponent', () => {
   });
 
   describe('Page Header / Welcome Card', () => {
-    it('should display welcome greeting in h1', () => {
+    it('[Red] should display welcome greeting in h1 via translate pipe', () => {
       const title = fixture.nativeElement.querySelector('app-welcome-card h1');
       expect(title.textContent).toContain('Welcome back, Admin!');
     });
 
-    it('should display the current date in welcome card', () => {
+    it('[Red] should display the current date in welcome card', () => {
       const welcomeEl = fixture.nativeElement.querySelector('app-welcome-card');
       expect(welcomeEl.textContent).toMatch(/[A-Za-z]+ \d+,? \d{4}/);
     });

@@ -1,6 +1,6 @@
 <div class="sharp-card p-5 card-lift bg-card-bg">
   <div class="flex items-center justify-between mb-4">
-    <h3 class="text-sm font-medium text-text-secondary">{{ data().label }}</h3>
+    <h3 class="text-sm font-medium text-text-secondary">{{ data().label | t }}</h3>
     <div class="w-10 h-10 rounded-lg {{ data().iconBg }} flex items-center justify-center {{ data().iconColor }}">
       <i class="{{ data().icon }}"></i>
     </div>
@@ -16,7 +16,7 @@
     <div class="progress-bar-fill" [style.width.%]="data().progress"></div>
   </div>
   <div class="flex justify-between mt-1.5 text-xs text-text-secondary">
-    <span>Target: {{ data().target | number }}</span>
+    <span>{{ 'admin.stats.target' | t }}: {{ data().target | number }}</span>
     <span>{{ data().progress }}%</span>
   </div>
 </div>

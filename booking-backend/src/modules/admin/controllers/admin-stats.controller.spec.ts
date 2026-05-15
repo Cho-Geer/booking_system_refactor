@@ -5,7 +5,6 @@ import {
   AdminStatsDto,
   StatCardDto,
   TimeDistributionItem,
-  StaffWorkloadItem,
   SystemStatusDto,
 } from '../dto/admin-stats.dto';
 import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
@@ -26,21 +25,15 @@ const mockRolesGuard = { canActivate: jest.fn(() => true) };
 
 // ── Shared fixtures ───────────────────────────────────────────────────
 const mockTimeDistribution: TimeDistributionItem[] = [
-  { hour: '09:00', count: 15 },
-  { hour: '10:00', count: 25 },
-  { hour: '11:00', count: 20 },
-  { hour: '12:00', count: 5 },
-  { hour: '13:00', count: 10 },
-  { hour: '14:00', count: 30 },
-  { hour: '15:00', count: 22 },
-  { hour: '16:00', count: 18 },
-  { hour: '17:00', count: 8 },
-];
-
-const mockStaffWorkload: StaffWorkloadItem[] = [
-  { serviceName: 'Haircut', workloadPercentage: 44.44, appointmentCount: 200 },
-  { serviceName: 'Manicure', workloadPercentage: 33.33, appointmentCount: 150 },
-  { serviceName: 'Facial', workloadPercentage: 22.22, appointmentCount: 100 },
+  { hour: 9, count: 15 },
+  { hour: 10, count: 25 },
+  { hour: 11, count: 20 },
+  { hour: 12, count: 5 },
+  { hour: 13, count: 10 },
+  { hour: 14, count: 30 },
+  { hour: 15, count: 22 },
+  { hour: 16, count: 18 },
+  { hour: 17, count: 8 },
 ];
 
 describe('AdminStatsController', () => {
@@ -84,7 +77,6 @@ describe('AdminStatsController', () => {
     });
 
     const mockDashboard: AdminStatsDto = {
-      totalBookings: sc(850, 12, true, 1000, 85),
       todayBookings: sc(25, 25, true, 50, 50),
       pendingBookings: sc(5, 0, true, 50, 10),
       activeUsers: sc(85, -5, false, 1500, 6),
@@ -104,7 +96,6 @@ describe('AdminStatsController', () => {
         { serviceName: 'Facial', count: 100, percentage: 22.22 },
       ],
       timeDistribution: mockTimeDistribution,
-      staffWorkload: mockStaffWorkload,
     };
 
     it('should call adminStatsService.getDashboard and return AdminStatsDto', async () => {
@@ -116,12 +107,23 @@ describe('AdminStatsController', () => {
       expect(result).toEqual(mockDashboard);
     });
 
+    it('[RED] should NOT contain totalBookings in response (HIGH-2)', async () => {
+      mockAdminStatsService.getDashboard.mockResolvedValue(mockDashboard);
+
+      const result: AdminStatsDto = await controller.getStats();
+
+      // totalBookings must be removed per contract.yaml v1.7.6
+      // This will FAIL because current AdminStatsDto still has totalBookings
+      expect(result).not.toHaveProperty('totalBookings');
+    });
+
     it('should return correct AdminStatsDto shape with new fields', async () => {
       mockAdminStatsService.getDashboard.mockResolvedValue(mockDashboard);
 
       const result: AdminStatsDto = await controller.getStats();
 
-      expect(result).toHaveProperty('totalBookings');
+      // HIGH-2: totalBookings removed — do not check for it
+      expect(result).not.toHaveProperty('totalBookings');
       expect(result).toHaveProperty('todayBookings');
       expect(result).toHaveProperty('pendingBookings');
       expect(result).toHaveProperty('activeUsers');
@@ -129,9 +131,7 @@ describe('AdminStatsController', () => {
       expect(result).toHaveProperty('bookingTrend');
       expect(result).toHaveProperty('servicePopularity');
       expect(result).toHaveProperty('timeDistribution');
-      expect(result).toHaveProperty('staffWorkload');
 
-      expect(typeof result.totalBookings).toBe('object');
       expect(typeof result.todayBookings).toBe('object');
       expect(typeof result.pendingBookings).toBe('object');
       expect(typeof result.activeUsers).toBe('object');
@@ -139,13 +139,11 @@ describe('AdminStatsController', () => {
       expect(Array.isArray(result.bookingTrend)).toBe(true);
       expect(Array.isArray(result.servicePopularity)).toBe(true);
       expect(Array.isArray(result.timeDistribution)).toBe(true);
-      expect(Array.isArray(result.staffWorkload)).toBe(true);
     });
 
-    it('should handle empty dashboard data gracefully', async () => {
+    it('[RED] should handle empty dashboard data without totalBookings', async () => {
       const empty = (): StatCardDto => ({ value: 0, changePercentage: 0, isPositive: true, target: 0, progressPercentage: 0 });
       const emptyDashboard: AdminStatsDto = {
-        totalBookings: empty(),
         todayBookings: empty(),
         pendingBookings: empty(),
         activeUsers: empty(),
@@ -153,21 +151,20 @@ describe('AdminStatsController', () => {
         bookingTrend: [],
         servicePopularity: [],
         timeDistribution: [],
-        staffWorkload: [],
       };
 
       mockAdminStatsService.getDashboard.mockResolvedValue(emptyDashboard);
 
       const result: AdminStatsDto = await controller.getStats();
 
-      expect(result.totalBookings.value).toBe(0);
+      // RED assertion: totalBookings should NOT be in response, will FAIL on current code
+      expect(result).not.toHaveProperty('totalBookings');
       expect(result.todayBookings.value).toBe(0);
       expect(result.activeUsers.value).toBe(0);
       expect(result.totalRevenue.value).toBe(0);
       expect(result.bookingTrend).toEqual([]);
       expect(result.servicePopularity).toEqual([]);
       expect(result.timeDistribution).toEqual([]);
-      expect(result.staffWorkload).toEqual([]);
     });
 
     it('should be protected by JwtAuthGuard', () => {
@@ -282,15 +279,15 @@ describe('AdminStatsController', () => {
       expect(result).toEqual(mockTimeDistribution);
     });
 
-    it('should return hour as string in HH:00 format', async () => {
+    it('should return hour as number (0-23)', async () => {
       mockAdminStatsService.getTimeDistribution.mockResolvedValue(mockTimeDistribution);
 
       const result = await controller.getTimeDistribution();
 
       expect(Array.isArray(result)).toBe(true);
       for (const item of result) {
-        expect(typeof item.hour).toBe('string');
-        expect(item.hour).toMatch(/^\d{2}:00$/);
+        expect(typeof item.hour).toBe('number');
+        expect(item.hour).toBeGreaterThanOrEqual(0);
       }
     });
 

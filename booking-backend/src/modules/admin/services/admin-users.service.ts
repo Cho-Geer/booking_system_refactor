@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../../../common/database/prisma.service";
 import { UsersService } from "../../users/users.service";
 import {
@@ -24,7 +24,7 @@ export class AdminUsersService {
   /**
    * List admin users with pagination, search, role, and status filters.
    * - `search`: OR condition on name, email, phone using contains + mode: 'insensitive'
-   * - `role`: mapped to userType Prisma field
+   * - `role`: mapped to role Prisma field
    * - `status`: passed through directly
    */
   async findAll(query: AdminUsersQueryDto): Promise<PaginatedResponseDto<AdminUserDto>> {
@@ -43,9 +43,9 @@ export class AdminUsersService {
       ];
     }
 
-    // Role filter: maps to userType
+    // Role filter: maps to role
     if (query.role) {
-      where.userType = query.role;
+      where.role = query.role;
     }
 
     // Status filter: direct pass-through
@@ -90,11 +90,10 @@ export class AdminUsersService {
 
   /**
    * Create a new admin user.
-   * Maps role→userType via fromCreateAdminUserDto, delegates to UsersService.create.
+   * Delegates to UsersService.create.
    */
   async create(dto: CreateAdminUserDto): Promise<AdminUserDto> {
-    // fromCreateAdminUserDto maps role→userType, cast for UsersService.create compatibility
-    const createData = fromCreateAdminUserDto(dto) as Parameters<
+    const createData = fromCreateAdminUserDto(dto) as unknown as Parameters<
       typeof this.usersService.create
     >[0];
     const user = await this.usersService.create(createData);
@@ -103,10 +102,10 @@ export class AdminUsersService {
 
   /**
    * Update an existing admin user.
-   * Maps role→userType via fromUpdateAdminUserDto, delegates to UsersService.update.
+   * Delegates to UsersService.update.
    */
   async update(id: string, dto: UpdateAdminUserDto): Promise<AdminUserDto> {
-    const updateData = fromUpdateAdminUserDto(dto) as Parameters<
+    const updateData = fromUpdateAdminUserDto(dto) as unknown as Parameters<
       typeof this.usersService.update
     >[1];
     const user = await this.usersService.update(id, updateData);

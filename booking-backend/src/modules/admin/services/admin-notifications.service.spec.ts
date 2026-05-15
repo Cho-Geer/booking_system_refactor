@@ -64,9 +64,9 @@ describe("AdminNotificationsService", () => {
 
       const result = await service.findAll("user-1", 1, 20, false);
 
-      expect(result.total).toBe(2);
-      expect(result.page).toBe(1);
-      expect(result.limit).toBe(20);
+      expect(result.meta.total).toBe(2);
+      expect(result.meta.page).toBe(1);
+      expect(result.meta.limit).toBe(20);
       expect(result.items).toHaveLength(2);
       expect(result.items[0].id).toBe("notif-1");
       expect(result.items[0].type).toBe("info");
@@ -107,7 +107,7 @@ describe("AdminNotificationsService", () => {
       const result = await service.findAll("user-2", 1, 20);
 
       expect(result.items).toHaveLength(0);
-      expect(result.total).toBe(0);
+      expect(result.meta.total).toBe(0);
     });
 
     it("should respect pagination skip value", async () => {

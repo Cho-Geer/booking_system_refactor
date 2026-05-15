@@ -13,7 +13,7 @@
                [routerLinkActiveOptions]="{exact: item.route === '/'}"
                 class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-text-secondary hover:bg-card-bg-light hover:text-text-primary border-l-2 border-transparent transition-colors duration-200">
               <i [class]="item.icon + ' w-5 text-center text-base'"></i>
-              <span class="truncate">{{ item.label }}</span>
+              <span class="truncate">{{ item.label | t }}</span>
               @if (item.badge && item.badge > 0) {
                 <span data-testid="sidebar-badge" class="ml-auto px-2 py-0.5 rounded-full text-xs font-medium bg-accent-green/20 text-accent-green">{{ item.badge }}</span>
               }
@@ -27,8 +27,8 @@
             routerLinkActive="sidebar-link-active"
             [routerLinkActiveOptions]="{exact: item.route === '/'}"
             class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-text-secondary hover:bg-card-bg-light hover:text-text-primary border-l-2 border-transparent transition-colors duration-200">
-          <i [class]="item.icon + ' w-5 text-center text-base'"></i>
-          <span class="truncate">{{ item.label }}</span>
+           <i [class]="item.icon + ' w-5 text-center text-base'"></i>
+           <span class="truncate">{{ item.label | t }}</span>
           @if (item.badge && item.badge > 0) {
             <span data-testid="sidebar-badge" class="ml-auto px-2 py-0.5 rounded-full text-xs font-medium bg-accent-green/20 text-accent-green">{{ item.badge }}</span>
           }
@@ -50,7 +50,7 @@
             <p class="text-xs text-text-secondary truncate">{{ userRole() }}</p>
           }
         </div>
-        <button class="text-text-secondary hover:text-accent-green transition-colors" aria-label="Logout" (click)="onLogout()">
+        <button class="text-text-secondary hover:text-accent-green transition-colors" [attr.aria-label]="'auth.logout' | t" (click)="onLogout()">
           <i class="pi pi-sign-out"></i>
         </button>
       </div>
@@ -80,7 +80,7 @@
             (click)="onClose()"
             class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-text-secondary hover:bg-card-bg-light hover:text-text-primary border-l-2 border-transparent transition-colors duration-200">
           <i [class]="item.icon + ' w-5 text-center text-base'"></i>
-          <span>{{ item.label }}</span>
+           <span>{{ item.label | t }}</span>
         </a>
       }
     </nav>

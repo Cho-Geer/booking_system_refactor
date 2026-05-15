@@ -1,15 +1,15 @@
-import {
-  Injectable,
-  NotFoundException,
-  ConflictException,
-} from "@nestjs/common";
-import { PrismaService } from "../../common/database/prisma.service";
-import { CreateTimeSlotDto, UpdateTimeSlotDto } from "./dto/time-slot.dto";
-import { Prisma } from "@prisma/client";
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { PrismaService } from '../../common/database/prisma.service';
+import { AdminSettingsService } from '../admin/services/admin-settings.service';
+import { CreateTimeSlotDto, UpdateTimeSlotDto } from './dto/time-slot.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class TimeSlotsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly adminSettingsService: AdminSettingsService,
+  ) {}
 
   async create(createTimeSlotDto: CreateTimeSlotDto) {
     // Check for duplicate time slot (serviceId + startTime + endTime)
@@ -22,9 +22,7 @@ export class TimeSlotsService {
     });
 
     if (existingSlot) {
-      throw new ConflictException(
-        "Time slot already exists for this service and time range",
-      );
+      throw new ConflictException('Time slot already exists for this service and time range');
     }
 
     return this.prisma.timeSlot.create({
@@ -41,12 +39,7 @@ export class TimeSlotsService {
     });
   }
 
-  async findAll(
-    serviceId?: string,
-    isActive?: boolean,
-    page = 1,
-    limit = 10,
-  ) {
+  async findAll(serviceId?: string, isActive?: boolean, page = 1, limit = 10) {
     const skip = (page - 1) * limit;
     const where: Prisma.TimeSlotWhereInput = {};
 
@@ -65,7 +58,7 @@ export class TimeSlotsService {
         include: {
           service: true,
         },
-        orderBy: { startTime: "asc" },
+        orderBy: { startTime: 'asc' },
       }),
       this.prisma.timeSlot.count({ where }),
     ]);
@@ -121,10 +114,16 @@ export class TimeSlotsService {
     }
 
     await this.prisma.timeSlot.delete({ where: { id } });
-    return { message: "Time slot deleted successfully" };
+    return { message: 'Time slot deleted successfully' };
   }
 
-  async getAvailableSlots(serviceId: string, startDate: Date, endDate: Date) {
+  async getAvailableSlots(
+    serviceId: string,
+    startDate: Date,
+    endDate: Date,
+    overtimeMinutes?: number,
+    _timezone?: string,
+  ) {
     const service = await this.prisma.service.findUnique({
       where: { id: serviceId },
     });
@@ -139,13 +138,17 @@ export class TimeSlotsService {
       endDate,
     );
 
+    // Adjust endDate to end-of-day so that slots with startTime > midnight are included
+    const endOfDay = new Date(endDate);
+    endOfDay.setUTCHours(23, 59, 59, 999);
+
     const slots = await this.prisma.timeSlot.findMany({
       where: {
         serviceId,
         isActive: true,
         startTime: {
           gte: startDate,
-          lte: endDate,
+          lte: endOfDay,
         },
       },
       include: {
@@ -154,17 +157,91 @@ export class TimeSlotsService {
           select: { appointments: true },
         },
       },
-      orderBy: { startTime: "asc" },
+      orderBy: { startTime: 'asc' },
     });
 
-    return slots.map((slot) => ({
-      id: slot.id,
-      startTime: slot.startTime,
-      endTime: slot.endTime,
-      capacity: slot.capacity,
-      bookedCount: slot._count.appointments,
-      available: slot.capacity > slot._count.appointments,
-    }));
+    return slots.map((slot, index, arr) => {
+      const nextSlot = arr[index + 1];
+      let maxOvertimeMinutes: number | undefined;
+      if (nextSlot) {
+        maxOvertimeMinutes = Math.max(
+          0,
+          Math.round((nextSlot.startTime.getTime() - slot.endTime.getTime()) / 60000),
+        );
+      }
+
+      let available = slot.capacity > slot._count.appointments;
+      if (
+        overtimeMinutes !== undefined &&
+        maxOvertimeMinutes !== undefined &&
+        overtimeMinutes > maxOvertimeMinutes
+      ) {
+        available = false;
+      }
+
+      return {
+        id: slot.id,
+        startTime: slot.startTime,
+        endTime: slot.endTime,
+        capacity: slot.capacity,
+        bookedCount: slot._count.appointments,
+        available,
+        maxOvertimeMinutes,
+      };
+    });
+  }
+
+  private async getBusinessHoursForDate(
+    date: Date,
+  ): Promise<{ openHour: number; openMin: number; closeHour: number; closeMin: number } | null> {
+    const businessHours = await this.adminSettingsService.getBusinessHours();
+    const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    const dayName = dayNames[date.getUTCDay()];
+    const daySchedule = (
+      businessHours as unknown as Record<string, Array<{ open: string; close: string }> | undefined>
+    )[dayName];
+
+    if (!daySchedule || daySchedule.length === 0) return null;
+
+    const { open, close } = daySchedule[0];
+    const [localOpenHour, localOpenMin] = open.split(':').map(Number);
+    const [localCloseHour, localCloseMin] = close.split(':').map(Number);
+
+    const timezone = businessHours.timezone || 'Asia/Shanghai';
+    const offset = this.getUTCOffsetForTimezone(timezone, date);
+
+    return {
+      openHour: localOpenHour - offset,
+      openMin: localOpenMin,
+      closeHour: localCloseHour - offset,
+      closeMin: localCloseMin,
+    };
+  }
+
+  private getUTCOffsetForTimezone(timezone: string, date: Date): number {
+    const parts = new Intl.DateTimeFormat('en', {
+      timeZone: timezone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    }).formatToParts(date);
+
+    const getNum = (type: string) => parseInt(parts.find((p) => p.type === type)?.value || '0', 10);
+
+    const localMs = Date.UTC(
+      getNum('year'),
+      getNum('month') - 1,
+      getNum('day'),
+      getNum('hour'),
+      getNum('minute'),
+      getNum('second'),
+    );
+
+    return (localMs - date.getTime()) / 3600000;
   }
 
   private async generateTimeSlotsForDateRange(
@@ -179,20 +256,32 @@ export class TimeSlotsService {
     const endDateEnd = new Date(endDate);
     endDateEnd.setUTCHours(23, 59, 59, 999);
 
+    await this.prisma.timeSlot.deleteMany({
+      where: {
+        serviceId,
+        startTime: { gte: startDate },
+        endTime: { lte: endDateEnd },
+        isActive: true,
+      },
+    });
+
     while (currentDate <= endDateEnd) {
+      const hours = await this.getBusinessHoursForDate(currentDate);
+      if (!hours) {
+        currentDate.setUTCDate(currentDate.getUTCDate() + 1);
+        continue;
+      }
+
       let slotStart = new Date(currentDate);
-      slotStart.setUTCHours(9, 0, 0, 0);
+      slotStart.setUTCHours(hours.openHour, hours.openMin, 0, 0);
       const dayEnd = new Date(currentDate);
-      dayEnd.setUTCHours(17, 0, 0, 0);
+      dayEnd.setUTCHours(hours.closeHour, hours.closeMin, 0, 0);
 
       while (slotStart < dayEnd) {
-        const slotEnd = new Date(
-          slotStart.getTime() + durationMinutes * 60 * 1000,
-        );
+        const slotEnd = new Date(slotStart.getTime() + durationMinutes * 60 * 1000);
 
-        // Use upsert with the compound unique identifier (using a composite key approach)
-        // Since we removed @unique from slotTime, we use findFirst + create as a workaround
-        // for the upsert since Prisma's upsert requires a unique constraint.
+        if (slotEnd > dayEnd) break;
+
         const existingSlot = await this.prisma.timeSlot.findFirst({
           where: {
             serviceId,
@@ -222,7 +311,7 @@ export class TimeSlotsService {
           });
         }
 
-        slotStart = new Date(slotStart.getTime() + durationMinutes * 60 * 1000);
+        slotStart = new Date(slotStart.getTime() + (durationMinutes + 30) * 60 * 1000);
       }
 
       currentDate.setUTCDate(currentDate.getUTCDate() + 1);

@@ -23,6 +23,7 @@ import { PaginatedResponseDto } from "../../../common/dto/base.dto";
 import { JwtAuthGuard } from "../../../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../../../common/guards/roles.guard";
 import { Roles } from "../../../common/decorators/roles.decorator";
+import { RateLimit } from "../../rate-limiter/rate-limiter.decorator";
 
 @ApiTags("Admin Users")
 @Controller("admin/users")
@@ -33,6 +34,7 @@ export class AdminUsersController {
 
   @Get()
   @Roles("ADMIN", "SUPER_ADMIN")
+  @RateLimit({ tier: "api", key: "ip", limit: 60 })
   @ApiOperation({ summary: "List all users with pagination and filters" })
   @ApiResponse({
     status: 200,
@@ -46,6 +48,7 @@ export class AdminUsersController {
 
   @Post()
   @Roles("SUPER_ADMIN")
+  @RateLimit({ tier: "api", key: "ip", limit: 20 })
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: "Create a new user (SUPER_ADMIN only)" })
   @ApiResponse({
@@ -59,6 +62,7 @@ export class AdminUsersController {
 
   @Put(":id")
   @Roles("ADMIN", "SUPER_ADMIN")
+  @RateLimit({ tier: "api", key: "ip", limit: 30 })
   @ApiOperation({ summary: "Update a user" })
   @ApiResponse({
     status: 200,
@@ -73,7 +77,8 @@ export class AdminUsersController {
   }
 
   @Delete(":id")
-  @Roles("ADMIN", "SUPER_ADMIN")
+  @Roles("SUPER_ADMIN")
+  @RateLimit({ tier: "api", key: "ip", limit: 20 })
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: "Delete a user" })
   @ApiResponse({

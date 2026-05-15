@@ -32,11 +32,11 @@ describe('AppTableWrapperComponent', () => {
     expect(content.nativeElement.textContent).toBe('Table');
   });
 
-  it('should have card-lift and overflow-hidden classes', () => {
+  it('should have card-lift class and should NOT have overflow-hidden (allows paginator dropdown to overflow)', () => {
     const wrapper = fixture.debugElement.query(By.css('div'));
     expect(wrapper).toBeTruthy();
     const classList = wrapper.nativeElement.classList;
     expect(classList.contains('card-lift')).toBe(true);
-    expect(classList.contains('overflow-hidden')).toBe(true);
+    expect(classList.contains('overflow-hidden')).toBe(false);
   });
 });

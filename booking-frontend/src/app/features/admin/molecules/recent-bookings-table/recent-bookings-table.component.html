@@ -15,7 +15,7 @@
       </div>
       <div class="flex justify-between items-center text-sm">
         <span class="text-text-secondary">{{ row.booking.appointmentDate | date:'MMM d, y' }}</span>
-        <app-button label="View" variant="ghost" size="sm" icon="pi pi-eye" (onClick)="rowClick.emit(row)" />
+        <app-button [label]="'admin.table.view' | t" variant="ghost" size="sm" icon="pi pi-eye" (onClick)="rowClick.emit(row)" />
       </div>
     </div>
   }
@@ -25,11 +25,11 @@
   <table class="data-table">
     <thead>
       <tr>
-        <th>Customer</th>
-        <th>Service</th>
-        <th>Date</th>
-        <th>Status</th>
-        <th class="text-right">Actions</th>
+        <th>{{ 'admin.table.customer' | t }}</th>
+        <th>{{ 'admin.table.service' | t }}</th>
+        <th>{{ 'admin.table.date' | t }}</th>
+        <th>{{ 'admin.table.status' | t }}</th>
+        <th class="text-right">{{ 'admin.table.actions' | t }}</th>
       </tr>
     </thead>
     <tbody>

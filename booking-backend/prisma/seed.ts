@@ -1,7 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import * as crypto from 'crypto';
-
-const prisma = new PrismaClient();
+import { seedDefaultTranslations } from '../src/modules/translations/translations-seed.service';
 
 // SHA-256 with pepper (matches HashService logic)
 const PII_HASH_PEPPER = process.env.PII_HASH_PEPPER || 'default-pepper-change-in-production';
@@ -22,10 +21,16 @@ function maskEmail(email: string): string {
   return masked + '@' + domain;
 }
 
-async function main() {
+export async function main(prisma?: PrismaClient) {
+  const db = prisma || new PrismaClient();
   console.log('🌱 Starting database seed...');
 
-  // Create admin user (三字段 PII 加密模型)
+  // Seed translations (idempotent)
+  console.log('🌍 Seeding default translations...');
+  await seedDefaultTranslations(db);
+  console.log('✅ Default translations seeded');
+
+  // Create admin user (三字段 PII 加密模型) — idempotent: safe to run repeatedly
   const adminEmail = 'zhaoge.tzx@gmail.com';
   const adminPhone = '+86-138-0000-0001';
   const adminPassword = 'Admin@123456';
@@ -34,23 +39,38 @@ async function main() {
   const bcrypt = await import('bcryptjs');
   const hashedPassword = await bcrypt.hash(adminPassword, 12);
 
-  const admin = await prisma.user.upsert({
-    where: { emailHash: hashWithPepper(adminEmail) },
-    update: {},
-    create: {
-      name: 'System Admin',
-      email: maskEmail(adminEmail),
-      emailHash: hashWithPepper(adminEmail),
-      emailEncrypted: '', // 需要加密服务运行时生成，种子数据留空
-      phone: maskPhone(adminPhone),
-      phoneHash: hashWithPepper(adminPhone),
-      phoneEncrypted: '', // 需要加密服务运行时生成，种子数据留空
-      passwordHash: hashedPassword,
-      userType: 'ADMIN',
-      status: 'ACTIVE',
-    },
-  });
-  console.log('✅ Created admin user (PII encrypted model):', admin.email);
+  const emailHash = hashWithPepper(adminEmail);
+  let admin = await db.user.findFirst({ where: { emailHash } });
+
+  if (!admin) {
+    try {
+      admin = await db.user.create({
+        data: {
+          name: 'System Admin',
+          email: maskEmail(adminEmail),
+          emailHash,
+          emailEncrypted: '', // 需要加密服务运行时生成，种子数据留空
+          phone: maskPhone(adminPhone),
+          phoneHash: hashWithPepper(adminPhone),
+          phoneEncrypted: '', // 需要加密服务运行时生成，种子数据留空
+          passwordHash: hashedPassword,
+          role: 'ADMIN',
+          status: 'ACTIVE',
+        },
+      });
+      console.log('✅ Created admin user (PII encrypted model):', admin.email);
+    } catch (err: any) {
+      // If user was created by a concurrent run or previous failed attempt
+      if (err?.code === 'P2002') {
+        admin = await db.user.findFirst({ where: { emailHash } });
+        console.log('⚠️ Admin user already exists, skipped creation:', admin?.email);
+      } else {
+        throw err;
+      }
+    }
+  } else {
+    console.log('⚠️ Admin user already exists, skipped creation:', admin.email);
+  }
 
   // Create service categories
   const categories = [
@@ -60,17 +80,17 @@ async function main() {
   ];
 
   for (const cat of categories) {
-    const existing = await prisma.serviceCategory.findFirst({
+    const existing = await db.serviceCategory.findFirst({
       where: { name: cat.name },
     });
     if (!existing) {
-      await prisma.serviceCategory.create({ data: cat });
+      await db.serviceCategory.create({ data: cat });
     }
   }
   console.log('✅ Created service categories');
 
   // Create sample services
-  const consultingCategory = await prisma.serviceCategory.findFirst({
+  const consultingCategory = await db.serviceCategory.findFirst({
     where: { name: 'Consulting' },
   });
 
@@ -93,24 +113,29 @@ async function main() {
     ];
 
     for (const service of services) {
-      const existing = await prisma.service.findFirst({
+      const existing = await db.service.findFirst({
         where: { name: service.name },
       });
       if (!existing) {
-        await prisma.service.create({ data: service });
+        await db.service.create({ data: service });
       }
     }
-    console.log('✅ Created sample services');
-  }
+  } // End if (consultingCategory)
 
+  console.log('✅ Created sample services');
   console.log('🎉 Database seeding completed successfully!');
+  return db; // Return for test access
 }
 
-main()
-  .catch((e) => {
-    console.error('❌ Seed failed:', e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+// Auto-execute only when run directly, not when imported by tests
+if (require.main === module) {
+  const prisma = new PrismaClient();
+  main(prisma)
+    .catch((e) => {
+      console.error('❌ Seed failed:', e);
+      process.exit(1);
+    })
+    .finally(async () => {
+      await prisma.$disconnect();
+    });
+}

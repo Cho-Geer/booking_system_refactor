@@ -9,13 +9,14 @@ import {
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 
 export class CreateServiceDto {
-  @ApiProperty({ description: "Service category ID" })
+  @ApiPropertyOptional({ description: "Service category ID" })
+  @IsOptional()
   @IsString()
-  categoryId: string;
+  categoryId?: string | null;
 
   @ApiProperty({ description: "Service name" })
   @IsString()
-  name: string;
+  name!: string;
 
   @ApiPropertyOptional({ description: "Service description" })
   @IsOptional()
@@ -25,12 +26,12 @@ export class CreateServiceDto {
   @ApiProperty({ description: "Duration in minutes" })
   @IsNumber()
   @IsPositive()
-  durationMinutes: number;
+  durationMinutes!: number;
 
   @ApiProperty({ description: "Service price" })
   @IsNumber()
   @Min(0)
-  price: number;
+  price!: number;
 
   @ApiPropertyOptional({ description: "Maximum capacity", default: 1 })
   @IsOptional()
@@ -43,7 +44,7 @@ export class UpdateServiceDto {
   @ApiPropertyOptional({ description: "Service category ID" })
   @IsOptional()
   @IsString()
-  categoryId?: string;
+  categoryId?: string | null;
 
   @ApiPropertyOptional({ description: "Service name" })
   @IsOptional()

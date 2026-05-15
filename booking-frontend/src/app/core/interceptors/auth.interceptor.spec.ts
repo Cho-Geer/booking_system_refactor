@@ -18,7 +18,7 @@ describe('AuthInterceptor', () => {
   const mockUser = {
     id: 'user-1',
     name: 'Test User',
-    userType: 'USER',
+    role: 'USER',
   };
 
   beforeEach(() => {
@@ -134,7 +134,7 @@ describe('AuthInterceptor', () => {
       data: {
         id: 'user-1',
         name: 'Test User',
-        userType: 'USER',
+        role: 'USER',
         createdAt: '2024-01-01',
       },
     });
@@ -182,7 +182,7 @@ describe('AuthInterceptor', () => {
       data: {
         id: 'user-1',
         name: 'Test User',
-        userType: 'USER',
+        role: 'USER',
         createdAt: '2024-01-01',
       },
     });

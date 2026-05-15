@@ -1,14 +1,12 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { NgClass } from '@angular/common';
 import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { filter } from 'rxjs/operators';
 import { AuthStore } from '../../../../stores/auth/auth.store';
-import { ApiService } from '../../../../core/services/api.service';
-import { SocketService } from '../../../../core/services/socket.service';
 import { AdminStore } from '../../../../features/admin/stores/admin.store';
 import { AppHeaderComponent, NavLink } from '../app-header/app-header.component';
 import { AppSidebarComponent, SidebarItem, SidebarSection } from '../app-sidebar/app-sidebar.component';
+import { TranslationService } from '../../../../core/services/translation.service';
 
 @Component({
   selector: 'app-layout',
@@ -19,16 +17,15 @@ import { AppSidebarComponent, SidebarItem, SidebarSection } from '../app-sidebar
 })
 export class AppLayoutComponent implements OnInit {
   private authStore = inject(AuthStore);
-  private apiService = inject(ApiService);
   private router = inject(Router);
-  private socketService = inject(SocketService);
   private adminStore = inject(AdminStore);
+  private translationService = inject(TranslationService);
 
   readonly user = this.authStore.currentUser;
   readonly isAuthenticated = this.authStore.isAuthenticated;
 
   readonly userName = computed(() => this.user()?.name);
-  readonly userRole = computed(() => this.user()?.userType);
+  readonly userRole = computed(() => this.user()?.role);
   readonly isAdmin = computed(
     () => this.userRole() === 'ADMIN' || this.userRole() === 'SUPER_ADMIN',
   );
@@ -44,35 +41,35 @@ export class AppLayoutComponent implements OnInit {
   readonly navLinks = computed<NavLink[]>(() => {
     if (this.isAdmin()) {
       return [
-        { label: 'Dashboard', route: '/admin/dashboard', icon: 'pi pi-chart-bar' },
-        { label: 'Booking', route: '/booking/services', icon: 'pi pi-calendar' },
-        { label: 'My Bookings', route: '/my-bookings', icon: 'pi pi-list' },
-        { label: 'Profile', route: '/profile', icon: 'pi pi-user' },
+        { label: 'sidebar.dashboard', route: '/admin/dashboard', icon: 'pi pi-chart-bar' },
+        { label: 'sidebar.booking', route: '/booking/services', icon: 'pi pi-calendar' },
+        { label: 'sidebar.myBookings', route: '/my-bookings', icon: 'pi pi-list' },
+        { label: 'sidebar.profile', route: '/profile', icon: 'pi pi-user' },
       ];
     }
     return [
-      { label: 'Booking', route: '/booking/services', icon: 'pi pi-calendar' },
-      { label: 'My Bookings', route: '/my-bookings', icon: 'pi pi-list' },
-      { label: 'Profile', route: '/profile', icon: 'pi pi-user' },
+      { label: 'sidebar.booking', route: '/booking/services', icon: 'pi pi-calendar' },
+      { label: 'sidebar.myBookings', route: '/my-bookings', icon: 'pi pi-list' },
+      { label: 'sidebar.profile', route: '/profile', icon: 'pi pi-user' },
     ];
   });
 
   /** Sidebar items for customer (non-admin) users */
   readonly customerSidebarItems: SidebarItem[] = [
-    { label: '预约服务', route: '/booking/services', icon: 'pi pi-calendar' },
-    { label: '我的预约', route: '/my-bookings', icon: 'pi pi-list' },
-    { label: '个人资料', route: '/profile', icon: 'pi pi-user' },
+    { label: 'sidebar.bookingServices', route: '/booking/services', icon: 'pi pi-calendar' },
+    { label: 'sidebar.myBookings', route: '/my-bookings', icon: 'pi pi-list' },
+    { label: 'sidebar.profile', route: '/profile', icon: 'pi pi-user' },
   ];
 
   /** Sidebar items for admin users */
   readonly adminSidebarItems: SidebarItem[] = [
-    { label: 'Dashboard', route: '/admin/dashboard', icon: 'pi pi-chart-bar' },
-    { label: 'Appointments', route: '/admin/appointments', icon: 'pi pi-calendar' },
-    { label: 'Users', route: '/admin/users', icon: 'pi pi-users' },
-    { label: 'Services', route: '/admin/services', icon: 'pi pi-briefcase' },
-    { label: 'Analytics', route: '/admin/analytics', icon: 'pi pi-chart-line' },
-    { label: 'History', route: '/admin/history', icon: 'pi pi-history' },
-    { label: 'Settings', route: '/admin/settings', icon: 'pi pi-cog' },
+    { label: 'sidebar.dashboard', route: '/admin/dashboard', icon: 'pi pi-chart-bar' },
+    { label: 'sidebar.bookings', route: '/admin/appointments', icon: 'pi pi-calendar' },
+    { label: 'sidebar.users', route: '/admin/users', icon: 'pi pi-users' },
+    { label: 'sidebar.services', route: '/admin/services', icon: 'pi pi-briefcase' },
+    { label: 'sidebar.reports', route: '/admin/analytics', icon: 'pi pi-chart-line' },
+    { label: 'sidebar.history', route: '/admin/history', icon: 'pi pi-history' },
+    { label: 'sidebar.settings', route: '/admin/settings', icon: 'pi pi-cog' },
   ];
 
   readonly sidebarItems = computed<SidebarItem[]>(() => {
@@ -97,18 +94,18 @@ export class AppLayoutComponent implements OnInit {
       label: this.userName() ?? 'User',
       items: [
         {
-          label: '个人资料',
+          label: this.translationService.t('sidebar', 'profile'),
           icon: 'pi pi-user',
           routerLink: '/profile',
         },
         {
-          label: '安全设置',
+          label: this.translationService.t('sidebar', 'security'),
           icon: 'pi pi-lock',
           command: () => this.router.navigate(['/profile']),
         },
         { separator: true },
         {
-          label: '退出登录',
+          label: this.translationService.t('sidebar', 'logout'),
           icon: 'pi pi-sign-out',
           command: () => this.onLogout(),
         },

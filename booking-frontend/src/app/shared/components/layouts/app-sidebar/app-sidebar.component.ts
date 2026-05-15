@@ -1,6 +1,7 @@
 import { Component, input, output } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { NavLink } from '../app-header/app-header.component';
+import { TranslatePipe } from '../../../pipes/translate.pipe';
 
 export interface SidebarItem {
   label: string;
@@ -17,7 +18,7 @@ export interface SidebarSection {
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive],
+  imports: [RouterLink, RouterLinkActive, TranslatePipe],
   templateUrl: './app-sidebar.component.html',
   styleUrl: './app-sidebar.component.scss',
 })

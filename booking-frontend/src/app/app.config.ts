@@ -9,7 +9,11 @@ import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { requestIdInterceptor } from './core/interceptors/request-id.interceptor';
 import { apiTransformInterceptor } from './core/interceptors/api-transform.interceptor';
+import { csrfInterceptor } from './core/interceptors/csrf.interceptor';
+import { errorInterceptor } from './core/interceptors/error.interceptor';
+import { loadingInterceptor } from './core/interceptors/loading.interceptor';
 import { AuthStore } from './stores/auth/auth.store';
+import { initializeTranslationFactory } from './core/services/translation.service';
 
 /**
  * App initializer that attempts to restore the user session on bootstrap.
@@ -26,11 +30,16 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideHttpClient(
-      withInterceptors([authInterceptor, apiTransformInterceptor, requestIdInterceptor])
+      withInterceptors([errorInterceptor, loadingInterceptor, csrfInterceptor, authInterceptor, apiTransformInterceptor, requestIdInterceptor])
     ),
     {
       provide: APP_INITIALIZER,
       useFactory: initializeAuth,
+      multi: true,
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initializeTranslationFactory,
       multi: true,
     },
     provideAnimationsAsync(),

@@ -30,7 +30,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
         name: true,
         phone: true, // 脱敏值
         email: true, // 脱敏值
-        userType: true,
+        role: true,
         status: true,
       },
     });
@@ -45,7 +45,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
       name: user.name,
       phone: user.phone, // 脱敏
       email: user.email, // 脱敏
-      userType: user.userType,
+      role: user.role,
       roles: payload.roles,
     };
   }

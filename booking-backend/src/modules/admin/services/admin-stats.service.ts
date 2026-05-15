@@ -4,7 +4,6 @@ import {
   AdminStatsDto,
   StatCardDto,
   ServiceDistributionItem,
-  StaffWorkloadItem,
   SystemStatusDto,
   SystemMetricsDto,
   TimeDistributionItem,
@@ -12,8 +11,6 @@ import {
 
 @Injectable()
 export class AdminStatsService {
-  private readonly startTime: Date = new Date();
-
   constructor(private readonly statsService: StatsService) {}
 
   private toStatCard(
@@ -36,7 +33,12 @@ export class AdminStatsService {
     };
   }
 
-  async getDashboard(): Promise<AdminStatsDto> {
+  async getDashboard(
+    _timeRange?: string,
+    _startDate?: string,
+    _endDate?: string,
+    _timezone?: string,
+  ): Promise<AdminStatsDto> {
     const [
       overview,
       revenue,
@@ -83,37 +85,17 @@ export class AdminStatsService {
           : 0,
     }));
 
-    // Compute staff workload as percentage distribution of appointments across services
-    const staffWorkload = this.computeStaffWorkload(popularServices);
-
-    // totalBookings: sum of last 7 days vs sum of 7-14 days ago
-    const last7Sum = dailyBookings
-      .slice(-7)
-      .reduce((s, d) => s + d.bookings, 0);
-    const prev7Sum = dailyBookings
-      .slice(-14, -7)
-      .reduce((s, d) => s + d.bookings, 0);
-
     // activeUsers change: last month vs month before from usersByMonth
     const userMonths = userStats.usersByMonth;
-    const lastUserMonth =
-      userMonths.length >= 1 ? userMonths[userMonths.length - 1].count : 0;
     const prevUserMonth =
       userMonths.length >= 2 ? userMonths[userMonths.length - 2].count : 0;
 
     // totalRevenue change: last month vs month before from revenueByMonth
     const revMonths = revenue.revenueByMonth;
-    const lastRevMonth =
-      revMonths.length >= 1 ? revMonths[revMonths.length - 1].revenue : 0;
     const prevRevMonth =
       revMonths.length >= 2 ? revMonths[revMonths.length - 2].revenue : 0;
 
     return {
-      totalBookings: this.toStatCard(
-        overview.totalAppointments,
-        prev7Sum,
-        Math.max(1000, Math.round(overview.totalAppointments * 1.2)),
-      ),
       todayBookings: this.toStatCard(
         todayCount,
         yesterdayCount,
@@ -137,10 +119,9 @@ export class AdminStatsService {
       bookingTrend,
       servicePopularity,
       timeDistribution: timeDistribution.map((item) => ({
-        hour: String(item.hour).padStart(2, "0") + ":00",
+        hour: Number(item.hour),
         count: item.count,
       })),
-      staffWorkload,
     };
   }
 
@@ -151,8 +132,8 @@ export class AdminStatsService {
    */
   async getBookingTrend(
     timeRange?: string,
-    startDate?: string,
-    endDate?: string,
+    _startDate?: string,
+    _endDate?: string,
     range?: string,
     _granularity?: string,
   ): Promise<{ date: string; count: number; revenue: number }[]> {
@@ -224,7 +205,7 @@ export class AdminStatsService {
   ): Promise<TimeDistributionItem[]> {
     const raw = await this.statsService.getTimeDistribution();
     return raw.map((item) => ({
-      hour: String(item.hour).padStart(2, "0") + ":00",
+      hour: Number(item.hour),
       count: item.count,
     }));
   }
@@ -284,26 +265,4 @@ export class AdminStatsService {
     };
   }
 
-  private computeStaffWorkload(
-    popularServices: Array<{
-      serviceName: string;
-      bookingCount: number;
-    }>,
-  ): StaffWorkloadItem[] {
-    const totalBookings = popularServices.reduce(
-      (sum, s) => sum + s.bookingCount,
-      0,
-    );
-
-    if (totalBookings === 0) {
-      return [];
-    }
-
-    return popularServices.map((s) => ({
-      serviceName: s.serviceName,
-      workloadPercentage:
-        Math.round((s.bookingCount / totalBookings) * 10000) / 100,
-      appointmentCount: s.bookingCount,
-    }));
-  }
 }

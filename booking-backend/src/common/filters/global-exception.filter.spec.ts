@@ -285,6 +285,26 @@ describe('GlobalExceptionFilter', () => {
       });
     });
 
+    it('should handle Prisma P2021 table not found error (e.g. missing database tables)', () => {
+      const prismaError = {
+        code: 'P2021',
+        message: 'Table "users" does not exist',
+        meta: { table: 'users' },
+      };
+
+      filter.catch(prismaError, mockHost);
+
+      expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: 'Database table not found. Please run database migrations.',
+        error: 'PrismaError',
+        timestamp: expect.any(String),
+        path: '/api/test-endpoint',
+        requestId: 'test-request-id-1234',
+      });
+    });
+
     it('should handle unknown Prisma error with generic internal server error message', () => {
       const prismaError = {
         code: 'P9999',

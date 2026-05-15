@@ -25,6 +25,7 @@ import { AppFilterBarComponent } from '../../../../shared/components/molecules/a
 import { AppTableWrapperComponent } from '../../../../shared/components/molecules/app-table-wrapper/app-table-wrapper.component';
 import { AppModalComponent } from '../../../../shared/components/atoms/app-modal/app-modal.component';
 import { Subscription, interval } from 'rxjs';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 export type ViewMode = 'grid' | 'list';
 
@@ -36,7 +37,7 @@ export type ViewMode = 'grid' | 'list';
     Textarea, SelectModule, ToggleSwitch, FormsModule, CurrencyPipe,
     AppCardComponent, AppButtonComponent, AppBadgeComponent,
     AppSearchInputComponent, AppDropdownComponent, AppSpinnerComponent,
-    AppFilterBarComponent, AppTableWrapperComponent, AppModalComponent,
+    AppFilterBarComponent, AppTableWrapperComponent, AppModalComponent, TranslatePipe,
   ],
   templateUrl: './service-management.component.html',
   styleUrl: './service-management.component.scss',
@@ -76,6 +77,10 @@ export class ServiceManagementComponent implements OnInit, OnDestroy {
   formPricePerMinute: number | null = null;
   formTaxRate: number | null = null;
 
+  // Image upload
+  readonly selectedFile = signal<File | null>(null);
+  readonly imageUploading = signal(false);
+
   // Form validation
   formErrors: { name?: string; duration?: string; price?: string } = {};
 
@@ -86,9 +91,11 @@ export class ServiceManagementComponent implements OnInit, OnDestroy {
     return p !== null && d !== null && d > 0 ? p / d : null;
   };
 
-  readonly totalServices = computed(() => this.vm().servicesTotal);
-  readonly activeServicesCount = computed(() => this.vm().allServicesForStats.filter(s => s.active).length);
+  readonly totalServices = computed(() => this.vm().servicesSummary?.total ?? this.vm().servicesTotal);
+  readonly activeServicesCount = computed(() => this.vm().servicesSummary?.active ?? this.vm().allServicesForStats.filter(s => s.active).length);
   readonly averagePrice = computed(() => {
+    const summary = this.vm().servicesSummary;
+    if (summary) return summary.averagePrice;
     const services = this.vm().allServicesForStats;
     if (services.length === 0) return 0;
     const total = services.reduce((sum, s) => sum + s.price, 0);
@@ -105,11 +112,13 @@ export class ServiceManagementComponent implements OnInit, OnDestroy {
     { label: 'Inactive', value: 'inactive' },
   ];
 
-  readonly categoryOptions = [
-    { label: 'All Categories', value: '' },
-    { label: 'Category A', value: 'Category A' },
-    { label: 'Category B', value: 'Category B' },
-  ];
+  readonly categoryOptions = computed(() => {
+    const categories = [...new Set(this.vm().allServicesForStats.map(s => s.category).filter(Boolean))] as string[];
+    return [
+      { label: 'All Categories', value: '' },
+      ...categories.map(c => ({ label: c, value: c })),
+    ];
+  });
 
   ngOnInit(): void {
     this.store.clearError();
@@ -135,9 +144,10 @@ export class ServiceManagementComponent implements OnInit, OnDestroy {
       active: this.statusFilter() === 'active' ? true :
               this.statusFilter() === 'inactive' ? false :
               undefined,
+      category: this.categoryFilter() || undefined,
     }).subscribe({
       next: (response) => {
-        this.store.setServices(response.items, response.total, response.page);
+        this.store.setServices(response.items, response.meta.total, response.meta.page);
         if (isFilterOperation) {
           this.isFiltering.set(false);
         } else {
@@ -149,10 +159,9 @@ export class ServiceManagementComponent implements OnInit, OnDestroy {
   }
 
   private loadAllServicesForStats(): void {
-    this.adminService.getAdminServices({ limit: 999, page: 1 }).subscribe({
-      next: response => {
-        const items = response.items.map(s => ({ ...s, price: Number(s.price) }));
-        this.store.setAllServicesForStats(items);
+    this.adminService.getServicesSummary().subscribe({
+      next: summary => {
+        this.store.setServicesSummary(summary);
       },
       error: () => {},
     });
@@ -325,6 +334,31 @@ export class ServiceManagementComponent implements OnInit, OnDestroy {
     return active ? 'confirmed' : 'expired';
   }
 
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+    const file = input.files[0];
+    this.selectedFile.set(file);
+    this.imageUploading.set(true);
+
+    const id = this.selectedService()?.id;
+    if (!id) {
+      this.imageUploading.set(false);
+      return;
+    }
+
+    this.adminService.uploadServiceImage(id, file).subscribe({
+      next: (result) => {
+        this.formImageUrl = result.imageUrl;
+        this.selectedFile.set(null);
+        this.imageUploading.set(false);
+      },
+      error: () => {
+        this.imageUploading.set(false);
+      },
+    });
+  }
+
   private resetForm(): void {
     this.formName = '';
     this.formDescription = '';
@@ -334,6 +368,7 @@ export class ServiceManagementComponent implements OnInit, OnDestroy {
     this.formImageUrl = '';
     this.formPricePerMinute = null;
     this.formTaxRate = null;
+    this.selectedFile.set(null);
     this.formErrors = {};
   }
 }

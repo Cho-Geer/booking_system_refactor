@@ -19,8 +19,9 @@ import {
 import { ServicesService } from "./services.service";
 import { CreateServiceDto, UpdateServiceDto } from "./dto/service.dto";
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
+import { Public } from "../../common/decorators/public.decorator";
 import { Roles } from "../../common/decorators/roles.decorator";
-import { UserType } from "@prisma/client";
+import { SystemRole } from "@prisma/client";
 import { RateLimit } from "../rate-limiter/rate-limiter.decorator";
 
 @ApiTags("Services")
@@ -32,13 +33,14 @@ export class ServicesController {
   constructor(private readonly servicesService: ServicesService) {}
 
   @Post()
-  @Roles(UserType.ADMIN)
+  @Roles(SystemRole.ADMIN)
   @ApiOperation({ summary: "Create a new service" })
   @ApiResponse({ status: 201, description: "Service created" })
   async create(@Body() createServiceDto: CreateServiceDto) {
     return this.servicesService.create(createServiceDto);
   }
 
+  @Public()
   @Get()
   @ApiOperation({ summary: "Get all services with pagination" })
   @ApiResponse({ status: 200, description: "List of services" })
@@ -50,8 +52,9 @@ export class ServicesController {
     return this.servicesService.findAll(page, limit, isActive);
   }
 
+  @Public()
   @Get(":id")
-  @ApiOperation({ summary: "Get service by ID" })
+  @ApiOperation({ summary: "Get service by ID (convenience endpoint, not explicitly in contract)" })
   @ApiResponse({ status: 200, description: "Service found" })
   @ApiResponse({ status: 404, description: "Service not found" })
   async findOne(@Param("id") id: string) {
@@ -59,7 +62,7 @@ export class ServicesController {
   }
 
   @Patch(":id")
-  @Roles(UserType.ADMIN)
+  @Roles(SystemRole.ADMIN)
   @ApiOperation({ summary: "Update service" })
   @ApiResponse({ status: 200, description: "Service updated" })
   async update(
@@ -70,7 +73,7 @@ export class ServicesController {
   }
 
   @Delete(":id")
-  @Roles(UserType.ADMIN)
+  @Roles(SystemRole.ADMIN)
   @ApiOperation({ summary: "Delete service" })
   @ApiResponse({ status: 200, description: "Service deleted" })
   async remove(@Param("id") id: string) {

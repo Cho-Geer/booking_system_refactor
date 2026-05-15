@@ -1,8 +1,8 @@
 <div class="my-bookings-page page-enter">
   <!-- Header -->
   <div class="mb-6 sm:mb-8">
-    <h1 class="text-2xl font-bold gradient-text">我的预约</h1>
-    <p class="text-sm text-gray-500 mt-1">查看和管理您的所有预约记录</p>
+    <h1 class="text-2xl font-bold gradient-text">{{ 'booking.myBookings' | t }}</h1>
+    <p class="text-sm text-gray-500 mt-1">{{ 'booking.myBookingsSubtitle' | t }}</p>
   </div>
 
   <!-- Pull-to-Refresh Indicator -->
@@ -11,15 +11,15 @@
       @if (pullToRefreshState() === 'pulling') {
         <span [style.opacity]="pullProgress() / 80" class="transition-opacity">
           @if (pullProgress() >= 80) {
-            ↓ 释放刷新
+            ↓ {{ 'booking.releaseToRefresh' | t }}
           } @else {
-            ↓ 下拉刷新
+            ↓ {{ 'booking.pullToRefresh' | t }}
           }
         </span>
       }
       @if (pullToRefreshState() === 'refreshing') {
         <div class="spinner"></div>
-        <span class="ml-2">刷新中...</span>
+        <span class="ml-2">{{ 'booking.refreshing' | t }}</span>
       }
     </div>
   }
@@ -48,10 +48,10 @@
       <div class="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
         <span class="text-2xl text-red-500">!</span>
       </div>
-      <h3 class="text-lg font-bold text-gray-900 mb-2">加载失败</h3>
+      <h3 class="text-lg font-bold text-gray-900 mb-2">{{ 'booking.loadFailed' | t }}</h3>
       <p class="text-sm text-gray-500 mb-6">{{ loadError() }}</p>
       <app-button
-        label="重新加载"
+        [label]="'booking.reload' | t"
         variant="primary"
         (onClick)="loadAppointments()"
       />
@@ -61,12 +61,12 @@
   <!-- Content -->
   @if (!isLoading() && !loadError()) {
     <!-- Filter Tabs using AppBadge -->
-    <div class="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-thin -mx-4 px-4 sm:mx-0 sm:px-0" role="tablist" aria-label="预约状态筛选">
+    <div class="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-thin -mx-4 px-4 sm:mx-0 sm:px-0" role="tablist" [attr.aria-label]="'booking.filterStatusAria' | t">
       @for (option of FILTER_OPTIONS; track option.value) {
         <button
           role="tab"
           [attr.aria-selected]="activeFilter() === option.value"
-          [attr.aria-label]="'筛选' + option.label + '，当前' + getFilterCount(option.value) + '项'"
+          [attr.aria-label]="'booking.filterAria' | t : { label: option.label, count: getFilterCount(option.value) }"
           [tabindex]="activeFilter() === option.value ? 0 : -1"
           class="filter-tab whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 min-h-[44px]"
           [class.active]="activeFilter() === option.value"
@@ -86,9 +86,9 @@
       <div data-testid="empty-state">
         <app-empty-state
           icon="📋"
-          title="暂无预约"
-          description="您还没有任何预约记录"
-          actionLabel="立即预约"
+          [title]="'booking.noBookings' | t"
+          [description]="'booking.noBookingsDesc' | t"
+          [actionLabel]="'booking.bookNow' | t"
           (action)="{}"
         />
       </div>
@@ -111,28 +111,46 @@
                   <h3 class="font-bold text-gray-900 text-sm sm:text-base truncate">{{ booking.serviceName }}</h3>
                   <app-badge [status]="toBadgeStatus(booking.status)"></app-badge>
                 </div>
-                <div class="space-y-1 text-sm text-gray-600">
-                  <div class="flex items-center gap-2">
-                    <span>📅</span>
-                    <span>{{ formatDate(booking.appointmentDate) }}</span>
+                  <div class="space-y-1 text-sm text-gray-600">
+                    <div class="flex items-center gap-2">
+                      <span>📅</span>
+                      <span>{{ formatDate(booking.appointmentDate) }}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span>🕐</span>
+                      <span>{{ formatTimeRange(booking.timeSlotStart, booking.timeSlotEnd) }}</span>
+                    </div>
+                    @if (booking.durationMinutes) {
+                      <div class="flex items-center gap-2">
+                        <span>⏱</span>
+                        <span>{{ booking.durationMinutes }} {{ 'booking.minAbbreviation' | t }}</span>
+                      </div>
+                    }
+                    @if (booking.price !== undefined) {
+                      <div class="flex items-center gap-2">
+                        <span>💰</span>
+                        <span>{{ booking.price | currency }} @if (booking.taxRate) { {{ 'booking.taxLabel' | t : { rate: booking.taxRate } }} }</span>
+                      </div>
+                    }
+                    @if (booking.taxIncludedAmount !== undefined) {
+                      <div class="flex items-center gap-2 font-semibold text-text-primary">
+                        <span>💵</span>
+                        <span>{{ 'booking.totalAmount' | t : { amount: (booking.taxIncludedAmount | currency) ?? '' } }}</span>
+                      </div>
+                    }
                   </div>
-                  <div class="flex items-center gap-2">
-                    <span>🕐</span>
-                    <span>{{ formatTimeRange(booking.timeSlotStart, booking.timeSlotEnd) }}</span>
-                  </div>
-                </div>
 
                 <!-- Actions -->
                 <div class="flex gap-3 mt-4">
                   <app-button
-                    label="查看详情"
+                    [label]="'booking.viewDetails' | t"
                     variant="secondary"
                     size="sm"
                     class="flex-1 sm:flex-none"
                   />
                   @if (booking.status === 'PENDING' || booking.status === 'CONFIRMED') {
                     <app-button
-                      label="取消预约"
+                      [label]="'booking.cancelBooking' | t"
                       variant="danger"
                       size="sm"
                       class="flex-1 sm:flex-none"
@@ -147,26 +165,63 @@
         }
       </div>
     }
+
+    <!-- Pagination -->
+    @if (totalPages() > 1) {
+      <div class="flex items-center justify-center gap-2 mt-6">
+        <app-button
+          [label]="'booking.prev' | t"
+          variant="secondary"
+          size="sm"
+          [disabled]="page() <= 1"
+          (onClick)="goToPage(page() - 1)"
+        />
+        <div class="flex items-center gap-1">
+          @for (p of [].constructor(totalPages()); track $index) {
+            <button
+              class="w-8 h-8 rounded-lg text-sm font-medium transition-colors"
+              [class.bg-primary-start]="page() === $index + 1"
+              [class.text-white]="page() === $index + 1"
+              [class.text-gray-600]="page() !== $index + 1"
+              [class.hover:bg-gray-100]="page() !== $index + 1"
+              (click)="goToPage($index + 1)"
+            >
+              {{ $index + 1 }}
+            </button>
+          }
+        </div>
+        <app-button
+          [label]="'booking.next' | t"
+          variant="secondary"
+          size="sm"
+          [disabled]="page() >= totalPages()"
+          (onClick)="goToPage(page() + 1)"
+        />
+      </div>
+      <p class="text-xs text-center text-gray-400 mt-2">
+        {{ 'booking.pageInfo' | t : { page: page(), totalPages: totalPages(), total: total() } }}
+      </p>
+    }
   }
 
   <!-- Cancel Confirmation Dialog using AppModal -->
   <app-modal
     [visible]="showCancelDialog()"
-    header="取消预约"
+    [header]="'booking.cancelTitle' | t"
     [closable]="true"
     [dismissableMask]="true"
     (visibleChange)="dismissCancel()"
   >
-    <p class="text-sm text-gray-500 mb-6">确定要取消此预约吗？此操作不可撤销。</p>
+    <p class="text-sm text-gray-500 mb-6">{{ 'booking.cancelConfirmMsg' | t }}</p>
     <div class="flex flex-col-reverse sm:flex-row gap-3 justify-end">
       <app-button
-        label="返回"
+        [label]="'booking.back' | t"
         variant="secondary"
         class="w-full sm:w-auto"
         (onClick)="dismissCancel()"
       />
       <app-button
-        label="确认取消"
+        [label]="'booking.confirmCancel' | t"
         variant="danger"
         class="w-full sm:w-auto"
         [disabled]="isCancelling()"

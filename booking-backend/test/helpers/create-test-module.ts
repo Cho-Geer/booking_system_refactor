@@ -32,6 +32,7 @@ async function cleanDatabase(prisma: PrismaClient): Promise<void> {
   await prisma.serviceCategory.deleteMany({});
   await prisma.userSession.deleteMany({});
   await prisma.user.deleteMany({});
+  await prisma.translationDictionary.deleteMany({});
 }
 
 /**

@@ -1,7 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { PrismaService } from "../../common/database/prisma.service";
 import { RateLimiterService } from "../rate-limiter/rate-limiter.service";
-import { ConfigService } from "@nestjs/config";
 import { createHash } from "crypto";
 
 // Configuration constants (can be moved to environment variables)
@@ -52,7 +51,6 @@ export class SlotPreemptionService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly rateLimiter: RateLimiterService,
-    private readonly configService: ConfigService,
   ) {}
 
   /**
@@ -69,7 +67,7 @@ export class SlotPreemptionService {
    * @returns ReservationResult with success status and appointment data
    */
   async reserveSlot(input: ReservationInput): Promise<ReservationResult> {
-    const { userId, slotId, idempotencyKey, ..._rest } = input;
+    const { userId, slotId, idempotencyKey } = input;
 
     // Step 1: Check rate limit using shared RateLimiterService
     const rateLimitResult = await this.rateLimiter.isAllowed(

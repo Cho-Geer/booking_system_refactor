@@ -4,22 +4,21 @@ import {
   IsBoolean,
   IsOptional,
   IsInt,
-  IsDate,
 } from "class-validator";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 
 export class CreateTimeSlotDto {
   @ApiProperty({ description: "Service ID" })
   @IsString()
-  serviceId: string;
+  serviceId!: string;
 
   @ApiProperty({ description: "Slot start time (ISO string)" })
   @IsDateString()
-  startTime: string;
+  startTime!: string;
 
   @ApiProperty({ description: "Slot end time (ISO string)" })
   @IsDateString()
-  endTime: string;
+  endTime!: string;
 
   @ApiPropertyOptional({ description: "Capacity", default: 1 })
   @IsOptional()
@@ -47,4 +46,27 @@ export class UpdateTimeSlotDto {
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
+}
+
+export class AvailableTimeSlotDto {
+  @ApiProperty()
+  id!: string;
+
+  @ApiProperty()
+  startTime!: Date;
+
+  @ApiProperty()
+  endTime!: Date;
+
+  @ApiProperty()
+  capacity!: number;
+
+  @ApiProperty()
+  bookedCount!: number;
+
+  @ApiProperty()
+  available!: boolean;
+
+  @ApiPropertyOptional()
+  maxOvertimeMinutes?: number;
 }

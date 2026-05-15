@@ -1,11 +1,11 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import { BookingStore } from '../../../stores/booking/booking.store';
-import { BookingService } from '../booking.service';
 import { Service, ApiService } from '../../../core/services/api.service';
 import { AppCardComponent } from '../../../shared/components/atoms/app-card/app-card.component';
 import { AppInputComponent } from '../../../shared/components/atoms/app-input/app-input.component';
 import { AppEmptyStateComponent } from '../../../shared/components/atoms/app-empty-state/app-empty-state.component';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 
 export interface ServiceCategory {
   id: string;
@@ -17,6 +17,7 @@ export interface ServiceCategory {
   standalone: true,
   imports: [
     CurrencyPipe,
+    TranslatePipe,
     AppCardComponent,
     AppInputComponent,
     AppEmptyStateComponent,
@@ -26,7 +27,6 @@ export interface ServiceCategory {
 })
 export class ServiceSelectionComponent implements OnInit {
   private store = inject(BookingStore);
-  private bookingService = inject(BookingService);
   private api = inject(ApiService);
 
   services = signal<Service[]>([]);
@@ -91,7 +91,7 @@ export class ServiceSelectionComponent implements OnInit {
     this.loadSlotsForService(service.id);
   }
 
-  private loadSlotsForService(serviceId: string): void {
+  private loadSlotsForService(_serviceId: string): void {
     // This would typically load slots from the API
     // For now, we're just marking the service as selected
   }

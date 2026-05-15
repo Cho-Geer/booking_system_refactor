@@ -4,7 +4,8 @@ import { Request } from 'express';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { CreateUserDto, UpdateUserDto, UserResponseDto } from './dto/user.dto';
-import { UserType } from '@prisma/client';
+import { UpdatePasswordDto } from './dto/update-password.dto';
+import { SystemRole } from '@prisma/client';
 import { ClsService } from 'nestjs-cls';
 
 // Mock UsersService
@@ -68,7 +69,7 @@ describe('UsersController', () => {
       password: 'SecurePass123!',
       name: 'John Doe',
       phone: '1234567890',
-      userType: UserType.CUSTOMER,
+      role: SystemRole.CUSTOMER,
     };
 
     const mockUser = {
@@ -76,7 +77,7 @@ describe('UsersController', () => {
       email: 'newuser@example.com',
       name: 'John Doe',
       phone: '1234567890',
-      userType: UserType.CUSTOMER,
+      role: SystemRole.CUSTOMER,
       status: 'ACTIVE',
       createdAt: new Date('2024-01-01'),
       updatedAt: new Date('2024-01-01'),
@@ -172,7 +173,7 @@ describe('UsersController', () => {
       id: 'user-1',
       email: 'test@example.com',
       name: 'John Doe',
-      userType: UserType.CUSTOMER,
+      role: SystemRole.CUSTOMER,
     };
 
     it('should call service.findOne and return the user', async () => {
@@ -204,7 +205,7 @@ describe('UsersController', () => {
       id: 'user-1',
       email: 'test@example.com',
       name: 'Updated Name',
-      userType: UserType.CUSTOMER,
+      role: SystemRole.CUSTOMER,
     };
 
     it('should call service.update and return the updated user', async () => {
@@ -257,8 +258,8 @@ describe('UsersController', () => {
     it('should call service.updatePassword with correct parameters', async () => {
       mockUsersService.updatePassword.mockResolvedValue({ message: 'Password changed successfully' });
 
-      const result = await controller.changePassword('user-1', {
-        oldPassword: 'OldPass123!',
+      const result = await controller.changePassword({
+        currentPassword: 'OldPass123!',
         newPassword: 'NewPass456!',
       }, mockReq as unknown as Request);
 
@@ -271,11 +272,12 @@ describe('UsersController', () => {
         new BadRequestException('Current password is incorrect'),
       );
 
+      mockReq.user = { id: 'user-1', roles: [] };
       await expect(
-        controller.changePassword('user-1', { oldPassword: 'WrongPass!', newPassword: 'NewPass!' }, mockReq as unknown as Request)
+        controller.changePassword({ currentPassword: 'WrongPass!', newPassword: 'NewPass!' } as UpdatePasswordDto, mockReq as unknown as Request)
       ).rejects.toThrow(BadRequestException);
       await expect(
-        controller.changePassword('user-1', { oldPassword: 'WrongPass!', newPassword: 'NewPass!' }, mockReq as unknown as Request)
+        controller.changePassword({ currentPassword: 'WrongPass!', newPassword: 'NewPass!' } as UpdatePasswordDto, mockReq as unknown as Request)
       ).rejects.toThrow('Current password is incorrect');
     });
 
@@ -285,10 +287,10 @@ describe('UsersController', () => {
       );
 
       await expect(
-        controller.changePassword('user-1', { oldPassword: 'OldPass!', newPassword: 'NewPass!' }, mockReq as unknown as Request)
+        controller.changePassword({ currentPassword: 'OldPass!', newPassword: 'NewPass!' }, mockReq as unknown as Request)
       ).rejects.toThrow(BadRequestException);
       await expect(
-        controller.changePassword('user-1', { oldPassword: 'OldPass!', newPassword: 'NewPass!' }, mockReq as unknown as Request)
+        controller.changePassword({ currentPassword: 'OldPass!', newPassword: 'NewPass!' }, mockReq as unknown as Request)
       ).rejects.toThrow('Password management is not supported');
     });
   });
@@ -363,14 +365,15 @@ describe('UsersController', () => {
 
       const controller = module.get<UsersController>(UsersController);
 
-      await expect(controller.changePassword(targetUserId, {
-        oldPassword: 'OldPass123!',
+      mockReq.user = { id: 'different-user', roles: [] };
+      await expect(controller.changePassword({
+        currentPassword: 'OldPass123!',
         newPassword: 'HackedPass456!',
-      }, mockReq as unknown as Request)).rejects.toThrow(ForbiddenException);
-      await expect(controller.changePassword(targetUserId, {
-        oldPassword: 'OldPass123!',
+      } as UpdatePasswordDto, mockReq as unknown as Request)).rejects.toThrow(ForbiddenException);
+      await expect(controller.changePassword({
+        currentPassword: 'OldPass123!',
         newPassword: 'HackedPass456!',
-      }, mockReq as unknown as Request)).rejects.toThrow('You can only change your own profile');
+      } as UpdatePasswordDto, mockReq as unknown as Request)).rejects.toThrow('You can only change your own profile');
     });
 
     it('should allow GET /users/:id when requester IS the resource owner', async () => {
@@ -491,15 +494,15 @@ describe('UsersController', () => {
   });
 
   // ==================== FIX-P1-004: GET /profile endpoint ====================
-  // RED Phase: Controller should return raw profile (ResponseInterceptor wraps it later)
-  describe('FIX-P1-004: GET /users/profile (RED)', () => {
+  // GREEN Phase: Controller should return raw profile (ResponseInterceptor wraps it later)
+  describe('FIX-P1-004: GET /users/profile (GREEN)', () => {
     it('should call service.getProfile and return the raw profile (no manual envelope)', async () => {
       const mockProfile = {
         id: 'user-1',
         email: 'user1@example.com',
         name: 'User One',
         phone: '138****5678',
-        userType: UserType.CUSTOMER,
+        role: SystemRole.CUSTOMER,
         status: 'ACTIVE',
         createdAt: new Date('2024-01-01'),
         updatedAt: new Date('2024-01-01'),
@@ -522,6 +525,39 @@ describe('UsersController', () => {
       expect(service.getProfile).toHaveBeenCalledWith('user-1');
       // Controller should return raw profile (no envelope); ResponseInterceptor wraps it
       expect(result).toEqual(mockProfile);
+      // Regression: response must NOT be wrapped in { user: ... }
+      expect(result).not.toHaveProperty('user');
+    });
+
+    it('should return result with role at top level (not nested)', async () => {
+      const mockProfile = {
+        id: 'user-2',
+        email: 'admin@example.com',
+        name: 'Admin User',
+        phone: '139****8765',
+        role: SystemRole.ADMIN,
+        status: 'ACTIVE',
+        createdAt: new Date('2024-06-01'),
+        updatedAt: new Date('2024-06-01'),
+      };
+
+      mockUsersService.getProfile.mockResolvedValue(mockProfile);
+
+      const module: TestingModule = await Test.createTestingModule({
+        controllers: [UsersController],
+        providers: [
+          { provide: UsersService, useValue: mockUsersService },
+          { provide: ClsService, useValue: mockClsService },
+        ],
+      }).compile();
+
+      const controller = module.get<UsersController>(UsersController);
+
+      const result = await controller.getProfile(mockReq as unknown as Request);
+
+      // role must be at top level, NOT under result.user.role
+      expect(result.role).toBe(SystemRole.ADMIN);
+      expect(result).not.toHaveProperty('user');
     });
 
     it('should throw ForbiddenException when user is not authenticated', async () => {

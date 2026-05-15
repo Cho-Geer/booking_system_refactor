@@ -1,4 +1,4 @@
-import { PrismaClient, UserType, UserStatus, AppointmentStatus } from '@prisma/client';
+import { PrismaClient, SystemRole, UserStatus, AppointmentStatus } from '@prisma/client';
 
 /**
  * Database fixtures for creating test data.
@@ -10,7 +10,7 @@ export interface TestUser {
   name: string;
   email: string | null;
   phone: string | null;
-  userType: UserType;
+  role: SystemRole;
   status: UserStatus;
 }
 
@@ -39,20 +39,20 @@ export interface TestAppointment {
 }
 
 /**
- * Create a test user with the specified user type
+ * Create a test user with the specified role
  */
 export async function createTestUser(
   prisma: PrismaClient,
-  userType: UserType = UserType.CUSTOMER,
+  role: SystemRole = SystemRole.CUSTOMER,
   overrides: Record<string, unknown> = {}
 ): Promise<TestUser> {
   const timestamp = Date.now();
   return prisma.user.create({
     data: {
-      name: `Test ${userType} ${timestamp}`,
-      email: `test-${userType.toLowerCase()}-${timestamp}@example.com`,
+      name: `Test ${role} ${timestamp}`,
+      email: `test-${role.toLowerCase()}-${timestamp}@example.com`,
       phone: `+1${String(timestamp).padStart(10, '0')}`,
-      userType,
+      role,
       status: UserStatus.ACTIVE,
       ...overrides,
     },
@@ -65,11 +65,11 @@ export async function createTestUser(
 export async function createTestUsers(
   prisma: PrismaClient,
   count: number,
-  userType: UserType = UserType.CUSTOMER
+  role: SystemRole = SystemRole.CUSTOMER
 ): Promise<TestUser[]> {
   const users: TestUser[] = [];
   for (let i = 0; i < count; i++) {
-    const user = await createTestUser(prisma, userType);
+    const user = await createTestUser(prisma, role);
     users.push(user);
   }
   return users;
@@ -223,9 +223,9 @@ export async function seedTestData(prisma: PrismaClient): Promise<{
   timeSlots: TestTimeSlot[];
 }> {
   // Create users
-  const customer = await createTestUser(prisma, UserType.CUSTOMER);
-  const admin = await createTestUser(prisma, UserType.ADMIN);
-  const superAdmin = await createTestUser(prisma, UserType.SUPER_ADMIN);
+  const customer = await createTestUser(prisma, SystemRole.CUSTOMER);
+  const admin = await createTestUser(prisma, SystemRole.ADMIN);
+  const superAdmin = await createTestUser(prisma, SystemRole.SUPER_ADMIN);
 
   // Create category
   const category = await createTestCategory(prisma);

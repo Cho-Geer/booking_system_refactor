@@ -26,6 +26,10 @@ import { LoginSendCodeDto } from "./dto/login-send-code.dto";
 import { LoginVerifyCodeDto } from "./dto/login-verify-code.dto";
 import { LoginPasswordDto } from "./dto/login-password.dto";
 import {
+  ResetPasswordSendCodeDto,
+  ResetPasswordVerifyDto,
+} from "./dto/reset-password.dto";
+import {
   AuthResponseDto,
   SendCodeResponseDto,
   LogoutResponseDto,
@@ -80,7 +84,7 @@ export class AuthController {
 
   @Public()
   @Post("register/complete")
-  @RateLimit({ tier: "auth", key: "ip" })
+  @RateLimit({ tier: "auth", key: "ip", limit: 10 })
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: "注册第二步：完成注册" })
   @ApiBody({ type: RegisterCompleteDto })
@@ -100,10 +104,10 @@ export class AuthController {
   async registerComplete(
     @Body() completeDto: RegisterCompleteDto,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<AuthResponseDto> {
+  ): Promise<AuthResponseDto & { _message: string }> {
     const result = await this.authService.registerComplete(completeDto);
     this.setRefreshCookie(res, result.refreshToken);
-    return this.stripRefreshToken(result);
+    return { ...this.stripRefreshToken(result), _message: "注册成功" };
   }
 
   // ==================== 登录流程 ====================
@@ -127,7 +131,7 @@ export class AuthController {
 
   @Public()
   @Post("login/verify-code")
-  @RateLimit({ tier: "auth", key: "email" })
+  @RateLimit({ tier: "auth", key: "email", limit: 10 })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: "验证码登录" })
   @ApiBody({ type: LoginVerifyCodeDto })
@@ -147,10 +151,15 @@ export class AuthController {
   async loginVerifyCode(
     @Body() verifyDto: LoginVerifyCodeDto,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<AuthResponseDto> {
-    const result = await this.authService.loginVerifyCode(verifyDto);
+    @Req() req: Request,
+  ): Promise<AuthResponseDto & { _message: string }> {
+    const result = await this.authService.loginVerifyCode(
+      verifyDto,
+      req.ip,
+      req.headers["user-agent"],
+    );
     this.setRefreshCookie(res, result.refreshToken);
-    return this.stripRefreshToken(result);
+    return { ...this.stripRefreshToken(result), _message: "登录成功" };
   }
 
   @Public()
@@ -175,17 +184,62 @@ export class AuthController {
   async loginPassword(
     @Body() loginDto: LoginPasswordDto,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<AuthResponseDto> {
-    const result = await this.authService.loginPassword(loginDto);
+    @Req() req: Request,
+  ): Promise<AuthResponseDto & { _message: string }> {
+    const result = await this.authService.loginPassword(
+      loginDto,
+      req.ip,
+      req.headers["user-agent"],
+    );
     this.setRefreshCookie(res, result.refreshToken);
-    return this.stripRefreshToken(result);
+    return { ...this.stripRefreshToken(result), _message: "登录成功" };
+  }
+
+  // ==================== 重置密码流程 ====================
+
+  @Public()
+  @Post("reset-password/send-code")
+  @RateLimit({ tier: "auth", key: "email" })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: "重置密码第一步：发送验证码" })
+  @ApiBody({ type: ResetPasswordSendCodeDto })
+  @ApiResponse({
+    status: 200,
+    description: "验证码发送成功（防枚举，用户不存在也返回 200）",
+    type: SendCodeResponseDto,
+  })
+  async resetPasswordSendCode(
+    @Body() sendDto: ResetPasswordSendCodeDto,
+  ): Promise<SendCodeResponseDto> {
+    return this.authService.resetPasswordSendCode(sendDto);
+  }
+
+  @Public()
+  @Post("reset-password/verify")
+  @RateLimit({ tier: "auth", key: "email", limit: 10 })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: "重置密码第二步：验证码校验并更新密码" })
+  @ApiBody({ type: ResetPasswordVerifyDto })
+  @ApiResponse({
+    status: 200,
+    description: "密码重置成功",
+  })
+  @ApiResponse({
+    status: 400,
+    description: "验证码无效或已过期",
+  })
+  async resetPasswordVerify(
+    @Body() verifyDto: ResetPasswordVerifyDto,
+  ): Promise<{ _message: string } & { message: string }> {
+    const result = await this.authService.resetPasswordVerify(verifyDto);
+    return { ...result, _message: "密码重置成功" };
   }
 
   // ==================== Token 管理 ====================
 
   @Public()
   @Post("refresh")
-  @RateLimit({ tier: "auth", key: "ip" })
+  @RateLimit({ tier: "auth", key: "ip", limit: 10 })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: "刷新 Token（旋转模式，refreshToken 来自 Cookie）" })
   @ApiResponse({

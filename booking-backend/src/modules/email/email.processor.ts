@@ -45,8 +45,8 @@ export class EmailProcessor {
       return { sent: true, messageId: info.messageId };
     } catch (error) {
       this.logger.error(
-        `Failed to send verification email to ${to}: ${error.message}`,
-        error.stack,
+        `Failed to send verification email to ${to}: ${(error as Error).message}`,
+        (error as Error).stack,
       );
       throw error;
     }

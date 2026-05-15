@@ -2,10 +2,10 @@
   <!-- Page Header -->
   <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
     <div>
-      <h1 class="text-2xl sm:text-display font-bold text-text-primary">Service Management</h1>
-      <p class="text-sm text-text-secondary mt-1">Manage your business services and pricing</p>
+      <h1 class="text-2xl sm:text-display font-bold text-text-primary">{{ 'admin.services.title' | t }}</h1>
+      <p class="text-sm text-text-secondary mt-1">{{ 'admin.services.subtitle' | t }}</p>
     </div>
-    <app-button label="New Service" variant="primary" icon="pi pi-plus" (onClick)="openNew()"></app-button>
+    <app-button [label]="'admin.services.newService' | t" variant="primary" icon="pi pi-plus" (onClick)="openNew()"></app-button>
   </div>
 
   <!-- Loading State -->
@@ -23,7 +23,7 @@
           </div>
           <div>
             <p class="text-3xl font-bold text-text-primary">{{ vm().servicesTotal }}</p>
-            <p class="text-sm text-text-secondary">Total Services</p>
+            <p class="text-sm text-text-secondary">{{ 'admin.services.totalServices' | t }}</p>
           </div>
         </div>
       </app-card>
@@ -35,7 +35,7 @@
           </div>
           <div>
             <p class="text-3xl font-bold text-text-primary">{{ activeServicesCount() }}</p>
-            <p class="text-sm text-text-secondary">Active Services</p>
+            <p class="text-sm text-text-secondary">{{ 'admin.services.activeServices' | t }}</p>
           </div>
         </div>
       </app-card>
@@ -47,7 +47,7 @@
           </div>
           <div>
             <p class="text-3xl font-bold text-text-primary">{{ averagePrice() | currency:'USD' }}</p>
-            <p class="text-sm text-text-secondary">Avg Price</p>
+            <p class="text-sm text-text-secondary">{{ 'admin.services.avgPrice' | t }}</p>
           </div>
         </div>
       </app-card>
@@ -64,7 +64,7 @@
     <app-filter-bar>
       <app-search-input
         [value]="searchQuery()"
-        placeholder="Search services..."
+        [placeholder]="'admin.services.searchPlaceholder' | t"
         [suggestions]="searchSuggestions()"
         [debounceMs]="300"
         [minLength]="1"
@@ -73,10 +73,10 @@
       ></app-search-input>
       <app-dropdown
         [value]="categoryFilter()"
-        [options]="categoryOptions"
+        [options]="categoryOptions()"
         optionLabel="label"
         optionValue="value"
-        placeholder="All Categories"
+        [placeholder]="'admin.services.allCategories' | t"
         styleClass="w-full sm:w-40"
         (valueChange)="onCategoryFilterChange($event)"
       ></app-dropdown>
@@ -85,12 +85,12 @@
         [options]="filterStatusOptions"
         optionLabel="label"
         optionValue="value"
-        placeholder="Status"
+        [placeholder]="'admin.table.status' | t"
         styleClass="w-full sm:w-32"
         (valueChange)="onStatusFilterChange($event)"
       ></app-dropdown>
       <app-button
-        label="Clear"
+        [label]="'global.clear' | t"
         variant="ghost"
         icon="pi pi-filter-slash"
         size="sm"
@@ -138,15 +138,15 @@
                 <span class="font-bold text-primary-start">{{ svc.price | currency:'USD' }}</span>
               </div>
               <div class="flex gap-2 mt-4 pt-3 border-t border-border-light">
-                <app-button icon="pi pi-eye" variant="ghost" size="sm" (onClick)="viewService(svc)">View</app-button>
-                <app-button icon="pi pi-pencil" variant="ghost" size="sm" (onClick)="editService(svc)">Edit</app-button>
-                <app-button icon="pi pi-trash" variant="danger" size="sm" (onClick)="confirmDeleteService(svc)">Delete</app-button>
+                <app-button icon="pi pi-eye" variant="ghost" size="sm" (onClick)="viewService(svc)">{{ 'admin.table.view' | t }}</app-button>
+                <app-button icon="pi pi-pencil" variant="ghost" size="sm" (onClick)="editService(svc)">{{ 'global.edit' | t }}</app-button>
+                <app-button icon="pi pi-trash" variant="danger" size="sm" (onClick)="confirmDeleteService(svc)">{{ 'global.delete' | t }}</app-button>
               </div>
             </div>
           </app-card>
         }
         @empty {
-          <div class="col-span-full text-center py-8 text-text-secondary">No services found.</div>
+          <div class="col-span-full text-center py-8 text-text-secondary">{{ 'admin.services.noServices' | t }}</div>
         }
       </div>
     }
@@ -162,18 +162,18 @@
           [totalRecords]="vm().servicesTotal"
           [rowsPerPageOptions]="[10, 25, 50]"
           [showCurrentPageReport]="true"
-          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} services"
+          [currentPageReportTemplate]="'admin.services.pageReport' | t : { first: '{first}', last: '{last}', totalRecords: '{totalRecords}' }"
           [tableStyle]="{ 'min-width': '650px' }"
           stripedRows="true"
           [rowHover]="true"
         >
           <ng-template #header>
             <tr>
-              <th pSortableColumn="name">Name <p-sortIcon field="name" /></th>
-              <th pSortableColumn="duration">Duration <p-sortIcon field="duration" /></th>
-              <th pSortableColumn="price">Price <p-sortIcon field="price" /></th>
-              <th pSortableColumn="active">Status <p-sortIcon field="active" /></th>
-              <th>Actions</th>
+              <th pSortableColumn="name">{{ 'admin.services.name' | t }} <p-sortIcon field="name" /></th>
+              <th pSortableColumn="duration">{{ 'admin.table.duration' | t }} <p-sortIcon field="duration" /></th>
+              <th pSortableColumn="price">{{ 'admin.table.price' | t }} <p-sortIcon field="price" /></th>
+              <th pSortableColumn="active">{{ 'admin.table.status' | t }} <p-sortIcon field="active" /></th>
+              <th>{{ 'admin.table.actions' | t }}</th>
             </tr>
           </ng-template>
           <ng-template #body let-svc>
@@ -209,7 +209,7 @@
           </ng-template>
           <ng-template #emptymessage>
             <tr>
-              <td colspan="5" class="text-center py-8 text-text-secondary">No services found.</td>
+              <td colspan="5" class="text-center py-8 text-text-secondary">{{ 'admin.services.noServices' | t }}</td>
             </tr>
           </ng-template>
         </p-table>
@@ -221,7 +221,7 @@
   <app-modal
     [visible]="serviceDialogVisible()"
     (visibleChange)="serviceDialogVisible.set($event); !$event && closeDialog()"
-    [header]="isViewMode() ? 'View Service' : isEdit() ? 'Edit Service' : 'New Service'"
+    [header]="isViewMode() ? ('admin.services.viewService' | t) : isEdit() ? ('admin.services.editService' | t) : ('admin.services.newService' | t)"
     [modal]="true"
     [closable]="true"
     [styleClass]="'rounded-xl w-[480px]'"
@@ -229,64 +229,73 @@
     <div class="flex flex-col gap-4 p-4">
       <!-- Name -->
       <div>
-        <label class="block font-medium mb-1 text-text-primary">Name *</label>
-        <input pInputText [(ngModel)]="formName" class="w-full" placeholder="Enter service name" [class.ng-invalid]="submitted() && formErrors.name" [disabled]="isViewMode()" />
+        <label class="block font-medium mb-1 text-text-primary">{{ 'admin.services.name' | t }} *</label>
+        <input pInputText [(ngModel)]="formName" class="w-full" [placeholder]="'admin.services.namePlaceholder' | t" [class.ng-invalid]="submitted() && formErrors.name" [disabled]="isViewMode()" />
         @if (submitted() && formErrors.name) {
           <small class="text-danger">{{ formErrors.name }}</small>
         }
       </div>
       <!-- Description -->
       <div>
-        <label class="block font-medium mb-1 text-text-primary">Description</label>
-        <textarea pTextarea [(ngModel)]="formDescription" class="w-full" rows="3" placeholder="Enter description" [disabled]="isViewMode()"></textarea>
+        <label class="block font-medium mb-1 text-text-primary">{{ 'admin.services.description' | t }}</label>
+        <textarea pTextarea [(ngModel)]="formDescription" class="w-full" rows="3" [placeholder]="'admin.services.descriptionPlaceholder' | t" [disabled]="isViewMode()"></textarea>
       </div>
       <div>
-        <label class="block font-medium mb-1 text-text-primary">Duration (min) *</label>
-        <p-inputNumber [(ngModel)]="formDuration" class="w-full" [min]="1" [max]="480" placeholder="Enter duration" [class.ng-invalid]="submitted() && formErrors.duration" [disabled]="isViewMode()" />
+        <label class="block font-medium mb-1 text-text-primary">{{ 'admin.services.duration' | t }} (min) *</label>
+        <p-inputNumber [(ngModel)]="formDuration" class="w-full" [min]="1" [max]="480" [placeholder]="'admin.services.durationPlaceholder' | t" [class.ng-invalid]="submitted() && formErrors.duration" [disabled]="isViewMode()" />
         @if (submitted() && formErrors.duration) {
           <small class="text-danger">{{ formErrors.duration }}</small>
         }
       </div>
       <div>
-        <label class="block font-medium mb-1 text-text-primary">Price ($) *</label>
-        <p-inputNumber [(ngModel)]="formPrice" class="w-full" [min]="0" [max]="99999" mode="currency" currency="USD" placeholder="Enter price" [disabled]="isViewMode()" [class.ng-invalid]="submitted() && formErrors.price" />
+        <label class="block font-medium mb-1 text-text-primary">{{ 'admin.services.price' | t }} ($) *</label>
+        <p-inputNumber [(ngModel)]="formPrice" class="w-full" [min]="0" [max]="99999" mode="currency" currency="USD" [placeholder]="'admin.services.pricePlaceholder' | t" [disabled]="isViewMode()" [class.ng-invalid]="submitted() && formErrors.price" />
         @if (submitted() && formErrors.price) {
           <small class="text-danger">{{ formErrors.price }}</small>
         }
       </div>
       <div>
-        <label class="block font-medium mb-1 text-text-primary">Price per Minute</label>
+        <label class="block font-medium mb-1 text-text-primary">{{ 'admin.services.pricePerMinute' | t }}</label>
         @if (isViewMode()) {
           <p class="text-text-primary font-medium">{{ (selectedService()?.pricePerMinute ?? formPricePerMinute ?? 0) | currency:'USD' }}</p>
         } @else {
           @if (computedPricePerMinute() !== null) {
             <p class="text-text-primary font-medium">{{ computedPricePerMinute() | currency:'USD' }}/min</p>
-            <p class="text-xs text-text-secondary mt-1">Auto-calculated: ${{ formPrice }} / {{ formDuration }}min</p>
+            <p class="text-xs text-text-secondary mt-1">{{ 'admin.services.autoCalculated' | t : { price: formPrice ?? 0, duration: formDuration ?? 0 } }}</p>
           } @else {
-            <p class="text-text-secondary text-sm">Auto-calculated from Price / Duration</p>
+            <p class="text-text-secondary text-sm">{{ 'admin.services.autoCalculatedHint' | t }}</p>
           }
         }
       </div>
       <div>
-        <label class="block font-medium mb-1 text-text-primary">Tax Rate (%)</label>
-        <p-inputNumber [(ngModel)]="formTaxRate" class="w-full" [min]="0" [max]="100" suffix="%" placeholder="Enter tax rate" [disabled]="isViewMode()" />
+        <label class="block font-medium mb-1 text-text-primary">{{ 'admin.services.taxRate' | t }} (%)</label>
+        <p-inputNumber [(ngModel)]="formTaxRate" class="w-full" [min]="0" [max]="100" suffix="%" [placeholder]="'admin.services.taxRatePlaceholder' | t" [disabled]="isViewMode()" />
       </div>
       <div>
-        <label class="block font-medium mb-1 text-text-primary">Image URL</label>
-        <input pInputText [(ngModel)]="formImageUrl" class="w-full" placeholder="https://..." [disabled]="isViewMode()" />
+        <label class="block font-medium mb-1 text-text-primary">{{ 'admin.services.imageUrl' | t }}</label>
+        <input pInputText [(ngModel)]="formImageUrl" class="w-full" [placeholder]="'admin.services.imageUrlPlaceholder' | t" [disabled]="isViewMode()" />
       </div>
+      @if (!isViewMode()) {
+        <div>
+          <label class="block font-medium mb-1 text-text-primary">{{ 'admin.services.uploadImage' | t }}</label>
+          <input type="file" accept="image/*" (change)="onFileSelected($event)" [disabled]="imageUploading()" class="w-full text-sm text-text-secondary file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-accent-green/10 file:text-accent-green hover:file:bg-accent-green/20" />
+          @if (imageUploading()) {
+            <p class="text-xs text-text-secondary mt-1">{{ 'admin.services.uploading' | t }}</p>
+          }
+        </div>
+      }
       <div class="flex items-center gap-3">
-        <label class="font-medium text-text-primary">Active</label>
+        <label class="font-medium text-text-primary">{{ 'admin.table.active' | t }}</label>
         <p-toggleSwitch [(ngModel)]="formActive" [disabled]="isViewMode()" />
       </div>
     </div>
     <div app-modal-footer>
       <div class="flex flex-col-reverse sm:flex-row gap-2 sm:gap-2">
         @if (isViewMode()) {
-          <app-button label="Close" variant="primary" (onClick)="closeDialog()"></app-button>
+          <app-button [label]="'global.close' | t" variant="primary" (onClick)="closeDialog()"></app-button>
         } @else {
-          <app-button label="Cancel" variant="secondary" (onClick)="closeDialog()"></app-button>
-          <app-button label="Save" variant="primary" (onClick)="saveService()"></app-button>
+          <app-button [label]="'global.cancel' | t" variant="secondary" (onClick)="closeDialog()"></app-button>
+          <app-button [label]="'global.save' | t" variant="primary" (onClick)="saveService()"></app-button>
         }
       </div>
     </div>
@@ -296,16 +305,16 @@
   <app-modal
     [visible]="deleteDialogVisible()"
     (visibleChange)="deleteDialogVisible.set($event)"
-    header="Confirm Delete"
+    [header]="'admin.services.confirmDelete' | t"
     [modal]="true"
     [closable]="true"
     [styleClass]="'rounded-xl w-[400px]'"
   >
-    <p class="p-4 text-text-primary">Are you sure you want to delete service <strong>{{ serviceToDelete()?.name }}</strong>? This action cannot be undone.</p>
+    <p class="p-4 text-text-primary">{{ 'admin.services.deleteMessage' | t : { name: serviceToDelete()?.name || '' } }}</p>
     <div app-modal-footer>
       <div class="flex flex-col-reverse sm:flex-row gap-2 sm:gap-2">
-        <app-button label="Cancel" variant="secondary" (onClick)="deleteDialogVisible.set(false)"></app-button>
-        <app-button label="Delete" variant="danger" (onClick)="deleteService()"></app-button>
+        <app-button [label]="'global.cancel' | t" variant="secondary" (onClick)="deleteDialogVisible.set(false)"></app-button>
+        <app-button [label]="'global.delete' | t" variant="danger" (onClick)="deleteService()"></app-button>
       </div>
     </div>
   </app-modal>

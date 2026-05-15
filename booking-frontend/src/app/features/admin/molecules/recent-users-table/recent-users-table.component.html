@@ -15,7 +15,7 @@
       </div>
       <div class="flex justify-between items-center text-sm">
         <span class="text-text-secondary">{{ row.user.createdAt | date:'MMM d, y' }}</span>
-        <app-button label="View" variant="ghost" size="sm" icon="pi pi-eye" (onClick)="rowClick.emit(row)" />
+        <app-button [label]="'admin.table.view' | t" variant="ghost" size="sm" icon="pi pi-eye" (onClick)="rowClick.emit(row)" />
       </div>
     </div>
   }
@@ -25,11 +25,11 @@
   <table class="data-table">
     <thead>
       <tr>
-        <th>Name</th>
-        <th>Role</th>
-        <th>Status</th>
-        <th>Created</th>
-        <th class="text-right">Actions</th>
+        <th>{{ 'admin.table.name' | t }}</th>
+        <th>{{ 'admin.table.role' | t }}</th>
+        <th>{{ 'admin.table.status' | t }}</th>
+        <th>{{ 'admin.table.created' | t }}</th>
+        <th class="text-right">{{ 'admin.table.actions' | t }}</th>
       </tr>
     </thead>
     <tbody>

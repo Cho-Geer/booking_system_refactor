@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Put,
   Body,
   Patch,
   Param,
@@ -21,18 +22,20 @@ import {
 import { UsersService } from "./users.service";
 import { CreateUserDto, UpdateUserDto, UserResponseDto } from "./dto/user.dto";
 import { ProfileResponseDto } from "./dto/profile-response.dto";
+import { UpdatePasswordDto } from "./dto/update-password.dto";
+import { UpdateTimezoneDto } from "./dto/update-timezone.dto";
+import { UpdateProfileDto } from "./dto/update-profile.dto";
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../../common/guards/roles.guard";
 import { Roles } from "../../common/decorators/roles.decorator";
-import { UserType } from "@prisma/client";
+import { SystemRole } from "@prisma/client";
 import { RateLimit } from "../rate-limiter/rate-limiter.decorator";
 import { Request } from "express";
-import { ClsService } from "nestjs-cls";
 
 interface JwtUser {
   id: string;
   roles?: string[];
-  userType?: string;
+  role?: string;
 }
 
 /**
@@ -68,11 +71,10 @@ function enforceOwnership(
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
-    private readonly cls: ClsService,
   ) {}
 
   @Post()
-  @Roles(UserType.ADMIN)
+  @Roles(SystemRole.ADMIN)
   @ApiOperation({ summary: "Create a new user" })
   @ApiResponse({
     status: 201,
@@ -85,7 +87,7 @@ export class UsersController {
   }
 
   @Get()
-  @Roles(UserType.ADMIN)
+  @Roles(SystemRole.ADMIN)
   @ApiOperation({ summary: "Get all users with pagination" })
   @ApiResponse({ status: 200, description: "List of users" })
   async findAll(
@@ -113,8 +115,6 @@ export class UsersController {
 
     const profile = await this.usersService.getProfile(user.id);
 
-    // ResponseInterceptor globally wraps all returns with envelope;
-    // return raw profile to avoid double-wrapping
     return profile;
   }
 
@@ -151,7 +151,7 @@ export class UsersController {
   }
 
   @Delete(":id")
-  @Roles(UserType.ADMIN)
+  @Roles(SystemRole.ADMIN)
   @ApiOperation({ summary: "Delete user" })
   @ApiResponse({ status: 200, description: "User deleted" })
   @ApiResponse({ status: 404, description: "User not found" })
@@ -159,21 +159,44 @@ export class UsersController {
     return this.usersService.remove(id);
   }
 
-  @Post(":id/change-password")
-  @ApiOperation({ summary: "Change user password" })
+  @Put("profile")
+  @Roles(SystemRole.CUSTOMER, SystemRole.ADMIN, SystemRole.SUPER_ADMIN)
+  async updateProfile(@Req() req: Request, @Body() dto: UpdateProfileDto) {
+    const result = await this.usersService.updateProfile((req.user as { sub: string } | undefined)?.sub ?? '', dto);
+    return { ...result, _message: "资料已更新" };
+  }
+
+  @Patch("profile/timezone")
+  @Roles(SystemRole.CUSTOMER, SystemRole.ADMIN, SystemRole.SUPER_ADMIN)
+  @RateLimit({ tier: "api", key: "ip" })
+  @ApiOperation({ summary: "Update preferred timezone" })
+  @ApiResponse({ status: 200, description: "Timezone updated" })
+  async updateTimezone(@Body() dto: UpdateTimezoneDto, @Req() req: Request) {
+    const user = req.user as JwtUser | undefined;
+    if (!user) {
+      throw new ForbiddenException("User not authenticated");
+    }
+    const result = await this.usersService.updateTimezone(user.id, dto);
+    return { ...result, _message: "时区已更新" };
+  }
+
+  @Put("profile/password")
+  @ApiOperation({ summary: "Change current user password" })
   @ApiResponse({ status: 200, description: "Password changed" })
   @ApiResponse({ status: 400, description: "Current password is incorrect" })
   async changePassword(
-    @Param("id") id: string,
-    @Body() body: { oldPassword: string; newPassword: string },
+    @Body() dto: UpdatePasswordDto,
     @Req() req: Request,
   ) {
-    // FIX-P0-003 REFACTOR: 使用统一的所有权检查函数
-    enforceOwnership(req.user as JwtUser | undefined, id, "change");
-    return this.usersService.updatePassword(
-      id,
-      body.oldPassword,
-      body.newPassword,
+    const user = req.user as JwtUser | undefined;
+    if (!user) {
+      throw new ForbiddenException("User not authenticated");
+    }
+    const result = await this.usersService.updatePassword(
+      user.id,
+      dto.currentPassword,
+      dto.newPassword,
     );
+    return { ...result, _message: "密码修改成功" };
   }
 }

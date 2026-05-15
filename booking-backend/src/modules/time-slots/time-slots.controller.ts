@@ -19,20 +19,22 @@ import {
 import { TimeSlotsService } from "./time-slots.service";
 import { CreateTimeSlotDto, UpdateTimeSlotDto } from "./dto/time-slot.dto";
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
+import { RolesGuard } from "../../common/guards/roles.guard";
 import { Roles } from "../../common/decorators/roles.decorator";
-import { UserType } from "@prisma/client";
+import { Public } from "../../common/decorators/public.decorator";
+import { SystemRole } from "@prisma/client";
 import { RateLimit } from "../rate-limiter/rate-limiter.decorator";
 
 @ApiTags("Time Slots")
 @Controller("time-slots")
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth("JWT-auth")
 @RateLimit({ tier: "public", key: "ip" })
 export class TimeSlotsController {
   constructor(private readonly timeSlotsService: TimeSlotsService) {}
 
   @Post()
-  @Roles(UserType.ADMIN)
+  @Roles(SystemRole.ADMIN)
   @ApiOperation({ summary: "Create a new time slot" })
   @ApiResponse({ status: 201, description: "Time slot created" })
   @ApiResponse({ status: 409, description: "Time slot already exists" })
@@ -52,6 +54,7 @@ export class TimeSlotsController {
     return this.timeSlotsService.findAll(serviceId, isActive, page, limit);
   }
 
+  @Public()
   @Get("available")
   @ApiOperation({ summary: "Get available time slots for a service" })
   @ApiResponse({ status: 200, description: "List of available time slots" })
@@ -59,16 +62,20 @@ export class TimeSlotsController {
     @Query("serviceId") serviceId: string,
     @Query("startDate") startDate: string,
     @Query("endDate") endDate: string,
+    @Query("overtimeMinutes") overtimeMinutes?: number,
+    @Query("timezone") timezone?: string,
   ) {
     return this.timeSlotsService.getAvailableSlots(
       serviceId,
       new Date(startDate),
       new Date(endDate),
+      overtimeMinutes,
+      timezone,
     );
   }
 
   @Get(":id")
-  @ApiOperation({ summary: "Get time slot by ID" })
+  @ApiOperation({ summary: "Get time slot by ID (convenience endpoint, not explicitly in contract)" })
   @ApiResponse({ status: 200, description: "Time slot found" })
   @ApiResponse({ status: 404, description: "Time slot not found" })
   async findOne(@Param("id") id: string) {
@@ -76,7 +83,7 @@ export class TimeSlotsController {
   }
 
   @Patch(":id")
-  @Roles(UserType.ADMIN)
+  @Roles(SystemRole.ADMIN)
   @ApiOperation({ summary: "Update time slot" })
   @ApiResponse({ status: 200, description: "Time slot updated" })
   async update(
@@ -87,7 +94,7 @@ export class TimeSlotsController {
   }
 
   @Delete(":id")
-  @Roles(UserType.ADMIN)
+  @Roles(SystemRole.ADMIN)
   @ApiOperation({ summary: "Delete time slot" })
   @ApiResponse({ status: 200, description: "Time slot deleted" })
   async remove(@Param("id") id: string) {

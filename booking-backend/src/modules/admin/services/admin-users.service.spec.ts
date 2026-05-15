@@ -67,7 +67,7 @@ describe("AdminUsersService", () => {
     name: "John Doe",
     email: "john@example.com",
     phone: "1234567890",
-    userType: "CUSTOMER",
+    role: "CUSTOMER",
     status: "ACTIVE",
     createdAt: new Date("2024-01-01"),
   };
@@ -147,7 +147,7 @@ describe("AdminUsersService", () => {
       expect(prisma.user.findMany).toHaveBeenCalledWith({
         skip: 0,
         take: 20,
-        where: { userType: "ADMIN" },
+        where: { role: "ADMIN" },
         orderBy: { createdAt: "desc" },
       });
     });
@@ -193,7 +193,7 @@ describe("AdminUsersService", () => {
             { email: { contains: "john", mode: "insensitive" } },
             { phone: { contains: "john", mode: "insensitive" } },
           ],
-          userType: "ADMIN",
+          role: "ADMIN",
           status: "ACTIVE",
         },
         orderBy: { createdAt: "desc" },
@@ -262,9 +262,31 @@ describe("AdminUsersService", () => {
   });
 
   // ============================================================
-  // create
+  // create — HIGH-1: passwordHash nullable for code-login users
   // ============================================================
   describe("create", () => {
+    it("[RED] should allow creating user without password (verification-code login)", () => {
+      // HIGH-1: passwordHash should be optional to support pure verification-code login users.
+      // The current mapper (fromCreateAdminUserDto) unconditionally copies dto.password,
+      // so even when password is undefined, the property `password: undefined` exists in output.
+      //
+      // After the fix: mapper should conditionally omit password when undefined.
+      // This test will FAIL because mapped output still has property 'password'.
+
+      const dto = new CreateAdminUserDto();
+      Object.assign(dto, {
+        name: "Code Login User",
+        email: "code@example.com",
+        role: "CUSTOMER",
+        // password is intentionally NOT set
+      });
+
+      const mapped = fromCreateAdminUserDto(dto as any);
+
+      // The correct behavior: when password is undefined, the property should not exist
+      // Current behavior: password: undefined is always included → this assertion FAILS
+      expect(mapped).not.toHaveProperty("password");
+    });
     it("should map role→userType using fromCreateAdminUserDto and delegate to UsersService.create", async () => {
       const dto: CreateAdminUserDto = {
         name: "New Admin",
@@ -277,7 +299,7 @@ describe("AdminUsersService", () => {
         ...mockPrismaUser,
         name: "New Admin",
         email: "admin@example.com",
-        userType: "ADMIN",
+        role: "ADMIN",
       };
 
       mockUsersService.create.mockResolvedValue(createdPrismaUser);
@@ -303,7 +325,7 @@ describe("AdminUsersService", () => {
         ...mockPrismaUser,
         name: "New Customer",
         email: "customer@example.com",
-        userType: "CUSTOMER",
+        role: "CUSTOMER",
       };
 
       mockUsersService.create.mockResolvedValue(createdPrismaUser);
@@ -330,7 +352,7 @@ describe("AdminUsersService", () => {
       const updatedPrismaUser = {
         ...mockPrismaUser,
         name: "Updated Name",
-        userType: "SUPER_ADMIN",
+        role: "SUPER_ADMIN",
       };
 
       mockUsersService.update.mockResolvedValue(updatedPrismaUser);

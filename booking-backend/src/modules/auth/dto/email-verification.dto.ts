@@ -18,7 +18,7 @@ export class SendVerificationCodeDto {
   })
   @IsEmail({}, { message: "邮箱格式不正确" })
   @IsNotEmpty({ message: "邮箱不能为空" })
-  email: string;
+  email!: string;
 
   @ApiProperty({
     description: "Type of verification code",
@@ -27,7 +27,7 @@ export class SendVerificationCodeDto {
   })
   @IsEnum(VerificationCodeType, { message: "验证码类型无效" })
   @IsNotEmpty({ message: "验证码类型不能为空" })
-  type: VerificationCodeType;
+  type!: VerificationCodeType;
 }
 
 export class VerifyVerificationCodeDto {
@@ -37,12 +37,12 @@ export class VerifyVerificationCodeDto {
   })
   @IsEmail({}, { message: "邮箱格式不正确" })
   @IsNotEmpty({ message: "邮箱不能为空" })
-  email: string;
+  email!: string;
 
   @ApiProperty({ description: "Verification code", example: "123456" })
   @IsString()
   @IsNotEmpty({ message: "验证码不能为空" })
-  code: string;
+  code!: string;
 
   @ApiProperty({
     description: "Type of verification code",
@@ -51,5 +51,5 @@ export class VerifyVerificationCodeDto {
   })
   @IsEnum(VerificationCodeType, { message: "验证码类型无效" })
   @IsNotEmpty({ message: "验证码类型不能为空" })
-  type: VerificationCodeType;
+  type!: VerificationCodeType;
 }

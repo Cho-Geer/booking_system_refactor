@@ -50,11 +50,13 @@ export class AdminNotificationsService {
       this.prisma.notification.count({ where }),
     ]);
 
+    const totalPages = Math.ceil(total / limit);
+    const hasNext = page < totalPages;
+    const hasPrev = page > 1;
+
     return {
       items: items.map(mapNotification),
-      total,
-      page,
-      limit,
+      meta: { total, page, limit, totalPages, hasNext, hasPrev },
     };
   }
 

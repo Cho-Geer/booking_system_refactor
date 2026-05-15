@@ -3,7 +3,7 @@ import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 
 export class BaseResponseDto {
   @ApiProperty({ description: "Success status" })
-  success: boolean;
+  success!: boolean;
 
   @ApiPropertyOptional({ description: "Message" })
   message?: string;
@@ -21,28 +21,28 @@ export class PaginationDto {
 
 export class MetaDto {
   @ApiProperty({ description: "Total count" })
-  total: number;
+  total!: number;
 
   @ApiProperty({ description: "Current page" })
-  page: number;
+  page!: number;
 
   @ApiProperty({ description: "Page size" })
-  limit: number;
+  limit!: number;
 
   @ApiProperty({ description: "Total pages" })
-  totalPages: number;
+  totalPages!: number;
 
   @ApiProperty({ description: "Has next page" })
-  hasNext: boolean;
+  hasNext!: boolean;
 
   @ApiProperty({ description: "Has previous page" })
-  hasPrev: boolean;
+  hasPrev!: boolean;
 }
 
 export class PaginatedResponseDto<T> {
   @ApiProperty({ description: "Data items" })
-  items: T[];
+  items!: T[];
 
   @ApiProperty({ description: "Pagination metadata" })
-  meta: MetaDto;
+  meta!: MetaDto;
 }

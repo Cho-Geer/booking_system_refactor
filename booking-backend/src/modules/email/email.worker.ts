@@ -64,8 +64,8 @@ export class EmailWorker extends WorkerHost {
       return { sent: true, messageId: info.messageId };
     } catch (error) {
       this.logger.error(
-        `Job ${job.id}: Failed to send email to ${to}: ${error.message}`,
-        error.stack,
+        `Job ${job.id}: Failed to send email to ${to}: ${(error as Error).message}`,
+        (error as Error).stack,
       );
       throw error;
     }

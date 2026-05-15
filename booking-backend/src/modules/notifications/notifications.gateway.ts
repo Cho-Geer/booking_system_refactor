@@ -29,14 +29,13 @@ export class NotificationsGateway
   implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit
 {
   @WebSocketServer()
-  server: Server;
+  server!: Server;
 
   private readonly logger = new Logger(NotificationsGateway.name);
   private connectedClients = new Map<
     string,
     { socket: Socket; userId?: string; roles?: string[] }
   >();
-  private healthBroadcastInterval: ReturnType<typeof setInterval> | null = null;
 
   constructor(private readonly wsJwtGuard: WsJwtGuard) {}
 
@@ -44,7 +43,7 @@ export class NotificationsGateway
     this.logger.log(
       "NotificationsGateway initialized — starting health broadcast",
     );
-    this.healthBroadcastInterval = setInterval(() => {
+    setInterval(() => {
       if (this.connectedClients.size === 0) {
         return;
       }
@@ -73,6 +72,10 @@ export class NotificationsGateway
         `Broadcast system.health.updated to ${this.connectedClients.size} clients`,
       );
     }, 60000);
+
+    setInterval(() => {
+      this.server.emit("ping", { timestamp: new Date().toISOString() });
+    }, 30000);
   }
 
   async handleConnection(client: Socket): Promise<void> {
@@ -222,6 +225,63 @@ export class NotificationsGateway
     this.server.to(`user:${userId}`).emit("booking_cancelled", payload);
   }
 
+  sendSlotBooked(
+    timeSlotId: string,
+    appointmentDate: string,
+    remainingCapacity: number,
+  ): void {
+    this.logger.log(`Emitting slot.booked to admin:broadcast`);
+    this.server
+      .to("admin:broadcast")
+      .emit("slot.booked", {
+        timeSlotId,
+        appointmentDate,
+        remainingCapacity,
+        timestamp: new Date().toISOString(),
+      });
+  }
+
+  sendSlotUpdate(slotId: string, isActive: boolean, bookedBy?: string): void {
+    this.logger.log(`Emitting slot-update to admin:broadcast`);
+    this.server.to("admin:broadcast").emit("slot-update", {
+      slotId,
+      isActive,
+      bookedBy: bookedBy ?? null,
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  sendTranslationsUpdated(domain?: string, locale?: string): void {
+    this.logger.log(`Emitting translations.updated to admin:broadcast`);
+    this.server.to("admin:broadcast").emit("translations.updated", {
+      domain: domain ?? null,
+      locale: locale ?? null,
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  sendNewNotification(notification: {
+    id: string;
+    type: string;
+    title: string;
+    body: string;
+    createdAt: string;
+  }): void {
+    this.logger.log(`Emitting notification.new to admin:broadcast`);
+    this.server.to("admin:broadcast").emit("notification.new", notification);
+  }
+
+  sendStatsUpdated(stats: {
+    totalBookings: number;
+    todayBookings: number;
+    pendingBookings: number;
+    activeUsers: number;
+    totalRevenue: number;
+  }): void {
+    this.logger.log(`Emitting stats.updated to admin:broadcast`);
+    this.server.to("admin:broadcast").emit("stats.updated", stats);
+  }
+
   /**
    * Broadcast an event to all connected clients
    */
@@ -253,7 +313,7 @@ export class NotificationsGateway
    */
   sendAppointmentStatusChanged(data: Record<string, unknown>): void {
     this.logger.log(`Broadcasting appointment.status_changed`);
-    this.sendAdminBroadcast("appointment.status_changed", data);
+    this.server.to("admin:broadcast").emit("appointment.status_changed", data);
   }
 
   /**
