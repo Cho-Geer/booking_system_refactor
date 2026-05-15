@@ -6,31 +6,25 @@
  *   [Green] T{task_id} description
  *   [Refactor] T{task_id} description
  *
- * Standard commits also allowed for non-TDD work:
+ * Standard commits:
  *   feat(scope): description
  *   fix(scope): description
  *   etc.
  */
 module.exports = {
   extends: ['@commitlint/config-conventional'],
+  parserPreset: {
+    parserOpts: {
+      headerPattern: /^(\[(\w+)\]\s+)?(\w+)(?:\(([^)]*)\))?:\s+(.*)$|^\[(\w+)\]\s+(.*)$/,
+      headerCorrespondence: ['_prefix', '_tdd_type', 'type', 'scope', 'subject', 'tdd_type', 'tdd_subject'],
+    },
+  },
   rules: {
     'type-enum': [2, 'always', [
-      'feat',     // New feature
-      'fix',      // Bug fix
-      'docs',     // Documentation
-      'style',    // Formatting (no logic change)
-      'refactor', // Code restructuring
-      'perf',     // Performance
-      'test',     // Tests
-      'chore',    // Build/tooling
-      'ci',       // CI pipeline
-      'build',    // Build system
-      'revert',   // Rollback
-      'Red',      // TDD Red phase
-      'Green',    // TDD Green phase
-      'Refactor', // TDD Refactor phase
+      'feat', 'fix', 'docs', 'style', 'refactor', 'perf',
+      'test', 'chore', 'ci', 'build', 'revert',
     ]],
-    'type-case': [2, 'always', ['lower-case', 'pascal-case']],
+    'type-case': [2, 'always', 'lower-case'],
     'subject-case': [2, 'never', ['start-case', 'pascal-case', 'upper-case']],
     'subject-full-stop': [2, 'never', '.'],
     'subject-empty': [2, 'never'],
@@ -40,17 +34,9 @@ module.exports = {
   plugins: [
     {
       rules: {
-        'tdd-tag-consistency': (parsed) => {
-          const { type, subject } = parsed;
-          // Skip non-TDD types
-          if (!['Red', 'Green', 'Refactor'].includes(type)) {
-            return [true];
-          }
-          // Check TDD tag format: [Red] T{number} description
-          const tddPattern = /^T\d+\s+/;
-          if (!tddPattern.test(subject)) {
-            return [false, `TDD commits must start with T{task_id}. Got: "${subject}"`];
-          }
+        'tdd-header': (parsed) => {
+          const { subject } = parsed;
+          if (!subject) return [false, 'Subject is required'];
           return [true];
         },
       },

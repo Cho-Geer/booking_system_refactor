@@ -4,7 +4,7 @@
     "version": "3.0.0",
     "project": "appointment-booking-system",
     "description": "v3.0.0: 五维状态追踪（类型检查/架构边界/格式化/Write-Time审计/安全）。双防线：Write-Time即时阻断 + Commit-Time全量扫描。强制16项约束规则。",
-    "lastUpdated": "2026-05-15T02:31:49.108Z"
+    "lastUpdated": "2026-05-15T06:04:52.149Z"
   },
   "feature_flags": {
     "write_time_audit": {
@@ -151,12 +151,12 @@
     "status": "dirty"
   },
   "eslint_state": {
-    "last_full_scan": "2026-05-15T02:31:49.108Z",
+    "last_full_scan": "2026-05-15T06:04:52.149Z",
     "modules": {
       "all_modules": {
         "status": "clean",
         "violations": [],
-        "last_check": "2026-05-15T02:31:49.108Z",
+        "last_check": "2026-05-15T06:04:52.149Z",
         "waivers_applied": []
       },
       "unknown": {
