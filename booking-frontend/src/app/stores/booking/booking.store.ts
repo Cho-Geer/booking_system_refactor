@@ -35,7 +35,7 @@ export const initialBookingState: BookingState = {
 export const BookingStore = signalStore(
   { providedIn: 'root' },
   withState<BookingState>(initialBookingState),
-  withComputed(({ slots, selectedSlot, activeBookings, services, bookings }) => ({
+  withComputed(({ slots, selectedSlot }) => ({
     availableSlots: computed(() => slots().filter(slot => slot.available)),
     bookedSlots: computed(() => slots().filter(slot => !slot.available)),
     hasSelection: computed(() => selectedSlot() !== null),

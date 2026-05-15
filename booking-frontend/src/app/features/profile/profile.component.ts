@@ -82,12 +82,12 @@ export class ProfileComponent {
     this.api.updateProfile({ name }).subscribe({
       next: (response) => {
         this.authStore.setUserProfile({
-          id: response.user.id,
-          name: response.user.name,
-          role: response.user.role,
-          email: response.user.email,
-          phone: response.user.phone,
-          createdAt: (response.user as { createdAt?: string }).createdAt,
+          id: response.id,
+          name: response.name,
+          role: response.role,
+          email: response.email,
+          phone: response.phone,
+          createdAt: response.createdAt,
         });
         this.isEditing.set(false);
         this.isSaving.set(false);

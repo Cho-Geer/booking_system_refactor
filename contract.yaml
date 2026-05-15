@@ -355,17 +355,14 @@ api:
             body:
               type: "object"
               properties:
-                  user:
-                    type: "object"
-                    properties:
-                       id: { type: "string" }
-                       email: { type: "string", description: "脱敏展示，如 us***@example.com" }
-                       name: { type: "string" }
-                       phone: { type: "string", description: "脱敏展示，如 138****5678" }
-                       role: { type: "string", enum: ["CUSTOMER", "ADMIN", "SUPER_ADMIN"] }
-                       status: { type: "string", enum: ["ACTIVE", "INACTIVE", "BLOCKED"] }
-                       preferredTimezone: { type: "string", description: "用户偏好时区（IANA 字符串，可空）" }
-                       created_at: { type: "string", format: "date-time" }
+                id: { type: "string" }
+                email: { type: "string", description: "脱敏展示，如 us***@example.com" }
+                name: { type: "string" }
+                phone: { type: "string", description: "脱敏展示，如 138****5678" }
+                role: { type: "string", enum: ["CUSTOMER", "ADMIN", "SUPER_ADMIN"] }
+                status: { type: "string", enum: ["ACTIVE", "INACTIVE", "BLOCKED"] }
+                preferredTimezone: { type: "string", description: "用户偏好时区（IANA 字符串，可空）" }
+                created_at: { type: "string", format: "date-time" }
 
       update_profile:
         method: "PUT"
@@ -383,16 +380,14 @@ api:
             body:
               type: "object"
               properties:
-                user:
-                  type: "object"
-                  properties:
-                    id: { type: "string" }
-                    email: { type: "string", description: "脱敏展示，如 us***@example.com" }
-                    name: { type: "string" }
-                    phone: { type: "string", description: "脱敏展示，如 138****5678" }
-                    role: { type: "string", enum: ["CUSTOMER", "ADMIN", "SUPER_ADMIN"] }
-                    status: { type: "string", enum: ["ACTIVE", "INACTIVE", "BLOCKED"] }
-                    created_at: { type: "string", format: "date-time" }
+                id: { type: "string" }
+                email: { type: "string", description: "脱敏展示，如 us***@example.com" }
+                name: { type: "string" }
+                phone: { type: "string", description: "脱敏展示，如 138****5678" }
+                role: { type: "string", enum: ["CUSTOMER", "ADMIN", "SUPER_ADMIN"] }
+                status: { type: "string", enum: ["ACTIVE", "INACTIVE", "BLOCKED"] }
+                created_at: { type: "string", format: "date-time" }
+                _message: { type: "string", example: "资料已更新" }
 
       update_timezone:
         method: "PATCH"
@@ -1939,6 +1934,8 @@ security:
 # ============================================
 
 testing:
+  deprecated: true
+  replaced_by: x-coverage-matrix
   strategy: "TDD (Test-Driven Development) with RED/GREEN/REFACTOR cycles"
   
   layers:
@@ -1976,6 +1973,184 @@ testing:
     rule: "No business code without failing test first"
     process: "RED (write failing test) → GREEN (minimal code) → REFACTOR (improve)"
     gate: "All tests must pass before code review"
+
+# ============================================
+# 6a. Test Mock Policy (ARB-002)
+# ============================================
+
+x-test-mock-policy:
+  description: "Three-tier mock governance enforced by ESLint mock-audit plugin"
+  version: "2.1.0"
+  enforcement: "compliance_gate_complete + ESLint MCP tool"
+  
+  rules:
+    no-tier1-mock:
+      cat: "1.1"
+      level: "error"
+      description: "Forbid jest.spyOn/jest.mock on TIER1 services (PrismaService, RedisService, ConfigService)"
+    no-skipped-tests:
+      cat: "1.2"
+      level: "error"
+      description: "Forbid skipped tests (describe.skip, it.skip, xdescribe, xit)"
+    no-skipped-audit:
+      cat: "1.0"
+      level: "error"
+      description: "eslint-disable bypass of TIER1 mock audit must reference a valid @Arbiter waiver ID"
+    no-console-log:
+      cat: "2.1"
+      level: "error"
+      description: "Forbid console.log/error/warn in production code"
+    tier3-verify:
+      cat: "3.1"
+      level: "warn"
+      description: "TIER3 mocks must verify call parameters with toHaveBeenCalledWith"
+    no-uncovered-switch:
+      cat: "3.2"
+      level: "warn"
+      description: "Switch statements should have a default branch"
+  
+  tier_definition:
+    tier1_real_only:
+      services:
+        - PrismaService
+        - RedisService
+        - ConfigService
+      mock_policy: "forbidden"
+      error_level: "error"
+      es_lint_rule: "booking/no-tier1-mock"
+    tier2_fake_ok:
+      services:
+        - JwtService
+        - QueueService
+        - NotificationGateway
+        - RateLimiterService
+      mock_policy: "warn"
+      error_level: "warn"
+    tier3_boundary_mock:
+      services:
+        - EmailService
+        - SMSService
+      mock_policy: "require_param_verification"
+      error_level: "warn"
+      es_lint_rule: "booking/tier3-verify"
+
+  integration_test_requirement:
+    mode: "per_module"
+    modules:
+      - appointments
+      - auth
+      - cache
+      - email
+      - health
+      - notifications
+      - rate-limiter
+      - services
+      - stats
+      - time-slots
+      - users
+      - verification
+
+  waive_policy:
+    requires_arbiter: true
+    requires_tech_debt_registry: true
+    max_validity_hours: 720  # 30 days
+    bypass_detection_rule: "booking/no-skipped-audit"
+
+# ============================================
+# 6b. Test Contract (ARB-002)
+# ============================================
+
+x-test-contract:
+  description: "Test framework configuration and lifecycle requirements"
+  framework:
+    backend:
+      unit: "Jest + NestJS testing utilities"
+      integration: "Supertest + Testcontainers (PostgreSQL 16, Redis 7.x)"
+      mutation: "Stryker"
+    frontend:
+      unit: "Jest + Angular Testing Library"
+      component: "Angular TestBed"
+    e2e:
+      tool: "Playwright"
+
+  lifecycle:
+    RED:
+      action: "Write failing test before any business code"
+      commit_tag: "[Red] {task_id}"
+    GREEN:
+      action: "Write minimal code to pass"
+      commit_tag: "[Green] {task_id}"
+    REFACTOR:
+      action: "Improve code quality while keeping all tests green"
+      commit_tag: "[Refactor] {task_id}"
+
+  evidence_requirements:
+    - artifact: "test_report.json"
+      field: "execution_evidence"
+      description: "Must contain key summary or assertion results from test command output"
+    - artifact: "HANDOVER.md"
+      description: "Task handover summary with core changes, assumptions, pitfalls"
+    - artifact: "TASK_LOG.md"
+      description: "Working memory scratchpad recording modification plan and key decisions"
+
+# ============================================
+# 6c. Coverage Matrix (ARB-002)
+# ============================================
+
+x-coverage-matrix:
+  description: "Per-priority coverage thresholds enforced at CI quality gates"
+  priorities:
+    P0:
+      name: "Critical"
+      description: "Core business logic, authentication, high-concurrency paths"
+      coverage:
+        lines: 90
+        branches: 85
+        functions: 90
+        statements: 90
+      modules:
+        - "auth"
+        - "appointments"
+        - "users"
+
+    P1:
+      name: "High"
+      description: "Secondary business logic, admin operations"
+      coverage:
+        lines: 80
+        branches: 75
+        functions: 80
+        statements: 80
+      modules:
+        - "admin"
+        - "services"
+        - "time-slots"
+
+    P2:
+      name: "Medium"
+      description: "Infrastructure, shared utilities, cross-cutting concerns"
+      coverage:
+        lines: 70
+        branches: 65
+        functions: 70
+        statements: 70
+      modules:
+        - "cache"
+        - "notifications"
+        - "email"
+        - "rate-limiter"
+
+    P3:
+      name: "Low"
+      description: "Configuration, health checks, non-critical paths"
+      coverage:
+        lines: 50
+        branches: 40
+        functions: 50
+        statements: 50
+      modules:
+        - "health"
+        - "config"
 
 # ============================================
 # 7. Deployment Contract

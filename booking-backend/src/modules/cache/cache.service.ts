@@ -29,7 +29,7 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
   private isConnected = false;
 
   constructor(
-    @Inject(REDIS_CONFIG_TOKEN) private readonly config: RedisConfig,
+    @Inject(REDIS_CONFIG_TOKEN) config: RedisConfig,
   ) {
     this.prefix = config.keyPrefix;
     this.ttlDefault = config.ttlDefault;

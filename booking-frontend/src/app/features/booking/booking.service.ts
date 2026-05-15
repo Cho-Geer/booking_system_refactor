@@ -36,7 +36,6 @@ export class BookingService {
    */
   async reserveSlot(slotId: string, maxSlots: number = DEFAULT_MAX_SLOTS): Promise<ReservationResponse> {
     const preferSeq = this.generatePreferSeq(maxSlots);
-    const idempotencyKey = this.generateIdempotencyKey();
     const serviceId = this.store.selectedServiceId();
 
     if (!serviceId) {

@@ -24,6 +24,7 @@ import {
   CreateAppointmentDto,
   UpdateAppointmentDto,
 } from "./dto/appointment.dto";
+import { Request } from "express";
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../../common/guards/roles.guard";
 import { Roles } from "../../common/decorators/roles.decorator";
@@ -49,13 +50,16 @@ export class AppointmentsController {
   @ApiResponse({ status: 409, description: "Time slot not available" })
   async create(
     @Body() createAppointmentDto: CreateAppointmentDto,
-    @Req() req,
+    @Req() req: Request,
     @Headers("idempotency-key") idempotencyKey: string,
   ) {
     if (!idempotencyKey) {
       throw new BadRequestException("Idempotency-Key header is required");
     }
-    const userId = req?.user?.id;
+    const userId = (req.user as { id?: string } | undefined)?.id;
+    if (!userId) {
+      throw new BadRequestException("User not authenticated");
+    }
 
     const cacheKey = `idempotent:apt:${idempotencyKey}`;
     const cached = await this.cacheService.get(cacheKey);
@@ -89,11 +93,11 @@ export class AppointmentsController {
   @ApiOperation({ summary: "Get my appointments" })
   @ApiResponse({ status: 200, description: "List of user appointments" })
   async getMyAppointments(
-    @Req() req,
+    @Req() req: Request,
     @Query("page", OptionalParseIntPipe) page: number = 1,
     @Query("limit", OptionalParseIntPipe) limit: number = 20,
   ) {
-    const userId = req?.user?.id;
+    const userId = (req.user as { id?: string } | undefined)?.id;
     return this.appointmentsService.findAll(page, limit, undefined, userId);
   }
 

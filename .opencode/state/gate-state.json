@@ -4755,6 +4755,534 @@
         "execution_summary": "Converted all hardcoded English text to TranslatePipe across 28 admin component files. Added TranslatePipe imports to 14 TypeScript files. Converted ~150+ hardcoded strings to admin.*, global.*, sidebar.*, and admin.quickBooking.* translation keys in HTML templates. Updated dashboard.ts stat card labels and system status labels to use translation keys. Updated stat-card template to pipe-translate labels and target text. tsc --noEmit passes cleanly.",
         "completed_at": "2026-05-13T09:56:09.951Z"
       }
+    },
+    "cg_ses_1778706057006": {
+      "session_id": "cg_ses_1778706057006",
+      "created_at": "2026-05-13T21:00:57.007Z",
+      "task_description": "Coder-FE: Fix User.preferredTimezone gaps in frontend - add preferredTimezone to api.service.ts getUserProfile() return type and auth.store.ts fetchUserProfile() mapping",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "FE preferredTimezone wiring fix: RED tests for auth.store.ts + api.service.ts, then GREEN implementation adding preferredTimezone to getUserProfile() return type and fetchUserProfile() mapping, then verify with tests and tsc",
+      "confirmed_at": "2026-05-13T21:59:42.363Z",
+      "consumed_at": "2026-05-13T22:01:48.911Z",
+      "audit": {
+        "execution_summary": "Coder-FE: Fixed User.preferredTimezone frontend wiring gap. Added preferredTimezone? to getUserProfile() return type in api.service.ts (2 spots: outer Observable type + inner ApiResponse type). Added preferredTimezone: profile.preferredTimezone mapping to fetchUserProfile() in auth.store.ts. TDD process: wrote 2 RED tests (FAILED correctly), implemented GREEN fixes (tests PASS). tsc --noEmit clean. Pre-existing test failures (9 unrelated) untouched.",
+        "completed_at": "2026-05-13T22:01:48.911Z"
+      }
+    },
+    "cg_ses_1778709234837": {
+      "session_id": "cg_ses_1778709234837",
+      "created_at": "2026-05-13T21:53:54.837Z",
+      "task_description": "Enhance current test architecture to be as strict as possible following TDD principles, achieving comprehensive and strict issue detection. Scope: audit existing test structure, testing standards, coverage, hooks, and CI pipeline; then design and enforce stricter TDD-aligned test architecture.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Enhance test architecture: (1) TDD双速层: Fake优先(<5s本地循环)+Real验证(CI门禁), (2) Mock三级分类: REAL-ONLY(Prisma/Redis/Config)/FAKE-OK(Jwt/BullMQ)/BOUNDARY-MOCK(Email/SMS), (3) 覆盖率升级: P0≥95%/P1≥85%/Global≥85%, (4) CI多层门禁: pre-commit→Unit→Integration→Mutation(kill≥85%)→E2E→VisualRegression→Performance→ContractVerify, (5) 新测试类型: 属性/模糊/契约/混沌/视觉回归, (6) @Architect 交付: contract.yaml扩展+testing-coding-standard v2.0+test/fakes/+RealTestModule+容器池+husky+GitHubActions+ESLint规则. 双仓库独立: Root管标准, Inner管实现.",
+      "confirmed_at": "2026-05-13T23:00:14.017Z",
+      "consumed_at": "2026-05-14T00:10:19.437Z",
+      "audit": {
+        "execution_summary": "Test Architecture v2.0 complete. 7 agents dispatched sequentially/parallelly: @Architect designed 11 specs, @Arbiter approved contract extensions (WV-2026-002), @Coder-BE implemented test/fakes/ (5 fakes, 94 tests), RealTestModule, ContainerPool, SchemaManager, Jest configs, ESLint mock-audit, and contract.yaml extensions (144 lines, x-test-mock-policy/x-test-contract/x-coverage-matrix), @CI-CD-Agent(general) implemented 7-stage CI pipeline test-gates.yml + pre-commit hook + docker-compose.ci.yml + 5 npm scripts, @Coder-FE updated frontend jest.config.js thresholds + property-based testing + visual regression (45 tests). @Guardian final review: PASS. Dual-repo integrity maintained: Root = testing-standard.md v2.0, Inner = all implementation artifacts.",
+        "completed_at": "2026-05-14T00:10:19.437Z"
+      }
+    },
+    "cg_ses_1778713381198": {
+      "session_id": "cg_ses_1778713381198",
+      "created_at": "2026-05-13T23:03:01.198Z",
+      "task_description": "Design enhanced TDD-aligned test architecture for booking system: mock minimization policy, dual-speed TDD strategy, coverage threshold upgrade, CI gate pipeline, pre-commit hooks, new test types (property/fuzz/contract/chaos/visual/negative), evidence chain enhancement, contract.yaml extension, testing-coding-standard.md v2.0 update",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Design enhanced TDD-aligned test architecture v2.0. 5 phases: (1) Deep context analysis of existing contract.yaml, testing-standard.md, jest configs, CI; (2) Architecture design of 11 deliverables including contract extension, fake services, RealTestModule, ContainerPool, pre-commit hooks, 7-stage CI gates, ESLint mock rules, coverage matrix, property/fuzz/contract/chaos strategies, constraint rules; (3) Root repo update: testing-coding-standard.md v2.0 with ADRs; (4) Inner repo design specs to .task_temp/TEST-ARCH-V2/; (5) Guardian constraint rules. No business logic code, no unilateral contract.yaml modification. All design specs are implementation blueprints for @Coder-BE/@Coder-FE.",
+      "confirmed_at": "2026-05-13T23:20:38.856Z",
+      "consumed_at": "2026-05-13T23:38:41.783Z",
+      "audit": {
+        "execution_summary": "Completed enhanced TDD-aligned test architecture v2.0 design for booking system. Delivered: (1) testing-coding-standard.md v2.0 written to Root repo at .opencode/context/code_standards/ with 5 ADRs; (2) 11 design specification documents written to .task_temp/TEST-ARCH-V2/ covering contract extension, fake services, RealTestModule, ContainerPool, pre-commit hooks, 7-stage CI pipeline, ESLint mock rules, coverage matrix, advanced test strategies (property/fuzz/contract/chaos/visual/negative), and architecture constraint rules for @Guardian. No business logic implementation code generated. No contract.yaml modified. All outputs are design blueprints for @Coder-BE/@Coder-FE/@CI-CD-Agent to implement.",
+        "completed_at": "2026-05-13T23:38:41.783Z"
+      }
+    },
+    "cg_ses_1778716493048": {
+      "session_id": "cg_ses_1778716493048",
+      "created_at": "2026-05-13T23:54:53.048Z",
+      "task_description": "Approve contract.yaml extension design for Test Architecture v2.0 - Review x-test-mock-policy, x-test-contract, and x-coverage-matrix sections for backward compatibility, enforceability, and alignment with project standards",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Arbitration of contract.yaml extension design for Test Architecture v2.0: Review x-test-mock-policy, x-test-contract, and x-coverage-matrix sections. Verdict: APPROVED with 3 conditions (ARB-001: Stryker dependency for mutation_kill_rate, ARB-002: deprecate existing testing section, ARB-003: fake file existence validation). Output WAIVE.md + TECH_DEBT_REGISTRY update.",
+      "confirmed_at": "2026-05-13T23:56:14.105Z",
+      "consumed_at": "2026-05-13T23:59:01.674Z",
+      "audit": {
+        "execution_summary": "Arbitration of contract.yaml extension design for Test Architecture v2.0: Reviewed x-test-mock-policy, x-test-contract, x-coverage-matrix. VERDICT: APPROVED with 3 conditions (ARB-001 mutation_kill_rate Stryker dependency, ARB-002 deprecate existing testing section, ARB-003 gate CI mock-audit on fake file existence). Produced WAIVE.md, updated TECH_DEBT_REGISTRY.md with 4 waiver records (WV-2026-002 through WV-2026-005).",
+        "completed_at": "2026-05-13T23:59:01.674Z"
+      }
+    },
+    "cg_ses_1778716507334": {
+      "session_id": "cg_ses_1778716507334",
+      "created_at": "2026-05-13T23:55:07.334Z",
+      "task_description": "Implement Test Architecture v2.0 backend infrastructure - Fakes, RealTestModule, ContainerPool, Jest configs, ESLint rules",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Implement Test Architecture v2.0 backend: 5 fake services with self-tests, RealTestModule, ContainerPool, SchemaManager, Jest config threshold updates, ESLint mock audit rules. TDD RED→GREEN per component.",
+      "confirmed_at": "2026-05-13T23:56:08.073Z",
+      "consumed_at": "2026-05-14T00:02:28.386Z",
+      "audit": {
+        "execution_summary": "Implemented Test Architecture v2.0 backend infrastructure: 5 fake services (FakeEventBus, FakeMessageQueue, LocalJwtSigner, FakeRateLimiter, FakePrismaClient) with 71 self-tests, RealTestModule + DockerChecker + TestInfraSelector, ContainerPool singleton, SchemaManager, updated Jest configs with per-module coverage thresholds (3 configs), Custom ESLint mock-audit rule blocking jest.spyOn on TIER1 services. All 94 tests pass, typecheck passes, ESLint passes.",
+        "completed_at": "2026-05-14T00:02:28.386Z"
+      }
+    },
+    "cg_ses_1778716573992": {
+      "session_id": "cg_ses_1778716573992",
+      "created_at": "2026-05-13T23:56:13.992Z",
+      "task_description": "Implement Test Architecture v2.0 CI/CD infrastructure: 7-stage CI pipeline, pre-commit hook, docker-compose.ci.yml, package.json scripts for booking system",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Implement Test Architecture v2.0 CI/CD: 7-stage test-gates.yml, .husky/pre-commit hook, docker-compose.ci.yml, package.json scripts for booking_system_refactor",
+      "confirmed_at": "2026-05-13T23:58:58.684Z",
+      "consumed_at": "2026-05-13T23:59:01.435Z",
+      "audit": {
+        "execution_summary": "Created Test Architecture v2.0 CI/CD infrastructure: (1) .github/workflows/test-gates.yml — 13 jobs across 7 stages with matrix strategy, concurrency group, service containers, flaky retry detection, and merge gate; (2) .husky/pre-commit — 4 checks (tsc, keystone:hash:verify, eslint mock-audit, jest --onlyChanged) with <10s budget; (3) docker-compose.ci.yml — PostgreSQL 16-alpine (tmpfs) + Redis 7-alpine with health checks; (4) package.json — added test:fake, test:real, test:ci, test:mutation, test:visual scripts. YAML and shell syntax validated.",
+        "completed_at": "2026-05-13T23:59:01.435Z"
+      }
+    },
+    "cg_ses_1778716987286": {
+      "session_id": "cg_ses_1778716987286",
+      "created_at": "2026-05-14T00:03:07.286Z",
+      "task_description": "Modify contract.yaml per Arbiter approval (WV-2026-002) - Add x-test-mock-policy, x-test-contract, x-coverage-matrix sections, mark existing testing: as deprecated",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Modify contract.yaml: (1) add deprecated: true and replaced_by: x-coverage-matrix to existing testing: section, (2) add three new extension sections (x-test-mock-policy, x-test-contract, x-coverage-matrix) after testing section, (3) run npm run keystone:hash to update machine.json. No other files modified.",
+      "confirmed_at": "2026-05-14T00:03:39.373Z",
+      "consumed_at": "2026-05-14T00:04:24.758Z",
+      "audit": {
+        "execution_summary": "Modified contract.yaml per ARB-002: marked testing section deprecated with replaced_by: x-coverage-matrix; added three new extension sections (x-test-mock-policy with 3-tier governance, x-test-contract with framework/lifecycle config, x-coverage-matrix with P0-P3 thresholds); ran npm run keystone:hash to sync machine.json. Output deliverables: TASK_LOG.md, HANDOVER.md, test_report.json.",
+        "completed_at": "2026-05-14T00:04:24.758Z"
+      }
+    },
+    "cg_ses_1778716992453": {
+      "session_id": "cg_ses_1778716992453",
+      "created_at": "2026-05-14T00:03:12.453Z",
+      "task_description": "Update frontend test strategy to align with Test Architecture v2.0 - update jest.config.js coverage thresholds, set up visual regression testing, set up property-based testing, update test patterns",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Update frontend test strategy: 1) Update jest.config.js coverageThresholds 2) Set up visual regression testing with Playwright 3) Set up property-based testing with fast-check 4) Create HANDOVER.md with Real-First migration guide",
+      "confirmed_at": "2026-05-14T00:04:02.048Z",
+      "consumed_at": "2026-05-14T00:07:32.578Z",
+      "audit": {
+        "execution_summary": "Updated frontend test strategy to align with Test Architecture v2.0. Updated jest.config.js with new coverageThreshold (global: 85/80/85/85; features/stores: 95/90/95/95; shared: 85/80; core: 90/85/90/90). Created TimeFormatPipe with tests (12 tests). Added property-based tests (8 tests) using fast-check for TranslatePipe and TimeFormatPipe invariants. Set up Playwright visual regression testing with config and app-snapshots spec. Created HANDOVER.md with Real-First migration guide. All 45 new/existing tests pass.",
+        "completed_at": "2026-05-14T00:07:32.578Z"
+      }
+    },
+    "cg_ses_1778717287735": {
+      "session_id": "cg_ses_1778717287735",
+      "created_at": "2026-05-14T00:08:07.735Z",
+      "task_description": "Guardian — Quality Gate review of ALL Test Architecture v2.0 implementations across backend, frontend, CI, and contract layers",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Guardian Quality Gate review of Test Architecture v2.0 across 10 areas: testing standards, contract, fakes, setup infrastructure, jest configs, ESLint rules, CI pipeline, pre-commit hooks, frontend, and evidence chain",
+      "confirmed_at": "2026-05-14T00:09:37.359Z",
+      "consumed_at": "2026-05-14T00:10:07.362Z",
+      "audit": {
+        "execution_summary": "Guardian Quality Gate review of Test Architecture v2.0 completed: PASS verdict. Reviewed 10 areas (testing standards, contract, fakes, setup infra, jest configs, ESLint rules, CI pipeline, pre-commit hooks, frontend, evidence chain). All CAT1-CAT6 checklists pass. Report written to .task_temp/TEST-ARCH-V2/guardian_report.md",
+        "completed_at": "2026-05-14T00:10:07.362Z"
+      }
+    },
+    "cg_ses_1778717675054": {
+      "session_id": "cg_ses_1778717675054",
+      "created_at": "2026-05-14T00:14:35.054Z",
+      "task_description": "Analyze the current codebase and plan comprehensive integration tests for the booking system. The task will: 1) Review existing integration tests in booking-backend/test/*.integration.spec.ts and e2e specs to understand current coverage. 2) Review the contract.yaml for all API endpoints and their contracts. 3) Identify gaps in integration test coverage across all major workflows (auth, users, appointments, services, time-slots, admin). 4) Review the test infrastructure (Testcontainers, jest-integration config, global setup). 5) Produce a detailed integration test plan covering: endpoint coverage matrix, data seeding strategy, test isolation approach, and TDD RED/GREEN phase schedule. Do NOT write any test code - only analysis and planning.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Phase 1: Reconnaissance - discover all existing integration tests via glob, read contract.yaml, review test infrastructure config. Phase 2: Gap analysis - map endpoints to tests, identify missing coverage. Phase 3: Infrastructure review - Testcontainers setup, data seeding, isolation. Phase 4: Produce integration test plan with endpoint coverage matrix, seeding strategy, isolation approach, TDD RED/GREEN schedule. Output to .task_temp/{taskId}/integration_test_plan.md. Read-only, no code written.",
+      "confirmed_at": "2026-05-14T00:17:52.364Z",
+      "consumed_at": "2026-05-14T00:25:06.284Z",
+      "audit": {
+        "execution_summary": "Phase 1: Discovered 6 integration test files (2852 lines), 5 e2e files, 70+ unit test files. Full test infrastructure assessment (Testcontainers PG16+Redis7, global setup/teardown, factories, fixtures, helpers). Phase 2: Mapped all 47 contract endpoints to existing test coverage — identified 20% direct coverage vs 90%+ target. Phase 3: Infrastructure rated STRONG overall with gaps in integration config file and transaction-level isolation. Phase 4: Produced comprehensive integration test plan with 26 TDD RED/GREEN cycles across 4 phases, endpoint coverage matrix, data seeding strategy (tiered), test isolation approach (hybrid truncation+transaction), and file structure recommendations. Output: .task_temp/architect-booking-integration-20260514/integration_test_plan.md (~14 sections).",
+        "completed_at": "2026-05-14T00:25:06.284Z"
+      }
+    },
+    "cg_ses_1778718725917": {
+      "session_id": "cg_ses_1778718725917",
+      "created_at": "2026-05-14T00:32:05.917Z",
+      "task_description": "Execute Phase 1 (P0 Critical) of the integration test plan: fix existing integration tests for contract path alignment (/v1/ prefix), then create new integration tests for P0 endpoints (appointments contract, user profile, SMS login, password reset, high-concurrency booking, idempotency-key, RBAC matrix) following TDD RED/GREEN cycles.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Phase 1 integration tests: R1 contract path alignment (fix existing tests), then R2-R8 new integration tests (appointments contract, user profile, SMS login, password reset, high-concurrency, RBAC), each cycle strictly following TDD RED→GREEN.",
+      "confirmed_at": "2026-05-14T00:32:16.867Z",
+      "consumed_at": "2026-05-14T00:54:51.627Z",
+      "audit": {
+        "execution_summary": "Phase 1 integration tests complete. Cycle R1 (contract path alignment) fixed 4 existing test files - 115 tests all GREEN. Cycles R2-R8 created 6 new integration test files (38 tests). Total: 12 suites, 153 tests all passing. Key fixes: /v1/ prefix alignment, Idempotency-Key header, login refreshToken cookie handling, DTO body format, pagination format, RBAC enforcement verified.",
+        "completed_at": "2026-05-14T00:54:51.627Z"
+      }
+    },
+    "cg_ses_1778720315773": {
+      "session_id": "cg_ses_1778720315773",
+      "created_at": "2026-05-14T00:58:35.773Z",
+      "task_description": "Execute Phase 2 (Cycles R9-R16) of the integration test plan: Admin Module Coverage. Create new integration test files for admin stats, admin users, admin services, admin appointments, admin settings, admin notifications, and admin system endpoints. Follow TDD RED→GREEN strictly for each cycle.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Phase 2 integration tests: Cycles R9-R16 Admin module coverage. R9-R10 admin stats (dashboard + sub-endpoints), R11 admin users CRUD, R12 admin services CRUD + summary, R13 admin appointments (Quick Booking), R14 admin settings business-hours, R15 admin notifications, R16 admin system health/metrics. Each cycle follows TDD RED→GREEN.",
+      "confirmed_at": "2026-05-14T00:59:02.194Z",
+      "consumed_at": "2026-05-14T01:09:29.211Z",
+      "audit": {
+        "execution_summary": "Phase 2 complete: 7 new admin integration test files created (admin-stats, admin-users, admin-services, admin-appointments, admin-settings, admin-notifications, admin-system) with 36 tests. Full suite: 19 suites, 189 tests all GREEN. Admin CRUD endpoints coverage added for stats, users, services, appointments, settings, notifications, system.",
+        "completed_at": "2026-05-14T01:09:29.211Z"
+      }
+    },
+    "cg_ses_1778721184705": {
+      "session_id": "cg_ses_1778721184705",
+      "created_at": "2026-05-14T01:13:04.705Z",
+      "task_description": "Execute Phase 3 (Cycles R17-R21) of the integration test plan: Translation module endpoints, user profile update/timezone, appointment state machine transitions, and response envelope validation. Follow TDD RED→GREEN strictly for each cycle.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Phase 3 integration tests: R17-R18 translation module (public + admin), R19 user profile update/timezone, R20 appointment state machine transitions, R21 response envelope validation. Each cycle follows TDD RED→GREEN. Add to existing files for R19-R20 where applicable.",
+      "confirmed_at": "2026-05-14T01:13:22.925Z",
+      "consumed_at": "2026-05-14T01:18:24.214Z",
+      "audit": {
+        "execution_summary": "Phase 3 complete: R17-R18 Translation module (9 tests), R19 profile update+timezone (+4 tests), R20 appointment state machine (+5 tests), R21 response envelope validation (8 tests). Total: 21 suites, 215 tests all GREEN. Phases 1-3 cumulative: 21 suites, 215 tests, all passing.",
+        "completed_at": "2026-05-14T01:18:24.214Z"
+      }
+    },
+    "cg_ses_1778722189521": {
+      "session_id": "cg_ses_1778722189521",
+      "created_at": "2026-05-14T01:29:49.521Z",
+      "task_description": "Execute Phase 4 (Cycles R22-R26) of the integration test plan: WebSocket events (appointment.status_changed, slot.booked, JWT auth handshake), overtime overlap detection, and appointment state machine full path testing. Follow TDD RED→GREEN strictly.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Phase 4 integration tests: R22-R24 WebSocket events (appointment.status_changed, slot.booked, JWT auth) using socket.io-client connected to real HTTP server, R25 overtime overlap detection, R26 appointment state machine full path. Each cycle TDD RED→GREEN.",
+      "confirmed_at": "2026-05-14T01:30:47.597Z",
+      "consumed_at": "2026-05-14T01:37:19.665Z",
+      "audit": {
+        "execution_summary": "Phase 4 complete: R22-R24 WebSocket events (5 tests), R25 overtime overlap (2 tests), R26 full state machine (8 tests). Final total: 23 suites, 230 tests, ALL GREEN. All 26 cycles of the integration test plan (R1-R26) from all 4 phases are complete.",
+        "completed_at": "2026-05-14T01:37:19.665Z"
+      }
+    },
+    "cg_ses_1778727119344": {
+      "session_id": "cg_ses_1778727119344",
+      "created_at": "2026-05-14T02:51:59.345Z",
+      "task_description": "Verify CI-CD-Agent dispatch success: list skills and MCP tools from agent config, confirm dispatchability",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Verify CI-CD-Agent dispatch: list skills & MCP tools from config, confirm dispatchability. Read-only, no code changes.",
+      "confirmed_at": "2026-05-14T02:52:04.974Z",
+      "consumed_at": "2026-05-14T02:52:08.451Z",
+      "audit": {
+        "execution_summary": "Verified CI-CD-Agent dispatch: listed 10 skills and 4 MCP tools from agent config, confirmed dispatchability.",
+        "completed_at": "2026-05-14T02:52:08.451Z"
+      }
+    },
+    "cg_ses_1778730260316": {
+      "session_id": "cg_ses_1778730260316",
+      "created_at": "2026-05-14T03:44:20.317Z",
+      "task_description": "Fix Docker startup: database tables missing and translations not seeded. Fix Dockerfile.dev CMD to run migrations+seed before start, add translation seeding to prisma/seed.ts, add P2021 to PRISMA_ERROR_MAP in global-exception.filter.ts. Follow TDD strictly.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix Docker startup: database tables missing and translations not seeded. Phase 1 (RED tests): write failing tests for P2021 handling and translation seeding. Phase 2 (GREEN): fix Dockerfile.dev CMD, prisma/seed.ts translation seeding, global-exception.filter.ts P2021. Phase 3 (REFACTOR): lint, typecheck, test coverage verification.",
+      "confirmed_at": "2026-05-14T03:46:10.668Z",
+      "consumed_at": "2026-05-14T03:58:36.388Z",
+      "audit": {
+        "execution_summary": "Fixed Docker startup issues: (1) Dockerfile.dev CMD now runs migrations+seed before start, (2) prisma/seed.ts now imports and calls seedDefaultTranslations() for translation seeding, (3) global-exception.filter.ts now maps P2021 to a descriptive 500 error. Followed TDD: wrote RED tests first (P2021 handler test + seed tests), then GREEN implementation. All 4 seed tests pass, P2021 test passes. Only 1 pre-existing test failure remains (unrelated String HttpException handling).",
+        "completed_at": "2026-05-14T03:58:36.388Z"
+      }
+    },
+    "cg_ses_1778740311899": {
+      "session_id": "cg_ses_1778740311899",
+      "created_at": "2026-05-14T06:31:51.900Z",
+      "task_description": "Add missing English translation keys to translations-seed.service.ts and re-seed the database. The user sees raw translation keys on admin pages. Add missing keys with appropriate English values to the defaultTranslations array in booking-backend/src/modules/translations/translations-seed.service.ts for domains: admin (services, quickBooking, appointments, users, system), sidebar (history, reports), auth (role.admin), profile (editProfile). Then run `docker exec booking-backend npx prisma db seed` to re-seed the database.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Add 37 missing English translation keys across admin/services, admin/quickBooking, admin/appointments, admin/users, admin/system, sidebar, auth, and profile domains in translations-seed.service.ts, then re-seed database via docker exec",
+      "confirmed_at": "2026-05-14T06:34:36.496Z",
+      "consumed_at": "2026-05-14T06:37:32.903Z",
+      "audit": {
+        "execution_summary": "Added 37 missing English translation keys across 8 domains (admin/services, admin/quickBooking, admin/appointments, admin/users, admin/system, sidebar, auth, profile) in translations-seed.service.ts. Updated test bounds in translation-seed.spec.ts. Re-seeded database via docker exec. Verified 446 total records (37 new keys confirmed in DB).",
+        "completed_at": "2026-05-14T06:37:32.903Z"
+      }
+    },
+    "cg_ses_1778741894306": {
+      "session_id": "cg_ses_1778741894306",
+      "created_at": "2026-05-14T06:58:14.306Z",
+      "task_description": "Fix translation seed file issues: 1) Fix pagination text for pageReport keys, 2) Change \"Administrator\" to \"ADMIN\", 3) Add 9 missing translation keys, then re-seed Docker database",
+      "gate_status": "checked",
+      "last_check_failed_items": [],
+      "plan_summary": null,
+      "confirmed_at": null,
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1778742974710": {
+      "session_id": "cg_ses_1778742974710",
+      "created_at": "2026-05-14T07:16:14.711Z",
+      "task_description": "Fix page navigation dropdowns on admin Booking, Users, and Services pages - dropdowns are being clipped by table container height constraints",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix page navigation dropdown clipping on 3 admin pages: root cause is overflow-hidden class on app-table-wrapper component. Plan: 1) RED phase: update unit test to expect no overflow-hidden; 2) GREEN phase: remove overflow-hidden from template; 3) Verify with Playwright screenshots on admin Booking/Users/Services pages; 4) REFACTOR: ensure visual integrity of rounded corners.",
+      "confirmed_at": "2026-05-14T07:23:46.776Z",
+      "consumed_at": "2026-05-14T07:30:43.396Z",
+      "audit": {
+        "execution_summary": "Fixed paginator dropdown clipping on admin Booking/Users/Services pages. Root cause: overflow-hidden on app-table-wrapper component clipped PrimeNG p-table's rowsPerPage dropdown. Fix: removed overflow-hidden from wrapper div class. TDD: Updated spec (RED->GREEN) with 3/3 tests passing. Playwright test script created at test/visual/table-paginator-dropdown.spec.ts (requires browser install to run). No regressions in existing tests - all pre-existing failures are unrelated.",
+        "completed_at": "2026-05-14T07:30:43.396Z"
+      }
+    },
+    "cg_ses_1778744895289": {
+      "session_id": "cg_ses_1778744895289",
+      "created_at": "2026-05-14T07:48:15.289Z",
+      "task_description": "Cross-reference current code against spec docs, implement Time Slot selector dropdown improvements (remove past-time options, change format to \"HH:mm - HH:mm\", disable unavailable slots). Revise docs if needed for consistency.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Modify admin Quick Booking time-slot dropdown: (1) Filter out past time slots (endTime < now), show \"no time slots, and reselect a new date\" when none remain; (2) format label as \"HH:mm - HH:mm\"; (3) remove \"(n available)\" suffix; (4) disable unavailable slots via optionDisabled. Then dispatch @Coder-FE for implementation and run strict tests + Playwright screenshot verification.",
+      "confirmed_at": "2026-05-14T08:03:40.467Z",
+      "consumed_at": "2026-05-14T08:08:53.528Z",
+      "audit": {
+        "execution_summary": "Completed implementation of admin Quick Booking time-slot dropdown: (1) past slots filtered out (endTime > now); (2) format changed to \"HH:mm - HH:mm\"; (3) \"(n available)\" suffix removed; (4) unavailable slots disabled via optionDisabled; (5) error message set to \"No time slots available. Please reselect a new date.\"; (6) tests passed (12/12); Playwright screenshots skipped (dev server not running).",
+        "completed_at": "2026-05-14T08:08:53.528Z"
+      }
+    },
+    "cg_ses_1778745949047": {
+      "session_id": "cg_ses_1778745949047",
+      "created_at": "2026-05-14T08:05:49.048Z",
+      "task_description": "Implement admin Quick Booking time-slot dropdown changes: (1) filter out past time slots where endTime <= now; (2) display time slots as 'HH:mm - HH:mm' instead of ISO strings with '(n available)' suffix; (3) disable unavailable slots instead of hiding them; (4) update translation key 'admin.appointments.noTimeSlots' in backend seed; (5) run tests; (6) check screenshots via Playwright.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Implement admin Quick Booking time-slot dropdown changes: change signal type, filter past slots, format HH:mm display, disable unavailable slots, update translation, run tests, Playwright screenshots",
+      "confirmed_at": "2026-05-14T08:06:20.443Z",
+      "consumed_at": "2026-05-14T08:08:15.196Z",
+      "audit": {
+        "execution_summary": "Implemented admin Quick Booking time-slot dropdown changes: (1) filtered out past time slots where endTime <= now; (2) formatted time slots as 'HH:mm - HH:mm' instead of ISO strings; (3) disabled unavailable slots instead of hiding them (optionDisabled=\"disabled\"); (4) updated translation key 'admin.appointments.noTimeSlots' in backend seed; (5) ran tests — 12/12 appointment-management tests pass; (6) Playwright screenshots skipped (dev server not running).",
+        "completed_at": "2026-05-14T08:08:15.196Z"
+      }
+    },
+    "cg_ses_1778758228545": {
+      "session_id": "cg_ses_1778758228545",
+      "created_at": "2026-05-14T11:30:28.546Z",
+      "task_description": "Implement ESLint audit strong-constraint architecture: ESLint plugin, MCP tool, contract.yaml update, machine.json update, compliance gate integration, Agent dispatch for backend fixes",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Implement ESLint audit enforcement: create ESLint plugin, MCP tool server, update contract.yaml/machine.json/AGENTS.md/compliance gate. Then dispatch @Coder-BE to fix time-slots.spec.ts and add integration test. Then @Guardian verification.",
+      "confirmed_at": "2026-05-14T11:30:33.606Z",
+      "consumed_at": "2026-05-14T11:35:33.127Z",
+      "audit": {
+        "execution_summary": "Implemented ESLint mock-audit enforcement framework: (1) AGENTS.md - compliance_gate_complete upgraded to P0 mandatory, execution flow updated; (2) contract.yaml - x-eslint-policy v2.0 with tier definitions; (3) machine.json v2.2.0 - eslint_state/contract_compliance/waivers_consumed fields; (4) testing-coding-standard.md - @Guardian CAT3.4-3.7 blocking rules; (5) ESLint plugin - no-tier1-mock, no-skipped-audit, tier3-verify rules; (6) MCP tool eslint-audit.js - reads contract.yaml, runs ESLint, updates machine.json; (7) compliance-gate.js - runGateComplete now checks machine.json eslint_state; (8) pre-commit hook - ESLint mock-audit on staged spec files.",
+        "completed_at": "2026-05-14T11:35:33.127Z"
+      }
+    },
+    "cg_ses_1778758735551": {
+      "session_id": "cg_ses_1778758735551",
+      "created_at": "2026-05-14T11:38:55.551Z",
+      "task_description": "Fix time-slots.service.spec.ts: remove all jest.spyOn on PrismaService (TIER1 violation CAT1.1). Replace with Testcontainers real PostgreSQL. Create time-slots.integration.spec.ts. Then call compliance_gate_complete to verify no ESLint violations remain.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix time-slots.service.spec.ts: Remove mock-based PrismaService tests (TIER1 violation). Replace with Testcontainers real PostgreSQL integration tests. Create test/integration/time-slots.integration.spec.ts. Run tests then compliance_gate_complete.",
+      "confirmed_at": "2026-05-14T11:40:32.183Z",
+      "consumed_at": "2026-05-14T11:44:31.455Z",
+      "audit": {
+        "execution_summary": "Fixed time-slots.service.spec.ts: Removed mockPrismaService TIER1 violation, replaced with 19 Testcontainers-based integration tests using real PostgreSQL. Created test/integration/time-slots.integration.spec.ts with 25 comprehensive integration tests. All 44 new tests pass. ESLint mock-audit: 0 violations on modified files. One pre-existing controller spec failure unrelated to changes.",
+        "completed_at": "2026-05-14T11:44:31.455Z"
+      }
+    },
+    "cg_ses_1778759789882": {
+      "session_id": "cg_ses_1778759789882",
+      "created_at": "2026-05-14T11:56:29.882Z",
+      "task_description": "Fix time-slots.service.ts lte: endDate midnight bug",
+      "gate_status": "armed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix time-slots.service.ts endDate midnight bug by adjusting to end-of-day, run tests, Playwright screenshot verification, eslint-audit, and compliance gate complete",
+      "confirmed_at": "2026-05-14T12:00:13.945Z",
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1778764097042": {
+      "session_id": "cg_ses_1778764097042",
+      "created_at": "2026-05-14T13:08:17.043Z",
+      "task_description": "Add timezone indicator to admin Quick Booking dialog in appointment-management component",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Add timezoneLabel computed signal using Intl API, display it as text-xs above time slot dropdown in Quick Booking dialog. Modify 2 files: .ts and .html. Run tests + eslint-audit.",
+      "confirmed_at": "2026-05-14T13:08:27.922Z",
+      "consumed_at": "2026-05-14T13:09:41.194Z",
+      "audit": {
+        "execution_summary": "Added timezoneLabel computed signal (Intl.DateTimeFormat) to appointment-management.component.ts and displayed it as small text above time slot dropdown in HTML. All 12 existing tests pass. ESLint audit: 0 violations.",
+        "completed_at": "2026-05-14T13:09:41.194Z"
+      }
+    },
+    "cg_ses_1778764396499": {
+      "session_id": "cg_ses_1778764396499",
+      "created_at": "2026-05-14T13:13:16.500Z",
+      "task_description": "Strictly review the OpenCode framework, analyze code quality guarantees and agent behavior constraints, and produce a comprehensive optimization plan aligned with multi-agent + central state management + low-mock testing characteristics",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Full OpenCode framework v3.0 optimization: Write-Time + Commit-Time dual defense. Implement code-quality-gate MCP tool, machine.json 8-dimension state extension, ESLint 5 new rules, dependency-cruiser, tsc strict, prettier, commitlint, agent scope enforcement, guardian enhancement. 18+ files across 5 phases.",
+      "confirmed_at": "2026-05-14T13:40:45.484Z",
+      "consumed_at": "2026-05-14T13:46:25.931Z",
+      "audit": {
+        "execution_summary": "Full OpenCode framework v3.0 optimization implementation completed. Created 6 new files (code-quality-gate MCP tool, dependency-cruiser config, prettier config, commitlint config, commit-msg hook). Modified 13 files (machine.json v3.0.0 upgrade with 8-dimension state, keystone-validate with 9 phases, ESLint with 5 new rules, agent configs with Write-Time Audit constraints, subagent-preamble with Step 8b protocol, tsconfig strict mode). All 23 files syntax-validated. Write-Time + Commit-Time dual defense integrated.",
+        "completed_at": "2026-05-14T13:46:25.931Z"
+      }
+    },
+    "cg_ses_1778767435969": {
+      "session_id": "cg_ses_1778767435969",
+      "created_at": "2026-05-14T14:03:55.969Z",
+      "task_description": "Fix time slot generation bug: TimeSlotsService.generateTimeSlotsForDateRange() hardcodes UTC hours 9-17. Must read business hours from AdminSettingsService.getBusinessHours() which returns per-day openings in business local timezone (default: Asia/Shanghai).",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix TimeSlotsService to read business hours from AdminSettingsService instead of hardcoding UTC 9-17. RED: update tests. GREEN: inject AdminSettingsService, add getBusinessHoursForDate helper, replace hardcoded hours. REFACTOR: verify all tests pass.",
+      "confirmed_at": "2026-05-14T14:04:51.771Z",
+      "consumed_at": "2026-05-14T14:13:18.200Z",
+      "audit": {
+        "execution_summary": "Fixed TimeSlotsService.generateTimeSlotsForDateRange() to read business hours from AdminSettingsService.getBusinessHours() instead of hardcoding UTC 9-17. Added getBusinessHoursForDate() and getUTCOffsetForTimezone() helper methods. Updated 4 files: time-slots.service.ts (main fix), time-slots.module.ts (AdminModule import), admin.module.ts (AdminSettingsService export), time-slots.service.spec.ts (RED phase tests for Mon/Sat/Sun). All 21 tests pass. ESLint audit clean.",
+        "completed_at": "2026-05-14T14:13:18.200Z"
+      }
+    },
+    "cg_ses_1778768554807": {
+      "session_id": "cg_ses_1778768554807",
+      "created_at": "2026-05-14T14:22:34.807Z",
+      "task_description": "Coder-FE: Fix quick-booking-form.component.html - add loadSlots() call when service changes. One-line change: add ; loadSlots() to the ngModelChange handler on the service selector.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Coder-FE: One-line fix in quick-booking-form.component.html - add loadSlots() call on service ngModelChange. Read, edit, audit, test, artifacts, close gate.",
+      "confirmed_at": "2026-05-14T14:22:53.304Z",
+      "consumed_at": "2026-05-14T14:24:29.404Z",
+      "audit": {
+        "execution_summary": "Coder-FE: Fixed quick-booking-form.component.html line 25 — added loadSlots() call on service ngModelChange. One-line change. ESLint audit passed (0 violations). Tests run (3/8 pass, 5 pre-existing failures unrelated). Artifacts: TASK_LOG.md, HANDOVER.md, test_report.json written.",
+        "completed_at": "2026-05-14T14:24:29.404Z"
+      }
+    },
+    "cg_ses_1778770242655": {
+      "session_id": "cg_ses_1778770242655",
+      "created_at": "2026-05-14T14:50:42.656Z",
+      "task_description": "Arbiter: Review task for TimeSlotsService code changes — determine appropriate agent assignment",
+      "gate_status": "checked",
+      "last_check_failed_items": [],
+      "plan_summary": null,
+      "confirmed_at": null,
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1778770269269": {
+      "session_id": "cg_ses_1778770269269",
+      "created_at": "2026-05-14T14:51:09.269Z",
+      "task_description": "Two changes to TimeSlotsService.generateTimeSlotsForDateRange(): 1) Add 30-min gap between consecutive time slots 2) Clean up old slots before regeneration 3) Update spec file expectations",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Add 30-min gap between slots, cleanup old slots before regeneration, update spec expectations (5 slots for 60-min, 4 slots for 90-min)",
+      "confirmed_at": "2026-05-14T14:51:39.033Z",
+      "consumed_at": "2026-05-14T14:54:59.011Z",
+      "audit": {
+        "execution_summary": "Applied 3 changes to time-slots module: (1) Added 30-min gap between slots (durationMinutes+30) (2) Added deleteMany cleanup before regeneration (3) Updated spec: Monday 60-min → 5 slots, added 90-min test → 4 slots, Saturday → 3 slots. Added slotEnd>dayEnd guard to prevent overflow beyond business hours. All 22 tests pass, ESLint audit clean.",
+        "completed_at": "2026-05-14T14:54:59.011Z"
+      }
+    },
+    "cg_ses_1778771124914": {
+      "session_id": "cg_ses_1778771124914",
+      "created_at": "2026-05-14T15:05:24.914Z",
+      "task_description": "Fix translation values with redundant markers in translations-seed.service.ts (3 lines: remove * from Name, Duration, Price)",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Remove redundant markers (*) from 3 translation values (Name, Duration, Price) in translations-seed.service.ts; run backend tests.",
+      "confirmed_at": "2026-05-14T15:05:42.495Z",
+      "consumed_at": "2026-05-14T15:06:29.302Z",
+      "audit": {
+        "execution_summary": "Changed 3 translation values in translations-seed.service.ts: 'Name *'→'Name', 'Duration (min) *'→'Duration', 'Price ($) *'→'Price'. Removed redundant markers that were duplicated by template-level asterisk/annotation appending. Write-Time Audit: pass (scope, format). ESLint audit: 0 violations. No change in test outcome (pre-existing failures unrelated).",
+        "completed_at": "2026-05-14T15:06:29.302Z"
+      }
+    },
+    "cg_ses_1778771484706": {
+      "session_id": "cg_ses_1778771484706",
+      "created_at": "2026-05-14T15:11:24.707Z",
+      "task_description": "Fix all TS6133 'declared but its value is never read' errors across 21 frontend files in booking-frontend",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix 21 TS6133 errors: prefix unused params with _, remove unused imports/vars/injects across 21 frontend files, then run npm run build to verify zero errors",
+      "confirmed_at": "2026-05-14T15:12:12.939Z",
+      "consumed_at": "2026-05-14T15:13:15.705Z",
+      "audit": {
+        "execution_summary": "Fixed 21 TS6133 errors across 21 frontend files: prefixed unused params with _ (auth.guard, admin.service, service-selection), removed unused vars (camelCaseRe, isPiiField, idempotencyKey), removed unused imports (inject, BadgeStatus, Router, NgClass, AdminUser, computed, AdminAppointmentsQuery, AppointmentStatus, AppointmentStatusEvent, BookingService, ApiService, SocketService), removed unused injects (Router, apiService, socketService, bookingService), removed unused destructured fields (activeBookings, services, bookings). Run npm run build confirms zero TS6133 errors.",
+        "completed_at": "2026-05-14T15:13:15.705Z"
+      }
+    },
+    "cg_ses_1778808686759": {
+      "session_id": "cg_ses_1778808686759",
+      "created_at": "2026-05-15T01:31:26.761Z",
+      "task_description": "Fix NestJS backend build so npm run build compiles with zero errors - fix TS2564, TS6133/TS6138, TS7006, TS18046 errors across all specified backend files",
+      "gate_status": "checked",
+      "last_check_failed_items": [],
+      "plan_summary": null,
+      "confirmed_at": null,
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1778808869997": {
+      "session_id": "cg_ses_1778808869997",
+      "created_at": "2026-05-15T01:34:29.997Z",
+      "task_description": "Fix ALL TypeScript build errors in booking-backend. Errors include: TS2564 (uninitialized properties), TS6133 (unused variables), TS7006 (implicit any parameters), TS18046 (unknown error type). Fix code only, never change tsconfig.json. Run npm run build to verify zero errors.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix all TS build errors (TS2564, TS6133, TS7006, TS18046) across ~30 files by modifying code only. Run build after each batch until zero errors.",
+      "confirmed_at": "2026-05-15T01:34:49.887Z",
+      "consumed_at": "2026-05-15T01:40:50.244Z",
+      "audit": {
+        "execution_summary": "Fixed all TypeScript build errors in booking-backend. Applied TS2564 (!) to uninitialized props in base.dto, appointment.dto, email-verification.dto, response.dto, service.dto, time-slot.dto, profile-response.dto, update-password.dto, user.dto, slot-preemption.controller, notifications.gateway. Removed unused imports/variables (TS6133) in roles.guard, main.ts, admin-notifications dto/controller, admin-stats dto/service, appointment.dto, cache.service, notifications.gateway, rate-limiter.interceptor, slot-preemption service/controller, admin-translations.controller, users.controller, admin-users.service. Added Request type (TS7006) in appointments.controller and users.controller. Cast error as Error (TS18046) in email.processor, email.worker, notification.processor. npm run build: zero errors.",
+        "completed_at": "2026-05-15T01:40:50.244Z"
+      }
+    },
+    "cg_ses_1778810087643": {
+      "session_id": "cg_ses_1778810087643",
+      "created_at": "2026-05-15T01:54:47.644Z",
+      "task_description": "Fix NestJS validation error - property name should not exist",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix CreateAdminServiceDto: add @IsString @IsNumber @IsOptional @IsBoolean @Min decorators to 7 fields missing validation decorators",
+      "confirmed_at": "2026-05-15T01:56:11.905Z",
+      "consumed_at": "2026-05-15T01:57:03.392Z",
+      "audit": {
+        "execution_summary": "Fixed CreateAdminServiceDto: added @IsString to name, @IsOptional+@IsString to description, @IsNumber+@Min(0) to duration and price, @IsOptional+@IsBoolean to active, @IsOptional+@IsNumber+@Min(0) to pricePerMinute, @IsOptional+@IsString to imageUrl. All 7 fields now properly decorated. Build passed.",
+        "completed_at": "2026-05-15T01:57:03.392Z"
+      }
+    },
+    "cg_ses_1778810506241": {
+      "session_id": "cg_ses_1778810506241",
+      "created_at": "2026-05-15T02:01:46.241Z",
+      "task_description": "Fix validation error: frontend sends 'tax_rate' (snake_case) but backend expects 'taxRate' (camelCase) in CreateAdminServiceDto",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix frontend interceptor to skip snake_case conversion for admin endpoints (tax_rate → taxRate), align with backend camelCase DTOs",
+      "confirmed_at": "2026-05-15T02:04:01.832Z",
+      "consumed_at": "2026-05-15T02:04:51.221Z",
+      "audit": {
+        "execution_summary": "Fixed frontend api-transform.interceptor.ts: skip camelCase→snake_case conversion for admin API URLs (req.url.includes('/admin/')), so taxRate is sent as taxRate instead of tax_rate, matching backend CreateAdminServiceDto camelCase DTO. Build verified.",
+        "completed_at": "2026-05-15T02:04:51.221Z"
+      }
+    },
+    "cg_ses_1778811901645": {
+      "session_id": "cg_ses_1778811901645",
+      "created_at": "2026-05-15T02:25:01.646Z",
+      "task_description": "Design TDD universal enforcement architecture for OpenCode framework - 3-layer enforcement (Write-Time, Commit-Time, Guardian Review) across 8 files",
+      "gate_status": "checked",
+      "last_check_failed_items": [],
+      "plan_summary": null,
+      "confirmed_at": null,
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1778812219320": {
+      "session_id": "cg_ses_1778812219320",
+      "created_at": "2026-05-15T02:30:19.321Z",
+      "task_description": "Implement TDD Universal Enforcement across 8 files: code-quality-gate.js, keystone-validate.js, machine.json, coder-be.md, coder-fe.md, guardian.md, subagent-preamble.md, pre-commit",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Implement TDD Universal Enforcement across 8 files: add Check 6 (checkTDDOrder) to code-quality-gate.js, add Phase 3.5 to keystone-validate.js, add tdd_enforcement_state to machine.json, update agent docs (coder-be/coder-fe/guardian/subagent-preamble), add pre-commit Layer 2.5 TDD pre-check",
+      "confirmed_at": "2026-05-15T02:30:35.620Z",
+      "consumed_at": "2026-05-15T02:31:55.816Z",
+      "audit": {
+        "execution_summary": "Implemented TDD Universal Enforcement across 8 files: added checkTDDOrder() Check 6 to code-quality-gate.js with CAT5.2 BLOCKER enforcement; added runPhase3_5 TDD validation to keystone-validate.js; added tdd_enforcement_state to machine.json; updated coder-be.md, coder-fe.md, guardian.md, subagent-preamble.md with CAT5.2 references; added pre-commit Layer 2.5 TDD pre-check. All syntax checks verified (node --check x2, bash -n x1).",
+        "completed_at": "2026-05-15T02:31:55.816Z"
+      }
+    },
+    "cg_ses_1778825029616": {
+      "session_id": "cg_ses_1778825029616",
+      "created_at": "2026-05-15T06:03:49.618Z",
+      "task_description": "Commit changes in root and inner repositories",
+      "gate_status": "armed",
+      "last_check_failed_items": [],
+      "plan_summary": "Commit changes in root repo (opencode-v3 configs/agents/hooks/MCP) and inner repo (integration tests, validation scripts, CI config, test setup)",
+      "confirmed_at": "2026-05-15T06:04:16.767Z",
+      "consumed_at": null,
+      "audit": null
     }
   }
 }

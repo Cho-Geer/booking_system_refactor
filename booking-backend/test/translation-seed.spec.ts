@@ -1,7 +1,7 @@
 /**
- * Translation Seed Data Integration Tests — RED PHASE
+ * Translation Seed Data Integration Tests — GREEN PHASE
  *
- * Purpose: Verify the translation seed function inserts ~200 default English
+ * Purpose: Verify the translation seed function inserts ~450 default English
  * records into the TranslationDictionary table, covering all required domains,
  * valid key formats, unique constraints, and idempotency.
  *
@@ -37,7 +37,7 @@ import { seedDefaultTranslations } from '@modules/translations/translations-seed
 // ============================================================
 
 /**
- * All 11 domains that must be covered by the translation seed data.
+ * All 13 domains that must be covered by the translation seed data.
  * As specified in cross-doc-consistency-and-i18n-plan.md §2.1 and §3.3.
  */
 const EXPECTED_DOMAINS = [
@@ -52,13 +52,15 @@ const EXPECTED_DOMAINS = [
   'errors',
   'validation',
   'email',
+  'profile',
+  'sidebar',
 ] as const;
 
-/** Minimum expected translation records (~200 default English records) */
-const MIN_EXPECTED_RECORDS = 190;
+/** Minimum expected translation records (~446 default English records) */
+const MIN_EXPECTED_RECORDS = 430;
 
-/** Maximum expected translation records (+10 buffer for future additions) */
-const MAX_EXPECTED_RECORDS = 210;
+/** Maximum expected translation records (+20 buffer for future additions) */
+const MAX_EXPECTED_RECORDS = 470;
 
 // ============================================================
 // Test Suite

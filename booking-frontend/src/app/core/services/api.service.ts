@@ -270,6 +270,7 @@ export class ApiService {
     email?: string; // masked value like "us***@example.com"
     phone?: string; // masked value like "138****5678"
     role: string;
+    preferredTimezone?: string;
     createdAt: string;
   }> {
     return this.http
@@ -279,6 +280,7 @@ export class ApiService {
         email?: string;
         phone?: string;
         role: string;
+        preferredTimezone?: string;
         createdAt: string;
       }>>(`${this.apiUrl}/users/profile`)
       .pipe(
@@ -291,9 +293,9 @@ export class ApiService {
    * Update user profile
    * PUT /v1/users/profile
    */
-  updateProfile(dto: { name?: string }): Observable<{ user: { id: string; name: string; email?: string; phone?: string; role: string; createdAt?: string } }> {
+  updateProfile(dto: { name?: string }): Observable<{ id: string; name: string; email?: string; phone?: string; role: string; createdAt?: string; _message: string }> {
     return this.http
-      .put<ApiResponse<{ user: { id: string; name: string; email?: string; phone?: string; role: string; createdAt?: string } }>>(`${this.apiUrl}/users/profile`, dto)
+      .put<ApiResponse<{ id: string; name: string; email?: string; phone?: string; role: string; createdAt?: string; _message: string }>>(`${this.apiUrl}/users/profile`, dto)
       .pipe(
         map(response => response.data),
         catchError(this.handleError)

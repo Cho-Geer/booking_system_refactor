@@ -1,7 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { AdminService } from '../../services/admin.service';
 import { ApiService } from '../../../../core/services/api.service';
 import { AdminUser, AdminServiceItem } from '../../dto/admin.dto';
@@ -19,7 +18,6 @@ import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 export class QuickBookingFormComponent implements OnInit {
   private adminService = inject(AdminService);
   private apiService = inject(ApiService);
-  private router = inject(Router);
 
   readonly users = signal<AdminUser[]>([]);
   readonly services = signal<AdminServiceItem[]>([]);

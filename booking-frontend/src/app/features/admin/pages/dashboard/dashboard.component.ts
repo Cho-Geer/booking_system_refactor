@@ -2,7 +2,7 @@ import { Component, computed, inject, OnInit, OnDestroy, signal } from '@angular
 import { Router } from '@angular/router';
 import { AdminStore } from '../../stores/admin.store';
 import { AdminService } from '../../services/admin.service';
-import { AdminAppointmentsQuery, AppointmentStatus, StatCard, SystemHealthDetail, TimeRange, TimeRangeSelection, BookingTableRow, RecentUserRow, RecentServiceRow } from '../../dto/admin.dto';
+import { StatCard, SystemHealthDetail, TimeRange, TimeRangeSelection, BookingTableRow, RecentUserRow, RecentServiceRow } from '../../dto/admin.dto';
 import { getInitials, getInitialsBg, mapStatus } from '../../shared/admin-utils';
 import { buildBookingTrendChartData, BOOKING_TREND_CHART_OPTIONS, buildServicePopularityChartData, DOUGHNUT_CHART_OPTIONS, buildTimeDistributionChartData, BAR_CHART_OPTIONS } from '../../shared/dashboard-chart-factories';
 import { WelcomeCardComponent } from '../../organisms/welcome-card/welcome-card.component';
@@ -13,7 +13,7 @@ import { RecentBookingsPanelComponent } from '../../organisms/recent-bookings-pa
 import { RecentUsersPanelComponent } from '../../organisms/recent-users-panel/recent-users-panel.component';
 import { RecentServicesPanelComponent } from '../../organisms/recent-services-panel/recent-services-panel.component';
 import { SystemStatusPanelComponent } from '../../organisms/system-status-panel/system-status-panel.component';
-import { SocketService, AppointmentStatusEvent, SystemHealthEvent } from '../../../../core/services/socket.service';
+import { SocketService, SystemHealthEvent } from '../../../../core/services/socket.service';
 import { Subscription, interval, lastValueFrom } from 'rxjs';
 
 @Component({

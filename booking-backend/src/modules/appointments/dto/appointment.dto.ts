@@ -3,7 +3,6 @@ import {
   IsEnum,
   IsOptional,
   IsObject,
-  IsNotEmpty,
   IsInt,
   Min,
   Max,
@@ -17,11 +16,11 @@ import { AppointmentStatus } from "@prisma/client";
 export class CreateAppointmentDto {
   @ApiProperty({ description: "Time slot ID" })
   @IsUUID("4", { message: "timeSlotId must be a valid UUID" })
-  timeSlotId: string;
+  timeSlotId!: string;
 
   @ApiProperty({ description: "Service ID" })
   @IsUUID("4", { message: "serviceId must be a valid UUID" })
-  serviceId: string;
+  serviceId!: string;
 
   @ApiProperty({ description: "Customer info (name, email, phone)" })
   @IsOptional()
@@ -49,7 +48,7 @@ export class CreateAppointmentDto {
 
   @ApiProperty({ description: "Appointment date-time string" })
   @IsDateString()
-  appointmentDate: string;
+  appointmentDate!: string;
 }
 
 export class UpdateAppointmentDto {
@@ -69,35 +68,35 @@ export class UpdateAppointmentDto {
 
 export class AppointmentResponseDto {
   @ApiProperty({ description: "Appointment ID" })
-  id: string;
+  id!: string;
 
   @ApiProperty({ description: "User ID" })
-  userId: string;
+  userId!: string;
 
   @ApiProperty({ description: "Time slot ID" })
-  timeSlotId: string;
+  timeSlotId!: string;
 
   @ApiProperty({ description: "Service ID" })
-  serviceId: string;
+  serviceId!: string;
 
   @ApiProperty({ description: "Status", enum: AppointmentStatus })
-  status: AppointmentStatus;
+  status!: AppointmentStatus;
 
   @ApiProperty({ description: "Customer name" })
-  customerName: string;
+  customerName!: string;
 
   @ApiProperty({ description: "Customer email" })
-  customerEmail: string;
+  customerEmail!: string;
 
   @ApiProperty({ description: "Customer phone" })
-  customerPhone: string;
+  customerPhone!: string;
 
   @ApiPropertyOptional({ description: "Notes" })
   notes?: string;
 
   @ApiProperty({ description: "Created at" })
-  createdAt: Date;
+  createdAt!: Date;
 
   @ApiProperty({ description: "Updated at" })
-  updatedAt: Date;
+  updatedAt!: Date;
 }

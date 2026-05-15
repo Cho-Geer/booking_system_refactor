@@ -494,8 +494,8 @@ describe('UsersController', () => {
   });
 
   // ==================== FIX-P1-004: GET /profile endpoint ====================
-  // RED Phase: Controller should return raw profile (ResponseInterceptor wraps it later)
-  describe('FIX-P1-004: GET /users/profile (RED)', () => {
+  // GREEN Phase: Controller should return raw profile (ResponseInterceptor wraps it later)
+  describe('FIX-P1-004: GET /users/profile (GREEN)', () => {
     it('should call service.getProfile and return the raw profile (no manual envelope)', async () => {
       const mockProfile = {
         id: 'user-1',
@@ -525,6 +525,39 @@ describe('UsersController', () => {
       expect(service.getProfile).toHaveBeenCalledWith('user-1');
       // Controller should return raw profile (no envelope); ResponseInterceptor wraps it
       expect(result).toEqual(mockProfile);
+      // Regression: response must NOT be wrapped in { user: ... }
+      expect(result).not.toHaveProperty('user');
+    });
+
+    it('should return result with role at top level (not nested)', async () => {
+      const mockProfile = {
+        id: 'user-2',
+        email: 'admin@example.com',
+        name: 'Admin User',
+        phone: '139****8765',
+        role: SystemRole.ADMIN,
+        status: 'ACTIVE',
+        createdAt: new Date('2024-06-01'),
+        updatedAt: new Date('2024-06-01'),
+      };
+
+      mockUsersService.getProfile.mockResolvedValue(mockProfile);
+
+      const module: TestingModule = await Test.createTestingModule({
+        controllers: [UsersController],
+        providers: [
+          { provide: UsersService, useValue: mockUsersService },
+          { provide: ClsService, useValue: mockClsService },
+        ],
+      }).compile();
+
+      const controller = module.get<UsersController>(UsersController);
+
+      const result = await controller.getProfile(mockReq as unknown as Request);
+
+      // role must be at top level, NOT under result.user.role
+      expect(result.role).toBe(SystemRole.ADMIN);
+      expect(result).not.toHaveProperty('user');
     });
 
     it('should throw ForbiddenException when user is not authenticated', async () => {

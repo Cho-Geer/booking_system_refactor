@@ -1,15 +1,15 @@
-import { PostgreSqlContainer } from '@testcontainers/postgresql';
-import { RedisContainer } from '@testcontainers/redis';
-import { execSync } from 'child_process';
-import { join } from 'path';
-import { writeFileSync } from 'fs';
+import { PostgreSqlContainer } from "@testcontainers/postgresql";
+import { RedisContainer } from "@testcontainers/redis";
+import { execSync } from "child_process";
+import { join } from "path";
+import { writeFileSync } from "fs";
 
 // Type declarations for global container references
 declare global {
   // eslint-disable-next-line no-var
-  var __POSTGRES_CONTAINER__: import('@testcontainers/postgresql').StartedPostgreSqlContainer;
+  var __POSTGRES_CONTAINER__: import("@testcontainers/postgresql").StartedPostgreSqlContainer;
   // eslint-disable-next-line no-var
-  var __REDIS_CONTAINER__: import('@testcontainers/redis').StartedRedisContainer;
+  var __REDIS_CONTAINER__: import("@testcontainers/redis").StartedRedisContainer;
 }
 
 /**
@@ -17,12 +17,12 @@ declare global {
  */
 function checkDockerAvailability(): void {
   try {
-    execSync('docker info', { stdio: 'ignore' });
-    console.log('Docker is available');
+    execSync("docker info", { stdio: "ignore" });
+    console.log("Docker is available");
   } catch {
     throw new Error(
-      'Docker is not available. Testcontainers requires Docker to be running.\n' +
-      'Please ensure Docker Desktop or Docker Engine is installed and running.'
+      "Docker is not available. Testcontainers requires Docker to be running.\n" +
+        "Please ensure Docker Desktop or Docker Engine is installed and running.",
     );
   }
 }
@@ -32,43 +32,47 @@ function checkDockerAvailability(): void {
  * Containers are shared across all test files to avoid startup overhead.
  */
 module.exports = async () => {
-  console.log('[GlobalSetup] Starting testcontainers infrastructure...');
+  console.log("[GlobalSetup] Starting testcontainers infrastructure...");
 
   // Verify Docker is available
   checkDockerAvailability();
 
   // Start PostgreSQL container
-  console.log('[GlobalSetup] Starting PostgreSQL container...');
-  const postgresContainer = await new PostgreSqlContainer('postgres:16')
-    .withDatabase('booking_test')
-    .withUsername('test_user')
-    .withPassword('test_password')
-    .withTmpFs({ '/var/lib/postgresql/data': 'rw' })
+  console.log("[GlobalSetup] Starting PostgreSQL container...");
+  const postgresContainer = await new PostgreSqlContainer("postgres:16")
+    .withDatabase("booking_test")
+    .withUsername("test_user")
+    .withPassword("test_password")
+    .withTmpFs({ "/var/lib/postgresql/data": "rw" })
     .withExposedPorts(5432)
-    .withCommand(['postgres', '-c', 'log_statement=all'])
+    .withCommand(["postgres", "-c", "log_statement=all"])
     .start();
 
   const postgresHost = postgresContainer.getHost();
   const postgresPort = postgresContainer.getMappedPort(5432);
   const databaseUrl = `postgresql://test_user:test_password@${postgresHost}:${postgresPort}/booking_test`;
 
-  console.log(`[GlobalSetup] PostgreSQL started at ${postgresHost}:${postgresPort}`);
+  console.log(
+    `[GlobalSetup] PostgreSQL started at ${postgresHost}:${postgresPort}`,
+  );
 
   // Install uuid-ossp extension in the test PostgreSQL container
-  console.log('[GlobalSetup] Installing uuid-ossp extension...');
+  console.log("[GlobalSetup] Installing uuid-ossp extension...");
   try {
     execSync(
       `docker exec ${postgresContainer.getName()} apt-get update -qq && docker exec ${postgresContainer.getName()} apt-get install -y -qq postgresql-16-uuid-ossp 2>/dev/null || true`,
-      { stdio: 'ignore', timeout: 60000 }
+      { stdio: "ignore", timeout: 60000 },
     );
   } catch {
     // Try alternative approach for postgres images that don't need apt-get
-    console.log('[GlobalSetup] Extension installation skipped or failed, trying alternative...');
+    console.log(
+      "[GlobalSetup] Extension installation skipped or failed, trying alternative...",
+    );
   }
 
   // Start Redis container
-  console.log('[GlobalSetup] Starting Redis container...');
-  const redisContainer = await new RedisContainer('redis:7-alpine')
+  console.log("[GlobalSetup] Starting Redis container...");
+  const redisContainer = await new RedisContainer("redis:7-alpine")
     .withExposedPorts(6379)
     .start();
 
@@ -79,16 +83,19 @@ module.exports = async () => {
   console.log(`[GlobalSetup] Redis started at ${redisHost}:${redisPort}`);
 
   // Run Prisma migrations
-  console.log('[GlobalSetup] Running Prisma migrations...');
+  console.log("[GlobalSetup] Running Prisma migrations...");
   try {
-    execSync('npx prisma migrate deploy', {
+    execSync("npx prisma migrate deploy", {
       env: { ...process.env, DATABASE_URL: databaseUrl },
-      stdio: 'inherit',
-      cwd: join(__dirname, '..', '..'),
+      stdio: "inherit",
+      cwd: join(__dirname, "..", ".."),
     });
-    console.log('[GlobalSetup] Migrations applied successfully');
+    console.log("[GlobalSetup] Migrations applied successfully");
   } catch (error) {
-    console.error('[GlobalSetup] Migration failed:', error instanceof Error ? error.message : error);
+    console.error(
+      "[GlobalSetup] Migration failed:",
+      error instanceof Error ? error.message : error,
+    );
     throw error;
   }
 
@@ -98,32 +105,33 @@ module.exports = async () => {
     REDIS_URL: redisUrl,
     REDIS_HOST: redisHost,
     REDIS_PORT: String(redisPort),
-    JWT_SECRET: 'test-jwt-secret-key-for-unit-tests-only',
-    JWT_REFRESH_SECRET: 'test-refresh-secret-key-for-unit-tests-only',
-    PII_ENCRYPTION_KEY: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef', // 64-char hex = 32 bytes
-    PII_HASH_PEPPER: 'test-pepper-for-integration-tests-only',
-    NODE_ENV: 'test',
-    PORT: '3002',
-    LOG_LEVEL: 'error',
-    SMTP_HOST: 'localhost',
-    SMTP_PORT: '1025',
-    SMTP_USER: 'test',
-    SMTP_PASS: 'test',
-    SMTP_FROM: 'test@example.com',
+    JWT_SECRET: "test-jwt-secret-key-for-unit-tests-only",
+    JWT_REFRESH_SECRET: "test-refresh-secret-key-for-unit-tests-only",
+    PII_ENCRYPTION_KEY:
+      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef", // 64-char hex = 32 bytes
+    PII_HASH_PEPPER: "test-pepper-for-integration-tests-only",
+    NODE_ENV: "test",
+    PORT: "3002",
+    LOG_LEVEL: "error",
+    SMTP_HOST: "localhost",
+    SMTP_PORT: "1025",
+    SMTP_USER: "test",
+    SMTP_PASS: "test",
+    SMTP_FROM: "test@example.com",
   };
 
   const envContent = Object.entries(testEnv)
     .map(([key, value]) => `${key}=${value}`)
-    .join('\n');
+    .join("\n");
 
-  writeFileSync(join(__dirname, '..', '..', '.env.test'), envContent);
-  console.log('[GlobalSetup] .env.test file written');
+  writeFileSync(join(__dirname, "..", "..", ".env.test"), envContent);
+  console.log("[GlobalSetup] .env.test file written");
 
   // Store container references globally for teardown
   global.__POSTGRES_CONTAINER__ = postgresContainer;
   global.__REDIS_CONTAINER__ = redisContainer;
 
-  console.log('[GlobalSetup] Testcontainers infrastructure ready');
+  console.log("[GlobalSetup] Testcontainers infrastructure ready");
 
   return {
     DATABASE_URL: databaseUrl,

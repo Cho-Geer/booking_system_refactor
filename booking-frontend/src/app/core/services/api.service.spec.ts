@@ -616,18 +616,24 @@ describe('ApiService', () => {
   });
 
   describe('updateProfile()', () => {
-    it('[RED] should fail: updateProfile should send PUT to /api/users/profile', () => {
+    it('[GREEN] should send PUT to /api/users/profile and return flat response (no user wrapper)', () => {
       const updateData = { name: 'New Name' };
-      const wrappedResponse: ApiResponse<{ user: { id: string; name: string; role: string } }> = {
+      // Backend now returns flat object (not wrapped in { user: ... })
+      const wrappedResponse: ApiResponse<{ id: string; name: string; role: string }> = {
         statusCode: 200,
         message: 'OK',
-        data: { user: { id: '1', name: 'New Name', role: 'CUSTOMER' } },
+        data: { id: '1', name: 'New Name', role: 'CUSTOMER' },
         timestamp: '2026-04-30T10:00:00.000Z',
         requestId: 'req-test-uuid',
       };
 
       service.updateProfile(updateData).subscribe((response) => {
-        expect(response.user.name).toBe('New Name');
+        // Flat response: directly access response.name, NOT response.user.name
+        expect(response.name).toBe('New Name');
+        expect(response.role).toBe('CUSTOMER');
+        expect(response.id).toBe('1');
+        // Must NOT have a 'user' wrapper property
+        expect((response as any).user).toBeUndefined();
       });
 
       const req = httpMock.expectOne(`${apiUrl}/users/profile`);
@@ -636,7 +642,7 @@ describe('ApiService', () => {
       req.flush(wrappedResponse);
     });
 
-    it('[RED] should fail: updateProfile should handle error', () => {
+    it('[GREEN] should handle updateProfile error', () => {
       service.updateProfile({ name: 'New Name' }).subscribe({
         next: () => fail('expected error'),
         error: (error) => {
@@ -646,6 +652,102 @@ describe('ApiService', () => {
 
       const req = httpMock.expectOne(`${apiUrl}/users/profile`);
       req.flush({ message: 'Update failed' }, { status: 400, statusText: 'Bad Request' });
+    });
+
+    it('[GREEN] should return _message field from backend response', () => {
+      const wrappedResponse: ApiResponse<{ id: string; name: string; _message: string }> = {
+        statusCode: 200,
+        message: 'OK',
+        data: { id: '1', name: 'Updated Name', _message: '资料已更新' },
+        timestamp: '2026-04-30T10:00:00.000Z',
+        requestId: 'req-test-uuid',
+      };
+
+      service.updateProfile({ name: 'Updated Name' }).subscribe((response) => {
+        expect(response._message).toBe('资料已更新');
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/users/profile`);
+      req.flush(wrappedResponse);
+    });
+  });
+
+  describe('getUserProfile()', () => {
+    it('[GREEN] should send GET to /api/users/profile and return flat profile (no user wrapper)', () => {
+      const wrappedResponse: ApiResponse<{ id: string; name: string; email: string; role: string }> = {
+        statusCode: 200,
+        message: 'OK',
+        data: { id: '1', name: 'Admin User', email: 'adm***@example.com', role: 'ADMIN' },
+        timestamp: '2026-04-30T10:00:00.000Z',
+        requestId: 'req-test-uuid',
+      };
+
+      service.getUserProfile().subscribe((profile) => {
+        expect(profile).toBeDefined();
+        // Flat response: role at top level, NOT under profile.user.role
+        expect(profile.role).toBe('ADMIN');
+        expect(profile.name).toBe('Admin User');
+        expect((profile as any).user).toBeUndefined();
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/users/profile`);
+      expect(req.request.method).toBe('GET');
+      req.flush(wrappedResponse);
+    });
+
+    it('[GREEN] should handle getUserProfile error', () => {
+      service.getUserProfile().subscribe({
+        next: () => fail('expected error'),
+        error: (error) => {
+          expect(error).toBeTruthy();
+        },
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/users/profile`);
+      req.flush({ message: 'Unauthorized' }, { status: 401, statusText: 'Unauthorized' });
+    });
+
+    it('[GREEN] should return role field (not userType) for post-login route resolution', () => {
+      // This is critical: login component reads profile.role for RouteResolver
+      const wrappedResponse: ApiResponse<{ id: string; name: string; role: string }> = {
+        statusCode: 200,
+        message: 'OK',
+        data: { id: '1', name: 'System Admin', role: 'ADMIN' },
+        timestamp: '2026-04-30T10:00:00.000Z',
+        requestId: 'req-test-uuid',
+      };
+
+      service.getUserProfile().subscribe((profile) => {
+        // profile.role is read by login component → RouteResolver.getPostLoginRoute(profile.role)
+        // If profile.role is undefined, RouteResolver defaults to /booking
+        expect(profile.role).toBe('ADMIN');
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/users/profile`);
+      req.flush(wrappedResponse);
+    });
+
+    // ============================================================
+    // [RED] Test: preferredTimezone in getUserProfile return type
+    // This verifies that the return type declaration includes
+    // preferredTimezone. Currently it's missing, so this FAILS.
+    // ============================================================
+
+    it('[RED] should fail: getUserProfile return type declaration should include preferredTimezone', () => {
+      const fs = require('fs');
+      const path = require('path');
+      const servicePath = path.resolve(__dirname, '../../core/services/api.service.ts');
+      const content = fs.readFileSync(servicePath, 'utf-8');
+
+      // Extract the getUserProfile method's return type declaration
+      const methodMatch = content.match(/getUserProfile\(\): Observable<\{[\s\S]*?\}>/);
+      expect(methodMatch).not.toBeNull();
+      if (methodMatch) {
+        const returnType = methodMatch[0];
+        // TARGET: return type includes preferredTimezone
+        // CURRENT: preferredTimezone is missing → this assertion FAILS
+        expect(returnType).toContain('preferredTimezone');
+      }
     });
   });
 

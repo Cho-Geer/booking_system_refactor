@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../../../common/database/prisma.service";
 
 const BUSINESS_HOURS_KEY = "business_hours";

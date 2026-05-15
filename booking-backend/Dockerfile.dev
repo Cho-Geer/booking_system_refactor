@@ -13,6 +13,12 @@ COPY . .
 # Generate Prisma Client
 RUN npx prisma generate
 
+# Switch to non-root user with UID 1000 (matches host user zhaoge)
+# This ensures files created in the container (e.g., dist/) are owned by the host user
+USER node
+
 EXPOSE 3000
 
-CMD ["npm", "run", "start:dev"]
+# Run database migrations and seed before starting the dev server
+# This ensures tables exist and translations are populated on first startup
+CMD sh -c 'npx prisma migrate deploy && npx prisma db seed && npm run start:dev'

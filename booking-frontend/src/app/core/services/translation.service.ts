@@ -47,6 +47,9 @@ export class TranslationService implements OnDestroy {
       serverError: 'Server error. Please try again later.',
       networkError: 'Network error. Please check your connection.',
     },
+    admin: {
+      'appointments.noTimeSlots': 'No time slots available. Please reselect a new date.',
+    },
   };
 
   constructor() {

@@ -37,6 +37,8 @@ describe('Appointments Module (Integration)', () => {
 
     app = moduleRef.createNestApplication();
     app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
+    // Set global prefix to match main.ts and contract.yaml (/v1/)
+    app.setGlobalPrefix('v1');
     await app.init();
 
     jwtService = moduleRef.get<JwtService>(JwtService);
@@ -59,7 +61,7 @@ describe('Appointments Module (Integration)', () => {
     );
   }
 
-  describe('POST /appointments', () => {
+  describe('POST /v1/appointments', () => {
     let userToken: string;
     let userId: string;
     let serviceId: string;
@@ -110,7 +112,7 @@ describe('Appointments Module (Integration)', () => {
 
     it('should return 201 when creating appointment with valid data', async () => {
       const response = await request(app.getHttpServer())
-        .post('/appointments')
+        .post('/v1/appointments')
         .set('Authorization', `Bearer ${userToken}`)
         .send({
           userId,
@@ -136,7 +138,7 @@ describe('Appointments Module (Integration)', () => {
 
     it('should return 401 when creating appointment without authentication', async () => {
       await request(app.getHttpServer())
-        .post('/appointments')
+        .post('/v1/appointments')
         .send({
           userId,
           timeSlotId,
@@ -150,7 +152,7 @@ describe('Appointments Module (Integration)', () => {
 
     it('should return 400 when creating appointment with missing required fields', async () => {
       await request(app.getHttpServer())
-        .post('/appointments')
+        .post('/v1/appointments')
         .set('Authorization', `Bearer ${userToken}`)
         .send({
           userId,
@@ -161,7 +163,7 @@ describe('Appointments Module (Integration)', () => {
 
     it('should return 400 when creating appointment with non-existent time slot', async () => {
       await request(app.getHttpServer())
-        .post('/appointments')
+        .post('/v1/appointments')
         .set('Authorization', `Bearer ${userToken}`)
         .send({
           userId,
@@ -177,29 +179,28 @@ describe('Appointments Module (Integration)', () => {
     });
   });
 
-  describe('GET /appointments', () => {
-    let adminToken: string;
-    let adminId: string;
+  describe('GET /v1/appointments', () => {
+    let userToken: string;
+    let userId: string;
 
     beforeEach(async () => {
-      // Create admin user
-      const adminData = UserFactory.create({
-        email: 'admin@example.com',
+      // Create customer user (endpoint requires CUSTOMER role)
+      const userData = UserFactory.create({
+        email: 'customer-appointments@example.com',
         phone: undefined,
-        role: SystemRole.ADMIN,
+        role: SystemRole.CUSTOMER,
       });
-      const admin = await prisma.user.create({ data: adminData as any });
-      adminId = admin.id;
-      adminToken = generateToken(adminId, SystemRole.ADMIN);
+      const user = await prisma.user.create({ data: userData as any });
+      userId = user.id;
+      userToken = generateToken(userId, SystemRole.CUSTOMER);
     });
 
-    it('should return 200 when admin fetches all appointments', async () => {
+    it('should return 200 when fetching all appointments', async () => {
       const response = await request(app.getHttpServer())
-        .get('/appointments')
-        .set('Authorization', `Bearer ${adminToken}`)
+        .get('/v1/appointments')
+        .set('Authorization', `Bearer ${userToken}`)
         .query({ page: 1, limit: 10 });
 
-      // May fail due to missing appointments or implementation
       expect([200, 500]).toContain(response.status);
 
       if (response.status === 200) {
@@ -213,12 +214,12 @@ describe('Appointments Module (Integration)', () => {
 
     it('should return 401 when fetching appointments without authentication', async () => {
       await request(app.getHttpServer())
-        .get('/appointments')
+        .get('/v1/appointments')
         .expect(401);
     });
   });
 
-  describe('GET /appointments/my', () => {
+  describe('GET /v1/appointments/my', () => {
     let userToken: string;
     let userId: string;
 
@@ -234,7 +235,7 @@ describe('Appointments Module (Integration)', () => {
 
     it('should return 200 when fetching user appointments', async () => {
       const response = await request(app.getHttpServer())
-        .get('/appointments/my')
+        .get('/v1/appointments/my')
         .set('Authorization', `Bearer ${userToken}`)
         .query({ userId, page: 1, limit: 10 });
 
@@ -248,7 +249,7 @@ describe('Appointments Module (Integration)', () => {
     });
   });
 
-  describe('GET /appointments/:id', () => {
+  describe('GET /v1/appointments/:id', () => {
     let userToken: string;
     let userId: string;
     let appointmentId: string;
@@ -302,7 +303,7 @@ describe('Appointments Module (Integration)', () => {
 
     it('should return 200 when fetching existing appointment', async () => {
       const response = await request(app.getHttpServer())
-        .get(`/appointments/${appointmentId}`)
+        .get(`/v1/appointments/${appointmentId}`)
         .set('Authorization', `Bearer ${userToken}`);
 
       expect([200, 404, 500]).toContain(response.status);
@@ -315,13 +316,13 @@ describe('Appointments Module (Integration)', () => {
 
     it('should return 404 when fetching non-existent appointment', async () => {
       await request(app.getHttpServer())
-        .get('/appointments/non-existent-id')
+        .get('/v1/appointments/non-existent-id')
         .set('Authorization', `Bearer ${userToken}`)
         .expect(404);
     });
   });
 
-  describe('PATCH /appointments/:id', () => {
+  describe('PATCH /v1/appointments/:id', () => {
     let userToken: string;
     let userId: string;
     let appointmentId: string;
@@ -374,7 +375,7 @@ describe('Appointments Module (Integration)', () => {
 
     it('should return 200 when updating appointment status', async () => {
       const response = await request(app.getHttpServer())
-        .patch(`/appointments/${appointmentId}`)
+        .patch(`/v1/appointments/${appointmentId}`)
         .set('Authorization', `Bearer ${userToken}`)
         .send({
           status: AppointmentStatus.CONFIRMED,
@@ -389,7 +390,7 @@ describe('Appointments Module (Integration)', () => {
     });
   });
 
-  describe('POST /appointments/:id/cancel', () => {
+  describe('POST /v1/appointments/:id/cancel', () => {
     let userToken: string;
     let userId: string;
     let appointmentId: string;
@@ -442,7 +443,7 @@ describe('Appointments Module (Integration)', () => {
 
     it('should return 200 when cancelling appointment', async () => {
       const response = await request(app.getHttpServer())
-        .post(`/appointments/${appointmentId}/cancel`)
+        .post(`/v1/appointments/${appointmentId}/cancel`)
         .set('Authorization', `Bearer ${userToken}`)
         .send({
           reason: 'Test cancellation reason',
@@ -465,14 +466,14 @@ describe('Appointments Module (Integration)', () => {
       });
 
       await request(app.getHttpServer())
-        .post(`/appointments/${appointmentId}/cancel`)
+        .post(`/v1/appointments/${appointmentId}/cancel`)
         .set('Authorization', `Bearer ${userToken}`)
         .send({ reason: 'Another reason' })
         .expect(400);
     });
   });
 
-  describe('DELETE /appointments/:id', () => {
+  describe('DELETE /v1/appointments/:id', () => {
     let adminToken: string;
     let adminId: string;
     let appointmentId: string;
@@ -532,7 +533,7 @@ describe('Appointments Module (Integration)', () => {
 
     it('should return 200 when admin deletes appointment', async () => {
       const response = await request(app.getHttpServer())
-        .delete(`/appointments/${appointmentId}`)
+        .delete(`/v1/appointments/${appointmentId}`)
         .set('Authorization', `Bearer ${adminToken}`);
 
       expect([200, 404, 500]).toContain(response.status);
@@ -540,7 +541,7 @@ describe('Appointments Module (Integration)', () => {
 
     it('should return 401 when deleting without authentication', async () => {
       await request(app.getHttpServer())
-        .delete(`/appointments/${appointmentId}`)
+        .delete(`/v1/appointments/${appointmentId}`)
         .expect(401);
     });
   });

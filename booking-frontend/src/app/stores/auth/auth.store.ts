@@ -188,6 +188,7 @@ export const AuthStore = signalStore(
           role: profile.role,
           email: profile.email,
           phone: profile.phone,
+          preferredTimezone: profile.preferredTimezone,
           createdAt: profile.createdAt,
         };
         patchState(store, { user, isLoading: false });

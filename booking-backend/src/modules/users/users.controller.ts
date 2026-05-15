@@ -31,7 +31,6 @@ import { Roles } from "../../common/decorators/roles.decorator";
 import { SystemRole } from "@prisma/client";
 import { RateLimit } from "../rate-limiter/rate-limiter.decorator";
 import { Request } from "express";
-import { ClsService } from "nestjs-cls";
 
 interface JwtUser {
   id: string;
@@ -72,7 +71,6 @@ function enforceOwnership(
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
-    private readonly cls: ClsService,
   ) {}
 
   @Post()
@@ -117,7 +115,7 @@ export class UsersController {
 
     const profile = await this.usersService.getProfile(user.id);
 
-    return { user: profile };
+    return profile;
   }
 
   @Get(":id")
@@ -163,8 +161,8 @@ export class UsersController {
 
   @Put("profile")
   @Roles(SystemRole.CUSTOMER, SystemRole.ADMIN, SystemRole.SUPER_ADMIN)
-  async updateProfile(@Req() req, @Body() dto: UpdateProfileDto) {
-    const result = await this.usersService.updateProfile(req.user.sub, dto);
+  async updateProfile(@Req() req: Request, @Body() dto: UpdateProfileDto) {
+    const result = await this.usersService.updateProfile((req.user as { sub: string } | undefined)?.sub ?? '', dto);
     return { ...result, _message: "资料已更新" };
   }
 

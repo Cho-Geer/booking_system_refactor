@@ -11,8 +11,6 @@ import {
 
 @Injectable()
 export class AdminStatsService {
-  private readonly startTime: Date = new Date();
-
   constructor(private readonly statsService: StatsService) {}
 
   private toStatCard(
@@ -36,10 +34,10 @@ export class AdminStatsService {
   }
 
   async getDashboard(
-    timeRange?: string,
-    startDate?: string,
-    endDate?: string,
-    timezone?: string,
+    _timeRange?: string,
+    _startDate?: string,
+    _endDate?: string,
+    _timezone?: string,
   ): Promise<AdminStatsDto> {
     const [
       overview,
@@ -89,15 +87,11 @@ export class AdminStatsService {
 
     // activeUsers change: last month vs month before from usersByMonth
     const userMonths = userStats.usersByMonth;
-    const lastUserMonth =
-      userMonths.length >= 1 ? userMonths[userMonths.length - 1].count : 0;
     const prevUserMonth =
       userMonths.length >= 2 ? userMonths[userMonths.length - 2].count : 0;
 
     // totalRevenue change: last month vs month before from revenueByMonth
     const revMonths = revenue.revenueByMonth;
-    const lastRevMonth =
-      revMonths.length >= 1 ? revMonths[revMonths.length - 1].revenue : 0;
     const prevRevMonth =
       revMonths.length >= 2 ? revMonths[revMonths.length - 2].revenue : 0;
 
@@ -138,8 +132,8 @@ export class AdminStatsService {
    */
   async getBookingTrend(
     timeRange?: string,
-    startDate?: string,
-    endDate?: string,
+    _startDate?: string,
+    _endDate?: string,
     range?: string,
     _granularity?: string,
   ): Promise<{ date: string; count: number; revenue: number }[]> {

@@ -18,7 +18,6 @@ import { AdminNotificationsService } from "../services/admin-notifications.servi
 import {
   NotificationListDto,
   UnreadCountDto,
-  NotificationItemDto,
 } from "../dto/admin-notifications.dto";
 import { JwtAuthGuard } from "../../../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../../../common/guards/roles.guard";

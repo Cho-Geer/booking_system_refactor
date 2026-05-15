@@ -1,11 +1,8 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { NgClass } from '@angular/common';
 import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { filter } from 'rxjs/operators';
 import { AuthStore } from '../../../../stores/auth/auth.store';
-import { ApiService } from '../../../../core/services/api.service';
-import { SocketService } from '../../../../core/services/socket.service';
 import { AdminStore } from '../../../../features/admin/stores/admin.store';
 import { AppHeaderComponent, NavLink } from '../app-header/app-header.component';
 import { AppSidebarComponent, SidebarItem, SidebarSection } from '../app-sidebar/app-sidebar.component';
@@ -20,9 +17,7 @@ import { TranslationService } from '../../../../core/services/translation.servic
 })
 export class AppLayoutComponent implements OnInit {
   private authStore = inject(AuthStore);
-  private apiService = inject(ApiService);
   private router = inject(Router);
-  private socketService = inject(SocketService);
   private adminStore = inject(AdminStore);
   private translationService = inject(TranslationService);
 

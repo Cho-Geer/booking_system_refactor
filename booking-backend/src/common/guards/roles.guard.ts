@@ -92,31 +92,4 @@ export class RolesGuard implements CanActivate {
     console.warn("Access denied - insufficient role:", logData);
   }
 
-  /**
-   * Get hierarchical role precedence (optional)
-   *
-   * This can be used to define role hierarchies where higher roles
-   * automatically have permissions of lower roles.
-   */
-  private getRoleHierarchy(): Map<string, string[]> {
-    // Define role hierarchy (higher roles inherit lower role permissions)
-    return new Map([
-      ["ADMIN", ["CUSTOMER", "ADMIN"]],
-      ["CUSTOMER", ["CUSTOMER"]],
-      ["SUPER_ADMIN", ["CUSTOMER", "ADMIN", "SUPER_ADMIN"]],
-    ]);
-  }
-
-  /**
-   * Check if user role has hierarchical access to required role
-   */
-  private hasHierarchicalAccess(
-    userRole: string,
-    requiredRole: string,
-  ): boolean {
-    const hierarchy = this.getRoleHierarchy();
-    const userInheritedRoles = hierarchy.get(userRole) || [userRole];
-
-    return userInheritedRoles.includes(requiredRole);
-  }
 }

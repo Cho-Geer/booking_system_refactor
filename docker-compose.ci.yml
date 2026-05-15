@@ -1,0 +1,44 @@
+# =============================================================================
+# docker-compose.ci.yml — Test Architecture v2.0 CI Infrastructure
+# =============================================================================
+# CI-focused compose file with tmpfs for PostgreSQL for maximum speed.
+# Used by test-gates.yml workflow for integration and E2E test stages.
+# PostgreSQL and Redis match versions used in production.
+# =============================================================================
+
+version: '3.8'
+
+services:
+  # PostgreSQL Database (CI optimized)
+  postgres:
+    image: postgres:16-alpine
+    container_name: booking-ci-postgres
+    environment:
+      POSTGRES_DB: booking_test
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+    ports:
+      - '5432:5432'
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U test -d booking_test']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 3s
+    restart: 'no'
+
+  # Redis Cache (CI optimized)
+  redis:
+    image: redis:7-alpine
+    container_name: booking-ci-redis
+    ports:
+      - '6379:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 2s
+    restart: 'no'

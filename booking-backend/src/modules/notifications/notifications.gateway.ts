@@ -29,14 +29,13 @@ export class NotificationsGateway
   implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit
 {
   @WebSocketServer()
-  server: Server;
+  server!: Server;
 
   private readonly logger = new Logger(NotificationsGateway.name);
   private connectedClients = new Map<
     string,
     { socket: Socket; userId?: string; roles?: string[] }
   >();
-  private healthBroadcastInterval: ReturnType<typeof setInterval> | null = null;
 
   constructor(private readonly wsJwtGuard: WsJwtGuard) {}
 
@@ -44,7 +43,7 @@ export class NotificationsGateway
     this.logger.log(
       "NotificationsGateway initialized — starting health broadcast",
     );
-    this.healthBroadcastInterval = setInterval(() => {
+    setInterval(() => {
       if (this.connectedClients.size === 0) {
         return;
       }

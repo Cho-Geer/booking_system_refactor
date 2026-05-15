@@ -198,7 +198,7 @@ export class AdminService {
 
   markNotificationRead(id: string): Observable<null> {
     return this.http.post<ApiResponse<null>>(`${this.apiUrl}/admin/notifications/${id}/read`, {})
-      .pipe(map(response => null), catchError(this.handleError));
+      .pipe(map(_response => null), catchError(this.handleError));
   }
 
   getUnreadCount(): Observable<UnreadCount> {

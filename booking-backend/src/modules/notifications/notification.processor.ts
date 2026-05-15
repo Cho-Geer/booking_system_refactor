@@ -71,8 +71,8 @@ export class NotificationProcessor extends WorkerHost {
       return { sent: true, eventType: type, userId };
     } catch (error) {
       this.logger.error(
-        `Job ${job.id}: Failed to send notification (${type}): ${error.message}`,
-        error.stack,
+        `Job ${job.id}: Failed to send notification (${type}): ${(error as Error).message}`,
+        (error as Error).stack,
       );
       throw error;
     }

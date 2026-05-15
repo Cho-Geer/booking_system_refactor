@@ -39,5 +39,6 @@ import { AdminSettingsService } from "./services/admin-settings.service";
     AdminNotificationsService,
     AdminSettingsService,
   ],
+  exports: [AdminSettingsService],
 })
 export class AdminModule {}

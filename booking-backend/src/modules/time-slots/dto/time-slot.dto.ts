@@ -10,15 +10,15 @@ import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 export class CreateTimeSlotDto {
   @ApiProperty({ description: "Service ID" })
   @IsString()
-  serviceId: string;
+  serviceId!: string;
 
   @ApiProperty({ description: "Slot start time (ISO string)" })
   @IsDateString()
-  startTime: string;
+  startTime!: string;
 
   @ApiProperty({ description: "Slot end time (ISO string)" })
   @IsDateString()
-  endTime: string;
+  endTime!: string;
 
   @ApiPropertyOptional({ description: "Capacity", default: 1 })
   @IsOptional()
@@ -50,22 +50,22 @@ export class UpdateTimeSlotDto {
 
 export class AvailableTimeSlotDto {
   @ApiProperty()
-  id: string;
+  id!: string;
 
   @ApiProperty()
-  startTime: Date;
+  startTime!: Date;
 
   @ApiProperty()
-  endTime: Date;
+  endTime!: Date;
 
   @ApiProperty()
-  capacity: number;
+  capacity!: number;
 
   @ApiProperty()
-  bookedCount: number;
+  bookedCount!: number;
 
   @ApiProperty()
-  available: boolean;
+  available!: boolean;
 
   @ApiPropertyOptional()
   maxOvertimeMinutes?: number;

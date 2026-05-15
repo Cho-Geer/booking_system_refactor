@@ -16,7 +16,7 @@ export class CreateServiceDto {
 
   @ApiProperty({ description: "Service name" })
   @IsString()
-  name: string;
+  name!: string;
 
   @ApiPropertyOptional({ description: "Service description" })
   @IsOptional()
@@ -26,12 +26,12 @@ export class CreateServiceDto {
   @ApiProperty({ description: "Duration in minutes" })
   @IsNumber()
   @IsPositive()
-  durationMinutes: number;
+  durationMinutes!: number;
 
   @ApiProperty({ description: "Service price" })
   @IsNumber()
   @Min(0)
-  price: number;
+  price!: number;
 
   @ApiPropertyOptional({ description: "Maximum capacity", default: 1 })
   @IsOptional()

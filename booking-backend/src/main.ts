@@ -28,7 +28,7 @@ async function bootstrap() {
   app.use(csrfInstance.use.bind(csrfInstance));
 
   // CSRF token endpoint — generates token/secret pair, sets XSRF-TOKEN cookie
-  app.use("/v1/csrf/token", (req: Request, res: Response) => {
+  app.use("/v1/csrf/token", (_req: Request, res: Response) => {
     const { token, secret } = csrfInstance.generateToken();
     res.cookie("XSRF-TOKEN", secret, {
       httpOnly: false,

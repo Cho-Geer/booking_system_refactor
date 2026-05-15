@@ -47,6 +47,10 @@ const PRISMA_ERROR_MAP: Record<
   P2005: { status: HttpStatus.BAD_REQUEST, message: "Invalid field value" },
   P2006: { status: HttpStatus.BAD_REQUEST, message: "Invalid field value" },
   P2011: { status: HttpStatus.BAD_REQUEST, message: "Required field missing" },
+  P2021: {
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    message: "Database table not found. Please run database migrations.",
+  },
   P2012: { status: HttpStatus.BAD_REQUEST, message: "Required field missing" },
   P2025: { status: HttpStatus.NOT_FOUND, message: "Resource not found" },
   P2034: {
@@ -130,7 +134,9 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       message,
       error,
       errors: errors.length > 0 ? errors : undefined,
-      timestamp: formatTimestampWithTimezone(request.headers?.["x-timezone"] as string | undefined),
+      timestamp: formatTimestampWithTimezone(
+        request.headers?.["x-timezone"] as string | undefined,
+      ),
       path: request.url,
       requestId,
     });

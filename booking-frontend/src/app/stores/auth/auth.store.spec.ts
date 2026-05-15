@@ -520,6 +520,36 @@ describe('AuthStore', () => {
 
       expect(store.error()).toBe('Profile fetch failed');
     });
+
+    // ============================================================
+    // [RED] Test: preferredTimezone mapping in fetchUserProfile
+    // Backend returns preferredTimezone but the store mapping
+    // doesn't include it. This test WILL FAIL until the mapping
+    // is added to auth.store.ts fetchUserProfile().
+    // ============================================================
+
+    it('[RED] should fail: fetchUserProfile should map preferredTimezone from API response', async () => {
+      apiServiceMock.getUserProfile.mockReturnValue(
+        of({
+          id: '1',
+          name: 'Test User',
+          email: 'tes***@example.com',
+          role: 'CUSTOMER',
+          preferredTimezone: 'Asia/Shanghai',
+          createdAt: '2026-01-01T00:00:00Z',
+        })
+      );
+
+      await store.fetchUserProfile();
+
+      const storedUser = store.user();
+      expect(storedUser).not.toBeNull();
+      // TARGET: preferredTimezone should be 'Asia/Shanghai'
+      // CURRENT: fetchUserProfile() doesn't map preferredTimezone → this assertion FAILS
+      expect(storedUser).toEqual(
+        expect.objectContaining({ preferredTimezone: 'Asia/Shanghai' })
+      );
+    });
   });
 
   // ==========================================

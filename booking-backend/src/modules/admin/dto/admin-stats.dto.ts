@@ -1,10 +1,8 @@
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { ApiProperty } from "@nestjs/swagger";
 import {
   IsString,
   IsNumber,
-  IsInt,
   IsBoolean,
-  IsOptional,
 } from "class-validator";
 
 export interface TimeDistributionItem {

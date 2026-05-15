@@ -18,7 +18,7 @@ export class CreateUserDto {
   @IsString()
   @IsNotEmpty({ message: "Name is required" })
   @MaxLength(100, { message: "Name must not exceed 100 characters" })
-  name: string;
+  name!: string;
 
   @ApiPropertyOptional({ description: "User email" })
   @IsOptional()
@@ -35,7 +35,7 @@ export class CreateUserDto {
   @ApiProperty({ description: "User password" })
   @IsString()
   @IsNotEmpty({ message: "Password is required" })
-  password: string;
+  password!: string;
 
   @ApiPropertyOptional({
     description: "User role",
@@ -80,10 +80,10 @@ export class UpdateUserDto {
 
 export class UserResponseDto {
   @ApiProperty({ description: "User ID" })
-  id: string;
+  id!: string;
 
   @ApiProperty({ description: "User name" })
-  name: string;
+  name!: string;
 
   @ApiPropertyOptional({ description: "User email" })
   email?: string;
@@ -92,10 +92,10 @@ export class UserResponseDto {
   phone?: string;
 
   @ApiProperty({ description: "User role", enum: SystemRole })
-  role: SystemRole;
+  role!: SystemRole;
 
   @ApiProperty({ description: "User status", enum: UserStatus })
-  status: UserStatus;
+  status!: UserStatus;
 
   @ApiProperty({ description: "Last login time" })
   lastLoginAt?: Date;
@@ -107,8 +107,8 @@ export class UserResponseDto {
   remarks?: string;
 
   @ApiProperty({ description: "Created at" })
-  createdAt: Date;
+  createdAt!: Date;
 
   @ApiProperty({ description: "Updated at" })
-  updatedAt: Date;
+  updatedAt!: Date;
 }

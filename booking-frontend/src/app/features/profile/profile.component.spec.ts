@@ -87,9 +87,10 @@ describe('ProfileComponent', () => {
   });
 
   describe('save profile', () => {
-    it('[RED] should fail: should call updateProfile and update store on save', () => {
+    it('[GREEN] should call updateProfile and update store on save with flat response', () => {
       const updatedUser = { ...mockUser, name: 'Updated Name' };
-      const updateResponse = { user: { ...updatedUser } };
+      // Backend now returns flat object (no { user: ... } wrapper)
+      const updateResponse = { ...updatedUser, _message: '资料已更新' };
       apiServiceMock.updateProfile.mockReturnValue(of(updateResponse));
 
       component.toggleEdit();
@@ -97,8 +98,35 @@ describe('ProfileComponent', () => {
       component.saveProfile();
 
       expect(apiServiceMock.updateProfile).toHaveBeenCalledWith({ name: 'Updated Name' });
-      expect(authStoreMock.setUserProfile).toHaveBeenCalledWith({ ...updatedUser });
+      // Must read from flat response: response.name, NOT response.user.name
+      expect(authStoreMock.setUserProfile).toHaveBeenCalledWith({
+        id: updatedUser.id,
+        name: 'Updated Name',
+        role: updatedUser.role,
+        email: updatedUser.email,
+        phone: updatedUser.phone,
+        createdAt: updatedUser.createdAt,
+      });
       expect(component.isEditing()).toBe(false);
+    });
+
+    it('[GREEN] should NOT pass user wrapper to setUserProfile (regression: must read flat)', () => {
+      // Simulate backend flat response: { id, name, role, ... } NOT { user: { ... } }
+      const flatResponse = { ...mockUser, name: 'Admin Name', _message: '资料已更新' };
+      apiServiceMock.updateProfile.mockReturnValue(of(flatResponse));
+
+      component.toggleEdit();
+      component.editName.set('Admin Name');
+      component.saveProfile();
+
+      // Verify setUserProfile is called with flat data, NOT { user: { ... } }
+      const callArgs = authStoreMock.setUserProfile.mock.calls[0][0];
+      expect(callArgs.id).toBe(mockUser.id);
+      // Must read response.name directly (flat), NOT response.user.name
+      expect(callArgs.name).toBe('Admin Name');
+      expect(callArgs.role).toBe(mockUser.role);
+      // Must NOT have .user wrapper — critical regression check
+      expect(callArgs.user).toBeUndefined();
     });
 
     it('[RED] should fail: should not save when name is empty', () => {

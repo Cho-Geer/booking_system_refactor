@@ -16,7 +16,6 @@ import { RolesGuard } from "../../common/guards/roles.guard";
 import { Roles } from "../../common/decorators/roles.decorator";
 import {
   TranslationService,
-  TranslationResult,
   BatchUpsertResult,
   SeedTranslationResult,
   PaginatedTranslationsResult,

@@ -1,6 +1,6 @@
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { IsOptional, IsNumber, IsString, IsBoolean, Min } from "class-validator";
-import { Type } from "class-transformer";
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsOptional, IsNumber, IsString, IsBoolean, Min } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class AdminServiceDto {
   @ApiProperty()
@@ -12,59 +12,73 @@ export class AdminServiceDto {
   @ApiProperty()
   description!: string;
 
-  @ApiProperty({ description: "Duration in minutes" })
+  @ApiProperty({ description: 'Duration in minutes' })
   duration!: number;
 
   @ApiProperty()
   price!: number;
 
-  @ApiProperty({ description: "Whether the service is active" })
+  @ApiProperty({ description: 'Whether the service is active' })
   active!: boolean;
 
-  @ApiPropertyOptional({ description: "Price per minute (auto-calculated)" })
+  @ApiPropertyOptional({ description: 'Price per minute (auto-calculated)' })
   pricePerMinute?: number;
 
-  @ApiPropertyOptional({ description: "Image URL (placeholder)" })
+  @ApiPropertyOptional({ description: 'Image URL (placeholder)' })
   imageUrl?: string;
 
-  @ApiPropertyOptional({ description: "Tax rate" })
+  @ApiPropertyOptional({ description: 'Tax rate' })
   taxRate?: number;
 
-  @ApiPropertyOptional({ description: "Service category name" })
+  @ApiPropertyOptional({ description: 'Service category name' })
   category?: string;
 
-  @ApiProperty({ format: "date-time" })
+  @ApiProperty({ format: 'date-time' })
   createdAt!: Date;
 }
 
 export class CreateAdminServiceDto {
-  @ApiPropertyOptional({ description: "Service category name" })
+  @ApiPropertyOptional({ description: 'Service category name' })
   @IsOptional()
   @IsString()
   category?: string;
 
   @ApiProperty()
+  @IsString()
   name!: string;
 
   @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
   description?: string;
 
-  @ApiProperty({ description: "Duration in minutes" })
+  @ApiProperty({ description: 'Duration in minutes' })
+  @IsNumber()
+  @Min(0)
   duration!: number;
 
   @ApiProperty()
+  @IsNumber()
+  @Min(0)
   price!: number;
 
   @ApiPropertyOptional({ default: true })
+  @IsOptional()
+  @IsBoolean()
   active?: boolean;
 
-  @ApiPropertyOptional({ description: "Price per minute (auto-calculated)" })
+  @ApiPropertyOptional({ description: 'Price per minute (auto-calculated)' })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
   pricePerMinute?: number;
 
   @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
   imageUrl?: string;
 
-  @ApiPropertyOptional({ description: "Tax rate" })
+  @ApiPropertyOptional({ description: 'Tax rate' })
   @IsOptional()
   @IsNumber()
   @Min(0)
@@ -82,7 +96,7 @@ export class UpdateAdminServiceDto {
   @IsString()
   description?: string;
 
-  @ApiPropertyOptional({ description: "Duration in minutes" })
+  @ApiPropertyOptional({ description: 'Duration in minutes' })
   @IsOptional()
   @IsNumber()
   @Min(0)
@@ -99,7 +113,7 @@ export class UpdateAdminServiceDto {
   @IsBoolean()
   active?: boolean;
 
-  @ApiPropertyOptional({ description: "Price per minute (auto-calculated)" })
+  @ApiPropertyOptional({ description: 'Price per minute (auto-calculated)' })
   @IsOptional()
   @IsNumber()
   @Min(0)
@@ -124,36 +138,36 @@ export class AdminServicesQueryDto {
   @IsNumber()
   limit?: number = 20;
 
-  @ApiPropertyOptional({ description: "Search by service name or description" })
+  @ApiPropertyOptional({ description: 'Search by service name or description' })
   @IsOptional()
   @IsString()
   search?: string;
 
-  @ApiPropertyOptional({ description: "Filter by active status" })
+  @ApiPropertyOptional({ description: 'Filter by active status' })
   @IsOptional()
   @Type(() => Boolean)
   @IsBoolean()
   active?: boolean;
 
-  @ApiPropertyOptional({ description: "Filter by category" })
+  @ApiPropertyOptional({ description: 'Filter by category' })
   @IsOptional()
   @IsString()
   category?: string;
 }
 
 export class AdminServiceSummaryDto {
-  @ApiProperty({ description: "Total number of services" })
+  @ApiProperty({ description: 'Total number of services' })
   totalServices!: number;
 
-  @ApiProperty({ description: "Number of active services" })
+  @ApiProperty({ description: 'Number of active services' })
   activeServicesCount!: number;
 
-  @ApiProperty({ description: "Number of inactive services" })
+  @ApiProperty({ description: 'Number of inactive services' })
   inactiveServicesCount!: number;
 
-  @ApiProperty({ description: "Average price across all services" })
+  @ApiProperty({ description: 'Average price across all services' })
   averagePrice!: number;
 
-  @ApiProperty({ description: "Service count grouped by category" })
+  @ApiProperty({ description: 'Service count grouped by category' })
   categories!: { category: string; count: number }[];
 }
