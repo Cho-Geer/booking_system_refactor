@@ -8,11 +8,7 @@ import { RegisterCompleteDto } from './dto/register-complete.dto';
 import { LoginPasswordDto } from './dto/login-password.dto';
 import { LoginSendCodeDto } from './dto/login-send-code.dto';
 import { LoginVerifyCodeDto } from './dto/login-verify-code.dto';
-import {
-  AuthResponseDto,
-  SendCodeResponseDto,
-  LogoutResponseDto,
-} from './dto/auth-response.dto';
+import { AuthResponseDto, SendCodeResponseDto, LogoutResponseDto } from './dto/auth-response.dto';
 
 /**
  * Helper: create a mock Express Response object
@@ -161,9 +157,7 @@ describe('AuthController', () => {
       );
 
       const mockRes = createMockRes();
-      await expect(controller.registerComplete(dto, mockRes)).rejects.toThrow(
-        '该邮箱已注册',
-      );
+      await expect(controller.registerComplete(dto, mockRes)).rejects.toThrow('该邮箱已注册');
       expect(authService.registerComplete).toHaveBeenCalledWith(dto);
     });
   });
@@ -393,9 +387,9 @@ describe('AuthController', () => {
         mockReq.user = {};
         const mockRes = createMockRes();
 
-        await expect(
-          controller.logout(mockReq, mockRes, 'Bearer invalid-token'),
-        ).rejects.toThrow('无法获取用户身份');
+        await expect(controller.logout(mockReq, mockRes, 'Bearer invalid-token')).rejects.toThrow(
+          '无法获取用户身份',
+        );
       });
 
       it('should use different userId for different authenticated users', async () => {

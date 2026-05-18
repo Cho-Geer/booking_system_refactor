@@ -3,10 +3,7 @@ import { INestApplication } from '@nestjs/common';
 import { RetentionService } from '../src/modules/retention/retention.service';
 import { PrismaService } from '../src/common/database/prisma.service';
 import { AppModule } from '../src/app.module';
-import {
-  createTestModule,
-  TestModule,
-} from './helpers/create-test-module';
+import { createTestModule, TestModule } from './helpers/create-test-module';
 import {
   createTestUser,
   createTestCategory,
@@ -134,7 +131,11 @@ describe('RetentionService (e2e)', () => {
           appointmentDate: new Date(),
           slotSequence: 1,
           status: AppointmentStatus.COMPLETED,
-          customerInfo: { name: 'Recent Customer', email: 'recent@example.com', phone: '+15551234568' },
+          customerInfo: {
+            name: 'Recent Customer',
+            email: 'recent@example.com',
+            phone: '+15551234568',
+          },
           remarks: 'Recent completed appointment',
         },
       });
@@ -199,7 +200,11 @@ describe('RetentionService (e2e)', () => {
           appointmentDate: oldDate,
           slotSequence: 1,
           status: AppointmentStatus.PENDING,
-          customerInfo: { name: 'Pending Customer', email: 'pending@example.com', phone: '+15551234567' },
+          customerInfo: {
+            name: 'Pending Customer',
+            email: 'pending@example.com',
+            phone: '+15551234567',
+          },
           remarks: 'Pending old appointment',
         },
       });
@@ -229,7 +234,11 @@ describe('RetentionService (e2e)', () => {
           appointmentDate: oldDate,
           slotSequence: 1,
           status: AppointmentStatus.CONFIRMED,
-          customerInfo: { name: 'Confirmed Customer', email: 'confirmed@example.com', phone: '+15551234568' },
+          customerInfo: {
+            name: 'Confirmed Customer',
+            email: 'confirmed@example.com',
+            phone: '+15551234568',
+          },
           remarks: 'Confirmed old appointment',
         },
       });
@@ -281,7 +290,7 @@ describe('RetentionService (e2e)', () => {
           data: {
             serviceId: svc.id,
             startTime: oldDate,
-          endTime: new Date(oldDate.getTime() + 60 * 60 * 1000),
+            endTime: new Date(oldDate.getTime() + 60 * 60 * 1000),
             capacity: 5,
             currentSequence: 0,
             isActive: true,
@@ -297,7 +306,11 @@ describe('RetentionService (e2e)', () => {
             appointmentDate: oldDate,
             slotSequence: 1,
             status,
-            customerInfo: { name: `${status} Customer`, email: `${status.toLowerCase()}@example.com`, phone: '+15551234567' },
+            customerInfo: {
+              name: `${status} Customer`,
+              email: `${status.toLowerCase()}@example.com`,
+              phone: '+15551234567',
+            },
             remarks: `${status} old appointment`,
           },
         });
@@ -768,7 +781,11 @@ describe('RetentionService (e2e)', () => {
           appointmentDate: recentDate,
           slotSequence: 1,
           status: AppointmentStatus.COMPLETED,
-          customerInfo: { name: 'Recent Customer', email: 'recent@example.com', phone: '+15551234567' },
+          customerInfo: {
+            name: 'Recent Customer',
+            email: 'recent@example.com',
+            phone: '+15551234567',
+          },
           remarks: 'Recent completed within retention',
         },
       });
@@ -812,7 +829,10 @@ describe('RetentionService (e2e)', () => {
       // Seed various old data
       const category = await createTestCategory(prisma);
       const svc = await createTestService(prisma, category.id);
-      const slot = await createTestTimeSlot(prisma, svc.id, { startTime: oldDate, endTime: new Date(oldDate.getTime() + 60 * 60 * 1000) });
+      const slot = await createTestTimeSlot(prisma, svc.id, {
+        startTime: oldDate,
+        endTime: new Date(oldDate.getTime() + 60 * 60 * 1000),
+      });
 
       // Old completed appointment
       const apt = await createTestAppointment(prisma, {
@@ -900,7 +920,7 @@ describe('RetentionService (e2e)', () => {
           data: {
             serviceId: svc.id,
             startTime: oldDate,
-          endTime: new Date(oldDate.getTime() + 60 * 60 * 1000),
+            endTime: new Date(oldDate.getTime() + 60 * 60 * 1000),
             capacity: 5,
             currentSequence: i,
             isActive: true,
@@ -915,7 +935,11 @@ describe('RetentionService (e2e)', () => {
             appointmentDate: oldDate,
             slotSequence: 1,
             status: AppointmentStatus.COMPLETED,
-            customerInfo: { name: `Batch Customer ${i}`, email: `batch-${i}@example.com`, phone: '+15551234567' },
+            customerInfo: {
+              name: `Batch Customer ${i}`,
+              email: `batch-${i}@example.com`,
+              phone: '+15551234567',
+            },
           },
         });
         await prisma.$executeRaw`
@@ -944,7 +968,11 @@ describe('RetentionService (e2e)', () => {
           appointmentDate: recentDate,
           slotSequence: 1,
           status: AppointmentStatus.CONFIRMED,
-          customerInfo: { name: 'Batch Recent', email: 'batch-recent@example.com', phone: '+15551234568' },
+          customerInfo: {
+            name: 'Batch Recent',
+            email: 'batch-recent@example.com',
+            phone: '+15551234568',
+          },
         },
       });
 

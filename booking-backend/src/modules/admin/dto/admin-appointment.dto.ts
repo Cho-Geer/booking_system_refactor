@@ -1,13 +1,24 @@
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { IsOptional, IsNumber, IsString, IsNotEmpty, IsInt, Min, IsEnum, IsDateString } from "class-validator";
-import { Type } from "class-transformer";
-import { AppointmentStatus } from "@prisma/client";
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  IsOptional,
+  IsNumber,
+  IsString,
+  IsNotEmpty,
+  IsInt,
+  Min,
+  IsEnum,
+  IsDateString,
+  IsArray,
+  ArrayNotEmpty,
+} from 'class-validator';
+import { Type } from 'class-transformer';
+import { AppointmentStatus } from '@prisma/client';
 
 export class AdminAppointmentDto {
   @ApiProperty()
   id!: string;
 
-  @ApiProperty({ description: "Display ID for admin panel" })
+  @ApiProperty({ description: 'Display ID for admin panel' })
   appointmentNumber!: string;
 
   @ApiProperty()
@@ -25,34 +36,37 @@ export class AdminAppointmentDto {
   @ApiProperty()
   timeSlotId!: string;
 
-  @ApiProperty({ format: "date-time" })
+  @ApiProperty({ format: 'date-time' })
   appointmentDate!: string;
 
-  @ApiProperty({ enum: ["PENDING", "CONFIRMED", "COMPLETED", "CANCELLED", "EXPIRED"] })
+  @ApiProperty({ enum: ['PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED', 'EXPIRED'] })
   status!: string;
 
-  @ApiPropertyOptional({ description: "Duration in minutes" })
+  @ApiPropertyOptional({ description: 'Duration in minutes' })
   durationMinutes?: number;
 
-  @ApiPropertyOptional({ description: "Price" })
+  @ApiPropertyOptional({ description: 'Price' })
   price?: number;
 
-  @ApiPropertyOptional({ description: "Tax rate" })
+  @ApiPropertyOptional({ description: 'Tax rate' })
   taxRate?: number;
 
-  @ApiPropertyOptional({ description: "Tax included amount" })
+  @ApiPropertyOptional({ description: 'Tax included amount' })
   taxIncludedAmount?: number;
 
-  @ApiProperty({ format: "date-time" })
+  @ApiProperty({ format: 'date-time' })
   createdAt!: Date;
+
+  @ApiPropertyOptional({ description: 'Whether the associated service is active' })
+  serviceActive?: boolean;
 }
 
 export class UpdateAppointmentStatusDto {
-  @ApiProperty({ enum: ["PENDING", "CONFIRMED", "COMPLETED", "CANCELLED", "EXPIRED"] })
+  @ApiProperty({ enum: ['PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED', 'EXPIRED'] })
   @IsEnum(AppointmentStatus)
   status!: AppointmentStatus;
 
-  @ApiPropertyOptional({ description: "Reason for status change" })
+  @ApiPropertyOptional({ description: 'Reason for status change' })
   @IsOptional()
   @IsString()
   reason?: string;
@@ -60,9 +74,14 @@ export class UpdateAppointmentStatusDto {
 
 export class BatchCancelDto {
   @ApiProperty({ type: [String] })
+  @IsArray()
+  @IsString({ each: true })
+  @ArrayNotEmpty()
   ids!: string[];
 
   @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
   reason?: string;
 }
 
@@ -78,32 +97,32 @@ export class BatchCancelResponseDto {
 }
 
 export class CreateAdminAppointmentDto {
-  @ApiProperty({ description: "Customer user ID" })
+  @ApiProperty({ description: 'Customer user ID' })
   @IsString()
   @IsNotEmpty()
   userId!: string;
 
-  @ApiProperty({ description: "Service ID" })
+  @ApiProperty({ description: 'Service ID' })
   @IsString()
   @IsNotEmpty()
   serviceId!: string;
 
-  @ApiProperty({ format: "date-time", description: "Appointment date and time" })
+  @ApiProperty({ format: 'date-time', description: 'Appointment date and time' })
   @IsDateString()
   @IsNotEmpty()
   appointmentDate!: string;
 
-  @ApiProperty({ description: "Time slot ID" })
+  @ApiProperty({ description: 'Time slot ID' })
   @IsString()
   @IsNotEmpty()
   timeSlotId!: string;
 
-  @ApiPropertyOptional({ description: "Additional notes" })
+  @ApiPropertyOptional({ description: 'Additional notes' })
   @IsOptional()
   @IsString()
   notes?: string;
 
-  @ApiPropertyOptional({ description: "Overtime minutes" })
+  @ApiPropertyOptional({ description: 'Overtime minutes' })
   @IsOptional()
   @IsInt()
   @Min(0)
@@ -123,17 +142,17 @@ export class AdminAppointmentsQueryDto {
   @IsNumber()
   limit?: number = 20;
 
-  @ApiPropertyOptional({ enum: ["PENDING", "CONFIRMED", "COMPLETED", "CANCELLED", "EXPIRED"] })
+  @ApiPropertyOptional({ enum: ['PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED', 'EXPIRED'] })
   @IsOptional()
   @IsEnum(AppointmentStatus)
   status?: AppointmentStatus;
 
-  @ApiPropertyOptional({ format: "date" })
+  @ApiPropertyOptional({ format: 'date' })
   @IsOptional()
   @IsString()
   startDate?: string;
 
-  @ApiPropertyOptional({ format: "date" })
+  @ApiPropertyOptional({ format: 'date' })
   @IsOptional()
   @IsString()
   endDate?: string;
@@ -148,7 +167,9 @@ export class AdminAppointmentsQueryDto {
   @IsString()
   userId?: string;
 
-  @ApiPropertyOptional({ description: "Search by appointment number, customer name, or service name" })
+  @ApiPropertyOptional({
+    description: 'Search by appointment number, customer name, or service name',
+  })
   @IsOptional()
   @IsString()
   search?: string;

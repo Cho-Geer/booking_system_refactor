@@ -1,6 +1,6 @@
-import { Module } from "@nestjs/common";
-import { EncryptionService } from "./encryption.service";
-import { HashService } from "./hash.service";
+import { Module } from '@nestjs/common';
+import { EncryptionService } from './encryption.service';
+import { HashService } from './hash.service';
 
 @Module({
   providers: [EncryptionService, HashService],

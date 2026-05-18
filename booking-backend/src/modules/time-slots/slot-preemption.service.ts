@@ -1,7 +1,7 @@
-import { Injectable, Logger } from "@nestjs/common";
-import { PrismaService } from "../../common/database/prisma.service";
-import { RateLimiterService } from "../rate-limiter/rate-limiter.service";
-import { createHash } from "crypto";
+import { Injectable, Logger } from '@nestjs/common';
+import { PrismaService } from '../../common/database/prisma.service';
+import { RateLimiterService } from '../rate-limiter/rate-limiter.service';
+import { createHash } from 'crypto';
 
 // Configuration constants (can be moved to environment variables)
 const SEQUENCE_RANGE = 10; // N: Number of slot sequences per time slot [5, 50]
@@ -13,7 +13,7 @@ const BACKOFF_BASE_MS = 100; // Base delay for exponential backoff [50, 500]
  */
 export interface ReservationResult {
   success: boolean;
-  status: "SUCCESS" | "RATE_LIMITED" | "CONFLICT" | "FAILED";
+  status: 'SUCCESS' | 'RATE_LIMITED' | 'CONFLICT' | 'FAILED';
   appointment?: Record<string, unknown>;
   allocatedSeq?: number;
   retryAfter?: number;
@@ -73,7 +73,7 @@ export class SlotPreemptionService {
     const rateLimitResult = await this.rateLimiter.isAllowed(
       userId,
       `/slots/${slotId}/reserve`,
-      "strict",
+      'strict',
       1,
       1,
     );
@@ -82,9 +82,9 @@ export class SlotPreemptionService {
       this.logger.warn(`Rate limit exceeded for user ${userId}`);
       return {
         success: false,
-        status: "RATE_LIMITED",
+        status: 'RATE_LIMITED',
         retryAfter: rateLimitResult.retryAfter ?? 1,
-        reason: "Rate limit exceeded. Please try again later.",
+        reason: 'Rate limit exceeded. Please try again later.',
       };
     }
 
@@ -111,9 +111,7 @@ export class SlotPreemptionService {
   /**
    * Attempt to reserve a slot with exponential backoff retries.
    */
-  private async attemptReservation(
-    input: ReservationInput,
-  ): Promise<ReservationResult> {
+  private async attemptReservation(input: ReservationInput): Promise<ReservationResult> {
     const {
       userId,
       slotId,
@@ -147,7 +145,7 @@ export class SlotPreemptionService {
 
             if (updateResult.count === 0) {
               // Collision detected - slot already taken or sequence mismatch
-              return { success: false, reason: "VERSION_CONFLICT" };
+              return { success: false, reason: 'VERSION_CONFLICT' };
             }
 
             // Slot claimed successfully - create appointment
@@ -156,7 +154,7 @@ export class SlotPreemptionService {
                 userId,
                 timeSlotId: slotId,
                 serviceId,
-                status: "PENDING",
+                status: 'PENDING',
                 customerInfo: {
                   name: customerName,
                   email: customerEmail,
@@ -180,7 +178,7 @@ export class SlotPreemptionService {
             };
           },
           {
-            isolationLevel: "Serializable",
+            isolationLevel: 'Serializable',
             timeout: 5000, // 5 seconds timeout
           },
         );
@@ -191,11 +189,8 @@ export class SlotPreemptionService {
           );
           return {
             success: true,
-            status: "SUCCESS",
-            appointment: reservationResult.appointment as Record<
-              string,
-              unknown
-            >,
+            status: 'SUCCESS',
+            appointment: reservationResult.appointment as Record<string, unknown>,
             allocatedSeq: reservationResult.allocatedSeq,
           };
         }
@@ -211,14 +206,9 @@ export class SlotPreemptionService {
       } catch (error: unknown) {
         const err = error as Record<string, unknown>;
         // Handle transaction errors
-        if (
-          err["code"] === "P2034" ||
-          (err["message"] as string)?.includes("timeout")
-        ) {
+        if (err['code'] === 'P2034' || (err['message'] as string)?.includes('timeout')) {
           // Transaction timeout - retry if attempts remain
-          this.logger.warn(
-            `Transaction timeout for slot ${slotId}, attempt ${attempt + 1}`,
-          );
+          this.logger.warn(`Transaction timeout for slot ${slotId}, attempt ${attempt + 1}`);
           if (attempt < MAX_RETRIES - 1) {
             const delay = BACKOFF_BASE_MS * Math.pow(2, attempt);
             await this.sleep(delay);
@@ -226,8 +216,8 @@ export class SlotPreemptionService {
           }
           return {
             success: false,
-            status: "FAILED",
-            reason: "Database timeout. Service temporarily unavailable.",
+            status: 'FAILED',
+            reason: 'Database timeout. Service temporarily unavailable.',
           };
         }
 
@@ -248,29 +238,23 @@ export class SlotPreemptionService {
     );
     return {
       success: false,
-      status: "CONFLICT",
-      reason: "Slot reservation failed: maximum retries exceeded",
+      status: 'CONFLICT',
+      reason: 'Slot reservation failed: maximum retries exceeded',
     };
   }
 
   /**
    * Generate an idempotency key from request data.
    */
-  static generateIdempotencyKey(
-    userId: string,
-    slotId: string,
-    timestamp: number,
-  ): string {
+  static generateIdempotencyKey(userId: string, slotId: string, timestamp: number): string {
     const payload = `${userId}:${slotId}:${Math.floor(timestamp / 1000)}`;
-    return createHash("sha256").update(payload).digest("hex");
+    return createHash('sha256').update(payload).digest('hex');
   }
 
   /**
    * Get cached idempotent result from Redis.
    */
-  private async getCachedIdempotentResult(
-    key: string,
-  ): Promise<ReservationResult | null> {
+  private async getCachedIdempotentResult(key: string): Promise<ReservationResult | null> {
     try {
       const redisClient = this.rateLimiter.getRedisClient();
       if (!redisClient) {
@@ -291,10 +275,7 @@ export class SlotPreemptionService {
   /**
    * Cache idempotent result in Redis with 60s TTL.
    */
-  private async cacheIdempotentResult(
-    key: string,
-    result: ReservationResult,
-  ): Promise<void> {
+  private async cacheIdempotentResult(key: string, result: ReservationResult): Promise<void> {
     try {
       const redisClient = this.rateLimiter.getRedisClient();
       if (!redisClient) {

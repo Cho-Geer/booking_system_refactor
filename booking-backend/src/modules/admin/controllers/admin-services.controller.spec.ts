@@ -15,6 +15,7 @@ const mockAdminServicesService = {
   create: jest.fn(),
   update: jest.fn(),
   remove: jest.fn(),
+  getAffectedAppointments: jest.fn(),
 };
 
 // ── Fixtures ───────────────────────────────────────────────────────────
@@ -150,9 +151,7 @@ describe('AdminServicesController', () => {
         new NotFoundException('Service with ID invalid-id not found'),
       );
 
-      await expect(controller.findOne('invalid-id')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(controller.findOne('invalid-id')).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -222,9 +221,7 @@ describe('AdminServicesController', () => {
         new NotFoundException('Service with ID invalid-id not found'),
       );
 
-      await expect(
-        controller.update('invalid-id', updateDto),
-      ).rejects.toThrow(NotFoundException);
+      await expect(controller.update('invalid-id', updateDto)).rejects.toThrow(NotFoundException);
     });
 
     it('should allow updating active status via update DTO', async () => {
@@ -241,13 +238,15 @@ describe('AdminServicesController', () => {
 
   // ─── remove ──────────────────────────────────────────────────────────
   describe('remove', () => {
-    it('should call service.remove and return undefined (204)', async () => {
-      mockAdminServicesService.remove.mockResolvedValue(undefined);
+    it('should call service.remove and return success message (200)', async () => {
+      mockAdminServicesService.remove.mockResolvedValue({
+        message: 'Service disabled successfully',
+      });
 
       const result = await controller.remove('svc-1');
 
       expect(adminService.remove).toHaveBeenCalledWith('svc-1');
-      expect(result).toBeUndefined();
+      expect(result).toEqual({ message: 'Service disabled successfully' });
     });
 
     it('should propagate NotFoundException from service.remove', async () => {
@@ -255,9 +254,25 @@ describe('AdminServicesController', () => {
         new NotFoundException('Service with ID invalid-id not found'),
       );
 
-      await expect(controller.remove('invalid-id')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(controller.remove('invalid-id')).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  // ─── getAffectedAppointments ────────────────────────────────────────
+  describe('getAffectedAppointments', () => {
+    it('should call service.getAffectedAppointments and return counts', async () => {
+      const mockResult = {
+        serviceName: 'Haircut',
+        pendingCount: 3,
+        confirmedCount: 5,
+        totalAffected: 8,
+      };
+      mockAdminServicesService.getAffectedAppointments.mockResolvedValue(mockResult);
+
+      const result = await controller.getAffectedAppointments('svc-1');
+
+      expect(adminService.getAffectedAppointments).toHaveBeenCalledWith('svc-1');
+      expect(result).toEqual(mockResult);
     });
   });
 });

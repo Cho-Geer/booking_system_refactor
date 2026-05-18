@@ -50,13 +50,11 @@ describe('LoginComponent', () => {
 
     socketServiceMock = {
       connect: jest.fn(),
+      subscribeToTranslationUpdates: jest.fn(() => of({ type: 'translation_updated', timestamp: new Date().toISOString() })),
     };
 
     await TestBed.configureTestingModule({
-      imports: [
-        LoginComponent,
-        ReactiveFormsModule,
-      ],
+      imports: [LoginComponent, ReactiveFormsModule],
       providers: [
         provideRouter([]),
         { provide: AuthStore, useValue: authStoreMock },
@@ -181,7 +179,7 @@ describe('LoginComponent', () => {
     it('should not submit when terms are not accepted', () => {
       component.passwordForm.patchValue({
         contact: 'test@example.com',
-        password: 'password123',
+        password: 'Test@1234',
       });
       component.acceptTerms.set(false);
 
@@ -193,29 +191,29 @@ describe('LoginComponent', () => {
     it('should call api.loginPassword with credentials when form is valid and terms accepted', () => {
       component.passwordForm.patchValue({
         contact: 'test@example.com',
-        password: 'password123',
+        password: 'Test@1234',
       });
       component.acceptTerms.set(true);
       apiServiceMock.loginPassword.mockReturnValue(of(mockLoginResponse));
-      apiServiceMock.getUserProfile.mockReturnValue(of(null));
+      apiServiceMock.getUserProfile.mockReturnValue(of(mockUser));
 
       component.onPasswordLogin();
 
       expect(apiServiceMock.loginPassword).toHaveBeenCalledWith({
         contact: 'test@example.com',
         contactType: 'email',
-        password: 'password123',
+        password: 'Test@1234',
       });
     });
 
     it('should set loading state before making API call', () => {
       component.passwordForm.patchValue({
         contact: 'test@example.com',
-        password: 'password123',
+        password: 'Test@1234',
       });
       component.acceptTerms.set(true);
       apiServiceMock.loginPassword.mockReturnValue(of(mockLoginResponse));
-      apiServiceMock.getUserProfile.mockReturnValue(of(null));
+      apiServiceMock.getUserProfile.mockReturnValue(of(mockUser));
 
       component.onPasswordLogin();
 
@@ -225,11 +223,11 @@ describe('LoginComponent', () => {
     it('should call loginSuccess on successful login', () => {
       component.passwordForm.patchValue({
         contact: 'test@example.com',
-        password: 'password123',
+        password: 'Test@1234',
       });
       component.acceptTerms.set(true);
       apiServiceMock.loginPassword.mockReturnValue(of(mockLoginResponse));
-      apiServiceMock.getUserProfile.mockReturnValue(of(null));
+      apiServiceMock.getUserProfile.mockReturnValue(of(mockUser));
 
       component.onPasswordLogin();
 
@@ -239,11 +237,11 @@ describe('LoginComponent', () => {
     it('should connect socket service on successful login', () => {
       component.passwordForm.patchValue({
         contact: 'test@example.com',
-        password: 'password123',
+        password: 'Test@1234',
       });
       component.acceptTerms.set(true);
       apiServiceMock.loginPassword.mockReturnValue(of(mockLoginResponse));
-      apiServiceMock.getUserProfile.mockReturnValue(of(null));
+      apiServiceMock.getUserProfile.mockReturnValue(of(mockUser));
 
       component.onPasswordLogin();
 
@@ -253,10 +251,12 @@ describe('LoginComponent', () => {
     it('should set error on login failure', () => {
       component.passwordForm.patchValue({
         contact: 'test@example.com',
-        password: 'password123',
+        password: 'Test@1234',
       });
       component.acceptTerms.set(true);
-      apiServiceMock.loginPassword.mockReturnValue(throwError(() => new Error('Invalid credentials')));
+      apiServiceMock.loginPassword.mockReturnValue(
+        throwError(() => new Error('Invalid credentials')),
+      );
 
       component.onPasswordLogin();
 
@@ -267,7 +267,9 @@ describe('LoginComponent', () => {
   describe('onSendCode()', () => {
     it('should send verification code when contact is valid', () => {
       component.codeLoginForm.get('contact')?.setValue('test@example.com');
-      apiServiceMock.loginSendCode.mockReturnValue(of({ maskedContact: 'tes***@example.com', expiresIn: 300 }));
+      apiServiceMock.loginSendCode.mockReturnValue(
+        of({ maskedContact: 'tes***@example.com', expiresIn: 300 }),
+      );
 
       component.onSendCode();
 
@@ -288,7 +290,9 @@ describe('LoginComponent', () => {
 
     it('should start countdown after sending code when maskedContact is present', () => {
       component.codeLoginForm.get('contact')?.setValue('test@example.com');
-      apiServiceMock.loginSendCode.mockReturnValue(of({ maskedContact: 'tes***@example.com', expiresIn: 300 }));
+      apiServiceMock.loginSendCode.mockReturnValue(
+        of({ maskedContact: 'tes***@example.com', expiresIn: 300 }),
+      );
 
       component.onSendCode();
 
@@ -297,7 +301,9 @@ describe('LoginComponent', () => {
 
     it('should advance to step 2 after sending code when maskedContact is present', () => {
       component.codeLoginForm.get('contact')?.setValue('test@example.com');
-      apiServiceMock.loginSendCode.mockReturnValue(of({ maskedContact: 'tes***@example.com', expiresIn: 300 }));
+      apiServiceMock.loginSendCode.mockReturnValue(
+        of({ maskedContact: 'tes***@example.com', expiresIn: 300 }),
+      );
 
       component.onSendCode();
 
@@ -332,7 +338,7 @@ describe('LoginComponent', () => {
       });
       component.acceptTerms.set(true);
       apiServiceMock.loginVerifyCode.mockReturnValue(of(mockLoginResponse));
-      apiServiceMock.getUserProfile.mockReturnValue(of(null));
+      apiServiceMock.getUserProfile.mockReturnValue(of(mockUser));
 
       component.onVerifyCode();
 
@@ -369,7 +375,7 @@ describe('LoginComponent', () => {
       });
       component.acceptTerms.set(true);
       apiServiceMock.loginVerifyCode.mockReturnValue(of(mockLoginResponse));
-      apiServiceMock.getUserProfile.mockReturnValue(of(null));
+      apiServiceMock.getUserProfile.mockReturnValue(of(mockUser));
 
       component.onVerifyCode();
 
@@ -436,7 +442,7 @@ describe('LoginComponent', () => {
 
       component.passwordForm.patchValue({
         contact: 'test@example.com',
-        password: 'password123',
+        password: 'Test@1234',
       });
       component.acceptTerms.set(true);
       apiServiceMock.loginPassword.mockReturnValue(of(mockLoginResponse));
@@ -447,7 +453,7 @@ describe('LoginComponent', () => {
       // TARGET: setUserProfile called with role field
       // CURRENT: setUserProfile called with userType field from profile.userType (undefined)
       expect(authStoreMock.setUserProfile).toHaveBeenCalledWith(
-        expect.objectContaining({ role: 'CUSTOMER' })
+        expect.objectContaining({ role: 'CUSTOMER' }),
       );
     });
 
@@ -465,7 +471,7 @@ describe('LoginComponent', () => {
 
       component.passwordForm.patchValue({
         contact: 'admin@test.com',
-        password: 'password123',
+        password: 'Test@1234',
       });
       component.acceptTerms.set(true);
       apiServiceMock.loginPassword.mockReturnValue(of(mockLoginResponse));
@@ -527,6 +533,66 @@ describe('LoginComponent', () => {
     it('[RED] should have app-button for submit', () => {
       const buttons = fixture.nativeElement.querySelectorAll('app-button');
       expect(buttons.length).toBeGreaterThan(0);
+    });
+  });
+
+  // ==========================================
+  // [PW-TOGGLE-IMPL] Password Visibility Toggle Tests
+  // ==========================================
+  //
+  // These tests PASS in GREEN phase:
+  // - `passwordVisible` signal is NOT implemented in LoginComponent
+  // - `togglePasswordVisibility()` method is NOT implemented
+  // - Template has hardcoded type="password" (not signal-bound)
+  // - No .password-toggle-btn element exists in template
+  //
+  // PW-TOGGLE: TDD GREEN phase — implementation complete
+
+  describe('password visibility toggle', () => {
+    it('should have passwordVisible signal default to false', () => {
+      expect(component.passwordVisible()).toBe(false);
+    });
+
+    it('should toggle passwordVisible from false to true', () => {
+      component.passwordVisible.set(false);
+      component.togglePasswordVisibility();
+      expect(component.passwordVisible()).toBe(true);
+    });
+
+    it('should toggle passwordVisible from true to false', () => {
+      component.passwordVisible.set(true);
+      component.togglePasswordVisibility();
+      expect(component.passwordVisible()).toBe(false);
+    });
+
+    it('should set password input type to password when passwordVisible is false', () => {
+      component.passwordVisible.set(false);
+      fixture.detectChanges();
+      const passwordInput = fixture.nativeElement.querySelector('#password') as HTMLInputElement;
+      expect(passwordInput.type).toBe('password');
+    });
+
+    it('should set password input type to text when passwordVisible is true', () => {
+      component.passwordVisible.set(true);
+      fixture.detectChanges();
+      const passwordInput = fixture.nativeElement.querySelector('#password') as HTMLInputElement;
+      expect(passwordInput.type).toBe('text');
+    });
+
+    it('should have show-password aria-label on toggle button when password is hidden', () => {
+      component.passwordVisible.set(false);
+      fixture.detectChanges();
+      const toggleBtn = fixture.nativeElement.querySelector('.password-toggle-btn');
+      expect(toggleBtn).toBeTruthy();
+      expect(toggleBtn.getAttribute('aria-label')).toBe('{{auth.login.showPassword}}');
+    });
+
+    it('should have hide-password aria-label on toggle button when password is visible', () => {
+      component.passwordVisible.set(true);
+      fixture.detectChanges();
+      const toggleBtn = fixture.nativeElement.querySelector('.password-toggle-btn');
+      expect(toggleBtn).toBeTruthy();
+      expect(toggleBtn.getAttribute('aria-label')).toBe('{{auth.login.hidePassword}}');
     });
   });
 });

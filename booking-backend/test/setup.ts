@@ -7,7 +7,7 @@ config({ path: '.env.test' });
 beforeAll(async () => {
   // Setup global test configuration
   console.log('🔧 Setting up test environment...');
-  
+
   // Set test timeout
   jest.setTimeout(10000);
 });

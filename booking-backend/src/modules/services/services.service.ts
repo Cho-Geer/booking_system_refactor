@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { PrismaService } from "../../common/database/prisma.service";
-import { CreateServiceDto, UpdateServiceDto } from "./dto/service.dto";
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../../common/database/prisma.service';
+import { CreateServiceDto, UpdateServiceDto } from './dto/service.dto';
 
 @Injectable()
 export class ServicesService {
@@ -27,16 +27,16 @@ export class ServicesService {
         include: {
           category: true,
         },
-        orderBy: { createdAt: "desc" },
+        orderBy: { createdAt: 'desc' },
       }),
       this.prisma.service.count({ where }),
     ]);
 
-    const totalPages = Math.ceil(total / pageSize);
+    const totalPages = Math.ceil(Number(total) / pageSize);
     return {
       items: services,
       meta: {
-        total,
+        total: Number(total),
         page,
         limit: pageSize,
         totalPages,
@@ -82,7 +82,10 @@ export class ServicesService {
       throw new NotFoundException(`Service with ID ${id} not found`);
     }
 
-    await this.prisma.service.delete({ where: { id } });
-    return { message: "Service deleted successfully" };
+    await this.prisma.service.update({
+      where: { id },
+      data: { isActive: false },
+    });
+    return { message: 'Service disabled successfully' };
   }
 }

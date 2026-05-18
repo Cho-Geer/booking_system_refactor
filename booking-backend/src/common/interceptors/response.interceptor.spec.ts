@@ -14,10 +14,7 @@ describe('ResponseInterceptor', () => {
     };
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        ResponseInterceptor,
-        { provide: ClsService, useValue: mockClsService },
-      ],
+      providers: [ResponseInterceptor, { provide: ClsService, useValue: mockClsService }],
     }).compile();
 
     interceptor = module.get<ResponseInterceptor<unknown>>(ResponseInterceptor);

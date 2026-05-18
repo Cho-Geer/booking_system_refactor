@@ -5,7 +5,10 @@ import { seedDefaultTranslations } from '../src/modules/translations/translation
 // SHA-256 with pepper (matches HashService logic)
 const PII_HASH_PEPPER = process.env.PII_HASH_PEPPER || 'default-pepper-change-in-production';
 function hashWithPepper(value: string): string {
-  return crypto.createHash('sha256').update(value + PII_HASH_PEPPER).digest('hex');
+  return crypto
+    .createHash('sha256')
+    .update(value + PII_HASH_PEPPER)
+    .digest('hex');
 }
 
 // Phone/email masking (matches MaskingUtil logic)
@@ -72,6 +75,45 @@ export async function main(prisma?: PrismaClient) {
     console.log('⚠️ Admin user already exists, skipped creation:', admin.email);
   }
 
+  // Create super admin user (三字段 PII 加密模型) — idempotent: safe to run repeatedly
+  const superAdminEmail = 'zhaogeyinzuo@outlook.com';
+  const superAdminPhone = '+86-138-0000-0002';
+  const superAdminPassword = 'Zhaoge@2026';
+
+  const superAdminEmailHash = hashWithPepper(superAdminEmail);
+  const superAdminHashedPassword = await bcrypt.hash(superAdminPassword, 12);
+  let superAdmin = await db.user.findFirst({ where: { emailHash: superAdminEmailHash } });
+
+  if (!superAdmin) {
+    try {
+      superAdmin = await db.user.create({
+        data: {
+          name: 'Super Admin',
+          email: maskEmail(superAdminEmail),
+          emailHash: superAdminEmailHash,
+          emailEncrypted: '', // 需要加密服务运行时生成，种子数据留空
+          phone: maskPhone(superAdminPhone),
+          phoneHash: hashWithPepper(superAdminPhone),
+          phoneEncrypted: '', // 需要加密服务运行时生成，种子数据留空
+          passwordHash: superAdminHashedPassword,
+          role: 'SUPER_ADMIN',
+          status: 'ACTIVE',
+        },
+      });
+      console.log('✅ Created super admin user (PII encrypted model):', superAdmin.email);
+    } catch (err: any) {
+      // If user was created by a concurrent run or previous failed attempt
+      if (err?.code === 'P2002') {
+        superAdmin = await db.user.findFirst({ where: { emailHash: superAdminEmailHash } });
+        console.log('⚠️ Super admin user already exists, skipped creation:', superAdmin?.email);
+      } else {
+        throw err;
+      }
+    }
+  } else {
+    console.log('⚠️ Super admin user already exists, skipped creation:', superAdmin.email);
+  }
+
   // Create service categories
   const categories = [
     { name: 'Consulting', description: 'Professional consulting services', displayOrder: 1 },
@@ -101,14 +143,14 @@ export async function main(prisma?: PrismaClient) {
         name: 'Business Strategy Consulting',
         description: 'One-on-one business strategy consultation',
         durationMinutes: 60,
-        price: 500.00,
+        price: 500.0,
       },
       {
         categoryId: consultingCategory.id,
         name: 'Technical Architecture Review',
         description: 'Expert review of your system architecture',
         durationMinutes: 90,
-        price: 800.00,
+        price: 800.0,
       },
     ];
 

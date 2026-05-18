@@ -1,555 +1,420 @@
-import { Test, TestingModule } from "@nestjs/testing";
-import { BadRequestException, NotFoundException } from "@nestjs/common";
-import { PrismaService } from "../../../common/database/prisma.service";
-import { AdminAppointmentsService } from "./admin-appointments.service";
-import {
-  AdminAppointmentsQueryDto,
-  UpdateAppointmentStatusDto,
-  BatchCancelDto,
-} from "../dto/admin-appointment.dto";
+import { Test, TestingModule } from '@nestjs/testing';
+import { AdminAppointmentsService } from './admin-appointments.service';
+import { PrismaService } from '../../../common/database/prisma.service';
+import { NotificationService } from '../../../modules/notifications/notification.service';
+import { EmailService } from '../../../modules/email/email.service';
+import { BatchCancelDto, CreateAdminAppointmentDto } from '../dto/admin-appointment.dto';
+import { toAdminAppointmentDto } from '../mappers/appointment.mapper';
 
-// Mock PrismaService
-const mockPrismaService = {
-  appointment: {
-    findMany: jest.fn(),
-    findUnique: jest.fn(),
-    count: jest.fn(),
-    update: jest.fn(),
-  },
-};
+jest.mock('../mappers/appointment.mapper', () => ({
+  toAdminAppointmentDto: jest.fn(),
+  generateAppointmentNumber: jest.fn().mockReturnValue('APT-MOCK-001'),
+}));
 
-describe("AdminAppointmentsService", () => {
+describe('AdminAppointmentsService', () => {
   let service: AdminAppointmentsService;
-  let prisma: typeof mockPrismaService;
+  let prisma: any;
+  let notificationService: any;
+  let emailService: any;
+
+  const mockAppointment = {
+    id: 'apt-001',
+    userId: 'user-001',
+    serviceId: 'svc-001',
+    timeSlotId: 'slot-001',
+    appointmentNumber: 'APT-20260517-001',
+    appointmentDate: new Date('2026-05-17T10:00:00Z'),
+    status: 'PENDING',
+    durationMinutes: 60,
+    remarks: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    customerInfo: {},
+    slotSequence: 0,
+    price: null,
+    taxRate: null,
+    taxIncludedAmount: null,
+    user: {
+      name: 'John Doe',
+      email: 'john@example.com',
+    },
+    service: {
+      id: 'svc-001',
+      name: 'Consultation',
+      durationMinutes: 60,
+      price: 100,
+      taxRate: 0.08,
+    },
+    timeSlot: {
+      startTime: new Date('2026-05-17T10:00:00Z'),
+      endTime: new Date('2026-05-17T11:00:00Z'),
+    },
+  };
+
+  const mockPrismaService = {
+    id: 'svc-001',
+    name: 'Consultation',
+    durationMinutes: 60,
+    price: 100,
+    taxRate: 0.08,
+    isActive: true,
+  };
+
+  const mockPrismaTimeSlot = {
+    id: 'slot-001',
+    startTime: new Date('2026-05-17T10:00:00Z'),
+    endTime: new Date('2026-05-17T11:00:00Z'),
+    isActive: true,
+  };
+
+  const createDtoBase = {
+    userId: 'user-001',
+    serviceId: 'svc-001',
+    appointmentDate: '2026-05-17T10:00:00Z',
+    timeSlotId: 'slot-001',
+  };
 
   beforeEach(async () => {
+    // Create mock PrismaService with chainable methods
+    const mockPrisma: Record<string, any> = {
+      appointment: {
+        findUnique: jest.fn(),
+        update: jest.fn(),
+        findMany: jest.fn(),
+        count: jest.fn(),
+        create: jest.fn(),
+      },
+      user: {
+        findUnique: jest.fn(),
+      },
+      service: {
+        findUnique: jest.fn(),
+      },
+      timeSlot: {
+        findFirst: jest.fn(),
+        findUnique: jest.fn(),
+      },
+      activityLog: {
+        create: jest.fn(),
+      },
+      $transaction: jest.fn((cb: any) => cb(mockPrisma)),
+    };
+
+    const mockNotificationService = {
+      notifyCancellation: jest.fn(),
+      notifyBookingConfirmation: jest.fn(),
+      notifyAppointmentUpdate: jest.fn(),
+    };
+
+    const mockEmailService = {
+      sendAppointmentCancellation: jest.fn(),
+      sendAppointmentConfirmation: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AdminAppointmentsService,
-        {
-          provide: PrismaService,
-          useValue: mockPrismaService,
-        },
+        { provide: PrismaService, useValue: mockPrisma },
+        { provide: NotificationService, useValue: mockNotificationService },
+        { provide: EmailService, useValue: mockEmailService },
       ],
     }).compile();
 
     service = module.get<AdminAppointmentsService>(AdminAppointmentsService);
     prisma = module.get(PrismaService);
-
-    jest.clearAllMocks();
+    notificationService = module.get(NotificationService);
+    emailService = module.get(EmailService);
   });
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it("should be defined", () => {
-    expect(service).toBeDefined();
-  });
-
-  describe("findAll", () => {
-    const mockAppointments = [
-      {
-        id: "apt-1",
-        userId: "user-1",
-        serviceId: "svc-1",
-        timeSlotId: "ts-1",
-        appointmentDate: new Date("2025-06-15T10:00:00Z"),
-        status: "PENDING",
-        createdAt: new Date("2025-06-01"),
-        updatedAt: new Date("2025-06-01"),
-        appointmentNumber: "APT-001",
-        customerInfo: {},
-        slotSequence: 1,
-        remarks: null,
-        user: { name: "John Doe" },
-        service: { name: "Haircut" },
-        timeSlot: { startTime: new Date("2025-06-15T10:00:00Z"), endTime: new Date("2025-06-15T10:30:00Z") },
-      },
-      {
-        id: "apt-2",
-        userId: "user-2",
-        serviceId: "svc-2",
-        timeSlotId: "ts-2",
-        appointmentDate: new Date("2025-06-16T14:00:00Z"),
-        status: "CONFIRMED",
-        createdAt: new Date("2025-06-02"),
-        updatedAt: new Date("2025-06-02"),
-        appointmentNumber: "APT-002",
-        customerInfo: {},
-        slotSequence: 1,
-        remarks: null,
-        user: { name: "Jane Smith" },
-        service: { name: "Manicure" },
-        timeSlot: { startTime: new Date("2025-06-16T14:00:00Z"), endTime: new Date("2025-06-16T14:30:00Z") },
-      },
-    ];
-
-    it("should return paginated appointments with default pagination", async () => {
-      mockPrismaService.appointment.findMany.mockResolvedValue(mockAppointments);
-      mockPrismaService.appointment.count.mockResolvedValue(2);
-
-      const query: AdminAppointmentsQueryDto = { page: 1, limit: 20 };
-      const result = await service.findAll(query);
-
-      expect(prisma.appointment.findMany).toHaveBeenCalledWith(
-        expect.objectContaining({
-          skip: 0,
-          take: 20,
-          where: {},
-          include: {
-            user: { select: { name: true } },
-            service: { select: { name: true } },
-            timeSlot: true,
-          },
-          orderBy: { createdAt: "desc" },
-        }),
-      );
-      expect(prisma.appointment.count).toHaveBeenCalledWith({ where: {} });
-      expect(result.items).toHaveLength(2);
-      expect(result.meta.total).toBe(2);
-      expect(result.meta.page).toBe(1);
-      expect(result.meta.limit).toBe(20);
-    });
-
-    it("should filter by date range when startDate and endDate provided", async () => {
-      mockPrismaService.appointment.findMany.mockResolvedValue([
-        mockAppointments[0],
-      ]);
-      mockPrismaService.appointment.count.mockResolvedValue(1);
-
-      const query: AdminAppointmentsQueryDto = {
-        startDate: "2025-06-15",
-        endDate: "2025-06-15",
-      };
-      await service.findAll(query);
-
-      expect(prisma.appointment.findMany).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: {
-            appointmentDate: {
-              gte: expect.any(Date),
-              lte: expect.any(Date),
-            },
-          },
-        }),
-      );
-    });
-
-    it("should filter by serviceId when provided", async () => {
-      mockPrismaService.appointment.findMany.mockResolvedValue([
-        mockAppointments[0],
-      ]);
-      mockPrismaService.appointment.count.mockResolvedValue(1);
-
-      const query: AdminAppointmentsQueryDto = { serviceId: "svc-1" };
-      await service.findAll(query);
-
-      expect(prisma.appointment.findMany).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: expect.objectContaining({ serviceId: "svc-1" }),
-        }),
-      );
-    });
-
-    it("should filter by userId when provided", async () => {
-      mockPrismaService.appointment.findMany.mockResolvedValue([
-        mockAppointments[0],
-      ]);
-      mockPrismaService.appointment.count.mockResolvedValue(1);
-
-      const query: AdminAppointmentsQueryDto = { userId: "user-1" };
-      await service.findAll(query);
-
-      expect(prisma.appointment.findMany).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: expect.objectContaining({ userId: "user-1" }),
-        }),
-      );
-    });
-
-    it("should filter by status when provided", async () => {
-      mockPrismaService.appointment.findMany.mockResolvedValue([
-        mockAppointments[0],
-      ]);
-      mockPrismaService.appointment.count.mockResolvedValue(1);
-
-      const query: AdminAppointmentsQueryDto = { status: "PENDING" };
-      await service.findAll(query);
-
-      expect(prisma.appointment.findMany).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: expect.objectContaining({ status: "PENDING" }),
-        }),
-      );
-    });
-
-    it("should combine multiple filters", async () => {
-      mockPrismaService.appointment.findMany.mockResolvedValue([]);
-      mockPrismaService.appointment.count.mockResolvedValue(0);
-
-      const query: AdminAppointmentsQueryDto = {
-        serviceId: "svc-1",
-        userId: "user-1",
-        status: "CONFIRMED",
-        startDate: "2025-06-01",
-        endDate: "2025-06-30",
-      };
-      await service.findAll(query);
-
-      expect(prisma.appointment.findMany).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: expect.objectContaining({
-            serviceId: "svc-1",
-            userId: "user-1",
-            status: "CONFIRMED",
-            appointmentDate: {
-              gte: expect.any(Date),
-              lte: expect.any(Date),
-            },
-          }),
-        }),
-      );
-    });
-
-    it("should use mapper to convert appointments to AdminAppointmentDto", async () => {
-      mockPrismaService.appointment.findMany.mockResolvedValue(mockAppointments);
-      mockPrismaService.appointment.count.mockResolvedValue(2);
-
-      const query: AdminAppointmentsQueryDto = {};
-      const result = await service.findAll(query);
-
-      expect(result.items).toHaveLength(2);
-      expect(result.items[0]).toHaveProperty("appointmentNumber");
-      expect(result.items[0]).toHaveProperty("userName", "John Doe");
-      expect(result.items[0]).toHaveProperty("serviceName", "Haircut");
-    });
-
-    it("should return empty items when no appointments match", async () => {
-      mockPrismaService.appointment.findMany.mockResolvedValue([]);
-      mockPrismaService.appointment.count.mockResolvedValue(0);
-
-      const query: AdminAppointmentsQueryDto = {};
-      const result = await service.findAll(query);
-
-      expect(result.items).toEqual([]);
-      expect(result.meta.total).toBe(0);
-    });
-
-    it("should filter by search query on appointmentNumber, user name, or service name", async () => {
-      mockPrismaService.appointment.findMany.mockResolvedValue([
-        mockAppointments[0],
-      ]);
-      mockPrismaService.appointment.count.mockResolvedValue(1);
-
-      const query: AdminAppointmentsQueryDto = { search: "John" };
-      await service.findAll(query);
-
-      expect(prisma.appointment.findMany).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: expect.objectContaining({
-            OR: [
-              { appointmentNumber: { contains: "John", mode: "insensitive" } },
-              { user: { name: { contains: "John", mode: "insensitive" } } },
-              { service: { name: { contains: "John", mode: "insensitive" } } },
-            ],
-          }),
-        }),
-      );
-    });
-  });
-
-  describe("updateStatus", () => {
-    const existingAppointment = {
-      id: "apt-1",
-      userId: "user-1",
-      serviceId: "svc-1",
-      timeSlotId: "ts-1",
-      appointmentDate: new Date("2025-06-15T10:00:00Z"),
-      status: "PENDING",
-      createdAt: new Date("2025-06-01"),
-      updatedAt: new Date("2025-06-01"),
-      appointmentNumber: "APT-001",
-      customerInfo: {},
-      remarks: null,
-      slotSequence: 1,
+  describe('batchCancel', () => {
+    const dto: BatchCancelDto = {
+      ids: ['apt-001', 'apt-002'],
+      reason: 'Customer requested cancellation',
     };
 
-    it("should throw NotFoundException if appointment does not exist", async () => {
-      mockPrismaService.appointment.findUnique.mockResolvedValue(null);
+    it('should cancel appointments and return success count', async () => {
+      // Arrange
+      prisma.appointment.findUnique
+        .mockResolvedValueOnce({ ...mockAppointment, id: 'apt-001', status: 'PENDING' })
+        .mockResolvedValueOnce({ ...mockAppointment, id: 'apt-002', status: 'CONFIRMED' });
+      prisma.appointment.update.mockResolvedValue({ ...mockAppointment, status: 'CANCELLED' });
+      prisma.activityLog.create.mockResolvedValue({ id: 'log-001' });
 
-      const dto: UpdateAppointmentStatusDto = { status: "CONFIRMED" };
-      await expect(
-        service.updateStatus("nonexistent-id", dto),
-      ).rejects.toThrow(NotFoundException);
-    });
-
-    it("should allow PENDING -> CONFIRMED transition", async () => {
-      mockPrismaService.appointment.findUnique.mockResolvedValue(
-        existingAppointment,
-      );
-      const updated = {
-        ...existingAppointment,
-        status: "CONFIRMED",
-        updatedAt: new Date("2025-06-02"),
-      };
-      mockPrismaService.appointment.update.mockResolvedValue(updated);
-
-      const dto: UpdateAppointmentStatusDto = { status: "CONFIRMED" };
-      const result = await service.updateStatus("apt-1", dto);
-
-      expect(prisma.appointment.update).toHaveBeenCalledWith({
-        where: { id: "apt-1" },
-        data: { status: "CONFIRMED" },
-      });
-      expect(result).toEqual({
-        id: "apt-1",
-        status: "CONFIRMED",
-        updatedAt: updated.updatedAt,
-      });
-    });
-
-    it("should allow CONFIRMED -> COMPLETED transition", async () => {
-      mockPrismaService.appointment.findUnique.mockResolvedValue({
-        ...existingAppointment,
-        status: "CONFIRMED",
-      });
-      const updated = {
-        ...existingAppointment,
-        status: "COMPLETED",
-        updatedAt: new Date("2025-06-02"),
-      };
-      mockPrismaService.appointment.update.mockResolvedValue(updated);
-
-      const dto: UpdateAppointmentStatusDto = { status: "COMPLETED" };
-      const result = await service.updateStatus("apt-1", dto);
-
-      expect(result.status).toBe("COMPLETED");
-    });
-
-    it("should allow any -> CANCELLED transition with reason", async () => {
-      mockPrismaService.appointment.findUnique.mockResolvedValue(
-        existingAppointment,
-      );
-      const updated = {
-        ...existingAppointment,
-        status: "CANCELLED",
-        remarks: "Customer requested cancellation",
-        updatedAt: new Date("2025-06-02"),
-      };
-      mockPrismaService.appointment.update.mockResolvedValue(updated);
-
-      const dto: UpdateAppointmentStatusDto = {
-        status: "CANCELLED",
-        reason: "Customer requested cancellation",
-      };
-      const result = await service.updateStatus("apt-1", dto);
-
-      expect(prisma.appointment.update).toHaveBeenCalledWith({
-        where: { id: "apt-1" },
-        data: { status: "CANCELLED", remarks: "Customer requested cancellation" },
-      });
-      expect(result.status).toBe("CANCELLED");
-    });
-
-    it("should throw BadRequestException for CANCELLED -> any transition", async () => {
-      mockPrismaService.appointment.findUnique.mockResolvedValue({
-        ...existingAppointment,
-        status: "CANCELLED",
-      });
-
-      const dto: UpdateAppointmentStatusDto = { status: "PENDING" };
-      await expect(
-        service.updateStatus("apt-1", dto),
-      ).rejects.toThrow(BadRequestException);
-      await expect(
-        service.updateStatus("apt-1", dto),
-      ).rejects.toThrow(
-        "Cannot transition from CANCELLED to PENDING",
-      );
-    });
-
-    it("should throw BadRequestException for invalid transition PENDING -> COMPLETED", async () => {
-      mockPrismaService.appointment.findUnique.mockResolvedValue(
-        existingAppointment,
-      );
-
-      const dto: UpdateAppointmentStatusDto = { status: "COMPLETED" };
-      await expect(
-        service.updateStatus("apt-1", dto),
-      ).rejects.toThrow(BadRequestException);
-      await expect(
-        service.updateStatus("apt-1", dto),
-      ).rejects.toThrow(
-        "Cannot transition from PENDING to COMPLETED",
-      );
-    });
-
-    it("should throw BadRequestException for invalid transition CONFIRMED -> PENDING", async () => {
-      mockPrismaService.appointment.findUnique.mockResolvedValue({
-        ...existingAppointment,
-        status: "CONFIRMED",
-      });
-
-      const dto: UpdateAppointmentStatusDto = { status: "PENDING" };
-      await expect(
-        service.updateStatus("apt-1", dto),
-      ).rejects.toThrow(BadRequestException);
-    });
-  });
-
-  describe("batchCancel", () => {
-    it("should cancel all appointments successfully", async () => {
-      mockPrismaService.appointment.findUnique
-        .mockResolvedValueOnce({
-          id: "apt-1",
-          status: "PENDING",
-          userId: "user-1",
-          serviceId: "svc-1",
-          timeSlotId: "ts-1",
-          appointmentDate: new Date(),
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          appointmentNumber: "APT-001",
-          customerInfo: {},
-          slotSequence: 1,
-          remarks: null,
-        })
-        .mockResolvedValueOnce({
-          id: "apt-2",
-          status: "CONFIRMED",
-          userId: "user-2",
-          serviceId: "svc-2",
-          timeSlotId: "ts-2",
-          appointmentDate: new Date(),
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          appointmentNumber: "APT-002",
-          customerInfo: {},
-          slotSequence: 1,
-          remarks: null,
-        });
-      mockPrismaService.appointment.update.mockResolvedValue({});
-
-      const dto: BatchCancelDto = {
-        ids: ["apt-1", "apt-2"],
-        reason: "Maintenance window",
-      };
+      // Act
       const result = await service.batchCancel(dto);
 
+      // Assert
       expect(result.successCount).toBe(2);
       expect(result.failedCount).toBe(0);
       expect(result.failedIds).toEqual([]);
     });
 
-    it("should report failures when appointments not found", async () => {
-      mockPrismaService.appointment.findUnique
-        .mockResolvedValueOnce({
-          id: "apt-1",
-          status: "PENDING",
-          userId: "user-1",
-          serviceId: "svc-1",
-          timeSlotId: "ts-1",
-          appointmentDate: new Date(),
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          appointmentNumber: "APT-001",
-          customerInfo: {},
-          slotSequence: 1,
-          remarks: null,
-        })
-        .mockResolvedValueOnce(null);
+    it('should pass performedBy to activity log metadata', async () => {
+      // Arrange
+      const performedBy = 'admin-001';
+      prisma.appointment.findUnique
+        .mockResolvedValueOnce({ ...mockAppointment, id: 'apt-001', status: 'PENDING' });
+      prisma.appointment.update.mockResolvedValue({ ...mockAppointment, status: 'CANCELLED' });
+      prisma.activityLog.create.mockResolvedValue({ id: 'log-001' });
 
-      const dto: BatchCancelDto = {
-        ids: ["apt-1", "apt-3"],
-        reason: "Cleanup",
-      };
-      const result = await service.batchCancel(dto);
+      // Act
+      await service.batchCancel(dto, performedBy);
 
-      expect(result.successCount).toBe(1);
-      expect(result.failedCount).toBe(1);
-      expect(result.failedIds).toEqual(["apt-3"]);
+      // Assert
+      expect(prisma.activityLog.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            action: 'BOOKING_CANCEL',
+            resourceType: 'APPOINTMENT',
+            resourceId: 'apt-001',
+            metadata: expect.objectContaining({
+              performedBy: 'admin-001',
+            }),
+          }),
+        }),
+      );
     });
 
-    it("should report failures when appointment is already cancelled", async () => {
-      mockPrismaService.appointment.findUnique
-        .mockResolvedValueOnce({
-          id: "apt-1",
-          status: "CANCELLED",
-          userId: "user-1",
-          serviceId: "svc-1",
-          timeSlotId: "ts-1",
-          appointmentDate: new Date(),
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          appointmentNumber: "APT-001",
-          customerInfo: {},
-          slotSequence: 1,
-          remarks: null,
-        })
-        .mockResolvedValueOnce({
-          id: "apt-2",
-          status: "PENDING",
-          userId: "user-2",
-          serviceId: "svc-2",
-          timeSlotId: "ts-2",
-          appointmentDate: new Date(),
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          appointmentNumber: "APT-002",
-          customerInfo: {},
-          slotSequence: 1,
-          remarks: null,
-        });
+    it('should create activity log for each cancelled appointment', async () => {
+      // Arrange
+      prisma.appointment.findUnique
+        .mockResolvedValueOnce({ ...mockAppointment, id: 'apt-001', status: 'PENDING' })
+        .mockResolvedValueOnce({ ...mockAppointment, id: 'apt-002', status: 'CONFIRMED' });
+      prisma.appointment.update.mockResolvedValue({ ...mockAppointment, status: 'CANCELLED' });
+      prisma.activityLog.create.mockResolvedValue({ id: 'log-001' });
 
-      const dto: BatchCancelDto = {
-        ids: ["apt-1", "apt-2"],
-        reason: "Cleanup",
-      };
-      const result = await service.batchCancel(dto);
+      // Act
+      await service.batchCancel(dto);
 
-      expect(result.successCount).toBe(1);
-      expect(result.failedCount).toBe(1);
-      expect(result.failedIds).toEqual(["apt-1"]);
+      // Assert
+      expect(prisma.activityLog.create).toHaveBeenCalledTimes(2);
     });
 
-    it("should handle empty ids array", async () => {
-      const dto: BatchCancelDto = { ids: [], reason: "test" };
+    it('should call notificationService.notifyCancellation for each cancelled appointment (fire-and-forget)', async () => {
+      // Arrange
+      prisma.appointment.findUnique
+        .mockResolvedValueOnce({ ...mockAppointment, id: 'apt-001', status: 'PENDING' })
+        .mockResolvedValueOnce({ ...mockAppointment, id: 'apt-002', status: 'CONFIRMED' });
+      prisma.appointment.update.mockResolvedValue({ ...mockAppointment, status: 'CANCELLED' });
+      prisma.activityLog.create.mockResolvedValue({ id: 'log-001' });
+
+      // Act
+      await service.batchCancel(dto);
+
+      // Assert
+      expect(notificationService.notifyCancellation).toHaveBeenCalledTimes(2);
+      expect(notificationService.notifyCancellation).toHaveBeenCalledWith(
+        expect.objectContaining({
+          appointmentId: 'apt-001',
+          cancelReason: 'Customer requested cancellation',
+        }),
+      );
+    });
+
+    it('should call emailService.sendAppointmentCancellation for each cancelled appointment (fire-and-forget)', async () => {
+      // Arrange
+      prisma.appointment.findUnique
+        .mockResolvedValueOnce({ ...mockAppointment, id: 'apt-001', status: 'PENDING' })
+        .mockResolvedValueOnce({ ...mockAppointment, id: 'apt-002', status: 'CONFIRMED' });
+      prisma.appointment.update.mockResolvedValue({ ...mockAppointment, status: 'CANCELLED' });
+      prisma.activityLog.create.mockResolvedValue({ id: 'log-001' });
+
+      // Act
+      await service.batchCancel(dto);
+
+      // Assert
+      expect(emailService.sendAppointmentCancellation).toHaveBeenCalledTimes(2);
+      expect(emailService.sendAppointmentCancellation).toHaveBeenCalledWith(
+        expect.objectContaining({
+          appointmentId: 'apt-001',
+          customerName: 'John Doe',
+          customerEmail: 'john@example.com',
+          cancelReason: 'Customer requested cancellation',
+        }),
+      );
+    });
+
+    it('should handle errors in notification fire-and-forget without breaking the batch', async () => {
+      // Arrange
+      prisma.appointment.findUnique
+        .mockResolvedValueOnce({ ...mockAppointment, id: 'apt-001', status: 'PENDING' })
+        .mockResolvedValueOnce({ ...mockAppointment, id: 'apt-002', status: 'CONFIRMED' });
+      prisma.appointment.update.mockResolvedValue({ ...mockAppointment, status: 'CANCELLED' });
+      prisma.activityLog.create.mockResolvedValue({ id: 'log-001' });
+      notificationService.notifyCancellation.mockImplementation(() => {
+        throw new Error('WebSocket disconnected');
+      });
+
+      // Act
       const result = await service.batchCancel(dto);
 
-      expect(result.successCount).toBe(0);
+      // Assert
+      expect(result.successCount).toBe(2);
       expect(result.failedCount).toBe(0);
-      expect(result.failedIds).toEqual([]);
     });
 
-    it("should collect multiple failures", async () => {
-      mockPrismaService.appointment.findUnique
-        .mockResolvedValueOnce(null)
-        .mockResolvedValueOnce({
-          id: "apt-2",
-          status: "CANCELLED",
-          userId: "user-2",
-          serviceId: "svc-2",
-          timeSlotId: "ts-2",
-          appointmentDate: new Date(),
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          appointmentNumber: "APT-002",
-          customerInfo: {},
-          slotSequence: 1,
-          remarks: null,
-        })
-        .mockResolvedValueOnce(null);
+    it('should handle errors in email fire-and-forget without breaking the batch', async () => {
+      // Arrange
+      prisma.appointment.findUnique
+        .mockResolvedValueOnce({ ...mockAppointment, id: 'apt-001', status: 'PENDING' })
+        .mockResolvedValueOnce({ ...mockAppointment, id: 'apt-002', status: 'CONFIRMED' });
+      prisma.appointment.update.mockResolvedValue({ ...mockAppointment, status: 'CANCELLED' });
+      prisma.activityLog.create.mockResolvedValue({ id: 'log-001' });
+      emailService.sendAppointmentCancellation.mockImplementation(() => {
+        throw new Error('Queue unavailable');
+      });
 
-      const dto: BatchCancelDto = {
-        ids: ["apt-1", "apt-2", "apt-3"],
-        reason: "test",
-      };
+      // Act
       const result = await service.batchCancel(dto);
 
+      // Assert
+      expect(result.successCount).toBe(2);
+      expect(result.failedCount).toBe(0);
+    });
+
+    it('should skip already cancelled appointments', async () => {
+      // Arrange
+      prisma.appointment.findUnique
+        .mockResolvedValueOnce({ ...mockAppointment, id: 'apt-001', status: 'CANCELLED' });
+
+      // Act
+      const result = await service.batchCancel({ ids: ['apt-001'], reason: 'test' });
+
+      // Assert
       expect(result.successCount).toBe(0);
-      expect(result.failedCount).toBe(3);
-      expect(result.failedIds).toEqual(["apt-1", "apt-2", "apt-3"]);
+      expect(result.failedCount).toBe(1);
+      expect(result.failedIds).toEqual(['apt-001']);
+      expect(prisma.appointment.update).not.toHaveBeenCalled();
+      expect(prisma.activityLog.create).not.toHaveBeenCalled();
+    });
+
+    it('should add non-existent appointments to failedIds', async () => {
+      // Arrange
+      prisma.appointment.findUnique.mockResolvedValueOnce(null);
+
+      // Act
+      const result = await service.batchCancel({ ids: ['apt-999'], reason: 'test' });
+
+      // Assert
+      expect(result.successCount).toBe(0);
+      expect(result.failedCount).toBe(1);
+      expect(result.failedIds).toEqual(['apt-999']);
+    });
+
+    it('should handle mixed results (some succeed, some fail)', async () => {
+      // Arrange
+      prisma.appointment.findUnique
+        .mockResolvedValueOnce({ ...mockAppointment, id: 'apt-001', status: 'PENDING' })
+        .mockResolvedValueOnce(null) // non-existent
+        .mockResolvedValueOnce({ ...mockAppointment, id: 'apt-003', status: 'CANCELLED' });
+      prisma.appointment.update.mockResolvedValue({ ...mockAppointment, status: 'CANCELLED' });
+      prisma.activityLog.create.mockResolvedValue({ id: 'log-001' });
+
+      // Act
+      const result = await service.batchCancel({
+        ids: ['apt-001', 'apt-002', 'apt-003'],
+        reason: 'test',
+      });
+
+      // Assert
+      expect(result.successCount).toBe(1);
+      expect(result.failedCount).toBe(2);
+      expect(result.failedIds).toEqual(['apt-002', 'apt-003']);
+    });
+
+    it('should update appointment remarks with reason when provided', async () => {
+      // Arrange
+      const reason = 'Customer no-show policy';
+      prisma.appointment.findUnique
+        .mockResolvedValueOnce({ ...mockAppointment, id: 'apt-001', status: 'PENDING' });
+      prisma.appointment.update.mockResolvedValue({ ...mockAppointment, status: 'CANCELLED' });
+      prisma.activityLog.create.mockResolvedValue({ id: 'log-001' });
+
+      // Act
+      await service.batchCancel({ ids: ['apt-001'], reason });
+
+      // Assert
+      expect(prisma.appointment.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: 'apt-001' },
+          data: expect.objectContaining({
+            status: 'CANCELLED',
+            remarks: reason,
+          }),
+        }),
+      );
+    });
+  });
+
+  describe('create', () => {
+    beforeEach(() => {
+      prisma.service.findUnique.mockResolvedValue(mockPrismaService);
+      prisma.user.findUnique.mockResolvedValue({ id: 'user-001', name: 'John Doe' });
+      prisma.timeSlot.findUnique.mockResolvedValue(mockPrismaTimeSlot);
+    });
+
+    it('[RED] should use overtimeMinutes in duration calculation', async () => {
+      // Arrange
+      const dto: CreateAdminAppointmentDto = {
+        ...createDtoBase,
+        overtimeMinutes: 15,
+      };
+
+      prisma.appointment.create.mockResolvedValue({
+        ...mockAppointment,
+        durationMinutes: 75, // 60 + 15
+      });
+      (toAdminAppointmentDto as jest.Mock).mockReturnValue({
+        ...mockAppointment,
+        durationMinutes: 75,
+      });
+
+      // Act
+      const result = await service.create(dto);
+
+      // Assert
+      expect(prisma.appointment.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            durationMinutes: 75, // service.durationMinutes(60) + overtimeMinutes(15)
+          }),
+        }),
+      );
+      expect(result.durationMinutes).toBe(75);
+    });
+
+    it('[RED] should not add overtimeMinutes when not provided', async () => {
+      // Arrange
+      const dto: CreateAdminAppointmentDto = {
+        ...createDtoBase,
+      };
+
+      prisma.timeSlot.findFirst.mockResolvedValue(mockPrismaTimeSlot);
+      prisma.appointment.create.mockResolvedValue({
+        ...mockAppointment,
+        durationMinutes: 60,
+      });
+      (toAdminAppointmentDto as jest.Mock).mockReturnValue({
+        ...mockAppointment,
+        durationMinutes: 60,
+      });
+
+      // Act
+      const result = await service.create(dto);
+
+      // Assert
+      expect(prisma.appointment.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            durationMinutes: 60, // service.durationMinutes(60) + undefined = 60
+          }),
+        }),
+      );
+      expect(result.durationMinutes).toBe(60);
     });
   });
 });

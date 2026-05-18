@@ -16,25 +16,25 @@ declare global {
 
 beforeAll(async () => {
   console.log('🚀 Setting up E2E test environment...');
-  
+
   if (!global.testSetupComplete) {
     // Create testing module
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
-    
+
     // Create NestJS application
     global.app = moduleRef.createNestApplication();
-    
+
     // Configure application
     global.app.enableShutdownHooks();
-    
+
     // Start application
     await global.app.init();
-    
+
     // Wait for application to be ready
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
     global.testSetupComplete = true;
     console.log('✅ E2E test environment setup completed');
   }
@@ -42,7 +42,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   console.log('🧹 Tearing down E2E test environment...');
-  
+
   if (global.app) {
     try {
       await global.app.close();
@@ -51,11 +51,11 @@ afterAll(async () => {
       console.error('❌ Error closing application:', error);
     }
   }
-  
+
   // Reset global variables
   global.app = null;
   global.testSetupComplete = false;
-  
+
   console.log('✅ E2E test environment teardown completed');
 });
 

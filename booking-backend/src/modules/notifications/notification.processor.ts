@@ -1,21 +1,17 @@
-import { Processor, WorkerHost, OnWorkerEvent } from "@nestjs/bullmq";
-import { Logger } from "@nestjs/common";
-import { Job } from "bullmq";
-import { NotificationsGateway } from "./notifications.gateway";
+import { Processor, WorkerHost, OnWorkerEvent } from '@nestjs/bullmq';
+import { Logger } from '@nestjs/common';
+import { Job } from 'bullmq';
+import { NotificationsGateway } from './notifications.gateway';
 
 export interface NotificationJobData {
   userId: string;
-  type:
-    | "booking_confirmation"
-    | "appointment_update"
-    | "cancellation"
-    | "broadcast";
+  type: 'booking_confirmation' | 'appointment_update' | 'cancellation' | 'broadcast';
   event: string;
   data: Record<string, unknown>;
   timestamp?: string;
 }
 
-@Processor("notifications")
+@Processor('notifications')
 export class NotificationProcessor extends WorkerHost {
   private readonly logger = new Logger(NotificationProcessor.name);
 
@@ -28,9 +24,7 @@ export class NotificationProcessor extends WorkerHost {
   ): Promise<{ sent: boolean; eventType: string; userId?: string }> {
     const { userId, type, event, data } = job.data;
 
-    this.logger.log(
-      `Processing notification job ${job.id}: ${type} for user ${userId}`,
-    );
+    this.logger.log(`Processing notification job ${job.id}: ${type} for user ${userId}`);
 
     await job.updateProgress(10);
     this.logger.debug(`Job ${job.id}: Preparing notification payload`);
@@ -46,16 +40,16 @@ export class NotificationProcessor extends WorkerHost {
       };
 
       switch (type) {
-        case "booking_confirmation":
+        case 'booking_confirmation':
           this.notificationsGateway.sendBookingConfirmation(userId, payload);
           break;
-        case "appointment_update":
+        case 'appointment_update':
           this.notificationsGateway.sendAppointmentUpdate(userId, payload);
           break;
-        case "cancellation":
+        case 'cancellation':
           this.notificationsGateway.sendCancellation(userId, payload);
           break;
-        case "broadcast":
+        case 'broadcast':
           this.notificationsGateway.sendBroadcast(event, payload);
           break;
         default:
@@ -65,7 +59,7 @@ export class NotificationProcessor extends WorkerHost {
 
       await job.updateProgress(100);
       this.logger.log(
-        `Job ${job.id}: Notification sent successfully (${type}) to user ${userId || "all"}`,
+        `Job ${job.id}: Notification sent successfully (${type}) to user ${userId || 'all'}`,
       );
 
       return { sent: true, eventType: type, userId };
@@ -78,14 +72,14 @@ export class NotificationProcessor extends WorkerHost {
     }
   }
 
-  @OnWorkerEvent("completed")
+  @OnWorkerEvent('completed')
   onCompleted(job: Job<NotificationJobData>) {
     this.logger.log(
       `Notification job ${job.id} completed successfully for ${job.data.type} to user ${job.data.userId}`,
     );
   }
 
-  @OnWorkerEvent("failed")
+  @OnWorkerEvent('failed')
   onFailed(job: Job<NotificationJobData>, error: Error) {
     this.logger.error(
       `Notification job ${job.id} failed for ${job.data.type}: ${error.message}`,
@@ -93,10 +87,10 @@ export class NotificationProcessor extends WorkerHost {
     );
   }
 
-  @OnWorkerEvent("progress")
+  @OnWorkerEvent('progress')
   onProgress(job: Job<NotificationJobData>, progress: number | object) {
     this.logger.debug(
-      `Notification job ${job.id} progress: ${typeof progress === "number" ? `${progress}%` : JSON.stringify(progress)}`,
+      `Notification job ${job.id} progress: ${typeof progress === 'number' ? `${progress}%` : JSON.stringify(progress)}`,
     );
   }
 }

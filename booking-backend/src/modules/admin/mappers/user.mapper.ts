@@ -1,4 +1,4 @@
-import { CreateAdminUserDto, UpdateAdminUserDto, AdminUserDto } from "../dto/admin-user.dto";
+import { CreateAdminUserDto, UpdateAdminUserDto, AdminUserDto } from '../dto/admin-user.dto';
 
 interface PrismaUser {
   id: string;

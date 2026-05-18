@@ -56,10 +56,16 @@ describe('[R15] Admin Notifications', () => {
   beforeEach(async () => {
     await testModule.resetDatabase();
 
-    const adminData = UserFactory.create({ email: `admin-notif-${Date.now()}@example.com`, role: SystemRole.ADMIN });
+    const adminData = UserFactory.create({
+      email: `admin-notif-${Date.now()}@example.com`,
+      role: SystemRole.ADMIN,
+    });
     const admin = await prisma.user.create({ data: adminData as any });
     adminId = admin.id;
-    adminToken = jwtService.sign({ sub: admin.id, role: SystemRole.ADMIN }, { expiresIn: '15m', secret: process.env.JWT_SECRET });
+    adminToken = jwtService.sign(
+      { sub: admin.id, role: SystemRole.ADMIN },
+      { expiresIn: '15m', secret: process.env.JWT_SECRET },
+    );
   });
 
   describe('GET /v1/admin/notifications', () => {
@@ -87,8 +93,24 @@ describe('[R15] Admin Notifications', () => {
     });
 
     it('should support unread_only filter', async () => {
-      await prisma.notification.create({ data: { userId: adminId, title: 'Unread', content: 'Unread msg', type: 'SYSTEM', isRead: false } as any });
-      await prisma.notification.create({ data: { userId: adminId, title: 'Read', content: 'Read msg', type: 'SYSTEM', isRead: true } as any });
+      await prisma.notification.create({
+        data: {
+          userId: adminId,
+          title: 'Unread',
+          content: 'Unread msg',
+          type: 'SYSTEM',
+          isRead: false,
+        } as any,
+      });
+      await prisma.notification.create({
+        data: {
+          userId: adminId,
+          title: 'Read',
+          content: 'Read msg',
+          type: 'SYSTEM',
+          isRead: true,
+        } as any,
+      });
 
       const response = await request(app.getHttpServer())
         .get('/v1/admin/notifications')
@@ -101,9 +123,14 @@ describe('[R15] Admin Notifications', () => {
     });
 
     it('should return 403 for CUSTOMER role', async () => {
-      const customerData = UserFactory.create({ email: `customer-notif-${Date.now()}@example.com` });
+      const customerData = UserFactory.create({
+        email: `customer-notif-${Date.now()}@example.com`,
+      });
       const customer = await prisma.user.create({ data: customerData as any });
-      const customerToken = jwtService.sign({ sub: customer.id, role: SystemRole.CUSTOMER }, { expiresIn: '15m', secret: process.env.JWT_SECRET });
+      const customerToken = jwtService.sign(
+        { sub: customer.id, role: SystemRole.CUSTOMER },
+        { expiresIn: '15m', secret: process.env.JWT_SECRET },
+      );
 
       await request(app.getHttpServer())
         .get('/v1/admin/notifications')
@@ -115,7 +142,13 @@ describe('[R15] Admin Notifications', () => {
   describe('POST /v1/admin/notifications/:id/read', () => {
     it('should mark notification as read', async () => {
       const notif = await prisma.notification.create({
-        data: { userId: adminId, title: 'Mark Read', content: 'To be read', type: 'SYSTEM', isRead: false } as any,
+        data: {
+          userId: adminId,
+          title: 'Mark Read',
+          content: 'To be read',
+          type: 'SYSTEM',
+          isRead: false,
+        } as any,
       });
 
       const response = await request(app.getHttpServer())

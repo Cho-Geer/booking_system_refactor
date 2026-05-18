@@ -74,7 +74,7 @@ describe('EmailService', () => {
         options,
       }),
     );
-    
+
     mockTransporter = createMockTransporter();
 
     const module: TestingModule = await Test.createTestingModule({
@@ -111,9 +111,7 @@ describe('EmailService', () => {
 
       await service.onModuleInit();
 
-      expect(loggerLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining('SMTP server is ready'),
-      );
+      expect(loggerLogSpy).toHaveBeenCalledWith(expect.stringContaining('SMTP server is ready'));
 
       loggerLogSpy.mockRestore();
     });
@@ -137,9 +135,7 @@ describe('EmailService', () => {
 
       await service.onModuleInit();
 
-      expect(loggerWarnSpy).toHaveBeenCalledWith(
-        expect.stringContaining('String error message'),
-      );
+      expect(loggerWarnSpy).toHaveBeenCalledWith(expect.stringContaining('String error message'));
 
       loggerWarnSpy.mockRestore();
     });

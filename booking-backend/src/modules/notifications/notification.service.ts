@@ -1,5 +1,5 @@
-import { Injectable, Logger } from "@nestjs/common";
-import { NotificationsGateway } from "./notifications.gateway";
+import { Injectable, Logger } from '@nestjs/common';
+import { NotificationsGateway } from './notifications.gateway';
 
 export interface AppointmentNotificationData {
   appointmentId: string;
@@ -35,12 +35,10 @@ export class NotificationService {
    * Notify user that their booking has been confirmed
    */
   notifyBookingConfirmation(data: AppointmentNotificationData): void {
-    this.logger.log(
-      `Sending booking confirmation for appointment ${data.appointmentId}`,
-    );
+    this.logger.log(`Sending booking confirmation for appointment ${data.appointmentId}`);
     this.notificationsGateway.sendBookingConfirmation(data.userId, {
       ...data,
-      type: "booking_confirmation",
+      type: 'booking_confirmation',
       message: `Your booking for ${data.serviceName} on ${data.date} at ${data.time} has been confirmed.`,
     });
   }
@@ -49,12 +47,10 @@ export class NotificationService {
    * Notify user that their appointment has been updated
    */
   notifyAppointmentUpdate(data: AppointmentNotificationData): void {
-    this.logger.log(
-      `Sending appointment update for appointment ${data.appointmentId}`,
-    );
+    this.logger.log(`Sending appointment update for appointment ${data.appointmentId}`);
     this.notificationsGateway.sendAppointmentUpdate(data.userId, {
       ...data,
-      type: "appointment_update",
+      type: 'appointment_update',
       message: `Your appointment for ${data.serviceName} has been updated to ${data.status}.`,
     });
   }
@@ -63,12 +59,10 @@ export class NotificationService {
    * Notify user that their appointment has been cancelled
    */
   notifyCancellation(data: CancellationNotificationData): void {
-    this.logger.log(
-      `Sending cancellation notification for appointment ${data.appointmentId}`,
-    );
+    this.logger.log(`Sending cancellation notification for appointment ${data.appointmentId}`);
     this.notificationsGateway.sendCancellation(data.userId, {
       ...data,
-      type: "cancellation",
+      type: 'cancellation',
       message: `Your appointment for ${data.serviceName} on ${data.date} at ${data.time} has been cancelled.`,
     });
   }

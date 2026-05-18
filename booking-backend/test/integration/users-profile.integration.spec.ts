@@ -52,13 +52,15 @@ describe('[R3] GET /v1/users/profile — PII Masking & Full Response', () => {
     await testModule.resetDatabase();
   });
 
-  async function setupUser(overrides: Partial<{
-    email: string;
-    phone: string;
-    name: string;
-    role: SystemRole;
-    preferredTimezone: string;
-  }> = {}) {
+  async function setupUser(
+    overrides: Partial<{
+      email: string;
+      phone: string;
+      name: string;
+      role: SystemRole;
+      preferredTimezone: string;
+    }> = {},
+  ) {
     const email = overrides.email || `profile-test-${Date.now()}@example.com`;
     const phone = overrides.phone || '+8613800138000';
     const user = await prisma.user.create({
@@ -156,9 +158,7 @@ describe('[R3] GET /v1/users/profile — PII Masking & Full Response', () => {
     });
 
     it('should return 401 when not authenticated', async () => {
-      await request(app.getHttpServer())
-        .get('/v1/users/profile')
-        .expect(401);
+      await request(app.getHttpServer()).get('/v1/users/profile').expect(401);
     });
   });
 

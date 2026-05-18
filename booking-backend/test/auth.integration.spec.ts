@@ -58,12 +58,10 @@ describe('Auth Module (Integration)', () => {
 
   describe('POST /v1/auth/register/send-code', () => {
     it('should return 200 when sending verification code for registration', async () => {
-      const response = await request(app.getHttpServer())
-        .post('/v1/auth/register/send-code')
-        .send({
-          contact: 'newuser@example.com',
-          contactType: 'email',
-        });
+      const response = await request(app.getHttpServer()).post('/v1/auth/register/send-code').send({
+        contact: 'newuser@example.com',
+        contactType: 'email',
+      });
 
       // Should return 200 (success), 400 (validation error), or 503 (verification service unavailable in test)
       expect([200, 400, 503]).toContain(response.status);
@@ -106,15 +104,13 @@ describe('Auth Module (Integration)', () => {
 
   describe('POST /v1/auth/register/complete', () => {
     it('should return 400 when verification code is invalid', async () => {
-      const response = await request(app.getHttpServer())
-        .post('/v1/auth/register/complete')
-        .send({
-          contact: 'badcode@example.com',
-          contactType: 'email',
-          code: 'wrong-code',
-          password: 'SecureP@ssw0rd',
-          name: 'Test User',
-        });
+      const response = await request(app.getHttpServer()).post('/v1/auth/register/complete').send({
+        contact: 'badcode@example.com',
+        contactType: 'email',
+        code: 'wrong-code',
+        password: 'SecureP@ssw0rd',
+        name: 'Test User',
+      });
       // 400 = invalid code, 503 = verification service unavailable in test env
       expect([400, 503]).toContain(response.status);
     });
@@ -130,7 +126,7 @@ describe('Auth Module (Integration)', () => {
       });
       await prisma.user.create({
         data: {
-          ...userData as any,
+          ...(userData as any),
           passwordHash: hashedPassword,
           status: UserStatus.ACTIVE,
         },
@@ -217,11 +213,9 @@ describe('Auth Module (Integration)', () => {
     });
 
     it('should return 200 and new token pair when refresh token is valid', async () => {
-      const response = await request(app.getHttpServer())
-        .post('/v1/auth/refresh')
-        .send({
-          refreshToken: refreshToken,
-        });
+      const response = await request(app.getHttpServer()).post('/v1/auth/refresh').send({
+        refreshToken: refreshToken,
+      });
 
       // Should return 200 (success) or 401 (session not found due to token reuse detection)
       expect([200, 401]).toContain(response.status);
@@ -288,9 +282,7 @@ describe('Auth Module (Integration)', () => {
     });
 
     it('should return 401 when logout without authorization', async () => {
-      await request(app.getHttpServer())
-        .post('/v1/auth/logout')
-        .expect(401);
+      await request(app.getHttpServer()).post('/v1/auth/logout').expect(401);
     });
   });
 });

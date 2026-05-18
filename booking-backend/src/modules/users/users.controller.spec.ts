@@ -1,5 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ConflictException, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import {
+  ConflictException,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { Request } from 'express';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
@@ -98,7 +103,9 @@ describe('UsersController', () => {
       );
 
       await expect(controller.create(createUserDto)).rejects.toThrow(ConflictException);
-      await expect(controller.create(createUserDto)).rejects.toThrow('User with this email already exists');
+      await expect(controller.create(createUserDto)).rejects.toThrow(
+        'User with this email already exists',
+      );
     });
   });
 
@@ -191,8 +198,12 @@ describe('UsersController', () => {
       );
 
       // 使用 user-1 作为目标 ID，这样所有权检查会通过
-      await expect(controller.findOne('user-1', mockReq as unknown as Request)).rejects.toThrow(NotFoundException);
-      await expect(controller.findOne('user-1', mockReq as unknown as Request)).rejects.toThrow('User with ID user-1 not found');
+      await expect(controller.findOne('user-1', mockReq as unknown as Request)).rejects.toThrow(
+        NotFoundException,
+      );
+      await expect(controller.findOne('user-1', mockReq as unknown as Request)).rejects.toThrow(
+        'User with ID user-1 not found',
+      );
     });
   });
 
@@ -211,7 +222,11 @@ describe('UsersController', () => {
     it('should call service.update and return the updated user', async () => {
       mockUsersService.update.mockResolvedValue(mockUpdatedUser);
 
-      const result = await controller.update('user-1', updateUserDto, mockReq as unknown as Request);
+      const result = await controller.update(
+        'user-1',
+        updateUserDto,
+        mockReq as unknown as Request,
+      );
 
       expect(service.update).toHaveBeenCalledWith('user-1', updateUserDto);
       expect(result).toEqual(mockUpdatedUser);
@@ -223,7 +238,9 @@ describe('UsersController', () => {
       );
 
       // 使用 user-1 作为目标 ID，这样所有权检查会通过
-      await expect(controller.update('user-1', updateUserDto, mockReq as unknown as Request)).rejects.toThrow(NotFoundException);
+      await expect(
+        controller.update('user-1', updateUserDto, mockReq as unknown as Request),
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('should propagate ConflictException for duplicate email update', async () => {
@@ -231,7 +248,13 @@ describe('UsersController', () => {
         new ConflictException('User with this email already exists'),
       );
 
-      await expect(controller.update('user-1', { email: 'existing@example.com' }, mockReq as unknown as Request)).rejects.toThrow(ConflictException);
+      await expect(
+        controller.update(
+          'user-1',
+          { email: 'existing@example.com' },
+          mockReq as unknown as Request,
+        ),
+      ).rejects.toThrow(ConflictException);
     });
   });
 
@@ -256,12 +279,17 @@ describe('UsersController', () => {
 
   describe('changePassword', () => {
     it('should call service.updatePassword with correct parameters', async () => {
-      mockUsersService.updatePassword.mockResolvedValue({ message: 'Password changed successfully' });
+      mockUsersService.updatePassword.mockResolvedValue({
+        message: 'Password changed successfully',
+      });
 
-      const result = await controller.changePassword({
-        currentPassword: 'OldPass123!',
-        newPassword: 'NewPass456!',
-      }, mockReq as unknown as Request);
+      const result = await controller.changePassword(
+        {
+          currentPassword: 'OldPass123!',
+          newPassword: 'NewPass456!',
+        },
+        mockReq as unknown as Request,
+      );
 
       expect(service.updatePassword).toHaveBeenCalledWith('user-1', 'OldPass123!', 'NewPass456!');
       expect(result).toEqual({ message: 'Password changed successfully' });
@@ -274,10 +302,16 @@ describe('UsersController', () => {
 
       mockReq.user = { id: 'user-1', roles: [] };
       await expect(
-        controller.changePassword({ currentPassword: 'WrongPass!', newPassword: 'NewPass!' } as UpdatePasswordDto, mockReq as unknown as Request)
+        controller.changePassword(
+          { currentPassword: 'WrongPass!', newPassword: 'NewPass!' } as UpdatePasswordDto,
+          mockReq as unknown as Request,
+        ),
       ).rejects.toThrow(BadRequestException);
       await expect(
-        controller.changePassword({ currentPassword: 'WrongPass!', newPassword: 'NewPass!' } as UpdatePasswordDto, mockReq as unknown as Request)
+        controller.changePassword(
+          { currentPassword: 'WrongPass!', newPassword: 'NewPass!' } as UpdatePasswordDto,
+          mockReq as unknown as Request,
+        ),
       ).rejects.toThrow('Current password is incorrect');
     });
 
@@ -287,10 +321,16 @@ describe('UsersController', () => {
       );
 
       await expect(
-        controller.changePassword({ currentPassword: 'OldPass!', newPassword: 'NewPass!' }, mockReq as unknown as Request)
+        controller.changePassword(
+          { currentPassword: 'OldPass!', newPassword: 'NewPass!' },
+          mockReq as unknown as Request,
+        ),
       ).rejects.toThrow(BadRequestException);
       await expect(
-        controller.changePassword({ currentPassword: 'OldPass!', newPassword: 'NewPass!' }, mockReq as unknown as Request)
+        controller.changePassword(
+          { currentPassword: 'OldPass!', newPassword: 'NewPass!' },
+          mockReq as unknown as Request,
+        ),
       ).rejects.toThrow('Password management is not supported');
     });
   });
@@ -302,13 +342,13 @@ describe('UsersController', () => {
     it('should reject GET /users/:id when requester is not the resource owner', async () => {
       // 场景：用户 A (user-1) 尝试查看用户 B (user-2) 的资料
       // 预期：返回 403 Forbidden
-      
+
       const mockUser = { id: 'user-1', roles: [] }; // 请求者是 user-1，不是管理员
       const targetUserId = 'user-2'; // 目标是 user-2
 
       // 需要 mock Request 对象
       const mockReq = { user: mockUser };
-      
+
       // 由于 controller 现在需要 @Req()，我们需要重新编译模块
       const module: TestingModule = await Test.createTestingModule({
         controllers: [UsersController],
@@ -326,8 +366,12 @@ describe('UsersController', () => {
 
       const controller = module.get<UsersController>(UsersController);
 
-      await expect(controller.findOne(targetUserId, mockReq as unknown as Request)).rejects.toThrow(ForbiddenException);
-      await expect(controller.findOne(targetUserId, mockReq as unknown as Request)).rejects.toThrow('You can only access your own profile');
+      await expect(controller.findOne(targetUserId, mockReq as unknown as Request)).rejects.toThrow(
+        ForbiddenException,
+      );
+      await expect(controller.findOne(targetUserId, mockReq as unknown as Request)).rejects.toThrow(
+        'You can only access your own profile',
+      );
     });
 
     it('should reject PATCH /users/:id when requester is not the resource owner', async () => {
@@ -346,8 +390,12 @@ describe('UsersController', () => {
 
       const controller = module.get<UsersController>(UsersController);
 
-      await expect(controller.update(targetUserId, updateDto, mockReq as unknown as Request)).rejects.toThrow(ForbiddenException);
-      await expect(controller.update(targetUserId, updateDto, mockReq as unknown as Request)).rejects.toThrow('You can only update your own profile');
+      await expect(
+        controller.update(targetUserId, updateDto, mockReq as unknown as Request),
+      ).rejects.toThrow(ForbiddenException);
+      await expect(
+        controller.update(targetUserId, updateDto, mockReq as unknown as Request),
+      ).rejects.toThrow('You can only update your own profile');
     });
 
     it('should reject POST /users/:id/change-password when requester is not the resource owner', async () => {
@@ -366,14 +414,24 @@ describe('UsersController', () => {
       const controller = module.get<UsersController>(UsersController);
 
       mockReq.user = { id: 'different-user', roles: [] };
-      await expect(controller.changePassword({
-        currentPassword: 'OldPass123!',
-        newPassword: 'HackedPass456!',
-      } as UpdatePasswordDto, mockReq as unknown as Request)).rejects.toThrow(ForbiddenException);
-      await expect(controller.changePassword({
-        currentPassword: 'OldPass123!',
-        newPassword: 'HackedPass456!',
-      } as UpdatePasswordDto, mockReq as unknown as Request)).rejects.toThrow('You can only change your own profile');
+      await expect(
+        controller.changePassword(
+          {
+            currentPassword: 'OldPass123!',
+            newPassword: 'HackedPass456!',
+          } as UpdatePasswordDto,
+          mockReq as unknown as Request,
+        ),
+      ).rejects.toThrow(ForbiddenException);
+      await expect(
+        controller.changePassword(
+          {
+            currentPassword: 'OldPass123!',
+            newPassword: 'HackedPass456!',
+          } as UpdatePasswordDto,
+          mockReq as unknown as Request,
+        ),
+      ).rejects.toThrow('You can only change your own profile');
     });
 
     it('should allow GET /users/:id when requester IS the resource owner', async () => {
@@ -427,7 +485,11 @@ describe('UsersController', () => {
 
       const controller = module.get<UsersController>(UsersController);
 
-      const result = await controller.update(targetUserId, updateDto, mockReq as unknown as Request);
+      const result = await controller.update(
+        targetUserId,
+        updateDto,
+        mockReq as unknown as Request,
+      );
 
       expect(result.name).toBe('Updated Name');
     });
@@ -573,7 +635,9 @@ describe('UsersController', () => {
 
       const reqWithoutUser = { user: undefined };
 
-      await expect(controller.getProfile(reqWithoutUser as unknown as Request)).rejects.toThrow(ForbiddenException);
+      await expect(controller.getProfile(reqWithoutUser as unknown as Request)).rejects.toThrow(
+        ForbiddenException,
+      );
     });
   });
 });

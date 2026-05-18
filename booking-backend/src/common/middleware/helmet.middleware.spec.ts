@@ -132,10 +132,7 @@ describe('HelmetMiddleware', () => {
 
       middleware.use(mockReq as any, mockRes as any, mockNext);
 
-      expect(mockRes.setHeader).toHaveBeenCalledWith(
-        'X-Permitted-Cross-Domain-Policies',
-        'none',
-      );
+      expect(mockRes.setHeader).toHaveBeenCalledWith('X-Permitted-Cross-Domain-Policies', 'none');
     });
 
     it('should set Referrer-Policy to strict-origin-when-cross-origin', () => {
@@ -197,10 +194,7 @@ describe('HelmetMiddleware', () => {
 
       middleware.use(mockReq as any, mockRes as any, mockNext);
 
-      expect(mockRes.setHeader).toHaveBeenCalledWith(
-        'Cross-Origin-Resource-Policy',
-        'same-origin',
-      );
+      expect(mockRes.setHeader).toHaveBeenCalledWith('Cross-Origin-Resource-Policy', 'same-origin');
     });
 
     it('should set Origin-Agent-Cluster header', () => {
@@ -210,10 +204,7 @@ describe('HelmetMiddleware', () => {
 
       middleware.use(mockReq as any, mockRes as any, mockNext);
 
-      expect(mockRes.setHeader).toHaveBeenCalledWith(
-        'Origin-Agent-Cluster',
-        expect.any(String),
-      );
+      expect(mockRes.setHeader).toHaveBeenCalledWith('Origin-Agent-Cluster', expect.any(String));
     });
 
     it('should work with POST requests', () => {
@@ -224,10 +215,7 @@ describe('HelmetMiddleware', () => {
       middleware.use(mockReq as any, mockRes as any, mockNext);
 
       expect(mockNext).toHaveBeenCalled();
-      expect(mockRes.setHeader).toHaveBeenCalledWith(
-        'Content-Security-Policy',
-        expect.any(String),
-      );
+      expect(mockRes.setHeader).toHaveBeenCalledWith('Content-Security-Policy', expect.any(String));
     });
 
     it('should handle requests with custom headers', () => {

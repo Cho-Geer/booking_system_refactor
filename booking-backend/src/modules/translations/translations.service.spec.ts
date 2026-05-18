@@ -31,24 +31,114 @@ const createMockCacheService = () => ({
 // ============================================================
 const MOCK_TRANSLATIONS_EN = [
   // global domain
-  { id: '1', domain: 'global', key: 'save', locale: 'en', value: 'Save', isCustom: false, tenantId: null, createdAt: new Date('2026-01-01'), updatedAt: new Date('2026-05-01') },
-  { id: '2', domain: 'global', key: 'cancel', locale: 'en', value: 'Cancel', isCustom: false, tenantId: null, createdAt: new Date('2026-01-01'), updatedAt: new Date('2026-05-01') },
+  {
+    id: '1',
+    domain: 'global',
+    key: 'save',
+    locale: 'en',
+    value: 'Save',
+    isCustom: false,
+    tenantId: null,
+    createdAt: new Date('2026-01-01'),
+    updatedAt: new Date('2026-05-01'),
+  },
+  {
+    id: '2',
+    domain: 'global',
+    key: 'cancel',
+    locale: 'en',
+    value: 'Cancel',
+    isCustom: false,
+    tenantId: null,
+    createdAt: new Date('2026-01-01'),
+    updatedAt: new Date('2026-05-01'),
+  },
   // auth domain
-  { id: '3', domain: 'auth', key: 'login.title', locale: 'en', value: 'Sign In', isCustom: false, tenantId: null, createdAt: new Date('2026-01-01'), updatedAt: new Date('2026-05-01') },
-  { id: '4', domain: 'auth', key: 'logout', locale: 'en', value: 'Sign Out', isCustom: false, tenantId: null, createdAt: new Date('2026-01-01'), updatedAt: new Date('2026-05-01') },
+  {
+    id: '3',
+    domain: 'auth',
+    key: 'login.title',
+    locale: 'en',
+    value: 'Sign In',
+    isCustom: false,
+    tenantId: null,
+    createdAt: new Date('2026-01-01'),
+    updatedAt: new Date('2026-05-01'),
+  },
+  {
+    id: '4',
+    domain: 'auth',
+    key: 'logout',
+    locale: 'en',
+    value: 'Sign Out',
+    isCustom: false,
+    tenantId: null,
+    createdAt: new Date('2026-01-01'),
+    updatedAt: new Date('2026-05-01'),
+  },
   // booking domain
-  { id: '5', domain: 'booking', key: 'select_date', locale: 'en', value: 'Select a date', isCustom: false, tenantId: null, createdAt: new Date('2026-01-01'), updatedAt: new Date('2026-05-01') },
+  {
+    id: '5',
+    domain: 'booking',
+    key: 'select_date',
+    locale: 'en',
+    value: 'Select a date',
+    isCustom: false,
+    tenantId: null,
+    createdAt: new Date('2026-01-01'),
+    updatedAt: new Date('2026-05-01'),
+  },
 ];
 
 const MOCK_TRANSLATIONS_ZH = [
-  { id: '6', domain: 'global', key: 'save', locale: 'zh', value: '保存', isCustom: false, tenantId: null, createdAt: new Date('2026-01-01'), updatedAt: new Date('2026-05-01') },
-  { id: '7', domain: 'global', key: 'cancel', locale: 'zh', value: '取消', isCustom: false, tenantId: null, createdAt: new Date('2026-01-01'), updatedAt: new Date('2026-05-01') },
-  { id: '8', domain: 'auth', key: 'login.title', locale: 'zh', value: '登录', isCustom: false, tenantId: null, createdAt: new Date('2026-01-01'), updatedAt: new Date('2026-05-01') },
+  {
+    id: '6',
+    domain: 'global',
+    key: 'save',
+    locale: 'zh',
+    value: '保存',
+    isCustom: false,
+    tenantId: null,
+    createdAt: new Date('2026-01-01'),
+    updatedAt: new Date('2026-05-01'),
+  },
+  {
+    id: '7',
+    domain: 'global',
+    key: 'cancel',
+    locale: 'zh',
+    value: '取消',
+    isCustom: false,
+    tenantId: null,
+    createdAt: new Date('2026-01-01'),
+    updatedAt: new Date('2026-05-01'),
+  },
+  {
+    id: '8',
+    domain: 'auth',
+    key: 'login.title',
+    locale: 'zh',
+    value: '登录',
+    isCustom: false,
+    tenantId: null,
+    createdAt: new Date('2026-01-01'),
+    updatedAt: new Date('2026-05-01'),
+  },
 ];
 
 // Entries updated after the "since" timestamp
 const MOCK_UPDATED_ENTRIES = [
-  { id: '9', domain: 'auth', key: 'login.title', locale: 'en', value: 'Sign In Updated', isCustom: false, tenantId: null, createdAt: new Date('2026-01-01'), updatedAt: new Date('2026-06-01') },
+  {
+    id: '9',
+    domain: 'auth',
+    key: 'login.title',
+    locale: 'en',
+    value: 'Sign In Updated',
+    isCustom: false,
+    tenantId: null,
+    createdAt: new Date('2026-01-01'),
+    updatedAt: new Date('2026-06-01'),
+  },
 ];
 
 describe('TranslationService', () => {
@@ -128,7 +218,7 @@ describe('TranslationService', () => {
 
     it('should filter by domain when domain param is provided', async () => {
       // Arrange
-      const authEntries = MOCK_TRANSLATIONS_EN.filter(e => e.domain === 'auth');
+      const authEntries = MOCK_TRANSLATIONS_EN.filter((e) => e.domain === 'auth');
       mockPrisma.translationDictionary.findMany.mockResolvedValue(authEntries);
 
       // Act
@@ -310,7 +400,7 @@ describe('TranslationService', () => {
     it('should re-query DB and re-cache on cache miss', async () => {
       // Arrange — first call cache miss
       mockCache.get
-        .mockResolvedValueOnce(null)  // first call miss
+        .mockResolvedValueOnce(null) // first call miss
         .mockResolvedValueOnce(null); // second call miss
       mockPrisma.translationDictionary.findMany.mockResolvedValue(MOCK_TRANSLATIONS_EN);
 
@@ -381,7 +471,7 @@ describe('TranslationService', () => {
     it('should cause next getTranslations to re-query DB after invalidation', async () => {
       // Arrange — cache miss after invalidation
       mockCache.get
-        .mockResolvedValueOnce(null)  // after invalidation, cache miss
+        .mockResolvedValueOnce(null) // after invalidation, cache miss
         .mockResolvedValueOnce(null);
       mockPrisma.translationDictionary.findMany.mockResolvedValue(MOCK_TRANSLATIONS_EN);
 
@@ -401,13 +491,11 @@ describe('TranslationService', () => {
   describe('Service definition', () => {
     it('should be injectable (have @Injectable decorator)', () => {
       // Arrange
-      const decorators = Reflect.getOwnPropertyDescriptor(
-        TranslationService,
-        '__decorate',
-      ) || {};
+      const decorators = Reflect.getOwnPropertyDescriptor(TranslationService, '__decorate') || {};
 
       // Assert — TranslationService must have @Injectable() which adds metadata
-      const isInjectable = Reflect.getMetadata('design:paramtypes', TranslationService) ||
+      const isInjectable =
+        Reflect.getMetadata('design:paramtypes', TranslationService) ||
         (TranslationService as any).__decorate;
       expect(isInjectable).toBeTruthy();
     });

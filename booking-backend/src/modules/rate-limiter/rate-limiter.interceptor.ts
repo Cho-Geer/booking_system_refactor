@@ -1,13 +1,7 @@
-import {
-  Injectable,
-  NestInterceptor,
-  ExecutionContext,
-  CallHandler,
-  Logger,
-} from "@nestjs/common";
-import { Request, Response } from "express";
-import { Observable } from "rxjs";
-import { tap } from "rxjs/operators";
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler, Logger } from '@nestjs/common';
+import { Request, Response } from 'express';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 /**
  * Rate limiting interceptor that logs rate limit violations and adds
  * diagnostic headers to responses.
@@ -63,9 +57,7 @@ export class RateLimitInterceptor implements NestInterceptor {
 
     // Log slow requests (> 1000ms)
     if (duration > 1000) {
-      this.logger.warn(
-        `Slow request: ${request.method} ${request.path} took ${duration}ms`,
-      );
+      this.logger.warn(`Slow request: ${request.method} ${request.path} took ${duration}ms`);
     }
 
     // Log 429 responses specifically
@@ -84,13 +76,11 @@ export class RateLimitInterceptor implements NestInterceptor {
    * @returns IP address
    */
   private extractIp(request: Request): string {
-    const forwardedFor = request.headers["x-forwarded-for"];
+    const forwardedFor = request.headers['x-forwarded-for'];
     if (forwardedFor) {
-      const ips = (
-        typeof forwardedFor === "string" ? forwardedFor : forwardedFor[0]
-      ).split(",");
-      return ips[0]?.trim() || request.ip || "unknown";
+      const ips = (typeof forwardedFor === 'string' ? forwardedFor : forwardedFor[0]).split(',');
+      return ips[0]?.trim() || request.ip || 'unknown';
     }
-    return request.ip || "unknown";
+    return request.ip || 'unknown';
   }
 }

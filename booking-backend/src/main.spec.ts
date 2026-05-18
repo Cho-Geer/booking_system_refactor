@@ -7,11 +7,21 @@ import { CsrfMiddleware } from './common/middleware/csrf.middleware';
 // ============================================================
 jest.mock('@nestjs/swagger', () => {
   class MockDocumentBuilder {
-    setTitle() { return this; }
-    setDescription() { return this; }
-    setVersion() { return this; }
-    addBearerAuth() { return this; }
-    build() { return {}; }
+    setTitle() {
+      return this;
+    }
+    setDescription() {
+      return this;
+    }
+    setVersion() {
+      return this;
+    }
+    addBearerAuth() {
+      return this;
+    }
+    build() {
+      return {};
+    }
   }
 
   return {

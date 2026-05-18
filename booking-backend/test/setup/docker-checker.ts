@@ -1,4 +1,4 @@
-import { execSync } from "child_process";
+import { execSync } from 'child_process';
 
 /**
  * Docker availability checker with caching.
@@ -25,15 +25,15 @@ export function checkDockerAvailable(): boolean {
   }
 
   // CI environment: Docker is required
-  if (process.env.CI === "true") {
+  if (process.env.CI === 'true') {
     try {
-      execSync("docker info", { stdio: "ignore", timeout: 5000 });
+      execSync('docker info', { stdio: 'ignore', timeout: 5000 });
       dockerAvailableCache = true;
       return true;
     } catch {
       console.warn(
-        "[DockerChecker] CI environment detected but Docker is not available. " +
-          "Falling back to fake infrastructure.",
+        '[DockerChecker] CI environment detected but Docker is not available. ' +
+          'Falling back to fake infrastructure.',
       );
       dockerAvailableCache = false;
       return false;
@@ -42,13 +42,13 @@ export function checkDockerAvailable(): boolean {
 
   // Local development: gracefully degrade to fakes
   try {
-    execSync("docker info", { stdio: "ignore", timeout: 2000 });
+    execSync('docker info', { stdio: 'ignore', timeout: 2000 });
     dockerAvailableCache = true;
     return true;
   } catch {
     console.warn(
-      "[DockerChecker] Docker not available. Using Fake infrastructure for tests. " +
-        "Integration tests will be skipped. Run with Docker to enable full integration testing.",
+      '[DockerChecker] Docker not available. Using Fake infrastructure for tests. ' +
+        'Integration tests will be skipped. Run with Docker to enable full integration testing.',
     );
     dockerAvailableCache = false;
     return false;

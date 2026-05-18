@@ -61,6 +61,11 @@ export class ServiceManagementComponent implements OnInit, OnDestroy {
   readonly isViewMode = signal(false);
   readonly submitted = signal(false);
 
+  // Disable warning dialog state
+  readonly disableWarningVisible = signal(false);
+  readonly disableWarningData = signal<{pendingCount: number; confirmedCount: number} | null>(null);
+  private pendingDisableUpdates: UpdateAdminServiceRequest | null = null;
+
   // Search/filter
   readonly searchQuery = signal('');
   readonly isFiltering = signal(false);
@@ -261,14 +266,25 @@ export class ServiceManagementComponent implements OnInit, OnDestroy {
         imageUrl: this.formImageUrl || undefined,
         taxRate: this.formTaxRate ?? undefined,
       };
-      this.adminService.updateAdminService(this.selectedService()!.id, updates).subscribe({
-        next: () => {
-          this.store.updateServiceInList(this.selectedService()!.id, updates);
-          this.loadAllServicesForStats();
-          this.closeDialog();
-        },
-        error: (err) => this.store.setError(err.message ?? 'Failed to update service'),
-      });
+
+      // Check if disabling an active service — show warning modal
+      const wasActive = this.selectedService()!.active;
+      if (updates.active === false && wasActive === true) {
+        this.adminService.getServiceAffectedAppointments(this.selectedService()!.id).subscribe({
+          next: (data) => {
+            this.disableWarningData.set(data);
+            this.pendingDisableUpdates = updates;
+            this.disableWarningVisible.set(true);
+          },
+          error: () => {
+            // On error, proceed without warning
+            this.proceedUpdateService(updates);
+          },
+        });
+        return;
+      }
+
+      this.proceedUpdateService(updates);
     } else {
       const dto: CreateAdminServiceRequest = {
         name: this.formName,
@@ -288,6 +304,33 @@ export class ServiceManagementComponent implements OnInit, OnDestroy {
         error: (err) => this.store.setError(err.message ?? 'Failed to create service'),
       });
     }
+  }
+
+  /** Confirm service disable after warning — proceed with the update. */
+  confirmDisableService(): void {
+    if (!this.selectedService() || !this.pendingDisableUpdates) return;
+    this.proceedUpdateService(this.pendingDisableUpdates);
+    this.disableWarningVisible.set(false);
+    this.disableWarningData.set(null);
+    this.pendingDisableUpdates = null;
+  }
+
+  /** Cancel service disable — close warning and do nothing. */
+  cancelDisableService(): void {
+    this.disableWarningVisible.set(false);
+    this.disableWarningData.set(null);
+    this.pendingDisableUpdates = null;
+  }
+
+  private proceedUpdateService(updates: UpdateAdminServiceRequest): void {
+    this.adminService.updateAdminService(this.selectedService()!.id, updates).subscribe({
+      next: () => {
+        this.store.updateServiceInList(this.selectedService()!.id, updates);
+        this.loadAllServicesForStats();
+        this.closeDialog();
+      },
+      error: (err) => this.store.setError(err.message ?? 'Failed to update service'),
+    });
   }
 
   deleteService(): void {

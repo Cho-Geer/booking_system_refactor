@@ -59,13 +59,25 @@ describe('[R17-R18] Translation Module', () => {
   beforeEach(async () => {
     await testModule.resetDatabase();
 
-    const adminData = UserFactory.create({ email: `admin-trans-${Date.now()}@example.com`, role: SystemRole.ADMIN });
+    const adminData = UserFactory.create({
+      email: `admin-trans-${Date.now()}@example.com`,
+      role: SystemRole.ADMIN,
+    });
     const admin = await prisma.user.create({ data: adminData as any });
-    adminToken = jwtService.sign({ sub: admin.id, role: SystemRole.ADMIN }, { expiresIn: '15m', secret: process.env.JWT_SECRET });
+    adminToken = jwtService.sign(
+      { sub: admin.id, role: SystemRole.ADMIN },
+      { expiresIn: '15m', secret: process.env.JWT_SECRET },
+    );
 
-    const saData = UserFactory.create({ email: `sa-trans-${Date.now()}@example.com`, role: SystemRole.SUPER_ADMIN });
+    const saData = UserFactory.create({
+      email: `sa-trans-${Date.now()}@example.com`,
+      role: SystemRole.SUPER_ADMIN,
+    });
     const sa = await prisma.user.create({ data: saData as any });
-    superAdminToken = jwtService.sign({ sub: sa.id, role: SystemRole.SUPER_ADMIN }, { expiresIn: '15m', secret: process.env.JWT_SECRET });
+    superAdminToken = jwtService.sign(
+      { sub: sa.id, role: SystemRole.SUPER_ADMIN },
+      { expiresIn: '15m', secret: process.env.JWT_SECRET },
+    );
   });
 
   // ============================================================
@@ -78,9 +90,7 @@ describe('[R17-R18] Translation Module', () => {
         data: { domain: 'common', key: 'hello', value: 'Hello', locale: 'en-US', isCustom: false },
       } as any);
 
-      const response = await request(app.getHttpServer())
-        .get('/v1/translations')
-        .expect(200);
+      const response = await request(app.getHttpServer()).get('/v1/translations').expect(200);
 
       const data = extractDataBody(response);
       expect(data).toHaveProperty('locale');
@@ -107,7 +117,13 @@ describe('[R17-R18] Translation Module', () => {
 
     it('should support domain filter', async () => {
       await prisma.translationDictionary.create({
-        data: { domain: 'admin', key: 'dashboard', value: 'Dashboard', locale: 'en-US', isCustom: false },
+        data: {
+          domain: 'admin',
+          key: 'dashboard',
+          value: 'Dashboard',
+          locale: 'en-US',
+          isCustom: false,
+        },
       } as any);
 
       const response = await request(app.getHttpServer())
@@ -143,9 +159,14 @@ describe('[R17-R18] Translation Module', () => {
     });
 
     it('should return 403 for CUSTOMER role', async () => {
-      const customerData = UserFactory.create({ email: `customer-trans-${Date.now()}@example.com` });
+      const customerData = UserFactory.create({
+        email: `customer-trans-${Date.now()}@example.com`,
+      });
       const customer = await prisma.user.create({ data: customerData as any });
-      const customerToken = jwtService.sign({ sub: customer.id, role: SystemRole.CUSTOMER }, { expiresIn: '15m', secret: process.env.JWT_SECRET });
+      const customerToken = jwtService.sign(
+        { sub: customer.id, role: SystemRole.CUSTOMER },
+        { expiresIn: '15m', secret: process.env.JWT_SECRET },
+      );
 
       await request(app.getHttpServer())
         .get('/v1/admin/translations')
@@ -161,7 +182,13 @@ describe('[R17-R18] Translation Module', () => {
         .set('Authorization', `Bearer ${adminToken}`)
         .send({
           entries: [
-            { domain: 'common', key: 'welcome', value: 'Welcome', locale: 'en-US', isCustom: false },
+            {
+              domain: 'common',
+              key: 'welcome',
+              value: 'Welcome',
+              locale: 'en-US',
+              isCustom: false,
+            },
             { domain: 'common', key: 'welcome', value: '欢迎', locale: 'zh-CN', isCustom: false },
           ],
         })
@@ -176,7 +203,13 @@ describe('[R17-R18] Translation Module', () => {
   describe('DELETE /v1/admin/translations/:id', () => {
     it('should delete a translation entry for ADMIN', async () => {
       const entry = await prisma.translationDictionary.create({
-        data: { domain: 'common', key: 'todelete', value: 'Delete me', locale: 'en-US', isCustom: true },
+        data: {
+          domain: 'common',
+          key: 'todelete',
+          value: 'Delete me',
+          locale: 'en-US',
+          isCustom: true,
+        },
       } as any);
 
       await request(app.getHttpServer())

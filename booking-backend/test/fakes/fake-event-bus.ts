@@ -64,7 +64,7 @@ export class FakeEventBus {
    * Supports '*' as wildcard character.
    */
   broadcast(roomPattern: string, event: any): void {
-    const regex = new RegExp("^" + roomPattern.replace(/\*/g, ".*") + "$");
+    const regex = new RegExp('^' + roomPattern.replace(/\*/g, '.*') + '$');
     for (const [room] of this.subscribers) {
       if (regex.test(room)) {
         this.publish(room, event);

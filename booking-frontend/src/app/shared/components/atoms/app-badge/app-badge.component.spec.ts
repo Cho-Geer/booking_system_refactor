@@ -20,7 +20,7 @@ describe('AppBadgeComponent', () => {
 
   it('should display default pending label', () => {
     const el = fixture.nativeElement.querySelector('span');
-    expect(el.textContent).toContain('待确认');
+    expect(el.textContent).toContain('Pending');
   });
 
   it('should show correct label for confirmed status', () => {
@@ -28,7 +28,7 @@ describe('AppBadgeComponent', () => {
     fixture.componentRef.setInput('customLabel', undefined);
     fixture.detectChanges();
     const el = fixture.nativeElement.querySelector('span');
-    expect(el.textContent).toContain('已确认');
+    expect(el.textContent).toContain('Confirmed');
   });
 
   it('should show custom label when provided', () => {

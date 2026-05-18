@@ -8,7 +8,11 @@ import { AuthService } from './auth.service';
 import { PrismaService } from '../../common/database/prisma.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
-import { SendVerificationCodeDto, VerifyVerificationCodeDto, VerificationCodeType } from './dto/email-verification.dto';
+import {
+  SendVerificationCodeDto,
+  VerifyVerificationCodeDto,
+  VerificationCodeType,
+} from './dto/email-verification.dto';
 import { LoginResponseDto, RegisterResponseDto } from './dto/response.dto';
 import { VerificationService } from '../verification/verification.service';
 import { EmailService } from '../email/email.service';
@@ -128,7 +132,9 @@ xdescribe('AuthService (Redis Verification Code Refactor)', () => {
     mockCacheService = createMockCacheService();
 
     // Mock the PrismaClient constructor
-    jest.spyOn(require('@prisma/client'), 'PrismaClient').mockImplementation(() => mockPrismaClient);
+    jest
+      .spyOn(require('@prisma/client'), 'PrismaClient')
+      .mockImplementation(() => mockPrismaClient);
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -186,10 +192,7 @@ xdescribe('AuthService (Redis Verification Code Refactor)', () => {
 
       // Assert
       expect(result).toEqual({ success: true });
-      expect(mockVerificationService.generateCode).toHaveBeenCalledWith(
-        testEmail,
-        testType
-      );
+      expect(mockVerificationService.generateCode).toHaveBeenCalledWith(testEmail, testType);
       expect(mockVerificationService.generateCode).toHaveBeenCalledTimes(1);
     });
 
@@ -230,9 +233,7 @@ xdescribe('AuthService (Redis Verification Code Refactor)', () => {
       };
 
       // Act & Assert
-      await expect(service.sendVerificationCode(sendDto)).rejects.toThrow(
-        ConflictException
-      );
+      await expect(service.sendVerificationCode(sendDto)).rejects.toThrow(ConflictException);
       expect(mockVerificationService.generateCode).not.toHaveBeenCalled();
     });
 
@@ -246,9 +247,7 @@ xdescribe('AuthService (Redis Verification Code Refactor)', () => {
       };
 
       // Act & Assert
-      await expect(service.sendVerificationCode(sendDto)).rejects.toThrow(
-        BadRequestException
-      );
+      await expect(service.sendVerificationCode(sendDto)).rejects.toThrow(BadRequestException);
     });
 
     it('should throw BadRequestException when user inactive (LOGIN type)', async () => {
@@ -265,9 +264,7 @@ xdescribe('AuthService (Redis Verification Code Refactor)', () => {
       };
 
       // Act & Assert
-      await expect(service.sendVerificationCode(sendDto)).rejects.toThrow(
-        BadRequestException
-      );
+      await expect(service.sendVerificationCode(sendDto)).rejects.toThrow(BadRequestException);
     });
 
     it('should throw BadRequestException when user not found (RESET type)', async () => {
@@ -280,9 +277,7 @@ xdescribe('AuthService (Redis Verification Code Refactor)', () => {
       };
 
       // Act & Assert
-      await expect(service.sendVerificationCode(sendDto)).rejects.toThrow(
-        BadRequestException
-      );
+      await expect(service.sendVerificationCode(sendDto)).rejects.toThrow(BadRequestException);
     });
 
     it('should rollback Redis code when email sending fails', async () => {
@@ -298,15 +293,10 @@ xdescribe('AuthService (Redis Verification Code Refactor)', () => {
       };
 
       // Act & Assert
-      await expect(service.sendVerificationCode(sendDto)).rejects.toThrow(
-        BadRequestException
-      );
+      await expect(service.sendVerificationCode(sendDto)).rejects.toThrow(BadRequestException);
 
       // Verify rollback
-      expect(mockVerificationService.deleteCode).toHaveBeenCalledWith(
-        testEmail,
-        testType
-      );
+      expect(mockVerificationService.deleteCode).toHaveBeenCalledWith(testEmail, testType);
     });
 
     it('should use correct email subject for each verification type', async () => {
@@ -341,7 +331,7 @@ xdescribe('AuthService (Redis Verification Code Refactor)', () => {
         expect(mockEmailService.sendEmail).toHaveBeenCalledWith(
           expect.objectContaining({
             subject: expect.stringContaining('Verification Code'),
-          })
+          }),
         );
 
         jest.clearAllMocks();
@@ -374,7 +364,7 @@ xdescribe('AuthService (Redis Verification Code Refactor)', () => {
       expect(mockVerificationService.verifyCode).toHaveBeenCalledWith(
         testEmail,
         testCode,
-        testType
+        testType,
       );
       expect(mockVerificationService.verifyCode).toHaveBeenCalledTimes(1);
     });
@@ -382,7 +372,7 @@ xdescribe('AuthService (Redis Verification Code Refactor)', () => {
     it('should throw InvalidVerificationCodeException when code is invalid', async () => {
       // Arrange
       mockVerificationService.verifyCode.mockRejectedValue(
-        new InvalidVerificationCodeException('Invalid code')
+        new InvalidVerificationCodeException('Invalid code'),
       );
 
       const verifyDto: VerifyVerificationCodeDto = {
@@ -393,14 +383,14 @@ xdescribe('AuthService (Redis Verification Code Refactor)', () => {
 
       // Act & Assert
       await expect(service.verifyVerificationCode(verifyDto)).rejects.toThrow(
-        InvalidVerificationCodeException
+        InvalidVerificationCodeException,
       );
     });
 
     it('should throw MaxAttemptsExceededException when too many attempts', async () => {
       // Arrange
       mockVerificationService.verifyCode.mockRejectedValue(
-        new MaxAttemptsExceededException('Too many attempts')
+        new MaxAttemptsExceededException('Too many attempts'),
       );
 
       const verifyDto: VerifyVerificationCodeDto = {
@@ -411,14 +401,14 @@ xdescribe('AuthService (Redis Verification Code Refactor)', () => {
 
       // Act & Assert
       await expect(service.verifyVerificationCode(verifyDto)).rejects.toThrow(
-        MaxAttemptsExceededException
+        MaxAttemptsExceededException,
       );
     });
 
     it('should throw VerificationUnavailableException when Redis is unavailable', async () => {
       // Arrange
       mockVerificationService.verifyCode.mockRejectedValue(
-        new VerificationUnavailableException('Service unavailable')
+        new VerificationUnavailableException('Service unavailable'),
       );
 
       const verifyDto: VerifyVerificationCodeDto = {
@@ -429,7 +419,7 @@ xdescribe('AuthService (Redis Verification Code Refactor)', () => {
 
       // Act & Assert
       await expect(service.verifyVerificationCode(verifyDto)).rejects.toThrow(
-        VerificationUnavailableException
+        VerificationUnavailableException,
       );
     });
 
@@ -474,7 +464,7 @@ xdescribe('AuthService (Redis Verification Code Refactor)', () => {
       expect(sendResult.success).toBe(true);
       expect(mockVerificationService.generateCode).toHaveBeenCalledWith(
         testEmail,
-        VerificationCodeType.REGISTER
+        VerificationCodeType.REGISTER,
       );
 
       // Arrange - Verify
@@ -494,7 +484,7 @@ xdescribe('AuthService (Redis Verification Code Refactor)', () => {
       expect(mockVerificationService.verifyCode).toHaveBeenCalledWith(
         testEmail,
         generatedCode,
-        VerificationCodeType.REGISTER
+        VerificationCodeType.REGISTER,
       );
     });
   });

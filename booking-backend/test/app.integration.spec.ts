@@ -65,7 +65,10 @@ async function cleanDatabase(prisma: PrismaClient) {
  */
 function hashValue(value: string): string {
   const PEPPER = 'test-pepper-for-integration-tests-only';
-  return crypto.createHash('sha256').update(value + PEPPER).digest('hex');
+  return crypto
+    .createHash('sha256')
+    .update(value + PEPPER)
+    .digest('hex');
 }
 
 // ============================================================
@@ -220,9 +223,7 @@ describe('Booking System Integration Tests (Real DB)', () => {
   // ============================================================
   describe('GET /v1/health', () => {
     it('should return health status', async () => {
-      const response = await request(app.getHttpServer())
-        .get('/v1/health')
-        .expect(200);
+      const response = await request(app.getHttpServer()).get('/v1/health').expect(200);
 
       expect(extractDataBody(response)).toHaveProperty('status');
       expect(extractDataBody(response)).toHaveProperty('timestamp');
@@ -261,7 +262,13 @@ describe('Booking System Integration Tests (Real DB)', () => {
       it('should reject completion with invalid code', async () => {
         const response = await request(app.getHttpServer())
           .post('/v1/auth/register/complete')
-          .send({ contact: 'test@example.com', contactType: 'email', code: 'wrong-code', password: 'SecurePass123!', name: 'Test' });
+          .send({
+            contact: 'test@example.com',
+            contactType: 'email',
+            code: 'wrong-code',
+            password: 'SecurePass123!',
+            name: 'Test',
+          });
         // 400 = invalid code, 503 = verification service unavailable in test env
         expect([400, 503]).toContain(response.status);
       });
@@ -294,7 +301,11 @@ describe('Booking System Integration Tests (Real DB)', () => {
       it('should reject login with non-existent email', async () => {
         await request(app.getHttpServer())
           .post('/v1/auth/login/password')
-          .send({ contact: 'nonexistent@example.com', contactType: 'email', password: TEST_USER.password })
+          .send({
+            contact: 'nonexistent@example.com',
+            contactType: 'email',
+            password: TEST_USER.password,
+          })
           .expect(401);
       });
     });
@@ -382,8 +393,16 @@ describe('Booking System Integration Tests (Real DB)', () => {
 
     it('should get all users with pagination', async () => {
       // Create some users
-      await createTestUser(prisma, { ...TEST_USER, email: 'user1@example.com', phone: '+1111111111' });
-      await createTestUser(prisma, { ...TEST_USER, email: 'user2@example.com', phone: '+2222222222' });
+      await createTestUser(prisma, {
+        ...TEST_USER,
+        email: 'user1@example.com',
+        phone: '+1111111111',
+      });
+      await createTestUser(prisma, {
+        ...TEST_USER,
+        email: 'user2@example.com',
+        phone: '+2222222222',
+      });
 
       const response = await request(app.getHttpServer())
         .get('/v1/users')
@@ -442,9 +461,7 @@ describe('Booking System Integration Tests (Real DB)', () => {
     });
 
     it('should reject unauthorized access without token', async () => {
-      await request(app.getHttpServer())
-        .get('/v1/users')
-        .expect(401);
+      await request(app.getHttpServer()).get('/v1/users').expect(401);
     });
   });
 
@@ -1207,52 +1224,55 @@ describe('Booking System Integration Tests (Real DB)', () => {
       expect([200, 201, 400, 503]).toContain(registerResponse.status);
 
       // Step 3: Create a test user directly since auth flow may not work in test env
-      const user = await createTestUser(prisma, { email: 'flowtest@example.com', name: 'Flow Test' });
+      const user = await createTestUser(prisma, {
+        email: 'flowtest@example.com',
+        name: 'Flow Test',
+      });
       const token = generateTestToken(jwtService, user);
 
-        // Create category + service
-        const category = await prisma.serviceCategory.create({
-          data: { name: `Flow Category`, isActive: true },
-        });
-        const service = await prisma.service.create({
-          data: {
-            categoryId: category.id,
-            name: 'Flow Service',
-            durationMinutes: 30,
-            price: 25,
-            isActive: true,
-          },
-        });
-        const timeSlot = await createTimeSlot(prisma, service.id);
+      // Create category + service
+      const category = await prisma.serviceCategory.create({
+        data: { name: `Flow Category`, isActive: true },
+      });
+      const service = await prisma.service.create({
+        data: {
+          categoryId: category.id,
+          name: 'Flow Service',
+          durationMinutes: 30,
+          price: 25,
+          isActive: true,
+        },
+      });
+      const timeSlot = await createTimeSlot(prisma, service.id);
 
-        // Create appointment
-        const appointmentResponse = await request(app.getHttpServer())
-          .post('/v1/appointments')
+      // Create appointment
+      const appointmentResponse = await request(app.getHttpServer())
+        .post('/v1/appointments')
+        .set('Authorization', `Bearer ${token}`)
+        .set('Idempotency-Key', `test-idem-flow-${Date.now()}`)
+        .send({
+          timeSlotId: timeSlot.id,
+          serviceId: service.id,
+          customerInfo: { name: 'Flow Test', email: 'flowtest@example.com', phone: '+7777777777' },
+          appointmentDate: new Date(Date.now() + 86400000).toISOString(),
+        });
+      expect([200, 201, 400, 401]).toContain(appointmentResponse.status);
+
+      if (appointmentResponse.status === 201) {
+        const appointmentId = appointmentResponse.body.data.id;
+
+        // Cancel appointment
+        await request(app.getHttpServer())
+          .post(`/v1/appointments/${appointmentId}/cancel`)
           .set('Authorization', `Bearer ${token}`)
-          .set('Idempotency-Key', `test-idem-flow-${Date.now()}`)
-          .send({
-            timeSlotId: timeSlot.id,
-            serviceId: service.id,
-            customerInfo: { name: 'Flow Test', email: 'flowtest@example.com', phone: '+7777777777' },
-            appointmentDate: new Date(Date.now() + 86400000).toISOString(),
-          });
-        expect([200, 201, 400, 401]).toContain(appointmentResponse.status);
+          .send({ reason: 'End-to-end flow test' });
 
-        if (appointmentResponse.status === 201) {
-          const appointmentId = appointmentResponse.body.data.id;
-
-          // Cancel appointment
-          await request(app.getHttpServer())
-            .post(`/v1/appointments/${appointmentId}/cancel`)
-            .set('Authorization', `Bearer ${token}`)
-            .send({ reason: 'End-to-end flow test' });
-
-          // Verify cancellation
-          const cancelledAppointment = await prisma.appointment.findUnique({
-            where: { id: appointmentId },
-          });
-          expect(cancelledAppointment?.status).toBe('CANCELLED');
-        }
+        // Verify cancellation
+        const cancelledAppointment = await prisma.appointment.findUnique({
+          where: { id: appointmentId },
+        });
+        expect(cancelledAppointment?.status).toBe('CANCELLED');
+      }
     });
   });
 });

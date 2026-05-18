@@ -31,7 +31,7 @@ const mockJwtService = {
 
 /**
  * FIX-P0-006 GREEN Phase: 验证 WebSocket 网关 JWT 认证已实现
- * 
+ *
  * 安全修复已完成：
  * - NotificationsGateway.handleConnection() 现在验证 JWT token
  * - 无 token 或无效 token 的连接会被拒绝并断开
@@ -79,9 +79,9 @@ describe('FIX-P0-006: WebSocket JWT Authentication (GREEN)', () => {
        * GREEN 阶段：Gateway 现在拒绝没有 auth token 的连接
        */
       const socketWithoutAuth = { ...mockSocket, id: 'unauth-socket' };
-      
+
       gateway.handleConnection(socketWithoutAuth as any);
-      
+
       // 验证：未认证连接被拒绝（emit error 并 disconnect）
       expect(socketWithoutAuth.emit).toHaveBeenCalledWith('error', 'Authentication required');
       expect(socketWithoutAuth.disconnect).toHaveBeenCalled();
@@ -108,7 +108,7 @@ describe('FIX-P0-006: WebSocket JWT Authentication (GREEN)', () => {
       });
 
       gateway.handleConnection(socketWithInvalidToken as any);
-      
+
       // 验证：无效 token 连接被拒绝
       expect(socketWithInvalidToken.emit).toHaveBeenCalledWith('error', 'Invalid token');
       expect(socketWithInvalidToken.disconnect).toHaveBeenCalled();
@@ -132,7 +132,7 @@ describe('FIX-P0-006: WebSocket JWT Authentication (GREEN)', () => {
       mockJwtService.verify.mockReturnValue({ sub: 'user-123' });
 
       gateway.handleConnection(socketWithValidToken as any);
-      
+
       // 验证：有效 token 连接成功
       expect(gateway.getConnectedClientsCount()).toBe(1);
       expect(gateway.isUserConnected('user-123')).toBe(true);
@@ -155,7 +155,7 @@ describe('FIX-P0-006: WebSocket JWT Authentication (GREEN)', () => {
       mockJwtService.verify.mockReturnValue({ sub: 'user-123' });
 
       gateway.handleConnection(socketWithToken as any);
-      
+
       // 验证：userId 被正确提取并存储
       expect(gateway.isUserConnected('user-123')).toBe(true);
     });
@@ -168,12 +168,9 @@ describe('FIX-P0-006: WebSocket JWT Authentication (GREEN)', () => {
        */
       // Connect without auth (will be rejected, not added to connectedClients)
       gateway.handleConnection(mockSocket as any);
-      
+
       // Try to join admin room without auth
-      const result = gateway.handleJoin(
-        { room: 'admin:secret-room' },
-        mockSocket as any,
-      );
+      const result = gateway.handleJoin({ room: 'admin:secret-room' }, mockSocket as any);
 
       // 验证：未认证用户的 join 被拒绝，返回错误对象
       expect(result).toEqual({ event: 'error', data: { error: 'Authentication required' } });
@@ -197,12 +194,9 @@ describe('FIX-P0-006: WebSocket JWT Authentication (GREEN)', () => {
 
       // Connect with valid token
       gateway.handleConnection(socketWithToken as any);
-      
+
       // User tries to join another user's room
-      const result = gateway.handleJoin(
-        { room: 'user:some-other-user' },
-        socketWithToken as any,
-      );
+      const result = gateway.handleJoin({ room: 'user:some-other-user' }, socketWithToken as any);
 
       // 验证：跨用户房间访问被拒绝
       expect(result).toEqual({ event: 'error', data: { error: 'Access denied' } });

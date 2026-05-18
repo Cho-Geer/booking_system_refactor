@@ -25,6 +25,18 @@ describe('ServiceManagementComponent', () => {
       getAdminAppointments: jest.fn(),
       updateAppointmentStatus: jest.fn(),
       batchCancelAppointments: jest.fn(),
+      getServiceAffectedAppointments: jest.fn(),
+      getServicesSummary: jest.fn().mockReturnValue(of({ total: 0, active: 0, averagePrice: 0 })),
+      getBookingTrend: jest.fn(),
+      getSystemStatus: jest.fn(),
+      getSystemMetrics: jest.fn(),
+      getNotifications: jest.fn(),
+      markNotificationRead: jest.fn(),
+      getUnreadCount: jest.fn(),
+      getBusinessHours: jest.fn(),
+      getTimeDistribution: jest.fn(),
+      uploadServiceImage: jest.fn(),
+      createAdminAppointment: jest.fn(),
     } as unknown as jest.Mocked<AdminService>;
 
     TestBed.configureTestingModule({
@@ -101,6 +113,8 @@ describe('ServiceManagementComponent', () => {
     store.setServices(services, 3, 1);
     store.setAllServicesForStats(services);
 
+    // Reset servicesSummary to force fallback to servicesTotal for this test
+    (store as any).setServicesSummary(null);
     expect(component.totalServices()).toBe(3);
     expect(component.activeServicesCount()).toBe(2);
     expect(component.averagePrice()).toBeCloseTo(38.33, 1);
@@ -283,6 +297,147 @@ describe('ServiceManagementComponent', () => {
 
       component.formDuration = 25;
       expect(component.computedPricePerMinute()).toBe(4);
+    });
+  });
+
+  // ==========================================
+  // [Red] Service Disable Warning Modal
+  // ==========================================
+
+  describe('[Red] Service disable warning modal', () => {
+    it('[Red] should call getServiceAffectedAppointments when disabling active service', () => {
+      const svc: AdminServiceItem = {
+        id: '1', name: 'Haircut', description: 'Cut', duration: 30, price: 25,
+        active: true, createdAt: '2026-01-01T00:00:00Z',
+      };
+      component.editService(svc);
+      component.formActive = false; // Toggle to disable
+
+      mockAdminService.getServiceAffectedAppointments.mockReturnValue(
+        of({ pendingCount: 3, confirmedCount: 2 }),
+      );
+
+      component.saveService();
+
+      expect(mockAdminService.getServiceAffectedAppointments).toHaveBeenCalledWith('1');
+    });
+
+    it('[Red] should show warning dialog with affected counts', () => {
+      const svc: AdminServiceItem = {
+        id: '1', name: 'Haircut', description: 'Cut', duration: 30, price: 25,
+        active: true, createdAt: '2026-01-01T00:00:00Z',
+      };
+      component.editService(svc);
+      component.formActive = false;
+
+      mockAdminService.getServiceAffectedAppointments.mockReturnValue(
+        of({ pendingCount: 5, confirmedCount: 2 }),
+      );
+
+      component.saveService();
+
+      expect(component.disableWarningVisible()).toBe(true);
+      expect(component.disableWarningData()).toEqual({ pendingCount: 5, confirmedCount: 2 });
+    });
+
+    it('[Red] should NOT show warning when creating a new service with active=false', () => {
+      component.openNew();
+      component.formActive = false;
+      component.formName = 'New Service';
+      component.formDuration = 30;
+      component.formPrice = 25;
+
+      mockAdminService.createAdminService.mockReturnValue(of({
+        id: 'new', name: 'New Service', description: '', duration: 30, price: 25,
+        active: false, createdAt: '2026-01-01T00:00:00Z',
+      }));
+
+      component.saveService();
+
+      expect(mockAdminService.getServiceAffectedAppointments).not.toHaveBeenCalled();
+      expect(mockAdminService.createAdminService).toHaveBeenCalled();
+    });
+
+    it('[Red] should NOT show warning when updating but active stays true', () => {
+      const svc: AdminServiceItem = {
+        id: '1', name: 'Haircut', description: 'Cut', duration: 30, price: 25,
+        active: true, createdAt: '2026-01-01T00:00:00Z',
+      };
+      component.editService(svc);
+      component.formActive = true; // No change
+
+      mockAdminService.updateAdminService.mockReturnValue(of({
+        id: '1', name: 'Haircut', description: 'Cut', duration: 30, price: 25,
+        active: true, createdAt: '2026-01-01T00:00:00Z',
+      }));
+
+      component.saveService();
+
+      expect(mockAdminService.getServiceAffectedAppointments).not.toHaveBeenCalled();
+    });
+
+    it('[Red] should NOT show warning when updating to active after being inactive', () => {
+      const svc: AdminServiceItem = {
+        id: '1', name: 'Old Service', description: 'Old', duration: 30, price: 25,
+        active: false, createdAt: '2026-01-01T00:00:00Z',
+      };
+      component.editService(svc);
+      component.formActive = true; // Re-enabling, not disabling
+
+      mockAdminService.updateAdminService.mockReturnValue(of({
+        id: '1', name: 'Old Service', description: 'Old', duration: 30, price: 25,
+        active: true, createdAt: '2026-01-01T00:00:00Z',
+      }));
+
+      component.saveService();
+
+      expect(mockAdminService.getServiceAffectedAppointments).not.toHaveBeenCalled();
+    });
+
+    it('[Red] should call updateAdminService after confirming disable', () => {
+      const svc: AdminServiceItem = {
+        id: '1', name: 'Haircut', description: 'Cut', duration: 30, price: 25,
+        active: true, createdAt: '2026-01-01T00:00:00Z',
+      };
+      component.editService(svc);
+      component.formActive = false;
+
+      mockAdminService.getServiceAffectedAppointments.mockReturnValue(
+        of({ pendingCount: 3, confirmedCount: 2 }),
+      );
+      mockAdminService.updateAdminService.mockReturnValue(of({
+        id: '1', name: 'Haircut', description: 'Cut', duration: 30, price: 25,
+        active: false, createdAt: '2026-01-01T00:00:00Z',
+      }));
+
+      component.saveService();
+      expect(component.disableWarningVisible()).toBe(true);
+
+      // Confirm disable
+      component.confirmDisableService();
+      expect(mockAdminService.updateAdminService).toHaveBeenCalledWith('1', expect.objectContaining({ active: false }));
+      expect(component.disableWarningVisible()).toBe(false);
+    });
+
+    it('[Red] should cancel disable and not call updateAdminService', () => {
+      const svc: AdminServiceItem = {
+        id: '1', name: 'Haircut', description: 'Cut', duration: 30, price: 25,
+        active: true, createdAt: '2026-01-01T00:00:00Z',
+      };
+      component.editService(svc);
+      component.formActive = false;
+
+      mockAdminService.getServiceAffectedAppointments.mockReturnValue(
+        of({ pendingCount: 3, confirmedCount: 2 }),
+      );
+
+      component.saveService();
+      expect(component.disableWarningVisible()).toBe(true);
+
+      // Cancel disable
+      component.cancelDisableService();
+      expect(component.disableWarningVisible()).toBe(false);
+      expect(mockAdminService.updateAdminService).not.toHaveBeenCalled();
     });
   });
 });

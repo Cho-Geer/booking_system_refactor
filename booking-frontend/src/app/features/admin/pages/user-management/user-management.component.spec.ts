@@ -13,14 +13,47 @@ describe('UserManagementComponent', () => {
 
   beforeEach(async () => {
     mockAdminService = {
-      getStats: jest.fn().mockReturnValue(of({
-        totalBookings: { value: 100, changePercentage: 0, isPositive: true, target: 1000, progressPercentage: 10 },
-        todayBookings: { value: 10, changePercentage: 0, isPositive: true, target: 100, progressPercentage: 10 },
-        pendingBookings: { value: 0, changePercentage: 0, isPositive: true, target: 50, progressPercentage: 0 },
-        activeUsers: { value: 50, changePercentage: 0, isPositive: true, target: 1500, progressPercentage: 3 },
-        totalRevenue: { value: 5000, changePercentage: 0, isPositive: true, target: 10000, progressPercentage: 50 },
-        bookingTrend: [], servicePopularity: [],
-      })),
+      getStats: jest.fn().mockReturnValue(
+        of({
+          totalBookings: {
+            value: 100,
+            changePercentage: 0,
+            isPositive: true,
+            target: 1000,
+            progressPercentage: 10,
+          },
+          todayBookings: {
+            value: 10,
+            changePercentage: 0,
+            isPositive: true,
+            target: 100,
+            progressPercentage: 10,
+          },
+          pendingBookings: {
+            value: 0,
+            changePercentage: 0,
+            isPositive: true,
+            target: 50,
+            progressPercentage: 0,
+          },
+          activeUsers: {
+            value: 50,
+            changePercentage: 0,
+            isPositive: true,
+            target: 1500,
+            progressPercentage: 3,
+          },
+          totalRevenue: {
+            value: 5000,
+            changePercentage: 0,
+            isPositive: true,
+            target: 10000,
+            progressPercentage: 50,
+          },
+          bookingTrend: [],
+          servicePopularity: [],
+        }),
+      ),
       getUsers: jest.fn().mockReturnValue(of({ items: [], total: 0, page: 1, limit: 10 })),
       createUser: jest.fn(),
       updateUser: jest.fn(),
@@ -36,10 +69,7 @@ describe('UserManagementComponent', () => {
 
     TestBed.configureTestingModule({
       imports: [UserManagementComponent],
-      providers: [
-        AdminStore,
-        { provide: AdminService, useValue: mockAdminService },
-      ],
+      providers: [AdminStore, { provide: AdminService, useValue: mockAdminService }],
     });
 
     fixture = TestBed.createComponent(UserManagementComponent);
@@ -59,7 +89,14 @@ describe('UserManagementComponent', () => {
 
   it('should display users from store', () => {
     const users: AdminUser[] = [
-      { id: '1', name: 'Alice', email: 'alice@test.com', role: 'CUSTOMER', status: 'ACTIVE', createdAt: '2026-01-01T00:00:00Z' },
+      {
+        id: '1',
+        name: 'Alice',
+        email: 'alice@test.com',
+        role: 'CUSTOMER',
+        status: 'ACTIVE',
+        createdAt: '2026-01-01T00:00:00Z',
+      },
     ];
 
     store.setUsers(users, 1, 1);
@@ -76,7 +113,12 @@ describe('UserManagementComponent', () => {
 
   it('should open user dialog for editing existing user', () => {
     const user: AdminUser = {
-      id: '1', name: 'Alice', email: 'alice@test.com', role: 'CUSTOMER', status: 'ACTIVE', createdAt: '2026-01-01T00:00:00Z',
+      id: '1',
+      name: 'Alice',
+      email: 'alice@test.com',
+      role: 'CUSTOMER',
+      status: 'ACTIVE',
+      createdAt: '2026-01-01T00:00:00Z',
     };
 
     component.editUser(user);
@@ -96,14 +138,35 @@ describe('UserManagementComponent', () => {
   });
 
   // ==========================================
-  // [RED] Enhanced tests for redesigned features
+  // Enhanced tests for redesigned features
   // ==========================================
 
-  it('[RED] should compute stats from users list', () => {
+  it('should compute stats from users list', () => {
     const users: AdminUser[] = [
-      { id: '1', name: 'Alice', email: 'alice@test.com', role: 'CUSTOMER', status: 'ACTIVE', createdAt: '2026-05-01T00:00:00Z' },
-      { id: '2', name: 'Bob', email: 'bob@test.com', role: 'ADMIN', status: 'ACTIVE', createdAt: '2026-04-01T00:00:00Z' },
-      { id: '3', name: 'Carol', email: 'carol@test.com', role: 'CUSTOMER', status: 'INACTIVE', createdAt: '2026-05-02T00:00:00Z' },
+      {
+        id: '1',
+        name: 'Alice',
+        email: 'alice@test.com',
+        role: 'CUSTOMER',
+        status: 'ACTIVE',
+        createdAt: '2026-05-01T00:00:00Z',
+      },
+      {
+        id: '2',
+        name: 'Bob',
+        email: 'bob@test.com',
+        role: 'ADMIN',
+        status: 'ACTIVE',
+        createdAt: '2026-04-01T00:00:00Z',
+      },
+      {
+        id: '3',
+        name: 'Carol',
+        email: 'carol@test.com',
+        role: 'CUSTOMER',
+        status: 'INACTIVE',
+        createdAt: '2026-05-02T00:00:00Z',
+      },
     ];
     store.setUsers(users, 3, 1);
     store.setAllUsersForStats(users);
@@ -113,7 +176,7 @@ describe('UserManagementComponent', () => {
     expect(component.newThisWeek()).toBeGreaterThanOrEqual(2);
   });
 
-  it('[RED] should clear all filters when clearFilters is called', () => {
+  it('should clear all filters when clearFilters is called', () => {
     component.searchQuery.set('Alice');
     component.selectedRoleFilter.set('ADMIN');
     component.selectedStatusFilter.set('ACTIVE');
@@ -125,7 +188,7 @@ describe('UserManagementComponent', () => {
     expect(component.selectedStatusFilter()).toBe('');
   });
 
-  it('[RED] should validate form on save with empty name', () => {
+  it('should validate form on save with empty name', () => {
     component.formName = '';
     component.formEmail = '';
     component.openNew();
@@ -135,21 +198,26 @@ describe('UserManagementComponent', () => {
     expect(component.formErrors.name).toBe('Name is required');
   });
 
-  it('[RED] should map role to badge status correctly', () => {
+  it('should map role to badge status correctly', () => {
     expect(component.mapRoleToBadge('CUSTOMER')).toBe('confirmed');
     expect(component.mapRoleToBadge('ADMIN')).toBe('pending');
     expect(component.mapRoleToBadge('SUPER_ADMIN')).toBe('pending');
   });
 
-  it('[RED] should map status to badge correctly', () => {
+  it('should map status to badge correctly', () => {
     expect(component.mapStatusToBadge('ACTIVE')).toBe('confirmed');
     expect(component.mapStatusToBadge('INACTIVE')).toBe('pending');
     expect(component.mapStatusToBadge('BLOCKED')).toBe('cancelled');
   });
 
-  it('[RED] should show confirm delete dialog and delete user', () => {
+  it('should show confirm delete dialog and delete user', () => {
     const user: AdminUser = {
-      id: '1', name: 'Alice', email: 'alice@test.com', role: 'CUSTOMER', status: 'ACTIVE', createdAt: '2026-01-01T00:00:00Z',
+      id: '1',
+      name: 'Alice',
+      email: 'alice@test.com',
+      role: 'CUSTOMER',
+      status: 'ACTIVE',
+      createdAt: '2026-01-01T00:00:00Z',
     };
     mockAdminService.deleteUser.mockReturnValue(of(null));
 

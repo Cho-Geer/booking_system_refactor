@@ -181,11 +181,11 @@ describe('StatsService', () => {
       mockPrismaService.appointment.groupBy.mockResolvedValueOnce([
         { status: 'COMPLETED', _count: 100 },
       ]);
-      mockPrismaService.$queryRaw.mockResolvedValueOnce([{ total: 5000.00 }]);
+      mockPrismaService.$queryRaw.mockResolvedValueOnce([{ total: 5000.0 }]);
       mockPrismaService.$queryRaw.mockResolvedValueOnce([
-        { month: '2024-01', revenue: 400.00 },
-        { month: '2024-02', revenue: 500.00 },
-        { month: '2024-03', revenue: 600.50 },
+        { month: '2024-01', revenue: 400.0 },
+        { month: '2024-02', revenue: 500.0 },
+        { month: '2024-03', revenue: 600.5 },
       ]);
 
       const result = await service.getRevenue();
@@ -267,9 +267,7 @@ describe('StatsService', () => {
         { status: 'COMPLETED', _count: 1 },
       ]);
       mockPrismaService.$queryRaw.mockResolvedValueOnce([{ total: 50 }]);
-      mockPrismaService.$queryRaw.mockResolvedValueOnce([
-        { month: '2024-06', revenue: '250.50' },
-      ]);
+      mockPrismaService.$queryRaw.mockResolvedValueOnce([{ month: '2024-06', revenue: '250.50' }]);
 
       const result = await service.getRevenue();
 
@@ -341,9 +339,7 @@ describe('StatsService', () => {
     });
 
     it('should only override user types returned by groupBy', async () => {
-      mockPrismaService.user.groupBy.mockResolvedValueOnce([
-        { userType: 'CUSTOMER', _count: 50 },
-      ]);
+      mockPrismaService.user.groupBy.mockResolvedValueOnce([{ userType: 'CUSTOMER', _count: 50 }]);
       mockPrismaService.$queryRaw.mockResolvedValueOnce([]);
       mockPrismaService.user.count.mockResolvedValue(10);
 
@@ -382,9 +378,7 @@ describe('StatsService', () => {
 
     it('should map usersByMonth count values to Number type', async () => {
       mockPrismaService.user.groupBy.mockResolvedValueOnce([]);
-      mockPrismaService.$queryRaw.mockResolvedValueOnce([
-        { month: '2024-05', count: '42' },
-      ]);
+      mockPrismaService.$queryRaw.mockResolvedValueOnce([{ month: '2024-05', count: '42' }]);
       mockPrismaService.user.count.mockResolvedValue(0);
 
       const result = await service.getUserStats();
@@ -600,9 +594,7 @@ describe('StatsService', () => {
     });
 
     it('should convert hour and count to number type', async () => {
-      mockPrismaService.$queryRaw.mockResolvedValueOnce([
-        { hour: '9', count: '15' },
-      ]);
+      mockPrismaService.$queryRaw.mockResolvedValueOnce([{ hour: '9', count: '15' }]);
 
       const result = await service.getTimeDistribution();
 
@@ -640,7 +632,7 @@ describe('StatsService', () => {
       expect(result.totalUsers).toBe(0);
       expect(result.totalServices).toBe(0);
       expect(result.totalAppointments).toBe(0);
-      expect(Object.values(result.appointmentsByStatus).every(v => v === 0)).toBe(true);
+      expect(Object.values(result.appointmentsByStatus).every((v) => v === 0)).toBe(true);
       expect(result.recentAppointments).toEqual([]);
     });
 
@@ -663,7 +655,7 @@ describe('StatsService', () => {
 
       const result = await service.getUserStats();
 
-      expect(Object.values(result.usersByRole).every(v => v === 0)).toBe(true);
+      expect(Object.values(result.usersByRole).every((v) => v === 0)).toBe(true);
       expect(result.activeUsers).toBe(0);
       expect(result.usersByMonth).toEqual([]);
     });

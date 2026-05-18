@@ -1,4 +1,4 @@
-import { Logger } from "@nestjs/common";
+import { Logger } from '@nestjs/common';
 
 /**
  * Reusable distributed lock helper.
@@ -38,9 +38,7 @@ export async function withDistributedLock<T>(
 
   const acquired = await cacheService.acquireLock(key, ttl);
   if (!acquired) {
-    (logger ?? new Logger("LockUtil")).warn(
-      `Skipping: another instance holds the lock "${key}"`,
-    );
+    (logger ?? new Logger('LockUtil')).warn(`Skipping: another instance holds the lock "${key}"`);
     return null;
   }
 
@@ -62,7 +60,7 @@ export function processSettledResults<T>(
 ): SettledResult[] {
   return results.map((result, index) => {
     const taskName = taskNames[index] ?? `task-${index}`;
-    if (result.status === "fulfilled") {
+    if (result.status === 'fulfilled') {
       logger.log(`${taskName} completed: ${String(result.value)}`);
       return { taskName, success: true, value: result.value };
     }

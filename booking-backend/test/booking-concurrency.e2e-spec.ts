@@ -105,7 +105,9 @@ describe('Booking Concurrency (E2E)', () => {
   it('should allow exactly 1 success and 9 conflicts when 10 concurrent requests hit the same slot (capacity=1)', async () => {
     // 1. Create shared dependencies
     const category = await createTestCategory(prisma);
-    const service = await createTestService(prisma, category.id, { name: 'Concurrency Test Service' });
+    const service = await createTestService(prisma, category.id, {
+      name: 'Concurrency Test Service',
+    });
 
     const timeSlot = await createTestTimeSlot(prisma, service.id, {
       capacity: 1,
@@ -123,11 +125,7 @@ describe('Booking Concurrency (E2E)', () => {
     // 2. Fire 10 simultaneous requests, all targeting the same slot with preferSeq=0
     const CONCURRENCY_COUNT = 10;
     const promises = Array.from({ length: CONCURRENCY_COUNT }, () =>
-      sendConcurrentReservation(
-        timeSlot.id,
-        token,
-        createReservationPayload(0, service.id),
-      ),
+      sendConcurrentReservation(timeSlot.id, token, createReservationPayload(0, service.id)),
     );
 
     // 3. Await all responses
@@ -174,7 +172,9 @@ describe('Booking Concurrency (E2E)', () => {
   it('should handle concurrent requests from different users with atomic preemption (capacity > 1)', async () => {
     // 1. Create shared dependencies
     const category = await createTestCategory(prisma);
-    const service = await createTestService(prisma, category.id, { name: 'Multi-User Concurrency Service' });
+    const service = await createTestService(prisma, category.id, {
+      name: 'Multi-User Concurrency Service',
+    });
 
     const timeSlot = await createTestTimeSlot(prisma, service.id, {
       capacity: 10,
@@ -239,7 +239,9 @@ describe('Booking Concurrency (E2E)', () => {
   it('should increment slot_sequence correctly across sequential reservations', async () => {
     // 1. Create dependencies
     const category = await createTestCategory(prisma);
-    const service = await createTestService(prisma, category.id, { name: 'Sequential Test Service' });
+    const service = await createTestService(prisma, category.id, {
+      name: 'Sequential Test Service',
+    });
 
     const timeSlot = await createTestTimeSlot(prisma, service.id, {
       capacity: 10,
@@ -298,7 +300,9 @@ describe('Booking Concurrency (E2E)', () => {
   // ============================================================
   it('should enforce unique constraint on (timeSlotId, appointmentDate, slotSequence)', async () => {
     const category = await createTestCategory(prisma);
-    const service = await createTestService(prisma, category.id, { name: 'Constraint Test Service' });
+    const service = await createTestService(prisma, category.id, {
+      name: 'Constraint Test Service',
+    });
 
     const timeSlot = await createTestTimeSlot(prisma, service.id, {
       capacity: 10,
@@ -352,7 +356,9 @@ describe('Booking Concurrency (E2E)', () => {
   // ============================================================
   it('should return cached result for duplicate idempotency key', async () => {
     const category = await createTestCategory(prisma);
-    const service = await createTestService(prisma, category.id, { name: 'Idempotency Test Service' });
+    const service = await createTestService(prisma, category.id, {
+      name: 'Idempotency Test Service',
+    });
 
     const timeSlot = await createTestTimeSlot(prisma, service.id, {
       capacity: 5,
@@ -531,7 +537,9 @@ describe('Booking Concurrency (E2E)', () => {
     });
 
     const category = await createTestCategory(prisma);
-    const service = await createTestService(prisma, category.id, { name: 'Direct Concurrency Service' });
+    const service = await createTestService(prisma, category.id, {
+      name: 'Direct Concurrency Service',
+    });
 
     const timeSlot = await createTestTimeSlot(prisma, service.id, {
       capacity: 1,

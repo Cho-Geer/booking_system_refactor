@@ -49,6 +49,15 @@ export class TranslationService implements OnDestroy {
     },
     admin: {
       'appointments.noTimeSlots': 'No time slots available. Please reselect a new date.',
+      'appointments.batchCancelTitle': 'Batch Cancel Appointments',
+      'appointments.batchCancelConfirm': 'Are you sure you want to cancel {count} appointment(s)? This action cannot be undone.',
+      'appointments.batchCancelReasonPlaceholder': 'Enter cancellation reason (optional)',
+      'appointments.confirmBatchCancel': 'Confirm Batch Cancel',
+      'services.confirmDisable': 'Disable Service',
+      'services.disableWarningMessage': 'This will cancel {pending} pending appointment(s). {confirmed} confirmed appointment(s) remain unchanged.',
+      'services.disablePending': '{count} pending appointment(s) will be cancelled',
+      'services.disableConfirmed': '{count} confirmed appointment(s) remain unchanged',
+      'services.disableConfirm': 'Disable Service',
     },
   };
 
@@ -136,10 +145,12 @@ export class TranslationService implements OnDestroy {
     key: string,
     params?: Record<string, string | number>,
   ): string {
-    const value = this.translations()?.[domain]?.[key];
+    let value = this.translations()?.[domain]?.[key];
     if (value === undefined) {
-      const fallback = TranslationService.FALLBACK_MAP[domain]?.[key];
-      return fallback ?? `{{${domain}.${key}}}`;
+      value = TranslationService.FALLBACK_MAP[domain]?.[key];
+      if (value === undefined) {
+        return `{{${domain}.${key}}}`;
+      }
     }
     if (params && Object.keys(params).length > 0) {
       return value.replace(

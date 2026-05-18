@@ -1,6 +1,6 @@
-import { Injectable } from "@nestjs/common";
-import { PrismaService } from "../../common/database/prisma.service";
-import { Prisma } from "@prisma/client";
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../../common/database/prisma.service';
+import { Prisma } from '@prisma/client';
 
 export interface CustomerInfo {
   name: string;
@@ -67,16 +67,16 @@ export class StatsService {
       appointmentsByStatusRaw,
       recentAppointments,
     ] = await Promise.all([
-      this.prisma.user.count(),
-      this.prisma.service.count(),
-      this.prisma.appointment.count(),
+      this.prisma.user.count().then(Number),
+      this.prisma.service.count().then(Number),
+      this.prisma.appointment.count().then(Number),
       this.prisma.appointment.groupBy({
-        by: ["status"],
+        by: ['status'],
         _count: true,
       }),
       this.prisma.appointment.findMany({
         take: 10,
-        orderBy: { createdAt: "desc" },
+        orderBy: { createdAt: 'desc' },
         select: {
           id: true,
           status: true,
@@ -96,9 +96,9 @@ export class StatsService {
       EXPIRED: 0,
     };
 
-    // Fill in actual counts
+    // Fill in actual counts (wrap _count — BigInt from Prisma groupBy)
     for (const item of appointmentsByStatusRaw) {
-      appointmentsByStatus[item.status] = item._count;
+      appointmentsByStatus[item.status] = Number(item._count);
     }
 
     return {
@@ -115,17 +115,15 @@ export class StatsService {
    */
   async getRevenue(): Promise<RevenueStats> {
     const completedAppointments = await this.prisma.appointment.groupBy({
-      by: ["status"],
+      by: ['status'],
       _count: true,
-      where: { status: "COMPLETED" },
+      where: { status: 'COMPLETED' },
     });
 
-    const completedCount = completedAppointments[0]?._count ?? 0;
+    const completedCount = Number(completedAppointments[0]?._count ?? 0);
 
     // Get total revenue from completed appointments
-    const totalRevenueResult = await this.prisma.$queryRaw<
-      Array<{ total: number }>
-    >(Prisma.sql`
+    const totalRevenueResult = await this.prisma.$queryRaw<Array<{ total: number }>>(Prisma.sql`
       SELECT COALESCE(SUM(s.price), 0) as total
       FROM appointments a
       JOIN services s ON a.service_id = s.id
@@ -154,8 +152,7 @@ export class StatsService {
       revenue: Number(row.revenue),
     }));
 
-    const averageAppointmentValue =
-      completedCount > 0 ? totalRevenue / completedCount : 0;
+    const averageAppointmentValue = completedCount > 0 ? totalRevenue / completedCount : 0;
 
     return {
       totalRevenue,
@@ -169,7 +166,7 @@ export class StatsService {
    */
   async getUserStats(): Promise<UserStats> {
     const usersByRoleRaw = await this.prisma.user.groupBy({
-      by: ["role"],
+      by: ['role'],
       _count: true,
     });
 
@@ -180,7 +177,7 @@ export class StatsService {
     };
 
     for (const item of usersByRoleRaw) {
-      usersByRole[item.role] = item._count as number;
+      usersByRole[item.role] = Number(item._count);
     }
 
     // Get users by month (last 12 months)
@@ -205,13 +202,15 @@ export class StatsService {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    const activeUsers = await this.prisma.user.count({
-      where: {
-        lastLoginAt: {
-          gte: thirtyDaysAgo,
+    const activeUsers = Number(
+      await this.prisma.user.count({
+        where: {
+          lastLoginAt: {
+            gte: thirtyDaysAgo,
+          },
         },
-      },
-    });
+      }),
+    );
 
     return {
       usersByRole,
@@ -248,7 +247,7 @@ export class StatsService {
     return result.map((row) => ({
       serviceId: row.service_id,
       serviceName: row.service_name,
-      bookingCount: row.booking_count,
+      bookingCount: Number(row.booking_count),
       revenue: Number(row.total_revenue),
     }));
   }
@@ -277,7 +276,7 @@ export class StatsService {
 
     return result.map((row) => ({
       date: row.date,
-      bookings: row.count,
+      bookings: Number(row.count),
       revenue: Number(row.revenue),
     }));
   }
@@ -286,9 +285,7 @@ export class StatsService {
    * Get hourly time distribution of appointments
    */
   async getTimeDistribution(): Promise<TimeDistribution[]> {
-    const result = await this.prisma.$queryRaw<
-      Array<{ hour: number; count: number }>
-    >(Prisma.sql`
+    const result = await this.prisma.$queryRaw<Array<{ hour: number; count: number }>>(Prisma.sql`
       SELECT 
         EXTRACT(HOUR FROM a.appointment_date)::int as hour,
         COUNT(a.id)::int as count

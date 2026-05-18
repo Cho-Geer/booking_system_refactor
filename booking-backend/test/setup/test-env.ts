@@ -1,11 +1,11 @@
-import { config } from "dotenv";
+import { config } from 'dotenv';
 
 // Load .env.test first if it exists (created by global-setup.ts)
-const envTestPath = require("path").join(__dirname, "..", "..", ".env.test");
+const envTestPath = require('path').join(__dirname, '..', '..', '.env.test');
 config({ path: envTestPath });
 
 // Fallback to .env
-config({ path: require("path").join(__dirname, "..", "..", ".env") });
+config({ path: require('path').join(__dirname, '..', '..', '.env') });
 
 // Set Jest timeout for integration tests (container startup takes time)
 jest.setTimeout(30000);
@@ -21,7 +21,7 @@ export function getTestDatabaseUrl(): string {
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) {
     throw new Error(
-      "DATABASE_URL is not set. Ensure global-setup.ts has run and created .env.test",
+      'DATABASE_URL is not set. Ensure global-setup.ts has run and created .env.test',
     );
   }
   return databaseUrl;
@@ -31,7 +31,7 @@ export function getTestDatabaseUrl(): string {
  * Get the test Redis URL from environment
  */
 export function getTestRedisUrl(): string {
-  return process.env.REDIS_URL || "redis://localhost:6379";
+  return process.env.REDIS_URL || 'redis://localhost:6379';
 }
 
 /**
@@ -39,22 +39,15 @@ export function getTestRedisUrl(): string {
  * (i.e., global-setup has run and containers are available)
  */
 export function isIntegrationMode(): boolean {
-  return process.env.NODE_ENV === "test" && !!process.env.DATABASE_URL;
+  return process.env.NODE_ENV === 'test' && !!process.env.DATABASE_URL;
 }
 
 /**
  * Suppress console output during tests (optional utility)
  */
 export function suppressConsole(): jest.SpyInstance[] {
-  const methods: Array<"log" | "debug" | "info" | "warn"> = [
-    "log",
-    "debug",
-    "info",
-    "warn",
-  ];
-  return methods.map((method) =>
-    jest.spyOn(console, method).mockImplementation(),
-  );
+  const methods: Array<'log' | 'debug' | 'info' | 'warn'> = ['log', 'debug', 'info', 'warn'];
+  return methods.map((method) => jest.spyOn(console, method).mockImplementation());
 }
 
 /**

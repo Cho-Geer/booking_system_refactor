@@ -257,9 +257,7 @@ describe('Translation Seed Data (RED phase — seed module does not exist)', () 
       await seedDefaultTranslations(module.prisma);
 
       // This should not throw
-      await expect(
-        seedDefaultTranslations(module.prisma),
-      ).resolves.not.toThrow();
+      await expect(seedDefaultTranslations(module.prisma)).resolves.not.toThrow();
     });
   });
 });

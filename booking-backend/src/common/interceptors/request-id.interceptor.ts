@@ -1,11 +1,6 @@
-import {
-  Injectable,
-  NestInterceptor,
-  ExecutionContext,
-  CallHandler,
-} from "@nestjs/common";
-import { Observable } from "rxjs";
-import { ClsService } from "nestjs-cls";
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
+import { Observable } from 'rxjs';
+import { ClsService } from 'nestjs-cls';
 
 /**
  * Intercepts incoming HTTP requests to extract or generate a request ID
@@ -32,11 +27,9 @@ export class RequestIdInterceptor implements NestInterceptor {
     const request = context.switchToHttp().getRequest();
 
     const requestId =
-      request.headers["x-request-id"] ??
-      this.cls.getId() ??
-      `req-${crypto.randomUUID()}`;
+      request.headers['x-request-id'] ?? this.cls.getId() ?? `req-${crypto.randomUUID()}`;
 
-    this.cls.set("requestId", requestId);
+    this.cls.set('requestId', requestId);
 
     return next.handle();
   }

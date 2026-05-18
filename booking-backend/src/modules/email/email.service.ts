@@ -1,7 +1,7 @@
-import { Injectable, Inject, Logger, OnModuleInit } from "@nestjs/common";
-import { InjectQueue } from "@nestjs/bullmq";
-import { Queue } from "bullmq";
-import type { Transporter } from "nodemailer";
+import { Injectable, Inject, Logger, OnModuleInit } from '@nestjs/common';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
+import type { Transporter } from 'nodemailer';
 
 export interface SendEmailDto {
   to: string;
@@ -36,20 +36,17 @@ export class EmailService implements OnModuleInit {
   private readonly logger = new Logger(EmailService.name);
 
   constructor(
-    @InjectQueue("email") private readonly emailQueue: Queue,
-    @Inject("EMAIL_TRANSPORTER") private readonly transporter: Transporter,
+    @InjectQueue('email') private readonly emailQueue: Queue,
+    @Inject('EMAIL_TRANSPORTER') private readonly transporter: Transporter,
   ) {}
 
   async onModuleInit(): Promise<void> {
     try {
       await this.transporter.verify();
-      this.logger.log("SMTP server is ready to accept messages");
+      this.logger.log('SMTP server is ready to accept messages');
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      this.logger.warn(
-        `SMTP verification failed (may be normal in dev): ${errorMessage}`,
-      );
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      this.logger.warn(`SMTP verification failed (may be normal in dev): ${errorMessage}`);
     }
   }
 
@@ -60,12 +57,12 @@ export class EmailService implements OnModuleInit {
     text,
   }: SendEmailDto): Promise<{ success: boolean; jobId?: string }> {
     const job = await this.emailQueue.add(
-      "verification-email",
+      'verification-email',
       { to, subject, html, text },
       {
         attempts: 3,
         backoff: {
-          type: "exponential",
+          type: 'exponential',
           delay: 2000,
         },
         removeOnComplete: true,
@@ -85,7 +82,7 @@ export class EmailService implements OnModuleInit {
     const text = this.generateConfirmationText(data);
 
     const job = await this.emailQueue.add(
-      "appointment-confirmation",
+      'appointment-confirmation',
       {
         to: data.customerEmail,
         subject: `Booking Confirmation - ${data.serviceName}`,
@@ -100,7 +97,7 @@ export class EmailService implements OnModuleInit {
       {
         attempts: 3,
         backoff: {
-          type: "exponential",
+          type: 'exponential',
           delay: 2000,
         },
         removeOnComplete: true,
@@ -122,7 +119,7 @@ export class EmailService implements OnModuleInit {
     const text = this.generateCancellationText(data);
 
     const job = await this.emailQueue.add(
-      "appointment-cancellation",
+      'appointment-cancellation',
       {
         to: data.customerEmail,
         subject: `Appointment Cancelled - ${data.serviceName}`,
@@ -137,7 +134,7 @@ export class EmailService implements OnModuleInit {
       {
         attempts: 3,
         backoff: {
-          type: "exponential",
+          type: 'exponential',
           delay: 2000,
         },
         removeOnComplete: true,
@@ -195,7 +192,7 @@ export class EmailService implements OnModuleInit {
                         <td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #555555;"><strong>Location:</strong></td>
                         <td style="padding: 12px; border-bottom: 1px solid #eeeeee; color: #333333;">${data.location}</td>
                       </tr>`
-                          : ""
+                          : ''
                       }
                     </table>
                     <p style="color: #555555; font-size: 14px;">If you need to make any changes, please contact our support team.</p>
@@ -228,7 +225,7 @@ Your appointment has been successfully confirmed. Here are the details:
 Service: ${data.serviceName}
 Date: ${data.date}
 Time: ${data.time}
-${data.location ? `Location: ${data.location}` : ""}
+${data.location ? `Location: ${data.location}` : ''}
 
 If you need to make any changes, please contact our support team.
 We look forward to serving you!

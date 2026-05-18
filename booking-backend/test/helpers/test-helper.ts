@@ -16,7 +16,7 @@ export function sleep(ms: number): Promise<void> {
  */
 export async function retry<T>(
   fn: () => Promise<T>,
-  options: { maxRetries?: number; delayMs?: number; label?: string } = {}
+  options: { maxRetries?: number; delayMs?: number; label?: string } = {},
 ): Promise<T> {
   const { maxRetries = 3, delayMs = 1000, label = 'operation' } = options;
 
@@ -28,7 +28,7 @@ export async function retry<T>(
       lastError = error instanceof Error ? error : new Error(String(error));
       console.warn(
         `[retry] ${label} failed (attempt ${attempt}/${maxRetries}):`,
-        lastError.message
+        lastError.message,
       );
       if (attempt < maxRetries) {
         await sleep(delayMs * attempt);

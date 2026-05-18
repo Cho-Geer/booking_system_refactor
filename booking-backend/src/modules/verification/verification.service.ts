@@ -1,21 +1,16 @@
-import { Injectable, Logger } from "@nestjs/common";
-import { CacheService } from "../cache/cache.service";
+import { Injectable, Logger } from '@nestjs/common';
+import { CacheService } from '../cache/cache.service';
 import {
   InvalidVerificationCodeException,
   MaxAttemptsExceededException,
   VerificationUnavailableException,
-} from "./exceptions/verification.exceptions";
+} from './exceptions/verification.exceptions';
 
 /**
  * Lua script evaluation result type.
  */
 interface LuaEvalResult {
-  status?:
-    | "not_found"
-    | "already_used"
-    | "max_attempts"
-    | "invalid_code"
-    | "success";
+  status?: 'not_found' | 'already_used' | 'max_attempts' | 'invalid_code' | 'success';
   attempts?: number;
   success?: boolean;
 }
@@ -102,10 +97,7 @@ export class VerificationService {
       this.logger.log(`Verification code generated (${type})`);
       return code;
     } catch (error) {
-      this.logger.error(
-        `Failed to store verification code for ${type}`,
-        (error as Error).stack,
-      );
+      this.logger.error(`Failed to store verification code for ${type}`, (error as Error).stack);
       throw new VerificationUnavailableException();
     }
   }
@@ -122,11 +114,7 @@ export class VerificationService {
    * @throws InvalidVerificationCodeException if code is invalid or already used
    * @throws MaxAttemptsExceededException if maximum attempts exceeded
    */
-  async verifyCode(
-    email: string,
-    code: string,
-    type: string,
-  ): Promise<{ success: boolean }> {
+  async verifyCode(email: string, code: string, type: string): Promise<{ success: boolean }> {
     if (!this.cacheService.isAvailable()) {
       throw new VerificationUnavailableException();
     }
@@ -147,42 +135,34 @@ export class VerificationService {
         String(this.MAX_ATTEMPTS),
       )) as string;
       const result = (
-        typeof rawResult === "string" ? JSON.parse(rawResult) : rawResult
+        typeof rawResult === 'string' ? JSON.parse(rawResult) : rawResult
       ) as LuaEvalResult;
 
-      if (result.status === "not_found") {
-        throw new InvalidVerificationCodeException(
-          "Invalid or expired verification code",
-        );
+      if (result.status === 'not_found') {
+        throw new InvalidVerificationCodeException('Invalid or expired verification code');
       }
 
-      if (result.status === "already_used") {
-        throw new InvalidVerificationCodeException(
-          "Verification code has already been used",
-        );
+      if (result.status === 'already_used') {
+        throw new InvalidVerificationCodeException('Verification code has already been used');
       }
 
-      if (result.status === "max_attempts") {
+      if (result.status === 'max_attempts') {
         throw new MaxAttemptsExceededException();
       }
 
-      if (result.status === "invalid_code") {
+      if (result.status === 'invalid_code') {
         const remainingAttempts = this.MAX_ATTEMPTS - (result.attempts ?? 0);
         throw new InvalidVerificationCodeException(
           `Invalid verification code. ${remainingAttempts} attempts remaining`,
         );
       }
 
-      if (result.status === "success") {
-        this.logger.log(
-          `Verification code verified successfully for ${email} (${type})`,
-        );
+      if (result.status === 'success') {
+        this.logger.log(`Verification code verified successfully for ${email} (${type})`);
         return { success: true };
       }
 
-      throw new InvalidVerificationCodeException(
-        "Invalid or expired verification code",
-      );
+      throw new InvalidVerificationCodeException('Invalid or expired verification code');
     } catch (error) {
       if (
         error instanceof InvalidVerificationCodeException ||
@@ -190,10 +170,7 @@ export class VerificationService {
       ) {
         throw error;
       }
-      this.logger.error(
-        `Failed to verify code for ${email}`,
-        (error as Error).stack,
-      );
+      this.logger.error(`Failed to verify code for ${email}`, (error as Error).stack);
       throw new VerificationUnavailableException();
     }
   }

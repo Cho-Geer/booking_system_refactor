@@ -1,16 +1,16 @@
-import { Injectable } from "@nestjs/common";
-import { PrismaService } from "../../../common/database/prisma.service";
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../../../common/database/prisma.service';
 
-const BUSINESS_HOURS_KEY = "business_hours";
+const BUSINESS_HOURS_KEY = 'business_hours';
 
 const DEFAULT_BUSINESS_HOURS = {
-  timezone: "Asia/Shanghai",
-  monday: [{ open: "09:00", close: "17:00" }],
-  tuesday: [{ open: "09:00", close: "17:00" }],
-  wednesday: [{ open: "09:00", close: "17:00" }],
-  thursday: [{ open: "09:00", close: "17:00" }],
-  friday: [{ open: "09:00", close: "17:00" }],
-  saturday: [{ open: "10:00", close: "14:00" }],
+  timezone: 'Asia/Shanghai',
+  monday: [{ open: '09:00', close: '17:00' }],
+  tuesday: [{ open: '09:00', close: '17:00' }],
+  wednesday: [{ open: '09:00', close: '17:00' }],
+  thursday: [{ open: '09:00', close: '17:00' }],
+  friday: [{ open: '09:00', close: '17:00' }],
+  saturday: [{ open: '10:00', close: '14:00' }],
   sunday: [],
 };
 
@@ -56,21 +56,21 @@ export class AdminSettingsService {
   }
 
   async updateBusinessHours(
-    data: Omit<BusinessHoursDto, "updatedAt">,
+    data: Omit<BusinessHoursDto, 'updatedAt'>,
   ): Promise<{ message: string }> {
     await this.prisma.systemSetting.upsert({
       where: { settingKey: BUSINESS_HOURS_KEY },
       create: {
         settingKey: BUSINESS_HOURS_KEY,
         settingValue: JSON.stringify(data),
-        settingType: "JSON",
-        category: "BUSINESS",
+        settingType: 'JSON',
+        category: 'BUSINESS',
       },
       update: {
         settingValue: JSON.stringify(data),
       },
     });
 
-    return { message: "营业时间已更新" };
+    return { message: '营业时间已更新' };
   }
 }

@@ -77,7 +77,9 @@ describe('ServicesController', () => {
         })(),
       );
 
-      await expect(controller.create(createServiceDto)).rejects.toThrow('Service with this name already exists');
+      await expect(controller.create(createServiceDto)).rejects.toThrow(
+        'Service with this name already exists',
+      );
     });
   });
 
@@ -209,7 +211,9 @@ describe('ServicesController', () => {
       );
 
       await expect(controller.findOne('invalid-id')).rejects.toThrow(NotFoundException);
-      await expect(controller.findOne('invalid-id')).rejects.toThrow('Service with ID invalid-id not found');
+      await expect(controller.findOne('invalid-id')).rejects.toThrow(
+        'Service with ID invalid-id not found',
+      );
     });
   });
 
@@ -240,7 +244,9 @@ describe('ServicesController', () => {
         new NotFoundException('Service with ID invalid-id not found'),
       );
 
-      await expect(controller.update('invalid-id', updateServiceDto)).rejects.toThrow(NotFoundException);
+      await expect(controller.update('invalid-id', updateServiceDto)).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('should allow updating isActive status', async () => {
@@ -269,7 +275,7 @@ describe('ServicesController', () => {
         name: 'Controller No Category',
         description: 'Created without category',
         durationMinutes: 30,
-        price: 75.00,
+        price: 75.0,
         maxCapacity: 1,
         // categoryId intentionally omitted — TypeScript error
       };
@@ -298,7 +304,7 @@ describe('ServicesController', () => {
         name: 'Null Category Service',
         description: 'Service with explicitly null category',
         durationMinutes: 60,
-        price: 120.00,
+        price: 120.0,
         maxCapacity: 2,
       };
 

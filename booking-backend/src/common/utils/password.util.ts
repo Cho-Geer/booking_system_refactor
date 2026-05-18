@@ -1,4 +1,4 @@
-import * as bcrypt from "bcryptjs";
+import * as bcrypt from 'bcryptjs';
 
 /**
  * Password Utility for secure password hashing and verification
@@ -41,16 +41,16 @@ export class PasswordUtil {
    * Common passwords that should be rejected
    */
   private static readonly COMMON_PASSWORDS = [
-    "password",
-    "123456",
-    "qwerty",
-    "admin",
-    "welcome",
-    "password123",
-    "123456789",
-    "12345678",
-    "12345",
-    "1234567",
+    'password',
+    '123456',
+    'qwerty',
+    'admin',
+    'welcome',
+    'password123',
+    '123456789',
+    '12345678',
+    '12345',
+    '1234567',
   ];
 
   /**
@@ -74,10 +74,7 @@ export class PasswordUtil {
    * @param hashedPassword - The hashed password to compare against
    * @returns Promise resolving to true if passwords match, false otherwise
    */
-  static async compare(
-    password: string,
-    hashedPassword: string,
-  ): Promise<boolean> {
+  static async compare(password: string, hashedPassword: string): Promise<boolean> {
     if (!password || !hashedPassword) {
       return false;
     }
@@ -106,57 +103,53 @@ export class PasswordUtil {
 
     // Check minimum length
     if (password.length < this.MIN_PASSWORD_LENGTH) {
-      errors.push(
-        `Password must be at least ${this.MIN_PASSWORD_LENGTH} characters long`,
-      );
+      errors.push(`Password must be at least ${this.MIN_PASSWORD_LENGTH} characters long`);
     }
 
     // Check for uppercase letter
     if (!this.PASSWORD_REGEX.UPPERCASE.test(password)) {
-      errors.push("Password must contain at least one uppercase letter");
+      errors.push('Password must contain at least one uppercase letter');
     }
 
     // Check for lowercase letter
     if (!this.PASSWORD_REGEX.LOWERCASE.test(password)) {
-      errors.push("Password must contain at least one lowercase letter");
+      errors.push('Password must contain at least one lowercase letter');
     }
 
     // Check for number
     if (!this.PASSWORD_REGEX.NUMBER.test(password)) {
-      errors.push("Password must contain at least one number");
+      errors.push('Password must contain at least one number');
     }
 
     // Check for special character
     if (!this.PASSWORD_REGEX.SPECIAL_CHAR.test(password)) {
-      errors.push("Password must contain at least one special character");
+      errors.push('Password must contain at least one special character');
     }
 
     // Check for common passwords (case-insensitive)
     const lowerPassword = password.toLowerCase();
     if (this.COMMON_PASSWORDS.includes(lowerPassword)) {
-      errors.push("Password is too common. Please choose a stronger password");
+      errors.push('Password is too common. Please choose a stronger password');
     }
 
     // Check for sequential characters
     if (this.hasSequentialChars(password)) {
-      errors.push(
-        'Password contains sequential characters (e.g., "12345", "abcde")',
-      );
+      errors.push('Password contains sequential characters (e.g., "12345", "abcde")');
     }
 
     // Check for repeated characters
     if (this.hasRepeatedChars(password)) {
-      errors.push("Password contains too many repeated characters");
+      errors.push('Password contains too many repeated characters');
     }
 
     // Check for keyboard patterns (optional, more complex)
     if (this.isKeyboardPattern(password)) {
-      errors.push("Password follows a keyboard pattern");
+      errors.push('Password follows a keyboard pattern');
     }
 
     // If there are validation errors, throw them
     if (errors.length > 0) {
-      throw new Error(`Password validation failed: ${errors.join("; ")}`);
+      throw new Error(`Password validation failed: ${errors.join('; ')}`);
     }
   }
 
@@ -219,20 +212,20 @@ export class PasswordUtil {
    */
   private static isKeyboardPattern(password: string): boolean {
     const keyboardPatterns = [
-      "qwerty",
-      "asdfgh",
-      "zxcvbn",
-      "qwertyuiop",
-      "asdfghjkl",
-      "zxcvbnm",
-      "123456",
-      "123456789",
-      "12345678",
-      "1234567",
-      "12345",
-      "abcdef",
-      "abc123",
-      "password",
+      'qwerty',
+      'asdfgh',
+      'zxcvbn',
+      'qwertyuiop',
+      'asdfghjkl',
+      'zxcvbnm',
+      '123456',
+      '123456789',
+      '12345678',
+      '1234567',
+      '12345',
+      'abcdef',
+      'abc123',
+      'password',
     ];
 
     const lowerPassword = password.toLowerCase();
@@ -254,14 +247,14 @@ export class PasswordUtil {
    */
   static generateSecurePassword(length: number = 16): string {
     const charset =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?";
-    let password = "";
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?';
+    let password = '';
 
     // Ensure at least one of each required character type
-    password += this.getRandomChar("ABCDEFGHIJKLMNOPQRSTUVWXYZ"); // Uppercase
-    password += this.getRandomChar("abcdefghijklmnopqrstuvwxyz"); // Lowercase
-    password += this.getRandomChar("0123456789"); // Number
-    password += this.getRandomChar("!@#$%^&*()_+-=[]{}|;:,.<>?"); // Special char
+    password += this.getRandomChar('ABCDEFGHIJKLMNOPQRSTUVWXYZ'); // Uppercase
+    password += this.getRandomChar('abcdefghijklmnopqrstuvwxyz'); // Lowercase
+    password += this.getRandomChar('0123456789'); // Number
+    password += this.getRandomChar('!@#$%^&*()_+-=[]{}|;:,.<>?'); // Special char
 
     // Fill the rest with random characters
     for (let i = password.length; i < length; i++) {
@@ -291,14 +284,14 @@ export class PasswordUtil {
    * @returns The shuffled string
    */
   private static shuffleString(str: string): string {
-    const array = str.split("");
+    const array = str.split('');
 
     for (let i = array.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [array[i], array[j]] = [array[j], array[i]];
     }
 
-    return array.join("");
+    return array.join('');
   }
 
   /**

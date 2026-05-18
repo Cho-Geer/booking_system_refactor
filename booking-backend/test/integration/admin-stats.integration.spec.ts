@@ -100,7 +100,9 @@ describe('[R9-R10] Admin Stats Endpoints', () => {
     });
 
     it('should return 403 for customer role', async () => {
-      const customerData = UserFactory.create({ email: `customer-stats-${Date.now()}@example.com` });
+      const customerData = UserFactory.create({
+        email: `customer-stats-${Date.now()}@example.com`,
+      });
       const customer = await prisma.user.create({ data: customerData as any });
       const customerToken = jwtService.sign(
         { sub: customer.id, role: SystemRole.CUSTOMER },

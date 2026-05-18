@@ -1,6 +1,6 @@
-import { Injectable, NestMiddleware } from "@nestjs/common";
-import { Request, Response, NextFunction } from "express";
-import { createHash, randomBytes } from "crypto";
+import { Injectable, NestMiddleware } from '@nestjs/common';
+import { Request, Response, NextFunction } from 'express';
+import { createHash, randomBytes } from 'crypto';
 
 /**
  * CSRF configuration options
@@ -22,9 +22,9 @@ export interface CsrfOptions {
  * Default CSRF configuration
  */
 const DEFAULT_CSRF_OPTIONS: CsrfOptions = {
-  bypassMethods: ["GET", "HEAD", "OPTIONS"],
-  tokenHeader: "X-CSRF-Token",
-  cookieName: "XSRF-TOKEN",
+  bypassMethods: ['GET', 'HEAD', 'OPTIONS'],
+  tokenHeader: 'X-CSRF-Token',
+  cookieName: 'XSRF-TOKEN',
   tokenLength: 32,
   bypassPaths: [],
 };
@@ -76,8 +76,8 @@ export class CsrfMiddleware implements NestMiddleware {
     if (!token || !secret) {
       res.status(403).json({
         statusCode: 403,
-        message: "CSRF token missing",
-        error: "Forbidden",
+        message: 'CSRF token missing',
+        error: 'Forbidden',
       });
       return;
     }
@@ -85,8 +85,8 @@ export class CsrfMiddleware implements NestMiddleware {
     if (!this.validateToken(token, secret)) {
       res.status(403).json({
         statusCode: 403,
-        message: "CSRF token validation failed",
-        error: "Forbidden",
+        message: 'CSRF token validation failed',
+        error: 'Forbidden',
       });
       return;
     }
@@ -101,7 +101,7 @@ export class CsrfMiddleware implements NestMiddleware {
    * @returns Object containing token and secret
    */
   generateToken(): { token: string; secret: string } {
-    const secret = randomBytes(this.options.tokenLength!).toString("base64");
+    const secret = randomBytes(this.options.tokenLength!).toString('base64');
     const token = this.createToken(secret);
     return { token, secret };
   }
@@ -112,9 +112,7 @@ export class CsrfMiddleware implements NestMiddleware {
    * @returns True if the method is bypassed
    */
   private isMethodBypassed(method: string): boolean {
-    const bypassMethods = this.options.bypassMethods!.map((m) =>
-      m.toUpperCase(),
-    );
+    const bypassMethods = this.options.bypassMethods!.map((m) => m.toUpperCase());
     return bypassMethods.includes(method.toUpperCase());
   }
 
@@ -131,12 +129,12 @@ export class CsrfMiddleware implements NestMiddleware {
         return true;
       }
       // Support wildcard prefix match
-      if (bypassPath.endsWith("/*")) {
+      if (bypassPath.endsWith('/*')) {
         const prefix = bypassPath.slice(0, -2);
         return path.startsWith(prefix);
       }
       // Support regex
-      if (bypassPath.startsWith("/") && bypassPath.endsWith("/")) {
+      if (bypassPath.startsWith('/') && bypassPath.endsWith('/')) {
         const regex = new RegExp(bypassPath.slice(1, -1));
         return regex.test(path);
       }
@@ -152,7 +150,7 @@ export class CsrfMiddleware implements NestMiddleware {
   private extractToken(req: Request): string | null {
     const tokenHeader = this.options.tokenHeader!;
     const token = req.headers[tokenHeader.toLowerCase()];
-    return typeof token === "string" ? token : null;
+    return typeof token === 'string' ? token : null;
   }
 
   /**
@@ -168,13 +166,11 @@ export class CsrfMiddleware implements NestMiddleware {
       return null;
     }
 
-    const cookies = cookieHeader
-      .split(";")
-      .reduce<Record<string, string>>((acc, cookie) => {
-        const [name, ...rest] = cookie.trim().split("=");
-        acc[name] = rest.join("=");
-        return acc;
-      }, {});
+    const cookies = cookieHeader.split(';').reduce<Record<string, string>>((acc, cookie) => {
+      const [name, ...rest] = cookie.trim().split('=');
+      acc[name] = rest.join('=');
+      return acc;
+    }, {});
 
     const raw = cookies[cookieName];
     if (!raw) return null;
@@ -191,7 +187,7 @@ export class CsrfMiddleware implements NestMiddleware {
    * @returns The generated token
    */
   private createToken(secret: string): string {
-    return createHash("sha256").update(secret).digest("hex");
+    return createHash('sha256').update(secret).digest('hex');
   }
 
   /**

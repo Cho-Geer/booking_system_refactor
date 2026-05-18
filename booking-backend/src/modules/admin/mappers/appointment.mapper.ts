@@ -1,4 +1,4 @@
-import { AdminAppointmentDto } from "../dto/admin-appointment.dto";
+import { AdminAppointmentDto } from '../dto/admin-appointment.dto';
 
 interface PrismaAppointment {
   id: string;
@@ -17,7 +17,7 @@ interface PrismaAppointment {
   taxIncludedAmount?: any;
   createdAt: Date;
   user?: { name: string };
-  service?: { name: string };
+  service?: { name: string; isActive?: boolean };
   timeSlot?: { startTime: Date; endTime: Date };
 }
 
@@ -26,7 +26,7 @@ let appointmentCounter = 0;
 export function generateAppointmentNumber(): string {
   appointmentCounter += 1;
   const ts = Date.now().toString(36).toUpperCase();
-  return `APT-${ts}-${appointmentCounter.toString().padStart(4, "0")}`;
+  return `APT-${ts}-${appointmentCounter.toString().padStart(4, '0')}`;
 }
 
 export function toAdminAppointmentDto(appt: PrismaAppointment): AdminAppointmentDto {
@@ -34,16 +34,17 @@ export function toAdminAppointmentDto(appt: PrismaAppointment): AdminAppointment
     id: appt.id,
     appointmentNumber: appt.appointmentNumber,
     userId: appt.userId,
-    userName: appt.user?.name ?? "Unknown",
+    userName: appt.user?.name ?? 'Unknown',
     serviceId: appt.serviceId,
-    serviceName: appt.service?.name ?? "Unknown",
+    serviceName: appt.service?.name ?? 'Unknown',
     timeSlotId: appt.timeSlotId,
     appointmentDate: appt.appointmentDate?.toISOString?.() ?? String(appt.appointmentDate),
     status: appt.status,
     durationMinutes: appt.durationMinutes ?? undefined,
     price: appt.price ? Number(appt.price) : undefined,
-    taxRate: appt.taxRate ? Number(appt.taxRate) : undefined,
+    taxRate: appt.taxRate ? Number(appt.taxRate) * 100 : undefined,
     taxIncludedAmount: appt.taxIncludedAmount ? Number(appt.taxIncludedAmount) : undefined,
+    serviceActive: appt.service?.isActive ?? true,
     createdAt: appt.createdAt,
   };
 }

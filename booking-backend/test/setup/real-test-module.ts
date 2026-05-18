@@ -1,7 +1,7 @@
-import { ModuleMetadata, Type } from "@nestjs/common/interfaces";
-import { Test, TestingModuleBuilder } from "@nestjs/testing";
-import { checkDockerAvailable } from "./docker-checker";
-import { selectInfrastructure, TestModuleOptions } from "./test-infra-selector";
+import { ModuleMetadata, Type } from '@nestjs/common/interfaces';
+import { Test, TestingModuleBuilder } from '@nestjs/testing';
+import { checkDockerAvailable } from './docker-checker';
+import { selectInfrastructure, TestModuleOptions } from './test-infra-selector';
 
 /**
  * RealTestModule — Base class for all NestJS test modules.
@@ -53,15 +53,13 @@ export class RealTestModule {
    * Force real infrastructure (for CI/CD integration tests).
    * Throws if Docker is not available.
    */
-  static async forIntegration(
-    config: ModuleMetadata,
-  ): Promise<TestingModuleBuilder> {
+  static async forIntegration(config: ModuleMetadata): Promise<TestingModuleBuilder> {
     if (!process.env.CI) {
       const dockerAvailable = checkDockerAvailable();
       if (!dockerAvailable) {
         console.warn(
-          "[RealTestModule] forIntegration called but Docker not available. " +
-            "Falling back to fake infrastructure for local development.",
+          '[RealTestModule] forIntegration called but Docker not available. ' +
+            'Falling back to fake infrastructure for local development.',
         );
         return RealTestModule.forUnit(config);
       }

@@ -7,6 +7,7 @@ import {
   StatCard,
   AdminServiceItem,
   AdminAppointment,
+  BusinessHoursDto,
   CreateAdminUserRequest,
   UpdateAdminUserRequest,
   CreateAdminServiceRequest,
@@ -256,7 +257,7 @@ describe('AdminService', () => {
         items: [
           {
             id: '1', appointmentNumber: 'APT-001', userId: 'u1', userName: 'Alice',
-            serviceId: 'svc1', serviceName: 'Haircut', timeSlotId: 'ts1',
+            serviceId: 'svc1', serviceName: 'Haircut', serviceActive: true, timeSlotId: 'ts1',
             appointmentDate: '2026-04-30T14:00:00Z', status: 'PENDING', createdAt: '2026-04-28T10:00:00Z',
           },
         ],
@@ -377,6 +378,84 @@ describe('AdminService', () => {
 
       const req = httpMock.expectOne(`${apiUrl}/admin/system/health`);
       req.flush({ message: 'Unauthorized' }, { status: 401, statusText: 'Unauthorized' });
+    });
+  });
+
+  // ==========================================
+  // Business Hours
+  // ==========================================
+
+  describe('getBusinessHours()', () => {
+    it('[RED] should fetch business hours from GET /api/admin/settings/business-hours', () => {
+      const mockBusinessHours: BusinessHoursDto = {
+        timezone: 'Asia/Shanghai',
+        monday: [{ open: '09:00', close: '17:00' }],
+        tuesday: [{ open: '09:00', close: '17:00' }],
+        wednesday: [{ open: '09:00', close: '17:00' }],
+        thursday: [{ open: '09:00', close: '17:00' }],
+        friday: [{ open: '09:00', close: '17:00' }],
+        saturday: [{ open: '09:00', close: '17:00' }],
+        sunday: [],
+        updatedAt: '2026-05-01T00:00:00Z',
+      };
+
+      service.getBusinessHours().subscribe(data => {
+        expect(data).toEqual(mockBusinessHours);
+        expect(data.sunday).toEqual([]);
+        expect(data.monday[0].open).toBe('09:00');
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/admin/settings/business-hours`);
+      expect(req.request.method).toBe('GET');
+      req.flush(mockBusinessHours);
+    });
+
+    it('[RED] should handle error when fetching business hours', () => {
+      service.getBusinessHours().subscribe({
+        next: () => fail('expected error'),
+        error: (error) => {
+          expect(error).toBeTruthy();
+        },
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/admin/settings/business-hours`);
+      req.flush({ message: 'Unauthorized' }, { status: 401, statusText: 'Unauthorized' });
+    });
+  });
+
+  // ==========================================
+  // Affected Appointments (service disable warning)
+  // ==========================================
+
+  describe('getServiceAffectedAppointments()', () => {
+    it('[Red] should fetch affected appointments from GET /v1/admin/services/:id/affected-appointments', () => {
+      const mockResponse = {
+        service_name: 'Haircut',
+        pending_count: 5,
+        confirmed_count: 3,
+        total_affected: 8,
+      };
+
+      service.getServiceAffectedAppointments('svc-1').subscribe(response => {
+        expect(response.pendingCount).toBe(5);
+        expect(response.confirmedCount).toBe(3);
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/admin/services/svc-1/affected-appointments`);
+      expect(req.request.method).toBe('GET');
+      req.flush(mockResponse);
+    });
+
+    it('[Red] should handle error when fetching affected appointments', () => {
+      service.getServiceAffectedAppointments('svc-1').subscribe({
+        next: () => fail('expected error'),
+        error: (error) => {
+          expect(error).toBeTruthy();
+        },
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/admin/services/svc-1/affected-appointments`);
+      req.flush({ message: 'Forbidden' }, { status: 403, statusText: 'Forbidden' });
     });
   });
 

@@ -9,6 +9,7 @@ import {
   BookingTrendItem,
   AdminServiceItem,
   AdminAppointment,
+  BusinessHoursDto,
   CreateAdminUserRequest,
   UpdateAdminUserRequest,
   CreateAdminServiceRequest,
@@ -216,6 +217,15 @@ export class AdminService {
   }
 
   // ==========================================
+  // Business Hours
+  // ==========================================
+
+  getBusinessHours(): Observable<BusinessHoursDto> {
+    return this.http.get<ApiResponse<BusinessHoursDto>>(`${this.apiUrl}/admin/settings/business-hours`)
+      .pipe(map(response => response.data), catchError(this.handleError));
+  }
+
+  // ==========================================
   // Service Image Upload
   // ==========================================
 
@@ -224,6 +234,15 @@ export class AdminService {
     formData.append('image', file);
     return this.http.post<ApiResponse<{ imageUrl: string }>>(`${this.apiUrl}/admin/services/${id}/image`, formData)
       .pipe(map(response => response.data), catchError(this.handleError));
+  }
+
+  // ==========================================
+  // Affected Appointments (service disable warning)
+  // ==========================================
+
+  getServiceAffectedAppointments(serviceId: string): Observable<{pendingCount: number; confirmedCount: number}> {
+    return this.http.get<ApiResponse<{pendingCount: number; confirmedCount: number}>>(`${this.apiUrl}/admin/services/${serviceId}/affected-appointments`)
+      .pipe(map(r => r.data), catchError(this.handleError));
   }
 
   // ==========================================

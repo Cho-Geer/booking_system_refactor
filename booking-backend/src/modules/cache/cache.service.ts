@@ -1,15 +1,9 @@
-import {
-  Injectable,
-  OnModuleInit,
-  OnModuleDestroy,
-  Logger,
-  Inject,
-} from "@nestjs/common";
-import Redis, { Redis as IORedisClient } from "ioredis";
-import { RedisConfig } from "../../config/redis.config";
+import { Injectable, OnModuleInit, OnModuleDestroy, Logger, Inject } from '@nestjs/common';
+import Redis, { Redis as IORedisClient } from 'ioredis';
+import { RedisConfig } from '../../config/redis.config';
 
-export const REDIS_CONFIG_TOKEN = "REDIS_CONFIG";
-export const REDIS_CLIENT_TOKEN = "REDIS_CLIENT";
+export const REDIS_CONFIG_TOKEN = 'REDIS_CONFIG';
+export const REDIS_CLIENT_TOKEN = 'REDIS_CLIENT';
 
 /**
  * Core cache service providing Redis-backed caching with high-concurrency optimizations.
@@ -28,9 +22,7 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
   private readonly redis: IORedisClient | null;
   private isConnected = false;
 
-  constructor(
-    @Inject(REDIS_CONFIG_TOKEN) config: RedisConfig,
-  ) {
+  constructor(@Inject(REDIS_CONFIG_TOKEN) config: RedisConfig) {
     this.prefix = config.keyPrefix;
     this.ttlDefault = config.ttlDefault;
     this.ttlSession = config.ttlSession;
@@ -44,7 +36,7 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
         retryStrategy: (times: number) => {
           if (times > 3) {
             this.logger.warn(
-              "Redis connection failed after 3 retries. Operating in degraded mode.",
+              'Redis connection failed after 3 retries. Operating in degraded mode.',
             );
             return null;
           }
@@ -52,22 +44,19 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
         },
       });
 
-      this.redis.on("connect", () => {
+      this.redis.on('connect', () => {
         this.isConnected = true;
-        this.logger.log("Redis connected successfully");
+        this.logger.log('Redis connected successfully');
       });
 
-      this.redis.on("error", (err: Error) => {
+      this.redis.on('error', (err: Error) => {
         this.isConnected = false;
-        this.logger.error("Redis connection error", err.stack);
+        this.logger.error('Redis connection error', err.stack);
       });
     } catch (err) {
       this.redis = null;
       this.isConnected = false;
-      this.logger.error(
-        "Failed to initialize Redis client",
-        (err as Error).stack,
-      );
+      this.logger.error('Failed to initialize Redis client', (err as Error).stack);
     }
   }
 
@@ -78,9 +67,7 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
         this.isConnected = true;
       } catch {
         this.isConnected = false;
-        this.logger.warn(
-          "Redis ping failed. Service will operate in degraded mode (no caching).",
-        );
+        this.logger.warn('Redis ping failed. Service will operate in degraded mode (no caching).');
       }
     }
   }
@@ -131,10 +118,7 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
       if (raw === null) return null;
       return JSON.parse(raw) as T;
     } catch (err) {
-      this.logger.error(
-        `Cache GET error for key: ${key}`,
-        (err as Error).stack,
-      );
+      this.logger.error(`Cache GET error for key: ${key}`, (err as Error).stack);
       return null;
     }
   }
@@ -151,17 +135,9 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
     try {
       const effectiveTtl = this.jitterTtl(ttl ?? this.ttlDefault);
       const serialized = JSON.stringify(value);
-      await this.redis.set(
-        this.prefixedKey(key),
-        serialized,
-        "EX",
-        effectiveTtl,
-      );
+      await this.redis.set(this.prefixedKey(key), serialized, 'EX', effectiveTtl);
     } catch (err) {
-      this.logger.error(
-        `Cache SET error for key: ${key}`,
-        (err as Error).stack,
-      );
+      this.logger.error(`Cache SET error for key: ${key}`, (err as Error).stack);
     }
   }
 
@@ -176,10 +152,7 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
     try {
       await this.redis.del(this.prefixedKey(key));
     } catch (err) {
-      this.logger.error(
-        `Cache DELETE error for key: ${key}`,
-        (err as Error).stack,
-      );
+      this.logger.error(`Cache DELETE error for key: ${key}`, (err as Error).stack);
     }
   }
 
@@ -194,10 +167,7 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
       const result = await this.redis.exists(this.prefixedKey(key));
       return result === 1;
     } catch (err) {
-      this.logger.error(
-        `Cache HAS error for key: ${key}`,
-        (err as Error).stack,
-      );
+      this.logger.error(`Cache HAS error for key: ${key}`, (err as Error).stack);
       return false;
     }
   }
@@ -235,10 +205,7 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
       );
       return result as number;
     } catch (err) {
-      this.logger.error(
-        `Cache DECR error for key: ${key}`,
-        (err as Error).stack,
-      );
+      this.logger.error(`Cache DECR error for key: ${key}`, (err as Error).stack);
       return min;
     }
   }
@@ -255,10 +222,7 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
       const result = await this.redis.incr(this.prefixedKey(key));
       return result;
     } catch (err) {
-      this.logger.error(
-        `Cache INCR error for key: ${key}`,
-        (err as Error).stack,
-      );
+      this.logger.error(`Cache INCR error for key: ${key}`, (err as Error).stack);
       return 0;
     }
   }
@@ -280,19 +244,10 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
       return false;
     }
     try {
-      const result = await this.redis.set(
-        this.prefixedKey(key),
-        "1",
-        "EX",
-        ttl,
-        "NX",
-      );
-      return result === "OK";
+      const result = await this.redis.set(this.prefixedKey(key), '1', 'EX', ttl, 'NX');
+      return result === 'OK';
     } catch (err) {
-      this.logger.error(
-        `Cache LOCK error for key: ${key}`,
-        (err as Error).stack,
-      );
+      this.logger.error(`Cache LOCK error for key: ${key}`, (err as Error).stack);
       return false;
     }
   }
@@ -308,10 +263,7 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
     try {
       await this.redis.del(this.prefixedKey(key));
     } catch (err) {
-      this.logger.error(
-        `Cache UNLOCK error for key: ${key}`,
-        (err as Error).stack,
-      );
+      this.logger.error(`Cache UNLOCK error for key: ${key}`, (err as Error).stack);
     }
   }
 
@@ -354,10 +306,7 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
       await this.set(key, data, ttl);
       return data;
     } catch (err) {
-      this.logger.error(
-        `cacheWithProtection fetch failed for key: ${key}`,
-        (err as Error).stack,
-      );
+      this.logger.error(`cacheWithProtection fetch failed for key: ${key}`, (err as Error).stack);
       return null;
     }
   }
@@ -392,11 +341,9 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
    * @param operations - Array of {op, args} tuples
    * @returns Array of results corresponding to each operation
    */
-  async pipeline(
-    operations: Array<{ op: string; args: unknown[] }>,
-  ): Promise<unknown[]> {
+  async pipeline(operations: Array<{ op: string; args: unknown[] }>): Promise<unknown[]> {
     if (!this.redis || !this.isConnected) {
-      this.logger.warn("Cache PIPELINE skipped (Redis unavailable)");
+      this.logger.warn('Cache PIPELINE skipped (Redis unavailable)');
       return [];
     }
     try {
@@ -406,9 +353,9 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
         const prefixedArgs = args.map((arg, idx) => {
           // Prefix string arguments that look like cache keys (first arg for most ops)
           if (
-            typeof arg === "string" &&
+            typeof arg === 'string' &&
             idx === 0 &&
-            ["set", "get", "del", "incr", "decr", "expire", "has"].includes(op)
+            ['set', 'get', 'del', 'incr', 'decr', 'expire', 'has'].includes(op)
           ) {
             return this.prefixedKey(arg);
           }
@@ -416,28 +363,28 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
         });
 
         switch (op) {
-          case "set": {
+          case 'set': {
             const [k, v, t] = prefixedArgs as [string, unknown, number?];
             const effectiveTtl = this.jitterTtl(t ?? this.ttlDefault);
-            pipe.set(k, JSON.stringify(v), "EX", effectiveTtl);
+            pipe.set(k, JSON.stringify(v), 'EX', effectiveTtl);
             break;
           }
-          case "get":
+          case 'get':
             pipe.get(prefixedArgs[0] as string);
             break;
-          case "del":
+          case 'del':
             pipe.del(prefixedArgs[0] as string);
             break;
-          case "incr":
+          case 'incr':
             pipe.incr(prefixedArgs[0] as string);
             break;
-          case "decr":
+          case 'decr':
             pipe.decr(prefixedArgs[0] as string);
             break;
-          case "expire":
+          case 'expire':
             pipe.expire(prefixedArgs[0] as string, prefixedArgs[1] as number);
             break;
-          case "has":
+          case 'has':
             pipe.exists(prefixedArgs[0] as string);
             break;
           default:
@@ -455,7 +402,7 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
         return val;
       });
     } catch (err) {
-      this.logger.error("Cache PIPELINE error", (err as Error).stack);
+      this.logger.error('Cache PIPELINE error', (err as Error).stack);
       return [];
     }
   }

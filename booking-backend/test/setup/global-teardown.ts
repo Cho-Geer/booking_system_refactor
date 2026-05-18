@@ -1,17 +1,17 @@
-import { existsSync, unlinkSync } from "fs";
+import { existsSync, unlinkSync } from 'fs';
 
-import { join } from "path";
+import { join } from 'path';
 
 // Type declarations for global container references
 
 declare global {
   // eslint-disable-next-line no-var
 
-  var __POSTGRES_CONTAINER__: import("@testcontainers/postgresql").StartedPostgreSqlContainer;
+  var __POSTGRES_CONTAINER__: import('@testcontainers/postgresql').StartedPostgreSqlContainer;
 
   // eslint-disable-next-line no-var
 
-  var __REDIS_CONTAINER__: import("@testcontainers/redis").StartedRedisContainer;
+  var __REDIS_CONTAINER__: import('@testcontainers/redis').StartedRedisContainer;
 }
 
 /**
@@ -23,21 +23,21 @@ declare global {
  */
 
 module.exports = async () => {
-  console.log("[GlobalTeardown] Starting testcontainers teardown...");
+  console.log('[GlobalTeardown] Starting testcontainers teardown...');
 
   try {
     // Stop PostgreSQL container
 
     if (global.__POSTGRES_CONTAINER__) {
-      console.log("[GlobalTeardown] Stopping PostgreSQL container...");
+      console.log('[GlobalTeardown] Stopping PostgreSQL container...');
 
       try {
         await global.__POSTGRES_CONTAINER__.stop();
 
-        console.log("[GlobalTeardown] PostgreSQL container stopped");
+        console.log('[GlobalTeardown] PostgreSQL container stopped');
       } catch (error) {
         console.error(
-          "[GlobalTeardown] Error stopping PostgreSQL container:",
+          '[GlobalTeardown] Error stopping PostgreSQL container:',
 
           error instanceof Error ? error.message : error,
         );
@@ -47,15 +47,15 @@ module.exports = async () => {
     // Stop Redis container
 
     if (global.__REDIS_CONTAINER__) {
-      console.log("[GlobalTeardown] Stopping Redis container...");
+      console.log('[GlobalTeardown] Stopping Redis container...');
 
       try {
         await global.__REDIS_CONTAINER__.stop();
 
-        console.log("[GlobalTeardown] Redis container stopped");
+        console.log('[GlobalTeardown] Redis container stopped');
       } catch (error) {
         console.error(
-          "[GlobalTeardown] Error stopping Redis container:",
+          '[GlobalTeardown] Error stopping Redis container:',
 
           error instanceof Error ? error.message : error,
         );
@@ -64,16 +64,16 @@ module.exports = async () => {
   } finally {
     // Clean up test environment file
 
-    const envFile = join(__dirname, "..", "..", ".env.test");
+    const envFile = join(__dirname, '..', '..', '.env.test');
 
     if (existsSync(envFile)) {
       try {
         unlinkSync(envFile);
 
-        console.log("[GlobalTeardown] .env.test file cleaned up");
+        console.log('[GlobalTeardown] .env.test file cleaned up');
       } catch (error) {
         console.error(
-          "[GlobalTeardown] Error cleaning up .env.test:",
+          '[GlobalTeardown] Error cleaning up .env.test:',
 
           error instanceof Error ? error.message : error,
         );
@@ -110,6 +110,6 @@ module.exports = async () => {
 
     // }
 
-    console.log("[GlobalTeardown] Testcontainers teardown completed");
+    console.log('[GlobalTeardown] Testcontainers teardown completed');
   }
 };

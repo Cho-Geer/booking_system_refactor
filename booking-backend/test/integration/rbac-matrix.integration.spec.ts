@@ -64,7 +64,9 @@ describe('[R8] RBAC Enforcement Matrix', () => {
 
     // Create CUSTOMER user
     const customerData = UserFactory.create({ email: `rbac-customer-${Date.now()}@example.com` });
-    const customerUser = await prisma.user.create({ data: { ...customerData as any, status: UserStatus.ACTIVE } });
+    const customerUser = await prisma.user.create({
+      data: { ...(customerData as any), status: UserStatus.ACTIVE },
+    });
     customerId = customerUser.id;
     customerToken = jwtService.sign(
       { sub: customerUser.id, role: SystemRole.CUSTOMER },
@@ -72,8 +74,13 @@ describe('[R8] RBAC Enforcement Matrix', () => {
     );
 
     // Create ADMIN user
-    const adminData = UserFactory.create({ email: `rbac-admin-${Date.now()}@example.com`, role: SystemRole.ADMIN });
-    const adminUser = await prisma.user.create({ data: { ...adminData as any, status: UserStatus.ACTIVE } });
+    const adminData = UserFactory.create({
+      email: `rbac-admin-${Date.now()}@example.com`,
+      role: SystemRole.ADMIN,
+    });
+    const adminUser = await prisma.user.create({
+      data: { ...(adminData as any), status: UserStatus.ACTIVE },
+    });
     adminId = adminUser.id;
     adminToken = jwtService.sign(
       { sub: adminUser.id, role: SystemRole.ADMIN },
@@ -191,15 +198,11 @@ describe('[R8] RBAC Enforcement Matrix', () => {
 
   describe('Unauthenticated — 401', () => {
     it('should reject unauthenticated GET /v1/users/profile — 401', async () => {
-      await request(app.getHttpServer())
-        .get('/v1/users/profile')
-        .expect(401);
+      await request(app.getHttpServer()).get('/v1/users/profile').expect(401);
     });
 
     it('should reject unauthenticated GET /v1/admin/stats — 401', async () => {
-      await request(app.getHttpServer())
-        .get('/v1/admin/stats')
-        .expect(401);
+      await request(app.getHttpServer()).get('/v1/admin/stats').expect(401);
     });
   });
 
@@ -220,7 +223,14 @@ describe('[R8] RBAC Enforcement Matrix', () => {
     const startTime = new Date(Date.now() + 48 * 60 * 60 * 1000);
     const endTime = new Date(startTime.getTime() + 60 * 60 * 1000);
     const timeSlot = await prisma.timeSlot.create({
-      data: { serviceId: service.id, startTime, endTime, capacity: 5, currentSequence: 0, isActive: true },
+      data: {
+        serviceId: service.id,
+        startTime,
+        endTime,
+        capacity: 5,
+        currentSequence: 0,
+        isActive: true,
+      },
     });
     return { serviceId: service.id, timeSlotId: timeSlot.id };
   }

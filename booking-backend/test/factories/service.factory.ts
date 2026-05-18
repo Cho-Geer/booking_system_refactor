@@ -77,7 +77,8 @@ export class ServiceFactory {
    */
   static create(overrides: ServiceFactoryOverrides = {}) {
     const uid = ServiceFactory.uid();
-    const categoryId = overrides.categoryId ?? ServiceFactory.lastCategoryId ?? ServiceCategoryFactory.create().id;
+    const categoryId =
+      overrides.categoryId ?? ServiceFactory.lastCategoryId ?? ServiceCategoryFactory.create().id;
     ServiceFactory.lastCategoryId = categoryId ?? null;
 
     return {

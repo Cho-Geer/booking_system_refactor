@@ -55,9 +55,15 @@ describe('[R16] Admin System', () => {
   beforeEach(async () => {
     await testModule.resetDatabase();
 
-    const adminData = UserFactory.create({ email: `admin-sys-${Date.now()}@example.com`, role: SystemRole.ADMIN });
+    const adminData = UserFactory.create({
+      email: `admin-sys-${Date.now()}@example.com`,
+      role: SystemRole.ADMIN,
+    });
     const admin = await prisma.user.create({ data: adminData as any });
-    adminToken = jwtService.sign({ sub: admin.id, role: SystemRole.ADMIN }, { expiresIn: '15m', secret: process.env.JWT_SECRET });
+    adminToken = jwtService.sign(
+      { sub: admin.id, role: SystemRole.ADMIN },
+      { expiresIn: '15m', secret: process.env.JWT_SECRET },
+    );
   });
 
   describe('GET /v1/admin/system/health', () => {
@@ -79,7 +85,10 @@ describe('[R16] Admin System', () => {
     it('should return 403 for CUSTOMER role', async () => {
       const customerData = UserFactory.create({ email: `customer-sys-${Date.now()}@example.com` });
       const customer = await prisma.user.create({ data: customerData as any });
-      const customerToken = jwtService.sign({ sub: customer.id, role: SystemRole.CUSTOMER }, { expiresIn: '15m', secret: process.env.JWT_SECRET });
+      const customerToken = jwtService.sign(
+        { sub: customer.id, role: SystemRole.CUSTOMER },
+        { expiresIn: '15m', secret: process.env.JWT_SECRET },
+      );
 
       await request(app.getHttpServer())
         .get('/v1/admin/system/health')
@@ -104,7 +113,10 @@ describe('[R16] Admin System', () => {
     it('should return 403 for CUSTOMER role', async () => {
       const customerData = UserFactory.create({ email: `customer-sys2-${Date.now()}@example.com` });
       const customer = await prisma.user.create({ data: customerData as any });
-      const customerToken = jwtService.sign({ sub: customer.id, role: SystemRole.CUSTOMER }, { expiresIn: '15m', secret: process.env.JWT_SECRET });
+      const customerToken = jwtService.sign(
+        { sub: customer.id, role: SystemRole.CUSTOMER },
+        { expiresIn: '15m', secret: process.env.JWT_SECRET },
+      );
 
       await request(app.getHttpServer())
         .get('/v1/admin/system/metrics')

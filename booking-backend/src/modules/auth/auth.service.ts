@@ -4,37 +4,31 @@ import {
   BadRequestException,
   ConflictException,
   Logger,
-} from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
-import { PrismaService } from "../../common/database/prisma.service";
-import { UserStatus, SystemRole } from "@prisma/client";
-import { EmailService } from "../email/email.service";
-import { VerificationService } from "../verification/verification.service";
-import { CacheService } from "../cache/cache.service";
-import { EncryptionService } from "../encryption/encryption.service";
-import { HashService } from "../encryption/hash.service";
-import { maskEmail, maskPhone } from "../encryption/masking.util";
-import * as bcrypt from "bcryptjs";
-import * as crypto from "crypto";
-import { RegisterSendCodeDto, ContactType } from "./dto/register-send-code.dto";
-import { RegisterCompleteDto } from "./dto/register-complete.dto";
-import { LoginSendCodeDto } from "./dto/login-send-code.dto";
-import { LoginVerifyCodeDto } from "./dto/login-verify-code.dto";
-import { LoginPasswordDto } from "./dto/login-password.dto";
-import {
-  ResetPasswordSendCodeDto,
-  ResetPasswordVerifyDto,
-} from "./dto/reset-password.dto";
-import {
-  SendVerificationCodeDto,
-  VerifyVerificationCodeDto,
-} from "./dto/email-verification.dto";
+} from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { PrismaService } from '../../common/database/prisma.service';
+import { UserStatus, SystemRole } from '@prisma/client';
+import { EmailService } from '../email/email.service';
+import { VerificationService } from '../verification/verification.service';
+import { CacheService } from '../cache/cache.service';
+import { EncryptionService } from '../encryption/encryption.service';
+import { HashService } from '../encryption/hash.service';
+import { maskEmail, maskPhone } from '../encryption/masking.util';
+import * as bcrypt from 'bcryptjs';
+import * as crypto from 'crypto';
+import { RegisterSendCodeDto, ContactType } from './dto/register-send-code.dto';
+import { RegisterCompleteDto } from './dto/register-complete.dto';
+import { LoginSendCodeDto } from './dto/login-send-code.dto';
+import { LoginVerifyCodeDto } from './dto/login-verify-code.dto';
+import { LoginPasswordDto } from './dto/login-password.dto';
+import { ResetPasswordSendCodeDto, ResetPasswordVerifyDto } from './dto/reset-password.dto';
+import { SendVerificationCodeDto, VerifyVerificationCodeDto } from './dto/email-verification.dto';
 import {
   AuthResponseDto,
   SendCodeResponseDto,
   LogoutResponseDto,
   RefreshTokenRequestDto,
-} from "./dto/auth-response.dto";
+} from './dto/auth-response.dto';
 
 /** Bcrypt salt rounds for password hashing (OWASP 2023 推荐值) */
 const BCRYPT_SALT_ROUNDS = 12;
@@ -81,10 +75,10 @@ export class AuthService {
     const jwtSecret = process.env.JWT_SECRET;
     const jwtRefreshSecret = process.env.JWT_REFRESH_SECRET;
     if (!jwtSecret) {
-      throw new Error("JWT_SECRET environment variable is required");
+      throw new Error('JWT_SECRET environment variable is required');
     }
     if (!jwtRefreshSecret) {
-      throw new Error("JWT_REFRESH_SECRET environment variable is required");
+      throw new Error('JWT_REFRESH_SECRET environment variable is required');
     }
   }
 
@@ -94,9 +88,7 @@ export class AuthService {
    * 注册第一步：发送验证码
    * POST /v1/auth/register/send-code
    */
-  async registerSendCode(
-    sendDto: RegisterSendCodeDto,
-  ): Promise<SendCodeResponseDto> {
+  async registerSendCode(sendDto: RegisterSendCodeDto): Promise<SendCodeResponseDto> {
     const { contact, contactType } = sendDto;
 
     // 计算 contact hash 检查唯一性
@@ -111,21 +103,18 @@ export class AuthService {
 
     if (existingUser) {
       throw new ConflictException(
-        contactType === ContactType.PHONE ? "该手机号已注册" : "该邮箱已注册",
+        contactType === ContactType.PHONE ? '该手机号已注册' : '该邮箱已注册',
       );
     }
 
     // 生成验证码并存入 Redis
     // Redis key: verify:register:{contactType}:{contactHash}
     const redisKey = `verify:register:${contactType}:${contactHash}`;
-    const code = await this.verificationService.generateCode(
-      redisKey,
-      "REGISTER",
-    );
+    const code = await this.verificationService.generateCode(redisKey, 'REGISTER');
 
     // 发送验证码
     if (contactType === ContactType.EMAIL) {
-      const subject = "您的注册验证码";
+      const subject = '您的注册验证码';
       const html = this.generateVerificationCodeHtml(code);
       const text = `您的注册验证码是: ${code}，5分钟内有效。`;
 
@@ -138,8 +127,8 @@ export class AuthService {
         });
       } catch (_error) {
         // 邮件发送失败，清理 Redis 中的验证码
-        await this.verificationService.deleteCode(redisKey, "REGISTER");
-        throw new BadRequestException("发送验证码失败，请稍后重试");
+        await this.verificationService.deleteCode(redisKey, 'REGISTER');
+        throw new BadRequestException('发送验证码失败，请稍后重试');
       }
     } else {
       // TODO: 集成短信服务
@@ -147,10 +136,7 @@ export class AuthService {
     }
 
     return {
-      maskedContact:
-        contactType === ContactType.PHONE
-          ? maskPhone(contact)
-          : maskEmail(contact),
+      maskedContact: contactType === ContactType.PHONE ? maskPhone(contact) : maskEmail(contact),
       expiresIn: VERIFICATION_CODE_TTL,
     };
   }
@@ -171,11 +157,11 @@ export class AuthService {
     const verificationResult = await this.verificationService.verifyCode(
       redisKey,
       code,
-      "REGISTER",
+      'REGISTER',
     );
 
     if (!verificationResult.success) {
-      throw new BadRequestException("验证码无效或已过期");
+      throw new BadRequestException('验证码无效或已过期');
     }
 
     // 2. 再次检查唯一性（防止并发注册）
@@ -187,9 +173,7 @@ export class AuthService {
 
     if (existingUser) {
       throw new ConflictException(
-        contactType === ContactType.PHONE
-          ? "该手机号已被注册"
-          : "该邮箱已被注册",
+        contactType === ContactType.PHONE ? '该手机号已被注册' : '该邮箱已被注册',
       );
     }
 
@@ -214,8 +198,8 @@ export class AuthService {
     } = {
       name,
       passwordHash,
-      role: "CUSTOMER",
-      status: "ACTIVE",
+      role: 'CUSTOMER',
+      status: 'ACTIVE',
       phoneHash: null,
       phoneEncrypted: null,
       emailHash: null,
@@ -266,26 +250,24 @@ export class AuthService {
 
     // 防枚举：无论用户是否存在，都返回成功
     if (!user) {
-      this.logger.warn(
-        `Login code requested for non-existent ${contactType}: ${contact}`,
-      );
+      this.logger.warn(`Login code requested for non-existent ${contactType}: ${contact}`);
       // 模拟延迟，防止时序攻击
       await new Promise((resolve) => setTimeout(resolve, 100));
       return { expiresIn: VERIFICATION_CODE_TTL };
     }
 
-    if (user.status !== "ACTIVE") {
-      throw new BadRequestException("用户账户已被禁用");
+    if (user.status !== 'ACTIVE') {
+      throw new BadRequestException('用户账户已被禁用');
     }
 
     // 生成验证码并存入 Redis
     // Redis key: verify:login:{contactType}:{contactHash}
     const redisKey = `verify:login:${contactType}:${contactHash}`;
-    const code = await this.verificationService.generateCode(redisKey, "LOGIN");
+    const code = await this.verificationService.generateCode(redisKey, 'LOGIN');
 
     // 发送验证码
     if (contactType === ContactType.EMAIL) {
-      const subject = "您的登录验证码";
+      const subject = '您的登录验证码';
       const html = this.generateVerificationCodeHtml(code);
       const text = `您的登录验证码是: ${code}，5分钟内有效。`;
 
@@ -297,8 +279,8 @@ export class AuthService {
           text,
         });
       } catch (_error) {
-        await this.verificationService.deleteCode(redisKey, "LOGIN");
-        throw new BadRequestException("发送验证码失败，请稍后重试");
+        await this.verificationService.deleteCode(redisKey, 'LOGIN');
+        throw new BadRequestException('发送验证码失败，请稍后重试');
       }
     } else {
       // TODO: 集成短信服务
@@ -306,10 +288,7 @@ export class AuthService {
     }
 
     return {
-      maskedContact:
-        contactType === ContactType.PHONE
-          ? maskPhone(contact)
-          : maskEmail(contact),
+      maskedContact: contactType === ContactType.PHONE ? maskPhone(contact) : maskEmail(contact),
       expiresIn: VERIFICATION_CODE_TTL,
     };
   }
@@ -333,20 +312,16 @@ export class AuthService {
       where: whereClause,
     });
 
-    if (!user || user.status !== "ACTIVE") {
-      throw new UnauthorizedException("用户不存在或账户已禁用");
+    if (!user || user.status !== 'ACTIVE') {
+      throw new UnauthorizedException('用户不存在或账户已禁用');
     }
 
     // 2. 验证码校验
     const redisKey = `verify:login:${contactType}:${contactHash}`;
-    const verificationResult = await this.verificationService.verifyCode(
-      redisKey,
-      code,
-      "LOGIN",
-    );
+    const verificationResult = await this.verificationService.verifyCode(redisKey, code, 'LOGIN');
 
     if (!verificationResult.success) {
-      throw new UnauthorizedException("验证码无效或已过期");
+      throw new UnauthorizedException('验证码无效或已过期');
     }
 
     // 3. 更新最后登录时间
@@ -362,12 +337,12 @@ export class AuthService {
     await this.prisma.activityLog.create({
       data: {
         userId: user.id,
-        action: "LOGIN",
-        resourceType: "AUTH",
+        action: 'LOGIN',
+        resourceType: 'AUTH',
         resourceId: user.id,
         ipAddress: ip,
         userAgent,
-        metadata: { method: "verify_code" },
+        metadata: { method: 'verify_code' },
       },
     });
 
@@ -382,8 +357,7 @@ export class AuthService {
   private async constantTimeLoginDelay(): Promise<void> {
     const minDelay = 250;
     const maxDelay = 350;
-    const delay =
-      Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
+    const delay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
     await new Promise((resolve) => setTimeout(resolve, delay));
   }
 
@@ -406,10 +380,10 @@ export class AuthService {
       where: whereClause,
     });
 
-    if (!user || !user.passwordHash || user.status !== "ACTIVE") {
+    if (!user || !user.passwordHash || user.status !== 'ACTIVE') {
       // 防枚举/定时攻击：恒定时间延迟模拟 bcrypt 耗时 (250-350ms)
       await this.constantTimeLoginDelay();
-      throw new UnauthorizedException("凭证无效");
+      throw new UnauthorizedException('凭证无效');
     }
 
     // 2. 密码验证 (bcrypt rounds=12)
@@ -417,7 +391,7 @@ export class AuthService {
     if (!isPasswordValid) {
       // 防定时攻击：与用户不存在路径保持相同的恒定时间延迟
       await this.constantTimeLoginDelay();
-      throw new UnauthorizedException("凭证无效");
+      throw new UnauthorizedException('凭证无效');
     }
 
     // 3. 更新最后登录时间
@@ -433,12 +407,12 @@ export class AuthService {
     await this.prisma.activityLog.create({
       data: {
         userId: user.id,
-        action: "LOGIN",
-        resourceType: "AUTH",
+        action: 'LOGIN',
+        resourceType: 'AUTH',
         resourceId: user.id,
         ipAddress: ip,
         userAgent,
-        metadata: { method: "password" },
+        metadata: { method: 'password' },
       },
     });
 
@@ -453,9 +427,7 @@ export class AuthService {
    *
    * 防枚举: 用户不存在时也返回 200
    */
-  async resetPasswordSendCode(
-    sendDto: ResetPasswordSendCodeDto,
-  ): Promise<SendCodeResponseDto> {
+  async resetPasswordSendCode(sendDto: ResetPasswordSendCodeDto): Promise<SendCodeResponseDto> {
     const { contact, contactType } = sendDto;
 
     const contactHash = this.hashService.hashWithPepper(contact);
@@ -467,24 +439,22 @@ export class AuthService {
 
     // 防枚举：无论用户是否存在，都返回成功
     if (!user) {
-      this.logger.warn(
-        `Reset password code requested for non-existent ${contactType}: ${contact}`,
-      );
+      this.logger.warn(`Reset password code requested for non-existent ${contactType}: ${contact}`);
       await new Promise((resolve) => setTimeout(resolve, 100));
       return { expiresIn: VERIFICATION_CODE_TTL };
     }
 
-    if (user.status !== "ACTIVE") {
-      throw new BadRequestException("用户账户已被禁用");
+    if (user.status !== 'ACTIVE') {
+      throw new BadRequestException('用户账户已被禁用');
     }
 
     // 生成验证码并存入 Redis
     const redisKey = `verify:reset:${contactType}:${contactHash}`;
-    const code = await this.verificationService.generateCode(redisKey, "RESET");
+    const code = await this.verificationService.generateCode(redisKey, 'RESET');
 
     // 发送验证码
     if (contactType === ContactType.EMAIL) {
-      const subject = "您的密码重置验证码";
+      const subject = '您的密码重置验证码';
       const html = this.generateVerificationCodeHtml(code);
       const text = `您的密码重置验证码是: ${code}，5分钟内有效。`;
 
@@ -496,8 +466,8 @@ export class AuthService {
           text,
         });
       } catch (_error) {
-        await this.verificationService.deleteCode(redisKey, "RESET");
-        throw new BadRequestException("发送验证码失败，请稍后重试");
+        await this.verificationService.deleteCode(redisKey, 'RESET');
+        throw new BadRequestException('发送验证码失败，请稍后重试');
       }
     } else {
       // TODO: 集成短信服务
@@ -505,10 +475,7 @@ export class AuthService {
     }
 
     return {
-      maskedContact:
-        contactType === ContactType.PHONE
-          ? maskPhone(contact)
-          : maskEmail(contact),
+      maskedContact: contactType === ContactType.PHONE ? maskPhone(contact) : maskEmail(contact),
       expiresIn: VERIFICATION_CODE_TTL,
     };
   }
@@ -517,9 +484,7 @@ export class AuthService {
    * 重置密码第二步：验证码校验并更新密码
    * POST /v1/auth/reset-password/verify
    */
-  async resetPasswordVerify(
-    verifyDto: ResetPasswordVerifyDto,
-  ): Promise<{ message: string }> {
+  async resetPasswordVerify(verifyDto: ResetPasswordVerifyDto): Promise<{ message: string }> {
     const { contact, contactType, code, newPassword } = verifyDto;
 
     // 1. 计算 hash 查找用户
@@ -530,20 +495,16 @@ export class AuthService {
       where: whereClause,
     });
 
-    if (!user || user.status !== "ACTIVE") {
-      throw new BadRequestException("用户不存在或账户已禁用");
+    if (!user || user.status !== 'ACTIVE') {
+      throw new BadRequestException('用户不存在或账户已禁用');
     }
 
     // 2. 验证码校验
     const redisKey = `verify:reset:${contactType}:${contactHash}`;
-    const verificationResult = await this.verificationService.verifyCode(
-      redisKey,
-      code,
-      "RESET",
-    );
+    const verificationResult = await this.verificationService.verifyCode(redisKey, code, 'RESET');
 
     if (!verificationResult.success) {
-      throw new BadRequestException("验证码无效或已过期");
+      throw new BadRequestException('验证码无效或已过期');
     }
 
     // 3. 密码哈希 (bcrypt rounds=12)
@@ -557,7 +518,7 @@ export class AuthService {
 
     this.logger.log(`Password reset completed for user: ${user.id}`);
 
-    return { message: "密码重置成功" };
+    return { message: '密码重置成功' };
   }
 
   // ==================== Token 管理 ====================
@@ -578,11 +539,11 @@ export class AuthService {
         secret: process.env.JWT_REFRESH_SECRET!,
       });
     } catch {
-      throw new UnauthorizedException("Refresh Token 无效或已过期");
+      throw new UnauthorizedException('Refresh Token 无效或已过期');
     }
 
-    if (payload.tokenType !== "refresh") {
-      throw new UnauthorizedException("无效的 Token 类型");
+    if (payload.tokenType !== 'refresh') {
+      throw new UnauthorizedException('无效的 Token 类型');
     }
 
     // 2. 查找会话
@@ -594,23 +555,16 @@ export class AuthService {
     // 3. Token 重用检测（重放攻击防护）
     if (!session) {
       await this.revokeAllUserSessions(payload.sub);
-      throw new UnauthorizedException("Refresh Token 重用检测：所有会话已吊销");
+      throw new UnauthorizedException('Refresh Token 重用检测：所有会话已吊销');
     }
 
     // 4. 验证会话有效性
-    if (
-      !session.isActive ||
-      !session.refreshExpiresAt ||
-      session.refreshExpiresAt < new Date()
-    ) {
-      throw new UnauthorizedException("Refresh Token 已过期或已吊销");
+    if (!session.isActive || !session.refreshExpiresAt || session.refreshExpiresAt < new Date()) {
+      throw new UnauthorizedException('Refresh Token 已过期或已吊销');
     }
 
     // 5. 原子操作：吊销旧会话 + 创建新会话
-    const tokens = await this.rotateToken(
-      session.user as unknown as UserPayload,
-      session.id,
-    );
+    const tokens = await this.rotateToken(session.user as unknown as UserPayload, session.id);
 
     return tokens;
   }
@@ -635,15 +589,15 @@ export class AuthService {
       jti?: string;
     } | null;
     const jti = decodedToken?.jti || crypto.randomUUID();
-    await this.cacheService.setSession(`token:blacklist:${jti}`, "revoked");
+    await this.cacheService.setSession(`token:blacklist:${jti}`, 'revoked');
 
     await this.prisma.activityLog.create({
-      data: { userId, action: "LOGOUT", resourceType: "AUTH", resourceId: userId },
+      data: { userId, action: 'LOGOUT', resourceType: 'AUTH', resourceId: userId },
     });
 
     this.logger.log(`User logged out: ${userId}`);
 
-    return { message: "登出成功" };
+    return { message: '登出成功' };
   }
 
   // ==================== 内部方法 ====================
@@ -686,7 +640,7 @@ export class AuthService {
     const refreshToken = this.jwtService.sign(
       {
         sub: user.id,
-        tokenType: "refresh",
+        tokenType: 'refresh',
         jti: crypto.randomUUID(),
       },
       {
@@ -700,9 +654,7 @@ export class AuthService {
     expiresAt.setSeconds(expiresAt.getSeconds() + SESSION_EXPIRES_IN_SECONDS);
 
     const refreshExpiresAt = new Date();
-    refreshExpiresAt.setDate(
-      refreshExpiresAt.getDate() + REFRESH_TOKEN_EXPIRES_DAYS,
-    );
+    refreshExpiresAt.setDate(refreshExpiresAt.getDate() + REFRESH_TOKEN_EXPIRES_DAYS);
 
     const sessionToken = `sess_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
 
@@ -720,7 +672,7 @@ export class AuthService {
         accessToken,
         refreshToken,
         expiresIn: ACCESS_TOKEN_EXPIRES_IN_SECONDS,
-        tokenType: "Bearer",
+        tokenType: 'Bearer',
       },
     };
   }
@@ -747,7 +699,9 @@ export class AuthService {
   /**
    * 生成 JWT Token 对（用于首次登录/注册）
    */
-  private async generateTokens(user: UserPayload): Promise<AuthResponseDto & { refreshToken: string }> {
+  private async generateTokens(
+    user: UserPayload,
+  ): Promise<AuthResponseDto & { refreshToken: string }> {
     return this._createTokenPair(user);
   }
 
@@ -786,28 +740,23 @@ export class AuthService {
    */
   private getPermissionsForRole(role: SystemRole): string[] {
     switch (role) {
-      case "CUSTOMER":
+      case 'CUSTOMER':
         return [
-          "view_own_profile",
-          "create_appointment",
-          "view_own_appointments",
-          "cancel_own_appointment",
+          'view_own_profile',
+          'create_appointment',
+          'view_own_appointments',
+          'cancel_own_appointment',
         ];
-      case "ADMIN":
+      case 'ADMIN':
         return [
-          "manage_users",
-          "manage_services",
-          "manage_time_slots",
-          "view_all_appointments",
-          "manage_appointments",
+          'manage_users',
+          'manage_services',
+          'manage_time_slots',
+          'view_all_appointments',
+          'manage_appointments',
         ];
-      case "SUPER_ADMIN":
-        return [
-          "all_admin_permissions",
-          "system_settings",
-          "view_audit_logs",
-          "manage_admins",
-        ];
+      case 'SUPER_ADMIN':
+        return ['all_admin_permissions', 'system_settings', 'view_audit_logs', 'manage_admins'];
       default:
         return [];
     }
@@ -828,10 +777,8 @@ export class AuthService {
   /**
    * 发送验证码 (Redis) - TODO: 待实现
    */
-  async sendVerificationCode(
-    _sendDto: SendVerificationCodeDto,
-  ): Promise<{ success: boolean }> {
-    throw new Error("Not implemented yet");
+  async sendVerificationCode(_sendDto: SendVerificationCodeDto): Promise<{ success: boolean }> {
+    throw new Error('Not implemented yet');
   }
 
   /**
@@ -840,7 +787,7 @@ export class AuthService {
   async verifyVerificationCode(
     _verifyDto: VerifyVerificationCodeDto,
   ): Promise<{ success: boolean }> {
-    throw new Error("Not implemented yet");
+    throw new Error('Not implemented yet');
   }
 
   // ==================== 邮件模板 ====================

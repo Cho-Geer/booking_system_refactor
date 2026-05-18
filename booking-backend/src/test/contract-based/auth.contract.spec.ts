@@ -1,7 +1,7 @@
 /**
  * Authentication API Contract Tests
  * Generated based on contract.yaml API specifications
- * 
+ *
  * These tests validate that the API implementation conforms to the contract.
  * According to TDD principles, these tests should FAIL initially (RED phase).
  */
@@ -119,14 +119,12 @@ xdescribe('Authentication API Contract Tests', () => {
 
     // Seed a test user for login tests (ignore duplicate errors)
     try {
-      await request(app.getHttpServer())
-        .post('/v1/auth/register')
-        .send({
-          email: 'test@example.com',
-          password: 'ValidPass123!',
-          name: 'Test User',
-          verifyCode: '123456',
-        });
+      await request(app.getHttpServer()).post('/v1/auth/register').send({
+        email: 'test@example.com',
+        password: 'ValidPass123!',
+        name: 'Test User',
+        verifyCode: '123456',
+      });
     } catch (e) {
       // Ignore duplicate user errors - user may already exist
     }
@@ -138,20 +136,18 @@ xdescribe('Authentication API Contract Tests', () => {
 
   describe(CONTRACT.auth.login.endpoint, () => {
     it('should return 401 for invalid credentials (error response contract)', async () => {
-      const response = await request(app.getHttpServer())
-        .post('/v1/auth/login')
-        .send({
-          email: 'nonexistent@example.com',
-          password: 'wrongpassword123',
-        });
+      const response = await request(app.getHttpServer()).post('/v1/auth/login').send({
+        email: 'nonexistent@example.com',
+        password: 'wrongpassword123',
+      });
 
       // Contract validation: status should be 401
       expect(response.status).toBe(401);
-      
+
       // Contract validation: response body should have error property
       expect(response.body).toHaveProperty('error');
       expect(typeof response.body.error).toBe('string');
-      
+
       // Contract validation: response structure should match contract
       expect(response.body).toMatchObject({
         error: expect.any(String),
@@ -168,9 +164,7 @@ xdescribe('Authentication API Contract Tests', () => {
       ];
 
       for (const testCase of testCases) {
-        const response = await request(app.getHttpServer())
-          .post('/v1/auth/login')
-          .send(testCase);
+        const response = await request(app.getHttpServer()).post('/v1/auth/login').send(testCase);
 
         // Contract validation: should return 400 for validation errors
         expect(response.status).toBe(400);
@@ -182,24 +176,22 @@ xdescribe('Authentication API Contract Tests', () => {
     it('should return 200 with tokens for valid credentials (success response contract)', async () => {
       // Note: This test requires a valid user to exist in the database
       // In TDD RED phase, this test will fail because the API is not implemented yet
-      const response = await request(app.getHttpServer())
-        .post('/v1/auth/login')
-        .send({
-          email: 'test@example.com',
-          password: 'ValidPass123!',
-        });
+      const response = await request(app.getHttpServer()).post('/v1/auth/login').send({
+        email: 'test@example.com',
+        password: 'ValidPass123!',
+      });
 
       // Contract validation: status should be 200
       expect(response.status).toBe(200);
-      
+
       // Contract validation: response should have access_token
       expect(response.body).toHaveProperty('access_token');
       expect(typeof response.body.access_token).toBe('string');
-      
+
       // Contract validation: response should have refresh_token
       expect(response.body).toHaveProperty('refresh_token');
       expect(typeof response.body.refresh_token).toBe('string');
-      
+
       // Contract validation: response should have user object
       expect(response.body).toHaveProperty('user');
       expect(response.body.user).toMatchObject({
@@ -234,19 +226,17 @@ xdescribe('Authentication API Contract Tests', () => {
     // This test should FAIL initially (TDD RED phase)
     it('should return 201 for successful registration (success response contract)', async () => {
       const uniqueEmail = `test-${Date.now()}@example.com`;
-      
-      const response = await request(app.getHttpServer())
-        .post('/v1/auth/register')
-        .send({
-          email: uniqueEmail,
-          password: 'ValidPass123!',
-          name: 'Test User',
-          verifyCode: '123456',
-        });
+
+      const response = await request(app.getHttpServer()).post('/v1/auth/register').send({
+        email: uniqueEmail,
+        password: 'ValidPass123!',
+        name: 'Test User',
+        verifyCode: '123456',
+      });
 
       // Contract validation: status should be 201
       expect(response.status).toBe(201);
-      
+
       // Contract validation: response should have user object
       expect(response.body).toHaveProperty('user');
       expect(response.body.user).toMatchObject({
@@ -255,7 +245,7 @@ xdescribe('Authentication API Contract Tests', () => {
         name: 'Test User',
         role: 'USER', // New users should have USER role by default
       });
-      
+
       // Contract validation: should NOT return tokens on registration
       // (tokens are returned after login, not registration)
       expect(response.body).not.toHaveProperty('access_token');
@@ -265,30 +255,26 @@ xdescribe('Authentication API Contract Tests', () => {
     // This test should FAIL initially (TDD RED phase)
     it('should return 400 for duplicate email registration (error response contract)', async () => {
       const duplicateEmail = 'duplicate@example.com';
-      
+
       // First registration should succeed
-      await request(app.getHttpServer())
-        .post('/v1/auth/register')
-        .send({
-          email: duplicateEmail,
-          password: 'ValidPass123!',
-          name: 'First User',
-          verifyCode: '123456',
-        });
+      await request(app.getHttpServer()).post('/v1/auth/register').send({
+        email: duplicateEmail,
+        password: 'ValidPass123!',
+        name: 'First User',
+        verifyCode: '123456',
+      });
 
       // Second registration with same email should fail
-      const response = await request(app.getHttpServer())
-        .post('/v1/auth/register')
-        .send({
-          email: duplicateEmail,
-          password: 'AnotherPass123!',
-          name: 'Second User',
-          verifyCode: '123456',
-        });
+      const response = await request(app.getHttpServer()).post('/v1/auth/register').send({
+        email: duplicateEmail,
+        password: 'AnotherPass123!',
+        name: 'Second User',
+        verifyCode: '123456',
+      });
 
       // Contract validation: status should be 400
       expect(response.status).toBe(400);
-      
+
       // Contract validation: response should have error property
       expect(response.body).toHaveProperty('error');
       expect(typeof response.body.error).toBe('string');
@@ -299,12 +285,10 @@ xdescribe('Authentication API Contract Tests', () => {
   // Additional contract validation tests
   describe('API Contract Compliance', () => {
     it('should use correct content-type header', async () => {
-      const response = await request(app.getHttpServer())
-        .post('/v1/auth/login')
-        .send({
-          email: 'test@example.com',
-          password: 'ValidPass123!',
-        });
+      const response = await request(app.getHttpServer()).post('/v1/auth/login').send({
+        email: 'test@example.com',
+        password: 'ValidPass123!',
+      });
 
       // Contract specifies default content type as application/json
       expect(response.headers['content-type']).toMatch(/application\/json/);
@@ -312,8 +296,7 @@ xdescribe('Authentication API Contract Tests', () => {
 
     it('should handle missing authentication header for protected routes', async () => {
       // Try to access a protected route without authentication
-      const response = await request(app.getHttpServer())
-        .get('/v1/users/profile');
+      const response = await request(app.getHttpServer()).get('/v1/users/profile');
 
       // Should return 401 Unauthorized
       expect(response.status).toBe(401);

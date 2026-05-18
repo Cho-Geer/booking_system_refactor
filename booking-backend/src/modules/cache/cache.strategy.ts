@@ -1,5 +1,5 @@
-import { Injectable, Logger } from "@nestjs/common";
-import { CacheService } from "./cache.service";
+import { Injectable, Logger } from '@nestjs/common';
+import { CacheService } from './cache.service';
 
 /**
  * Cache key formats as defined in the data architecture document.
@@ -9,10 +9,9 @@ export const CacheKeys = {
   /** User session: session:{sessionToken} */
   session: (token: string) => `session:${token}`,
   /** Verification code: verification:{phone}:{type} */
-  verification: (phone: string, type: string) =>
-    `verification:${phone}:${type}`,
+  verification: (phone: string, type: string) => `verification:${phone}:${type}`,
   /** Active services list: services:active */
-  servicesActive: "services:active",
+  servicesActive: 'services:active',
   /** Available time slots: timeslots:available:{date} */
   timeslotsAvailable: (date: string) => `timeslots:available:${date}`,
   /** User profile: user:{userId}:profile */
@@ -60,10 +59,7 @@ export class CacheStrategy {
    * Cache a user session.
    * Session TTL is managed by the CacheService config (REDIS_TTL_SESSION, default 7 days).
    */
-  async setUserSession(
-    sessionToken: string,
-    sessionData: unknown,
-  ): Promise<void> {
+  async setUserSession(sessionToken: string, sessionData: unknown): Promise<void> {
     const key = CacheKeys.session(sessionToken);
     await this.cacheService.setSession(key, sessionData);
   }
@@ -92,11 +88,7 @@ export class CacheStrategy {
   /**
    * Cache a verification code (SMS/Email) with 5-minute TTL.
    */
-  async setVerificationCode(
-    phone: string,
-    type: string,
-    code: string,
-  ): Promise<void> {
+  async setVerificationCode(phone: string, type: string, code: string): Promise<void> {
     const key = CacheKeys.verification(phone, type);
     await this.cacheService.set(key, { code }, CacheTTL.verification);
   }
@@ -104,10 +96,7 @@ export class CacheStrategy {
   /**
    * Get a cached verification code. Returns null if expired or not found.
    */
-  async getVerificationCode(
-    phone: string,
-    type: string,
-  ): Promise<string | null> {
+  async getVerificationCode(phone: string, type: string): Promise<string | null> {
     const key = CacheKeys.verification(phone, type);
     const data = await this.cacheService.get<{ code: string }>(key);
     return data?.code ?? null;
@@ -130,11 +119,7 @@ export class CacheStrategy {
    * Cache the active services list.
    */
   async setActiveServices(services: unknown[]): Promise<void> {
-    await this.cacheService.set(
-      CacheKeys.servicesActive,
-      services,
-      CacheTTL.servicesActive,
-    );
+    await this.cacheService.set(CacheKeys.servicesActive, services, CacheTTL.servicesActive);
   }
 
   /**
@@ -228,17 +213,9 @@ export class CacheStrategy {
     const client = this.cacheService.getClient();
     if (client) {
       try {
-        await client.set(
-          `booking:${key}`,
-          String(remaining),
-          "EX",
-          CacheTTL.slotRemaining,
-        );
+        await client.set(`booking:${key}`, String(remaining), 'EX', CacheTTL.slotRemaining);
       } catch (err) {
-        this.logger.error(
-          `Failed to set slot remaining for ${timeSlotId}`,
-          (err as Error).stack,
-        );
+        this.logger.error(`Failed to set slot remaining for ${timeSlotId}`, (err as Error).stack);
       }
     }
   }
@@ -266,10 +243,7 @@ export class CacheStrategy {
         const raw = await client.get(key);
         return raw !== null ? parseInt(raw, 10) : null;
       } catch (err) {
-        this.logger.error(
-          `Failed to get slot remaining for ${timeSlotId}`,
-          (err as Error).stack,
-        );
+        this.logger.error(`Failed to get slot remaining for ${timeSlotId}`, (err as Error).stack);
         return null;
       }
     }
@@ -289,12 +263,8 @@ export class CacheStrategy {
     ttl: number,
     fetchFn: () => Promise<T>,
   ): Promise<T | null> {
-    const result = await this.cacheService.cacheWithProtection(
-      key,
-      ttl,
-      fetchFn,
-    );
-    if (result && typeof result === "object" && "__null__" in result) {
+    const result = await this.cacheService.cacheWithProtection(key, ttl, fetchFn);
+    if (result && typeof result === 'object' && '__null__' in result) {
       return null;
     }
     return result as T | null;

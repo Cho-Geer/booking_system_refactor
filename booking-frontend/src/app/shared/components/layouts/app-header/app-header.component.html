@@ -58,7 +58,7 @@
         <div class="relative flex items-center gap-2">
           @if (isAdmin()) {
             <span data-testid="admin-badge" class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-accent-green/10 text-accent-green border border-accent-green/20">
-              {{ 'auth.role.admin' | t }}
+              {{ userRole() }}
             </span>
           }
           <button (click)="menu.toggle($event)" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-card-bg-light transition-colors">

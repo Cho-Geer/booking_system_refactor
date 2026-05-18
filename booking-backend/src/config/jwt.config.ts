@@ -1,4 +1,4 @@
-import * as fs from "fs";
+import * as fs from 'fs';
 
 /**
  * JWT 密钥加载策略（支持 Docker Secrets 文件 + 环境变量回退）
@@ -11,15 +11,15 @@ import * as fs from "fs";
  * @throws Error 当密钥不可用时
  */
 export function loadJwtSecret(): string {
-  const dockerSecretPath = "/run/secrets/jwt_secret";
+  const dockerSecretPath = '/run/secrets/jwt_secret';
   if (fs.existsSync(dockerSecretPath)) {
-    const secret = fs.readFileSync(dockerSecretPath, "utf8").trim();
+    const secret = fs.readFileSync(dockerSecretPath, 'utf8').trim();
     if (secret) return secret;
   }
   const envSecret = process.env.JWT_SECRET;
   if (envSecret) return envSecret;
   throw new Error(
-    "JWT_SECRET is not configured. Set the JWT_SECRET environment variable or mount a Docker Secret at /run/secrets/jwt_secret",
+    'JWT_SECRET is not configured. Set the JWT_SECRET environment variable or mount a Docker Secret at /run/secrets/jwt_secret',
   );
 }
 
@@ -29,14 +29,14 @@ export function loadJwtSecret(): string {
  * @throws Error 当密钥不可用时
  */
 export function loadJwtRefreshSecret(): string {
-  const dockerSecretPath = "/run/secrets/jwt_refresh_secret";
+  const dockerSecretPath = '/run/secrets/jwt_refresh_secret';
   if (fs.existsSync(dockerSecretPath)) {
-    const secret = fs.readFileSync(dockerSecretPath, "utf8").trim();
+    const secret = fs.readFileSync(dockerSecretPath, 'utf8').trim();
     if (secret) return secret;
   }
   const envSecret = process.env.JWT_REFRESH_SECRET;
   if (envSecret) return envSecret;
   throw new Error(
-    "JWT_REFRESH_SECRET is not configured. Set the JWT_REFRESH_SECRET environment variable or mount a Docker Secret at /run/secrets/jwt_refresh_secret",
+    'JWT_REFRESH_SECRET is not configured. Set the JWT_REFRESH_SECRET environment variable or mount a Docker Secret at /run/secrets/jwt_refresh_secret',
   );
 }

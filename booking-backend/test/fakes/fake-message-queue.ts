@@ -22,12 +22,7 @@
  * ```
  */
 
-export type JobStatus =
-  | "waiting"
-  | "active"
-  | "completed"
-  | "failed"
-  | "delayed";
+export type JobStatus = 'waiting' | 'active' | 'completed' | 'failed' | 'delayed';
 
 export interface FakeJob {
   id: string;
@@ -71,7 +66,7 @@ export class FakeMessageQueue {
     const job: FakeJob = {
       id,
       data,
-      status: options?.delay ? "delayed" : "waiting",
+      status: options?.delay ? 'delayed' : 'waiting',
       attemptsMade: 0,
     };
 
@@ -79,7 +74,7 @@ export class FakeMessageQueue {
 
     if (options?.delay && options.delay > 0) {
       const timerId = setTimeout(() => {
-        job.status = "waiting";
+        job.status = 'waiting';
         this.processNext();
       }, options.delay);
       this.timerIds.push(timerId);
@@ -168,9 +163,7 @@ export class FakeMessageQueue {
     }
 
     // Find the next waiting job
-    const waitingEntry = Array.from(this.jobs.values()).find(
-      (e) => e.job.status === "waiting",
-    );
+    const waitingEntry = Array.from(this.jobs.values()).find((e) => e.job.status === 'waiting');
 
     if (!waitingEntry) {
       // No more pending jobs — resolve completion promise
@@ -184,17 +177,17 @@ export class FakeMessageQueue {
     this.processing = true;
     const { job } = waitingEntry;
 
-    job.status = "active";
+    job.status = 'active';
     job.processedOn = Date.now();
     job.attemptsMade++;
 
     if (this.processor) {
       try {
         await this.processor(job);
-        job.status = "completed";
+        job.status = 'completed';
         job.finishedOn = Date.now();
       } catch (err) {
-        job.status = "failed";
+        job.status = 'failed';
         job.failedReason = err instanceof Error ? err.message : String(err);
         job.finishedOn = Date.now();
       }
@@ -211,7 +204,7 @@ export class FakeMessageQueue {
    */
   private hasPendingJobs(): boolean {
     return Array.from(this.jobs.values()).some(
-      (e) => e.job.status === "waiting" || e.job.status === "active",
+      (e) => e.job.status === 'waiting' || e.job.status === 'active',
     );
   }
 
@@ -219,17 +212,17 @@ export class FakeMessageQueue {
    * Process a specific job directly (used in tests for granular control).
    */
   private async processJob(job: FakeJob): Promise<void> {
-    job.status = "active";
+    job.status = 'active';
     job.processedOn = Date.now();
     job.attemptsMade++;
 
     if (this.processor) {
       try {
         await this.processor(job);
-        job.status = "completed";
+        job.status = 'completed';
         job.finishedOn = Date.now();
       } catch (err) {
-        job.status = "failed";
+        job.status = 'failed';
         job.failedReason = err instanceof Error ? err.message : String(err);
         job.finishedOn = Date.now();
       }

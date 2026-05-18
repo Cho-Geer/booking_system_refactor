@@ -63,11 +63,11 @@ export class TimeSlotsService {
       this.prisma.timeSlot.count({ where }),
     ]);
 
-    const totalPages = Math.ceil(total / limit);
+    const totalPages = Math.ceil(Number(total) / limit);
     return {
       items: timeSlots,
       meta: {
-        total,
+        total: Number(total),
         page,
         limit,
         totalPages,
@@ -170,7 +170,7 @@ export class TimeSlotsService {
         );
       }
 
-      let available = slot.capacity > slot._count.appointments;
+      let available = slot.capacity > Number(slot._count.appointments);
       if (
         overtimeMinutes !== undefined &&
         maxOvertimeMinutes !== undefined &&
@@ -184,7 +184,7 @@ export class TimeSlotsService {
         startTime: slot.startTime,
         endTime: slot.endTime,
         capacity: slot.capacity,
-        bookedCount: slot._count.appointments,
+        bookedCount: Number(slot._count.appointments),
         available,
         maxOvertimeMinutes,
       };

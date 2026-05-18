@@ -9,20 +9,11 @@ import {
   UseGuards,
   BadRequestException,
   Req,
-} from "@nestjs/common";
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiHeader,
-  ApiBearerAuth,
-} from "@nestjs/swagger";
-import { Request } from "express";
-import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
-import {
-  SlotPreemptionService,
-  ReservationInput,
-} from "./slot-preemption.service";
+} from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiHeader, ApiBearerAuth } from '@nestjs/swagger';
+import { Request } from 'express';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { SlotPreemptionService, ReservationInput } from './slot-preemption.service';
 
 interface AuthenticatedRequest extends Request {
   user?: {
@@ -72,9 +63,9 @@ export class ReserveSlotDto {
  *
  * API Contract: T005-CONCURRENCY-DESIGN Section 11
  */
-@ApiTags("Slot Reservation")
+@ApiTags('Slot Reservation')
 @ApiBearerAuth()
-@Controller("slots")
+@Controller('slots')
 @UseGuards(JwtAuthGuard)
 export class SlotPreemptionController {
   constructor(private readonly slotPreemptionService: SlotPreemptionService) {}
@@ -89,35 +80,34 @@ export class SlotPreemptionController {
    * @param userId User ID from JWT token
    * @param idempotencyKey Optional idempotency key for retry safety
    */
-  @Post(":slotId/reserve")
+  @Post(':slotId/reserve')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
-    summary: "Reserve a time slot",
+    summary: 'Reserve a time slot',
     description:
-      "Atomically reserve a time slot with optimistic locking and retry logic. Supports idempotency via Idempotency-Key header.",
+      'Atomically reserve a time slot with optimistic locking and retry logic. Supports idempotency via Idempotency-Key header.',
   })
   @ApiHeader({
-    name: "Idempotency-Key",
-    description:
-      "Optional idempotency key for safe retries (SHA256 hash recommended)",
+    name: 'Idempotency-Key',
+    description: 'Optional idempotency key for safe retries (SHA256 hash recommended)',
     required: false,
   })
   @ApiResponse({
     status: HttpStatus.CREATED,
-    description: "Slot reserved successfully",
+    description: 'Slot reserved successfully',
     schema: {
       example: {
         success: true,
-        status: "SUCCESS",
+        status: 'SUCCESS',
         appointment: {
-          id: "appointment-uuid",
-          userId: "user-uuid",
-          timeSlotId: "slot-uuid",
-          serviceId: "service-uuid",
-          status: "PENDING",
-          customerName: "John Doe",
-          customerEmail: "john@example.com",
-          createdAt: "2026-04-15T10:00:00Z",
+          id: 'appointment-uuid',
+          userId: 'user-uuid',
+          timeSlotId: 'slot-uuid',
+          serviceId: 'service-uuid',
+          status: 'PENDING',
+          customerName: 'John Doe',
+          customerEmail: 'john@example.com',
+          createdAt: '2026-04-15T10:00:00Z',
         },
         allocatedSeq: 3,
       },
@@ -125,44 +115,42 @@ export class SlotPreemptionController {
   })
   @ApiResponse({
     status: HttpStatus.TOO_MANY_REQUESTS,
-    description: "Rate limit exceeded",
+    description: 'Rate limit exceeded',
     schema: {
       example: {
         statusCode: 429,
-        message: "Rate limit exceeded. Please try again later.",
+        message: 'Rate limit exceeded. Please try again later.',
         retryAfter: 1,
       },
     },
   })
   @ApiResponse({
     status: HttpStatus.CONFLICT,
-    description: "Slot reservation failed after retries",
+    description: 'Slot reservation failed after retries',
     schema: {
       example: {
         statusCode: 409,
-        message: "Slot reservation failed: maximum retries exceeded",
+        message: 'Slot reservation failed: maximum retries exceeded',
       },
     },
   })
   async reserveSlot(
-    @Param("slotId") slotId: string,
+    @Param('slotId') slotId: string,
     @Body() body: ReserveSlotDto,
     @Req() req: AuthenticatedRequest,
-    @Headers("Idempotency-Key") idempotencyKey?: string,
+    @Headers('Idempotency-Key') idempotencyKey?: string,
   ): Promise<Record<string, unknown>> {
     // Extract user ID from JWT token (attached by JwtAuthGuard)
     const userId = req.user?.id;
 
     // Validate preferSeq range
     if (body.preferSeq < 0 || body.preferSeq >= 10) {
-      throw new BadRequestException("preferSeq must be between 0 and 9");
+      throw new BadRequestException('preferSeq must be between 0 and 9');
     }
 
     // Validate required fields
     if (!userId) {
-      throw new BadRequestException(
-        "User ID is required (should be provided by JWT guard)",
-      );
+      throw new BadRequestException('User ID is required (should be provided by JWT guard)');
     }
 
     const input: ReservationInput = {
@@ -180,7 +168,7 @@ export class SlotPreemptionController {
     const result = await this.slotPreemptionService.reserveSlot(input);
 
     // Map result to appropriate HTTP response
-    if (result.status === "RATE_LIMITED") {
+    if (result.status === 'RATE_LIMITED') {
       return {
         statusCode: HttpStatus.TOO_MANY_REQUESTS,
         message: result.reason,
@@ -188,12 +176,10 @@ export class SlotPreemptionController {
       };
     }
 
-    if (result.status === "CONFLICT" || result.status === "FAILED") {
+    if (result.status === 'CONFLICT' || result.status === 'FAILED') {
       return {
         statusCode:
-          result.status === "CONFLICT"
-            ? HttpStatus.CONFLICT
-            : HttpStatus.SERVICE_UNAVAILABLE,
+          result.status === 'CONFLICT' ? HttpStatus.CONFLICT : HttpStatus.SERVICE_UNAVAILABLE,
         message: result.reason,
       };
     }

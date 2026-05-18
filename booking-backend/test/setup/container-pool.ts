@@ -70,26 +70,26 @@ export class ContainerPool {
     // be started by global-setup.ts which runs before this)
     const databaseUrl =
       process.env.DATABASE_URL ||
-      "postgresql://test_user:test_password@localhost:5432/booking_test";
-    const redisUrl = process.env.REDIS_URL || "redis://localhost:6379";
+      'postgresql://test_user:test_password@localhost:5432/booking_test';
+    const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
 
     // Parse connection details from URLs
-    let postgresHost = "localhost";
+    let postgresHost = 'localhost';
     let postgresPort = 5432;
     try {
       const pgUrl = new URL(databaseUrl);
       postgresHost = pgUrl.hostname;
-      postgresPort = parseInt(pgUrl.port || "5432", 10);
+      postgresPort = parseInt(pgUrl.port || '5432', 10);
     } catch {
       // Use defaults
     }
 
-    let redisHost = "localhost";
+    let redisHost = 'localhost';
     let redisPort = 6379;
     try {
       const rUrl = new URL(redisUrl);
       redisHost = rUrl.hostname;
-      redisPort = parseInt(rUrl.port || "6379", 10);
+      redisPort = parseInt(rUrl.port || '6379', 10);
     } catch {
       // Use defaults
     }
@@ -105,7 +105,7 @@ export class ContainerPool {
 
     instance._initialized = true;
 
-    console.log("[ContainerPool] Initialized:", {
+    console.log('[ContainerPool] Initialized:', {
       postgres: `${postgresHost}:${postgresPort}`,
       redis: `${redisHost}:${redisPort}`,
     });
@@ -121,9 +121,7 @@ export class ContainerPool {
     const instance = ContainerPool.getInstance();
 
     if (!instance._initialized || !instance._connectionInfo) {
-      throw new Error(
-        "ContainerPool is not initialized. Call ContainerPool.initialize() first.",
-      );
+      throw new Error('ContainerPool is not initialized. Call ContainerPool.initialize() first.');
     }
 
     instance._activeSchemas.add(schemaName);
@@ -143,9 +141,7 @@ export class ContainerPool {
     const instance = ContainerPool.getInstance();
 
     if (!instance._initialized) {
-      throw new Error(
-        "ContainerPool is not initialized. Call ContainerPool.initialize() first.",
-      );
+      throw new Error('ContainerPool is not initialized. Call ContainerPool.initialize() first.');
     }
 
     instance._activeSchemas.delete(schemaName);
@@ -173,7 +169,7 @@ export class ContainerPool {
     instance._initialized = false;
     instance._connectionInfo = null;
 
-    console.log("[ContainerPool] Destroyed");
+    console.log('[ContainerPool] Destroyed');
   }
 
   /**
@@ -184,9 +180,7 @@ export class ContainerPool {
     const instance = ContainerPool.getInstance();
 
     if (!instance._initialized || !instance._connectionInfo) {
-      throw new Error(
-        "ContainerPool is not initialized. Call ContainerPool.initialize() first.",
-      );
+      throw new Error('ContainerPool is not initialized. Call ContainerPool.initialize() first.');
     }
 
     return instance._connectionInfo;

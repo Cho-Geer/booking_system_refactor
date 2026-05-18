@@ -1,11 +1,8 @@
-import { Injectable, Logger } from "@nestjs/common";
-import { Cron, CronExpression } from "@nestjs/schedule";
-import { PrismaService } from "../../common/database/prisma.service";
-import { CacheService } from "../cache/cache.service";
-import {
-  withDistributedLock,
-  processSettledResults,
-} from "../../common/utils/lock.util";
+import { Injectable, Logger } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import { PrismaService } from '../../common/database/prisma.service';
+import { CacheService } from '../cache/cache.service';
+import { withDistributedLock, processSettledResults } from '../../common/utils/lock.util';
 
 export interface RetentionConfig {
   appointmentRetentionDays: number;
@@ -22,7 +19,7 @@ export class RetentionService {
     sessionRetentionDays: 30,
   };
 
-  private readonly LOCK_KEY = "retention:cleanup:lock";
+  private readonly LOCK_KEY = 'retention:cleanup:lock';
   private readonly LOCK_TTL = 3600;
 
   constructor(
@@ -36,7 +33,7 @@ export class RetentionService {
       this.cacheService,
       { key: this.LOCK_KEY, ttl: this.LOCK_TTL, logger: this.logger },
       async () => {
-        this.logger.log("Starting daily data retention cleanup...");
+        this.logger.log('Starting daily data retention cleanup...');
 
         const results = await Promise.allSettled([
           this.cleanupExpiredAppointments(),
@@ -46,36 +43,30 @@ export class RetentionService {
 
         processSettledResults(
           results,
-          [
-            "Archived expired appointments",
-            "Deleted old system logs",
-            "Cleaned inactive sessions",
-          ],
+          ['Archived expired appointments', 'Deleted old system logs', 'Cleaned inactive sessions'],
           this.logger,
         );
 
-        this.logger.log("Daily data retention cleanup completed");
+        this.logger.log('Daily data retention cleanup completed');
       },
     );
   }
 
   async cleanupExpiredAppointments(): Promise<number> {
     const cutoffDate = new Date();
-    cutoffDate.setDate(
-      cutoffDate.getDate() - this.config.appointmentRetentionDays,
-    );
+    cutoffDate.setDate(cutoffDate.getDate() - this.config.appointmentRetentionDays);
 
     const result = await this.prisma.appointment.updateMany({
       where: {
         status: {
-          in: ["COMPLETED", "CANCELLED", "EXPIRED"],
+          in: ['COMPLETED', 'CANCELLED', 'EXPIRED'],
         },
         updatedAt: {
           lt: cutoffDate,
         },
       },
       data: {
-        remarks: "[ARCHIVED] Data retention cleanup",
+        remarks: '[ARCHIVED] Data retention cleanup',
       },
     });
 
@@ -87,9 +78,7 @@ export class RetentionService {
 
   async cleanupOldSystemLogs(): Promise<number> {
     const cutoffDate = new Date();
-    cutoffDate.setDate(
-      cutoffDate.getDate() - this.config.systemLogRetentionDays,
-    );
+    cutoffDate.setDate(cutoffDate.getDate() - this.config.systemLogRetentionDays);
 
     const result = await this.prisma.systemLog.deleteMany({
       where: {
@@ -99,9 +88,7 @@ export class RetentionService {
       },
     });
 
-    this.logger.log(
-      `Deleted ${result.count} system logs older than ${cutoffDate.toISOString()}`,
-    );
+    this.logger.log(`Deleted ${result.count} system logs older than ${cutoffDate.toISOString()}`);
     return result.count;
   }
 
@@ -135,9 +122,7 @@ export class RetentionService {
 
   async cleanupOldActivityLogs(): Promise<number> {
     const cutoffDate = new Date();
-    cutoffDate.setDate(
-      cutoffDate.getDate() - this.config.systemLogRetentionDays,
-    );
+    cutoffDate.setDate(cutoffDate.getDate() - this.config.systemLogRetentionDays);
 
     const result = await this.prisma.activityLog.deleteMany({
       where: {
@@ -147,9 +132,7 @@ export class RetentionService {
       },
     });
 
-    this.logger.log(
-      `Deleted ${result.count} activity logs older than ${cutoffDate.toISOString()}`,
-    );
+    this.logger.log(`Deleted ${result.count} activity logs older than ${cutoffDate.toISOString()}`);
     return result.count;
   }
 

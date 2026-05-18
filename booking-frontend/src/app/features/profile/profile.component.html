@@ -9,7 +9,9 @@
     <!-- Avatar Card -->
     <app-card variant="sharp" class="mb-6 text-center">
       <div class="relative inline-flex">
-        <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-primary-start to-primary-end flex items-center justify-center text-white text-xl sm:text-2xl font-bold ring-4 ring-white shadow-lg">
+        <div
+          class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-primary-start to-primary-end flex items-center justify-center text-white text-xl sm:text-2xl font-bold ring-4 ring-white shadow-lg"
+        >
           {{ avatarInitials() }}
         </div>
         <button
@@ -20,12 +22,21 @@
         </button>
       </div>
       <h2 class="text-xl font-bold text-gray-900 mt-4" data-testid="user-name">{{ u.name }}</h2>
-      <app-badge [status]="u.role === 'CUSTOMER' ? 'completed' : 'confirmed'" size="md" shape="pill" class="mt-2 inline-block">
+      <app-badge
+        [status]="u.role === 'CUSTOMER' ? 'confirmed' : 'pending'"
+        size="md"
+        class="mt-2 inline-block"
+      >
       </app-badge>
     </app-card>
 
     <!-- Profile Info Card -->
-    <app-card variant="sharp" [header]="'profile.basicInfo' | t" headerIcon="pi pi-user" class="mb-6">
+    <app-card
+      variant="sharp"
+      [header]="'profile.basicInfo' | t"
+      headerIcon="pi pi-user"
+      class="mb-6"
+    >
       <div class="flex items-center justify-between mb-4">
         <div></div>
         <app-button
@@ -65,7 +76,9 @@
         <div class="info-row">
           <label class="block text-sm text-gray-500 mb-1">{{ 'profile.email' | t }}</label>
           <div class="flex items-center gap-2">
-            <p class="text-base text-gray-900" data-testid="user-email">{{ u.email || ('global.notSet' | t) }}</p>
+            <p class="text-base text-gray-900" data-testid="user-email">
+              {{ u.email || ('global.notSet' | t) }}
+            </p>
             @if (u.email) {
               <app-badge status="confirmed" size="sm" [customLabel]="'global.verified' | t" />
             }
@@ -76,7 +89,9 @@
         <div class="info-row">
           <label class="block text-sm text-gray-500 mb-1">{{ 'profile.phone' | t }}</label>
           <div class="flex items-center gap-2">
-            <p class="text-base text-gray-900" data-testid="user-phone">{{ u.phone || ('global.notSet' | t) }}</p>
+            <p class="text-base text-gray-900" data-testid="user-phone">
+              {{ u.phone || ('global.notSet' | t) }}
+            </p>
             @if (u.phone) {
               <app-badge status="confirmed" size="sm" [customLabel]="'global.verified' | t" />
             }
@@ -133,7 +148,12 @@
     </app-card>
 
     <!-- Account Security Card -->
-    <app-card variant="sharp" [header]="'profile.accountSecurity' | t" headerIcon="pi pi-shield" class="mb-6">
+    <app-card
+      variant="sharp"
+      [header]="'profile.accountSecurity' | t"
+      headerIcon="pi pi-shield"
+      class="mb-6"
+    >
       <div class="flex items-center justify-between py-3">
         <div>
           <p class="text-sm font-medium text-gray-900">{{ 'profile.loginPassword' | t }}</p>
@@ -176,7 +196,9 @@
     }
 
     <div>
-      <label class="block text-sm font-medium text-text-primary mb-1">{{ 'profile.currentPassword' | t }}</label>
+      <label class="block text-sm font-medium text-text-primary mb-1">{{
+        'profile.currentPassword' | t
+      }}</label>
       <input
         type="password"
         class="sharp-input w-full"
@@ -186,7 +208,9 @@
       />
     </div>
     <div>
-      <label class="block text-sm font-medium text-text-primary mb-1">{{ 'profile.newPassword' | t }}</label>
+      <label class="block text-sm font-medium text-text-primary mb-1">{{
+        'profile.newPassword' | t
+      }}</label>
       <input
         type="password"
         class="sharp-input w-full"
@@ -196,7 +220,9 @@
       />
     </div>
     <div>
-      <label class="block text-sm font-medium text-text-primary mb-1">{{ 'profile.confirmNewPassword' | t }}</label>
+      <label class="block text-sm font-medium text-text-primary mb-1">{{
+        'profile.confirmNewPassword' | t
+      }}</label>
       <input
         type="password"
         class="sharp-input w-full"
@@ -207,7 +233,9 @@
     </div>
 
     @if (passwordError()) {
-      <div class="text-sm text-accent-red bg-accent-red/5 rounded-lg px-3 py-2">{{ passwordError() }}</div>
+      <div class="text-sm text-accent-red bg-accent-red/5 rounded-lg px-3 py-2">
+        {{ passwordError() }}
+      </div>
     }
 
     <div class="flex flex-col-reverse sm:flex-row gap-3 justify-end pt-2">

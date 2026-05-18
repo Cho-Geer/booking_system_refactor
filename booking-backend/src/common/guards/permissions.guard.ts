@@ -1,12 +1,7 @@
-import {
-  Injectable,
-  CanActivate,
-  ExecutionContext,
-  ForbiddenException,
-} from "@nestjs/common";
-import { Reflector } from "@nestjs/core";
-import { PERMISSIONS_MATRIX } from "../constants/permissions.constants";
-import { Request } from "express";
+import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import { PERMISSIONS_MATRIX } from '../constants/permissions.constants';
+import { Request } from 'express';
 
 interface PermissionsUser {
   id: string;
@@ -41,10 +36,10 @@ export class PermissionsGuard implements CanActivate {
    */
   canActivate(context: ExecutionContext): boolean {
     // Get required permissions from the handler or class metadata
-    const requiredPermissions = this.reflector.getAllAndOverride<string[]>(
-      "permissions",
-      [context.getHandler(), context.getClass()],
-    );
+    const requiredPermissions = this.reflector.getAllAndOverride<string[]>('permissions', [
+      context.getHandler(),
+      context.getClass(),
+    ]);
 
     // If no permissions are required, allow access
     if (!requiredPermissions || requiredPermissions.length === 0) {
@@ -56,7 +51,7 @@ export class PermissionsGuard implements CanActivate {
     const user = request.user;
 
     if (!user) {
-      throw new ForbiddenException("User not authenticated");
+      throw new ForbiddenException('User not authenticated');
     }
 
     // Get user permissions based on role
@@ -70,19 +65,15 @@ export class PermissionsGuard implements CanActivate {
     if (!hasAllPermissions) {
       this.logAccessDenied(user, requiredPermissions, userPermissions, context);
       throw new ForbiddenException(
-        `Access denied. Required permissions: ${requiredPermissions.join(", ")}`,
+        `Access denied. Required permissions: ${requiredPermissions.join(', ')}`,
       );
     }
 
     // Check data scope if applicable (e.g., user can only access their own data)
     if (this.requiresDataScopeCheck(requiredPermissions)) {
-      const hasDataAccess = this.checkDataScopeAccess(
-        user,
-        request,
-        requiredPermissions,
-      );
+      const hasDataAccess = this.checkDataScopeAccess(user, request, requiredPermissions);
       if (!hasDataAccess) {
-        throw new ForbiddenException("Access denied to this resource");
+        throw new ForbiddenException('Access denied to this resource');
       }
     }
 
@@ -95,8 +86,7 @@ export class PermissionsGuard implements CanActivate {
   private getUserPermissions(role: string): string[] {
     // Use permission matrix from constants
     const roleKey = role as keyof typeof PERMISSIONS_MATRIX.roles;
-    const rolePermissions =
-      PERMISSIONS_MATRIX.roles[roleKey]?.permissions || [];
+    const rolePermissions = PERMISSIONS_MATRIX.roles[roleKey]?.permissions || [];
 
     // Include inherited permissions from role hierarchy
     const inheritedPermissions = this.getInheritedPermissions(role);
@@ -115,10 +105,8 @@ export class PermissionsGuard implements CanActivate {
     let allPermissions: string[] = [];
 
     for (const inheritedRole of inheritedRoles) {
-      const inheritedRoleKey =
-        inheritedRole as keyof typeof PERMISSIONS_MATRIX.roles;
-      const rolePerms =
-        PERMISSIONS_MATRIX.roles[inheritedRoleKey]?.permissions || [];
+      const inheritedRoleKey = inheritedRole as keyof typeof PERMISSIONS_MATRIX.roles;
+      const rolePerms = PERMISSIONS_MATRIX.roles[inheritedRoleKey]?.permissions || [];
       allPermissions = [...allPermissions, ...rolePerms];
 
       // Recursively get permissions from inherited roles
@@ -135,9 +123,7 @@ export class PermissionsGuard implements CanActivate {
   private requiresDataScopeCheck(requiredPermissions: string[]): boolean {
     const dataScopePermissions = PERMISSIONS_MATRIX.dataScopePermissions || [];
 
-    return requiredPermissions.some((permission) =>
-      dataScopePermissions.includes(permission),
-    );
+    return requiredPermissions.some((permission) => dataScopePermissions.includes(permission));
   }
 
   /**
@@ -156,9 +142,7 @@ export class PermissionsGuard implements CanActivate {
     }
 
     // Check if user has "any" permission (can access any resource)
-    const hasAnyPermission = requiredPermissions.some((permission) =>
-      permission.endsWith(":any"),
-    );
+    const hasAnyPermission = requiredPermissions.some((permission) => permission.endsWith(':any'));
 
     if (hasAnyPermission) {
       return true;
@@ -184,7 +168,7 @@ export class PermissionsGuard implements CanActivate {
     // Try to get user ID from query parameters for user-specific resources
     if (request.query && request.query.userId) {
       const userId = request.query.userId;
-      return typeof userId === "string" ? userId : null;
+      return typeof userId === 'string' ? userId : null;
     }
 
     return null;
@@ -208,7 +192,7 @@ export class PermissionsGuard implements CanActivate {
     }
 
     // Check if request is for user's own profile
-    if (request.url.includes("/profile") && request.method === "GET") {
+    if (request.url.includes('/profile') && request.method === 'GET') {
       return true;
     }
 
@@ -240,10 +224,10 @@ export class PermissionsGuard implements CanActivate {
       missingPermissions,
       endpoint: `${request.method} ${request.url}`,
       ipAddress: request.ip,
-      userAgent: request.get("user-agent"),
+      userAgent: request.get('user-agent'),
     };
 
     // In production, this would log to a security monitoring system
-    console.warn("Access denied - insufficient permissions:", logData);
+    console.warn('Access denied - insufficient permissions:', logData);
   }
 }

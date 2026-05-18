@@ -210,9 +210,7 @@ describe('Email Module E2E Tests', () => {
   // ============================================================
   describe('GET /api/v1/health', () => {
     it('should return 200 and confirm the application is running (email module loaded)', async () => {
-      const response = await request(app.getHttpServer())
-        .get('/api/v1/health')
-        .expect(200);
+      const response = await request(app.getHttpServer()).get('/api/v1/health').expect(200);
 
       expect(response.body).toHaveProperty('status', 'ok');
       expect(response.body).toHaveProperty('timestamp');
@@ -453,7 +451,10 @@ describe('Email Module E2E Tests', () => {
       try {
         // Wait for the job to be processed
         await new Promise<void>((resolve, reject) => {
-          const timeout = setTimeout(() => reject(new Error('Worker processing timeout (5000ms)')), 5000);
+          const timeout = setTimeout(
+            () => reject(new Error('Worker processing timeout (5000ms)')),
+            5000,
+          );
           worker.on('completed', () => {
             clearTimeout(timeout);
             resolve();
@@ -512,7 +513,10 @@ describe('Email Module E2E Tests', () => {
 
       try {
         await new Promise<void>((resolve, reject) => {
-          const timeout = setTimeout(() => reject(new Error('Worker processing timeout (5000ms)')), 5000);
+          const timeout = setTimeout(
+            () => reject(new Error('Worker processing timeout (5000ms)')),
+            5000,
+          );
           worker.on('completed', () => {
             clearTimeout(timeout);
             resolve();
@@ -546,7 +550,13 @@ describe('Email Module E2E Tests', () => {
       const timeSlot = await createTimeSlot(prisma, service.id);
 
       // Count jobs before
-      const jobsBefore = await emailQueue.getJobs(['waiting', 'active', 'delayed', 'completed', 'failed']);
+      const jobsBefore = await emailQueue.getJobs([
+        'waiting',
+        'active',
+        'delayed',
+        'completed',
+        'failed',
+      ]);
       const countBefore = jobsBefore.length;
 
       // Create appointment via API
@@ -566,7 +576,13 @@ describe('Email Module E2E Tests', () => {
       expect(response.body.status).toBe('PENDING');
 
       // Verify a new job was added to the email queue
-      const jobsAfter = await emailQueue.getJobs(['waiting', 'active', 'delayed', 'completed', 'failed']);
+      const jobsAfter = await emailQueue.getJobs([
+        'waiting',
+        'active',
+        'delayed',
+        'completed',
+        'failed',
+      ]);
       expect(jobsAfter.length).toBeGreaterThan(countBefore);
 
       // Find the confirmation job
@@ -686,17 +702,13 @@ describe('Email Module E2E Tests', () => {
         .expect(201);
 
       // Drain the confirmation job so we can isolate the cancellation job
-      const drainWorker = new Worker(
-        'email',
-        async () => ({ sent: true }),
-        {
-          connection: {
-            host: process.env.REDIS_HOST || 'localhost',
-            port: parseInt(process.env.REDIS_PORT || '6379', 10),
-          },
-          concurrency: 1,
+      const drainWorker = new Worker('email', async () => ({ sent: true }), {
+        connection: {
+          host: process.env.REDIS_HOST || 'localhost',
+          port: parseInt(process.env.REDIS_PORT || '6379', 10),
         },
-      );
+        concurrency: 1,
+      });
       // Process all waiting jobs to clear the queue
       await new Promise<void>((resolve) => {
         let processed = 0;
@@ -710,7 +722,9 @@ describe('Email Module E2E Tests', () => {
 
       // Count cancellation jobs before
       const cancelJobsBefore = await emailQueue.getJobs(['waiting', 'active', 'delayed']);
-      const cancelCountBefore = cancelJobsBefore.filter((j) => j.name === 'appointment-cancellation').length;
+      const cancelCountBefore = cancelJobsBefore.filter(
+        (j) => j.name === 'appointment-cancellation',
+      ).length;
 
       // Cancel the appointment
       const appointmentId = createResponse.body.id;
@@ -1018,7 +1032,10 @@ describe('Email Module E2E Tests', () => {
 
         // Wait for confirmation email to be processed
         await new Promise<void>((resolve, reject) => {
-          const timeout = setTimeout(() => reject(new Error('Confirmation email timeout (8000ms)')), 8000);
+          const timeout = setTimeout(
+            () => reject(new Error('Confirmation email timeout (8000ms)')),
+            8000,
+          );
           worker.on('completed', () => {
             clearTimeout(timeout);
             resolve();
@@ -1040,7 +1057,10 @@ describe('Email Module E2E Tests', () => {
 
         // Wait for cancellation email to be processed
         await new Promise<void>((resolve, reject) => {
-          const timeout = setTimeout(() => reject(new Error('Cancellation email timeout (8000ms)')), 8000);
+          const timeout = setTimeout(
+            () => reject(new Error('Cancellation email timeout (8000ms)')),
+            8000,
+          );
           worker.on('completed', () => {
             clearTimeout(timeout);
             resolve();

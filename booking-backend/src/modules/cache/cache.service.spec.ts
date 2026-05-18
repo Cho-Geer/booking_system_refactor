@@ -404,13 +404,7 @@ describe('CacheService', () => {
       const result = await service.acquireLock('lock:booking:123', 10);
 
       expect(result).toBe(true);
-      expect(mockRedis.set).toHaveBeenCalledWith(
-        'booking:lock:booking:123',
-        '1',
-        'EX',
-        10,
-        'NX',
-      );
+      expect(mockRedis.set).toHaveBeenCalledWith('booking:lock:booking:123', '1', 'EX', 10, 'NX');
     });
 
     it('should return false when lock is already held', async () => {
@@ -571,9 +565,7 @@ describe('CacheService', () => {
 
     it('should handle delayed delete failure', async () => {
       // First call succeeds, second call fails
-      mockRedis.del
-        .mockResolvedValueOnce(1)
-        .mockRejectedValueOnce(new Error('Delayed DEL failed'));
+      mockRedis.del.mockResolvedValueOnce(1).mockRejectedValueOnce(new Error('Delayed DEL failed'));
 
       await service.deleteWithDelay('test:key', 300);
 
@@ -616,9 +608,7 @@ describe('CacheService', () => {
     it('should return empty array when Redis is unavailable', async () => {
       (service as any).isConnected = false;
 
-      const results = await service.pipeline([
-        { op: 'get', args: ['key1'] },
-      ]);
+      const results = await service.pipeline([{ op: 'get', args: ['key1'] }]);
 
       expect(results).toEqual([]);
     });
@@ -626,9 +616,7 @@ describe('CacheService', () => {
     it('should return empty array when redis client is null', async () => {
       (service as any).redis = null;
 
-      const results = await service.pipeline([
-        { op: 'get', args: ['key1'] },
-      ]);
+      const results = await service.pipeline([{ op: 'get', args: ['key1'] }]);
 
       expect(results).toEqual([]);
     });
@@ -640,9 +628,7 @@ describe('CacheService', () => {
       };
       mockRedis.pipeline.mockReturnValue(mockPipeline as any);
 
-      const results = await service.pipeline([
-        { op: 'set', args: ['key1', 'value1'] },
-      ]);
+      const results = await service.pipeline([{ op: 'set', args: ['key1', 'value1'] }]);
 
       expect(results).toEqual([]);
     });
@@ -650,15 +636,11 @@ describe('CacheService', () => {
     it('should handle individual pipeline operation errors', async () => {
       const mockPipeline = {
         get: jest.fn().mockReturnThis(),
-        exec: jest.fn().mockResolvedValue([
-          [new Error('Key not found'), null],
-        ]),
+        exec: jest.fn().mockResolvedValue([[new Error('Key not found'), null]]),
       };
       mockRedis.pipeline.mockReturnValue(mockPipeline as any);
 
-      const results = await service.pipeline([
-        { op: 'get', args: ['nonexistent'] },
-      ]);
+      const results = await service.pipeline([{ op: 'get', args: ['nonexistent'] }]);
 
       expect(results).toEqual([null]);
     });
@@ -666,15 +648,11 @@ describe('CacheService', () => {
     it('should support decr operation in pipeline', async () => {
       const mockPipeline = {
         decr: jest.fn().mockReturnThis(),
-        exec: jest.fn().mockResolvedValue([
-          [null, 4],
-        ]),
+        exec: jest.fn().mockResolvedValue([[null, 4]]),
       };
       mockRedis.pipeline.mockReturnValue(mockPipeline as any);
 
-      const results = await service.pipeline([
-        { op: 'decr', args: ['counter:test'] },
-      ]);
+      const results = await service.pipeline([{ op: 'decr', args: ['counter:test'] }]);
 
       expect(mockPipeline.decr).toHaveBeenCalledWith('booking:counter:test');
       expect(results).toEqual([4]);
@@ -683,15 +661,11 @@ describe('CacheService', () => {
     it('should support has operation in pipeline', async () => {
       const mockPipeline = {
         exists: jest.fn().mockReturnThis(),
-        exec: jest.fn().mockResolvedValue([
-          [null, 1],
-        ]),
+        exec: jest.fn().mockResolvedValue([[null, 1]]),
       };
       mockRedis.pipeline.mockReturnValue(mockPipeline as any);
 
-      const results = await service.pipeline([
-        { op: 'has', args: ['test:key'] },
-      ]);
+      const results = await service.pipeline([{ op: 'has', args: ['test:key'] }]);
 
       expect(mockPipeline.exists).toHaveBeenCalledWith('booking:test:key');
       expect(results).toEqual([1]);
@@ -704,9 +678,7 @@ describe('CacheService', () => {
       };
       mockRedis.pipeline.mockReturnValue(mockPipeline as any);
 
-      await service.pipeline([
-        { op: 'unknown_op', args: ['key1'] },
-      ]);
+      await service.pipeline([{ op: 'unknown_op', args: ['key1'] }]);
 
       expect(loggerWarnSpy).toHaveBeenCalledWith('Unknown pipeline operation: unknown_op');
     });
@@ -716,9 +688,7 @@ describe('CacheService', () => {
         throw new Error('Pipeline creation failed');
       });
 
-      const results = await service.pipeline([
-        { op: 'get', args: ['key1'] },
-      ]);
+      const results = await service.pipeline([{ op: 'get', args: ['key1'] }]);
 
       expect(results).toEqual([]);
     });
@@ -730,9 +700,7 @@ describe('CacheService', () => {
       };
       mockRedis.pipeline.mockReturnValue(mockPipeline as any);
 
-      const results = await service.pipeline([
-        { op: 'get', args: ['key1'] },
-      ]);
+      const results = await service.pipeline([{ op: 'get', args: ['key1'] }]);
 
       expect(results).toEqual([]);
     });
@@ -765,7 +733,12 @@ describe('CacheService', () => {
         { op: 'has', args: ['key6'] },
       ]);
 
-      expect(mockPipeline.set).toHaveBeenCalledWith('booking:key1', expect.any(String), 'EX', expect.any(Number));
+      expect(mockPipeline.set).toHaveBeenCalledWith(
+        'booking:key1',
+        expect.any(String),
+        'EX',
+        expect.any(Number),
+      );
       expect(mockPipeline.get).toHaveBeenCalledWith('booking:key2');
       expect(mockPipeline.del).toHaveBeenCalledWith('booking:key3');
       expect(mockPipeline.incr).toHaveBeenCalledWith('booking:key4');

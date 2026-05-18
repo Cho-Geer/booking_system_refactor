@@ -44,7 +44,7 @@ export interface TestAppointment {
 export async function createTestUser(
   prisma: PrismaClient,
   role: SystemRole = SystemRole.CUSTOMER,
-  overrides: Record<string, unknown> = {}
+  overrides: Record<string, unknown> = {},
 ): Promise<TestUser> {
   const timestamp = Date.now();
   return prisma.user.create({
@@ -65,7 +65,7 @@ export async function createTestUser(
 export async function createTestUsers(
   prisma: PrismaClient,
   count: number,
-  role: SystemRole = SystemRole.CUSTOMER
+  role: SystemRole = SystemRole.CUSTOMER,
 ): Promise<TestUser[]> {
   const users: TestUser[] = [];
   for (let i = 0; i < count; i++) {
@@ -80,7 +80,7 @@ export async function createTestUsers(
  */
 export async function createTestCategory(
   prisma: PrismaClient,
-  overrides: Record<string, unknown> = {}
+  overrides: Record<string, unknown> = {},
 ): Promise<{ id: string; name: string }> {
   const timestamp = Date.now();
   return prisma.serviceCategory.create({
@@ -100,7 +100,7 @@ export async function createTestCategory(
 export async function createTestService(
   prisma: PrismaClient,
   categoryId?: string,
-  overrides: Record<string, unknown> = {}
+  overrides: Record<string, unknown> = {},
 ): Promise<TestService> {
   const timestamp = Date.now();
 
@@ -129,7 +129,7 @@ export async function createTestService(
 export async function createTestTimeSlot(
   prisma: PrismaClient,
   serviceId?: string,
-  overrides: Record<string, unknown> = {}
+  overrides: Record<string, unknown> = {},
 ): Promise<TestTimeSlot> {
   const timestamp = Date.now();
 
@@ -165,7 +165,7 @@ export async function createTestAppointment(
     timeSlotId?: string;
     serviceId?: string;
     status?: AppointmentStatus;
-  } = {}
+  } = {},
 ): Promise<TestAppointment> {
   const timestamp = Date.now();
 

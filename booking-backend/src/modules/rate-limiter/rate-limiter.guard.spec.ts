@@ -492,7 +492,10 @@ describe('RateLimitGuard', () => {
 
       await guard.canActivate(mockCtx);
 
-      expect(mockCtx.mockResponse.setHeader).not.toHaveBeenCalledWith('Retry-After', expect.any(String));
+      expect(mockCtx.mockResponse.setHeader).not.toHaveBeenCalledWith(
+        'Retry-After',
+        expect.any(String),
+      );
     });
 
     it('should clamp negative remaining to 0 in headers', async () => {
@@ -534,10 +537,25 @@ describe('RateLimitGuard', () => {
         .mockReturnValueOnce({ tier: 'strict', key: 'user' })
         .mockReturnValueOnce(undefined);
       let mockCtx = createMockExecutionContext({ user: { sub: 'user-1' } }) as any;
-      mockRateLimiterService.isAllowed.mockResolvedValue({ allowed: true, limit: 1, current: 1, window: 1 });
-      mockRateLimiterService.getStatus.mockResolvedValue({ limit: 1, remaining: 0, resetAt: new Date() });
+      mockRateLimiterService.isAllowed.mockResolvedValue({
+        allowed: true,
+        limit: 1,
+        current: 1,
+        window: 1,
+      });
+      mockRateLimiterService.getStatus.mockResolvedValue({
+        limit: 1,
+        remaining: 0,
+        resetAt: new Date(),
+      });
       await guard.canActivate(mockCtx);
-      expect(rateLimiterService.isAllowed).toHaveBeenCalledWith('user-1', '/api/test', 'strict', 1, 1);
+      expect(rateLimiterService.isAllowed).toHaveBeenCalledWith(
+        'user-1',
+        '/api/test',
+        'strict',
+        1,
+        1,
+      );
 
       // Layer 2: User Daily (20/day)
       jest.clearAllMocks();
@@ -545,10 +563,25 @@ describe('RateLimitGuard', () => {
         .mockReturnValueOnce({ tier: 'api', key: 'user', limit: 20, window: 86400 })
         .mockReturnValueOnce(undefined);
       mockCtx = createMockExecutionContext({ user: { sub: 'user-1' } }) as any;
-      mockRateLimiterService.isAllowed.mockResolvedValue({ allowed: true, limit: 20, current: 5, window: 86400 });
-      mockRateLimiterService.getStatus.mockResolvedValue({ limit: 20, remaining: 15, resetAt: new Date() });
+      mockRateLimiterService.isAllowed.mockResolvedValue({
+        allowed: true,
+        limit: 20,
+        current: 5,
+        window: 86400,
+      });
+      mockRateLimiterService.getStatus.mockResolvedValue({
+        limit: 20,
+        remaining: 15,
+        resetAt: new Date(),
+      });
       await guard.canActivate(mockCtx);
-      expect(rateLimiterService.isAllowed).toHaveBeenCalledWith('user-1', '/api/test', 'api', 20, 86400);
+      expect(rateLimiterService.isAllowed).toHaveBeenCalledWith(
+        'user-1',
+        '/api/test',
+        'api',
+        20,
+        86400,
+      );
 
       // Layer 3: IP Global (10/min)
       jest.clearAllMocks();
@@ -556,10 +589,25 @@ describe('RateLimitGuard', () => {
         .mockReturnValueOnce({ tier: 'api', key: 'ip', limit: 10, window: 60 })
         .mockReturnValueOnce(undefined);
       mockCtx = createMockExecutionContext({ ip: '10.0.0.1' }) as any;
-      mockRateLimiterService.isAllowed.mockResolvedValue({ allowed: true, limit: 10, current: 3, window: 60 });
-      mockRateLimiterService.getStatus.mockResolvedValue({ limit: 10, remaining: 7, resetAt: new Date() });
+      mockRateLimiterService.isAllowed.mockResolvedValue({
+        allowed: true,
+        limit: 10,
+        current: 3,
+        window: 60,
+      });
+      mockRateLimiterService.getStatus.mockResolvedValue({
+        limit: 10,
+        remaining: 7,
+        resetAt: new Date(),
+      });
       await guard.canActivate(mockCtx);
-      expect(rateLimiterService.isAllowed).toHaveBeenCalledWith('10.0.0.1', '/api/test', 'api', 10, 60);
+      expect(rateLimiterService.isAllowed).toHaveBeenCalledWith(
+        '10.0.0.1',
+        '/api/test',
+        'api',
+        10,
+        60,
+      );
 
       // Layer 4: TimeSlot Capacity (public tier)
       jest.clearAllMocks();
@@ -567,8 +615,17 @@ describe('RateLimitGuard', () => {
         .mockReturnValueOnce({ tier: 'public', key: 'ip' })
         .mockReturnValueOnce(undefined);
       mockCtx = createMockExecutionContext() as any;
-      mockRateLimiterService.isAllowed.mockResolvedValue({ allowed: true, limit: 100, current: 50, window: 60 });
-      mockRateLimiterService.getStatus.mockResolvedValue({ limit: 100, remaining: 50, resetAt: new Date() });
+      mockRateLimiterService.isAllowed.mockResolvedValue({
+        allowed: true,
+        limit: 100,
+        current: 50,
+        window: 60,
+      });
+      mockRateLimiterService.getStatus.mockResolvedValue({
+        limit: 100,
+        remaining: 50,
+        resetAt: new Date(),
+      });
       await guard.canActivate(mockCtx);
       expect(rateLimiterService.isAllowed).toHaveBeenCalledWith(
         '127.0.0.1',
@@ -584,10 +641,25 @@ describe('RateLimitGuard', () => {
         .mockReturnValueOnce({ tier: 'public', key: 'user', limit: 100, window: 60 })
         .mockReturnValueOnce(undefined);
       mockCtx = createMockExecutionContext({ user: { sub: 'user-1' } }) as any;
-      mockRateLimiterService.isAllowed.mockResolvedValue({ allowed: true, limit: 100, current: 50, window: 60 });
-      mockRateLimiterService.getStatus.mockResolvedValue({ limit: 100, remaining: 50, resetAt: new Date() });
+      mockRateLimiterService.isAllowed.mockResolvedValue({
+        allowed: true,
+        limit: 100,
+        current: 50,
+        window: 60,
+      });
+      mockRateLimiterService.getStatus.mockResolvedValue({
+        limit: 100,
+        remaining: 50,
+        resetAt: new Date(),
+      });
       await guard.canActivate(mockCtx);
-      expect(rateLimiterService.isAllowed).toHaveBeenCalledWith('user-1', '/api/test', 'public', 100, 60);
+      expect(rateLimiterService.isAllowed).toHaveBeenCalledWith(
+        'user-1',
+        '/api/test',
+        'public',
+        100,
+        60,
+      );
     });
 
     it('should extract IP from req.ip when no x-forwarded-for header', async () => {
@@ -629,7 +701,7 @@ describe('RateLimitGuard', () => {
       const classConfig = { tier: 'public', key: 'ip' };
       mockReflector.get
         .mockReturnValueOnce(handlerConfig) // handler
-        .mockReturnValueOnce(classConfig);  // class (should not be used)
+        .mockReturnValueOnce(classConfig); // class (should not be used)
 
       const mockCtx = createMockExecutionContext({ user: { sub: 'user-1' } }) as any;
 
@@ -662,8 +734,8 @@ describe('RateLimitGuard', () => {
       process.env.NODE_ENV = 'production';
       const classConfig = { tier: 'auth', key: 'ip' };
       mockReflector.get
-        .mockReturnValueOnce(undefined)       // handler: no config
-        .mockReturnValueOnce(classConfig);    // class: use this
+        .mockReturnValueOnce(undefined) // handler: no config
+        .mockReturnValueOnce(classConfig); // class: use this
 
       const mockCtx = createMockExecutionContext() as any;
 

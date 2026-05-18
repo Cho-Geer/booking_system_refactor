@@ -1,11 +1,7 @@
-import {
-  Injectable,
-  ExecutionContext,
-  UnauthorizedException,
-} from "@nestjs/common";
-import { AuthGuard } from "@nestjs/passport";
-import { JwtService } from "@nestjs/jwt";
-import { Socket } from "socket.io";
+import { Injectable, ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { JwtService } from '@nestjs/jwt';
+import { Socket } from 'socket.io';
 
 /**
  * WebSocket JWT Authentication Guard
@@ -24,7 +20,7 @@ import { Socket } from "socket.io";
  * custom ExecutionContext handling, making @UseGuards less practical here)
  */
 @Injectable()
-export class WsJwtGuard extends AuthGuard("jwt") {
+export class WsJwtGuard extends AuthGuard('jwt') {
   constructor(private readonly jwtService: JwtService) {
     super();
   }
@@ -36,13 +32,13 @@ export class WsJwtGuard extends AuthGuard("jwt") {
     // Try auth.token first (Socket.IO recommended)
     const tokenFromAuth = client.handshake.auth?.token;
     if (tokenFromAuth) {
-      return tokenFromAuth.replace("Bearer ", "");
+      return tokenFromAuth.replace('Bearer ', '');
     }
 
     // Fallback to Authorization header
     const authHeader = client.handshake.headers?.authorization;
     if (authHeader) {
-      return authHeader.replace("Bearer ", "");
+      return authHeader.replace('Bearer ', '');
     }
 
     return null;
@@ -52,9 +48,7 @@ export class WsJwtGuard extends AuthGuard("jwt") {
    * Validate JWT token and extract user ID
    * @returns Decoded payload with userId
    */
-  async validateToken(
-    token: string,
-  ): Promise<{ userId: string; roles: string[] }> {
+  async validateToken(token: string): Promise<{ userId: string; roles: string[] }> {
     try {
       const decoded = this.jwtService.verify(token);
       return {
@@ -62,7 +56,7 @@ export class WsJwtGuard extends AuthGuard("jwt") {
         roles: decoded.roles || [],
       };
     } catch (_error) {
-      throw new UnauthorizedException("Invalid or expired token");
+      throw new UnauthorizedException('Invalid or expired token');
     }
   }
 

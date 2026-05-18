@@ -32,9 +32,7 @@ module.exports = async () => {
 
   // Start Redis container
   console.log('🗃️ Starting Redis container...');
-  const redisContainer = await new RedisContainer('redis:7-alpine')
-    .withExposedPorts(6379)
-    .start();
+  const redisContainer = await new RedisContainer('redis:7-alpine').withExposedPorts(6379).start();
 
   const postgresHost = postgresContainer.getHost();
   const postgresPort = postgresContainer.getMappedPort(5432);

@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from "uuid";
+import { v4 as uuidv4 } from 'uuid';
 
 /**
  * FakePrismaClient — In-memory database compatible with Prisma Client API.
@@ -65,22 +65,17 @@ export class FakePrismaClient {
     return new Proxy(this, {
       get(target, prop: string) {
         // Handle built-in methods
-        if (
-          prop in target ||
-          prop === "constructor" ||
-          prop === "__esModule" ||
-          prop === "then"
-        ) {
+        if (prop in target || prop === 'constructor' || prop === '__esModule' || prop === 'then') {
           return (target as any)[prop];
         }
 
         // Handle $transaction
-        if (prop === "$transaction") {
+        if (prop === '$transaction') {
           return target.$transaction.bind(target);
         }
 
         // Handle $connect, $disconnect (no-ops for in-memory)
-        if (prop === "$connect" || prop === "$disconnect") {
+        if (prop === '$connect' || prop === '$disconnect') {
           return async () => {};
         }
 
@@ -123,12 +118,7 @@ export class FakePrismaClient {
         return { ...record };
       },
 
-      findFirst: async (args: {
-        where?: any;
-        orderBy?: any;
-        skip?: number;
-        take?: number;
-      }) => {
+      findFirst: async (args: { where?: any; orderBy?: any; skip?: number; take?: number }) => {
         const all = Array.from(store.values());
         let filtered = this.applyWhere(all, args.where || {});
         filtered = this.applyOrderBy(filtered, args.orderBy);
@@ -206,10 +196,8 @@ export class FakePrismaClient {
    * Supports both interactive ($transaction(async (tx) => { ... }))
    * and sequential ($transaction([op1, op2, ...])) transactions.
    */
-  async $transaction(
-    arg: any | any[] | ((tx: FakePrismaClient) => Promise<any>),
-  ): Promise<any> {
-    if (typeof arg === "function") {
+  async $transaction(arg: any | any[] | ((tx: FakePrismaClient) => Promise<any>)): Promise<any> {
+    if (typeof arg === 'function') {
       // Interactive transaction
       return await arg(this);
     }
@@ -223,18 +211,18 @@ export class FakePrismaClient {
       return results;
     }
 
-    throw new Error("Invalid transaction argument");
+    throw new Error('Invalid transaction argument');
   }
 
   /**
    * Extract id from a where clause (supports { id: '...' } and composite keys).
    */
   private extractId(where: any): string {
-    if (!where) return "";
-    if (typeof where.id === "string") return where.id;
+    if (!where) return '';
+    if (typeof where.id === 'string') return where.id;
     // For composite keys or other formats, use the first value
     const values = Object.values(where);
-    return values.length > 0 ? String(values[0]) : "";
+    return values.length > 0 ? String(values[0]) : '';
   }
 
   /**
@@ -268,7 +256,7 @@ export class FakePrismaClient {
       if (aVal == null) return 1;
       if (bVal == null) return -1;
       const cmp = aVal < bVal ? -1 : 1;
-      return direction === "desc" ? -cmp : cmp;
+      return direction === 'desc' ? -cmp : cmp;
     });
 
     return sorted;

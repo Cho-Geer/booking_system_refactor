@@ -1,5 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { NotificationService, AppointmentNotificationData, CancellationNotificationData } from './notification.service';
+import {
+  NotificationService,
+  AppointmentNotificationData,
+  CancellationNotificationData,
+} from './notification.service';
 import { NotificationsGateway } from './notifications.gateway';
 
 // Mock NotificationsGateway

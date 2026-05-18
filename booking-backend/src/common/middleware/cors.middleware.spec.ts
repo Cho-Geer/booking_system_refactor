@@ -79,10 +79,7 @@ describe('CorsMiddleware', () => {
 
       middleware.use(mockReq as any, mockRes as any, mockNext);
 
-      expect(mockRes.setHeader).toHaveBeenCalledWith(
-        'Access-Control-Allow-Credentials',
-        'true',
-      );
+      expect(mockRes.setHeader).toHaveBeenCalledWith('Access-Control-Allow-Credentials', 'true');
     });
 
     it('should reject requests from non-whitelisted origins', () => {
@@ -296,10 +293,7 @@ describe('CorsMiddleware', () => {
 
       middleware.use(mockReq as any, mockRes as any, mockNext);
 
-      expect(mockRes.setHeader).toHaveBeenCalledWith(
-        'Access-Control-Allow-Methods',
-        'GET, POST',
-      );
+      expect(mockRes.setHeader).toHaveBeenCalledWith('Access-Control-Allow-Methods', 'GET, POST');
     });
 
     it('should use custom allowed headers', () => {

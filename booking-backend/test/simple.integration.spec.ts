@@ -1,9 +1,9 @@
 /**
  * Simple Database Integration Test
- * 
+ *
  * This test verifies database connectivity and schema correctness
  * using raw SQL queries, avoiding Prisma client schema mismatches.
- * 
+ *
  * Tests:
  * 1. Database connection via Testcontainers PostgreSQL
  * 2. Redis connection via Testcontainers
@@ -111,7 +111,7 @@ describe('Simple Database Integration Tests', () => {
         WHERE table_name = 'users' 
         ORDER BY ordinal_position
       `;
-      const columns = (result as any[]).map(r => r.column_name);
+      const columns = (result as any[]).map((r) => r.column_name);
       expect(columns).toContain('id');
       expect(columns).toContain('email');
       expect(columns).toContain('phone');
@@ -137,7 +137,7 @@ describe('Simple Database Integration Tests', () => {
         WHERE table_name = 'service_categories' 
         ORDER BY ordinal_position
       `;
-      const columns = (result as any[]).map(r => r.column_name);
+      const columns = (result as any[]).map((r) => r.column_name);
       expect(columns).toContain('id');
       expect(columns).toContain('name');
       expect(columns).toContain('description');
@@ -152,7 +152,7 @@ describe('Simple Database Integration Tests', () => {
         WHERE table_name = 'services' 
         ORDER BY ordinal_position
       `;
-      const columns = (result as any[]).map(r => r.column_name);
+      const columns = (result as any[]).map((r) => r.column_name);
       expect(columns).toContain('id');
       expect(columns).toContain('category_id');
       expect(columns).toContain('name');
@@ -166,7 +166,7 @@ describe('Simple Database Integration Tests', () => {
         FROM information_schema.columns 
         WHERE table_name = 'time_slots'
       `;
-      const columns = (result as any[]).map(r => r.column_name);
+      const columns = (result as any[]).map((r) => r.column_name);
       expect(columns).toContain('id');
       expect(columns).toContain('service_id');
       expect(columns).toContain('start_time');
@@ -180,7 +180,7 @@ describe('Simple Database Integration Tests', () => {
         FROM information_schema.columns 
         WHERE table_name = 'appointments'
       `;
-      const columns = (result as any[]).map(r => r.column_name);
+      const columns = (result as any[]).map((r) => r.column_name);
       expect(columns).toContain('id');
       expect(columns).toContain('user_id');
       expect(columns).toContain('time_slot_id');
@@ -194,7 +194,7 @@ describe('Simple Database Integration Tests', () => {
         FROM information_schema.columns 
         WHERE table_name = 'notifications'
       `;
-      const columns = (result as any[]).map(r => r.column_name);
+      const columns = (result as any[]).map((r) => r.column_name);
       expect(columns).toContain('id');
       expect(columns).toContain('user_id');
       expect(columns).toContain('type');
@@ -217,7 +217,7 @@ describe('Simple Database Integration Tests', () => {
         FROM information_schema.columns 
         WHERE table_name = 'user_sessions'
       `;
-      const columns = (result as any[]).map(r => r.column_name);
+      const columns = (result as any[]).map((r) => r.column_name);
       expect(columns).toContain('refresh_token');
     });
 
@@ -271,18 +271,18 @@ describe('Simple Database Integration Tests', () => {
   describe('CRUD Operations (Raw SQL)', () => {
     it('should insert and query a service category', async () => {
       const categoryName = `Test Category ${Date.now()}`;
-      
+
       await prisma.$executeRawUnsafe(
         `INSERT INTO service_categories (id, name, description, is_active, display_order, created_at, updated_at) VALUES (gen_random_uuid(), $1, 'Test description', true, 1, NOW(), NOW())`,
-        categoryName
+        categoryName,
       );
 
       const result = await prisma.$queryRawUnsafe(
         `SELECT id, name, description, is_active FROM service_categories WHERE name = $1`,
-        categoryName
+        categoryName,
       );
       const category = (result as any[])[0];
-      
+
       expect(category).toBeDefined();
       expect(category.name).toBe(categoryName);
       expect(category.is_active).toBe(true);
@@ -290,91 +290,88 @@ describe('Simple Database Integration Tests', () => {
       // Cleanup
       await prisma.$executeRawUnsafe(
         `DELETE FROM service_categories WHERE name = $1`,
-        categoryName
+        categoryName,
       );
     });
 
     it('should insert and query a user', async () => {
       const email = `test.${Date.now()}@example.com`;
-      
+
       await prisma.$executeRawUnsafe(
         `INSERT INTO users (id, email, phone, password_hash, name, role, status, created_at, updated_at) 
          VALUES (gen_random_uuid(), $1, $2, $3, $4, 'CUSTOMER', 'ACTIVE', NOW(), NOW())`,
         email,
         `+1${Date.now()}`,
         'hashed_password_test',
-        'Test User'
+        'Test User',
       );
 
       const result = await prisma.$queryRawUnsafe(
         `SELECT id, email, name, role, status FROM users WHERE email = $1`,
-        email
+        email,
       );
       const user = (result as any[])[0];
-      
+
       expect(user).toBeDefined();
       expect(user.email).toBe(email);
       expect(user.name).toBe('Test User');
       expect(user.role).toBe('CUSTOMER');
 
       // Cleanup
-      await prisma.$executeRawUnsafe(
-        `DELETE FROM users WHERE email = $1`,
-        email
-      );
+      await prisma.$executeRawUnsafe(`DELETE FROM users WHERE email = $1`, email);
     });
 
     it('should update a record', async () => {
       const categoryName = `Update Test Category ${Date.now()}`;
-      
+
       await prisma.$executeRawUnsafe(
         `INSERT INTO service_categories (id, name, description, is_active, display_order, created_at, updated_at) VALUES (gen_random_uuid(), $1, 'Original', true, 1, NOW(), NOW())`,
-        categoryName
+        categoryName,
       );
 
       await prisma.$executeRawUnsafe(
         `UPDATE service_categories SET description = 'Updated', display_order = 10 WHERE name = $1`,
-        categoryName
+        categoryName,
       );
 
       const result = await prisma.$queryRawUnsafe(
         `SELECT description, display_order FROM service_categories WHERE name = $1`,
-        categoryName
+        categoryName,
       );
       const updated = (result as any[])[0];
-      
+
       expect(updated.description).toBe('Updated');
       expect(updated.display_order).toBe(10);
 
       // Cleanup
       await prisma.$executeRawUnsafe(
         `DELETE FROM service_categories WHERE name = $1`,
-        categoryName
+        categoryName,
       );
     });
 
     it('should delete a record', async () => {
       const categoryName = `Delete Test Category ${Date.now()}`;
-      
+
       await prisma.$executeRawUnsafe(
         `INSERT INTO service_categories (id, name, description, is_active, display_order, created_at, updated_at) VALUES (gen_random_uuid(), $1, 'To delete', true, 1, NOW(), NOW())`,
-        categoryName
+        categoryName,
       );
 
       const beforeDelete = await prisma.$queryRawUnsafe(
         `SELECT COUNT(*) FROM service_categories WHERE name = $1`,
-        categoryName
+        categoryName,
       );
       expect(parseInt((beforeDelete as any[])[0].count)).toBe(1);
 
       await prisma.$executeRawUnsafe(
         `DELETE FROM service_categories WHERE name = $1`,
-        categoryName
+        categoryName,
       );
 
       const afterDelete = await prisma.$queryRawUnsafe(
         `SELECT COUNT(*) FROM service_categories WHERE name = $1`,
-        categoryName
+        categoryName,
       );
       expect(parseInt((afterDelete as any[])[0].count)).toBe(0);
     });
@@ -390,12 +387,9 @@ describe('Simple Database Integration Tests', () => {
       const result = await prisma.$transaction([
         prisma.$executeRawUnsafe(
           `INSERT INTO service_categories (id, name, description, is_active, display_order, created_at, updated_at) VALUES (gen_random_uuid(), $1, 'Transaction test', true, 1, NOW(), NOW())`,
-          testName
+          testName,
         ),
-        prisma.$queryRawUnsafe(
-          `SELECT id, name FROM service_categories WHERE name = $1`,
-          testName
-        ),
+        prisma.$queryRawUnsafe(`SELECT id, name FROM service_categories WHERE name = $1`, testName),
       ]);
 
       expect(result[0]).toBeDefined(); // INSERT succeeded
@@ -403,10 +397,7 @@ describe('Simple Database Integration Tests', () => {
       expect(inserted.name).toBe(testName);
 
       // Cleanup
-      await prisma.$executeRawUnsafe(
-        `DELETE FROM service_categories WHERE name = $1`,
-        testName
-      );
+      await prisma.$executeRawUnsafe(`DELETE FROM service_categories WHERE name = $1`, testName);
     });
 
     it('should verify transaction throws on constraint violation', async () => {
@@ -414,7 +405,7 @@ describe('Simple Database Integration Tests', () => {
 
       await prisma.$executeRawUnsafe(
         `INSERT INTO service_categories (id, name, description, is_active, display_order, created_at, updated_at) VALUES (gen_random_uuid(), $1, 'Test', true, 1, NOW(), NOW())`,
-        testName
+        testName,
       );
 
       // Second insert with same name should fail (unique constraint)
@@ -422,16 +413,13 @@ describe('Simple Database Integration Tests', () => {
         prisma.$transaction([
           prisma.$executeRawUnsafe(
             `INSERT INTO service_categories (id, name, description, is_active, display_order, created_at, updated_at) VALUES (gen_random_uuid(), $1, 'Duplicate', true, 2, NOW(), NOW())`,
-            testName
+            testName,
           ),
-        ])
+        ]),
       ).rejects.toThrow();
 
       // Cleanup
-      await prisma.$executeRawUnsafe(
-        `DELETE FROM service_categories WHERE name = $1`,
-        testName
-      );
+      await prisma.$executeRawUnsafe(`DELETE FROM service_categories WHERE name = $1`, testName);
     });
   });
 
@@ -442,8 +430,8 @@ describe('Simple Database Integration Tests', () => {
     it('should enforce foreign key on services -> service_categories', async () => {
       await expect(
         prisma.$executeRawUnsafe(
-          `INSERT INTO services (category_id, name, duration, price, is_active) VALUES ('00000000-0000-0000-0000-000000000000', 'Invalid Service', 60, 50, true)`
-        )
+          `INSERT INTO services (category_id, name, duration, price, is_active) VALUES ('00000000-0000-0000-0000-000000000000', 'Invalid Service', 60, 50, true)`,
+        ),
       ).rejects.toThrow();
     });
   });
@@ -454,12 +442,12 @@ describe('Simple Database Integration Tests', () => {
   describe('Unique Constraints', () => {
     it('should enforce unique email on users', async () => {
       const email = `unique.test.${Date.now()}@example.com`;
-      
+
       await prisma.$executeRawUnsafe(
         `INSERT INTO users (id, email, phone, password_hash, name, role, status, created_at, updated_at) 
          VALUES (gen_random_uuid(), $1, $2, 'hash', 'First Last', 'CUSTOMER', 'ACTIVE', NOW(), NOW())`,
         email,
-        `+1${Date.now()}`
+        `+1${Date.now()}`,
       );
 
       await expect(
@@ -467,15 +455,12 @@ describe('Simple Database Integration Tests', () => {
           `INSERT INTO users (id, email, phone, password_hash, name, role, status, created_at, updated_at) 
            VALUES (gen_random_uuid(), $1, $2, 'hash', 'First2 Last2', 'CUSTOMER', 'ACTIVE', NOW(), NOW())`,
           email,
-          `+2${Date.now()}`
-        )
+          `+2${Date.now()}`,
+        ),
       ).rejects.toThrow();
 
       // Cleanup
-      await prisma.$executeRawUnsafe(
-        `DELETE FROM users WHERE email = $1`,
-        email
-      );
+      await prisma.$executeRawUnsafe(`DELETE FROM users WHERE email = $1`, email);
     });
   });
 });
