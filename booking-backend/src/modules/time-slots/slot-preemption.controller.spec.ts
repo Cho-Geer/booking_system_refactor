@@ -54,25 +54,25 @@ describe('SlotPreemptionController', () => {
     it('should throw BadRequestException when preferSeq is out of range (negative)', async () => {
       const invalidBody = { ...mockBody, preferSeq: -1 };
 
-      await expect(
-        controller.reserveSlot(mockSlotId, invalidBody, mockReq),
-      ).rejects.toThrow(BadRequestException);
+      await expect(controller.reserveSlot(mockSlotId, invalidBody, mockReq)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should throw BadRequestException when preferSeq is out of range (>= 10)', async () => {
       const invalidBody = { ...mockBody, preferSeq: 10 };
 
-      await expect(
-        controller.reserveSlot(mockSlotId, invalidBody, mockReq),
-      ).rejects.toThrow(BadRequestException);
+      await expect(controller.reserveSlot(mockSlotId, invalidBody, mockReq)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should throw BadRequestException when userId is missing', async () => {
       const reqWithoutUser = { user: null } as unknown as AuthenticatedRequest;
 
-      await expect(
-        controller.reserveSlot(mockSlotId, mockBody, reqWithoutUser),
-      ).rejects.toThrow(BadRequestException);
+      await expect(controller.reserveSlot(mockSlotId, mockBody, reqWithoutUser)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should return 201 with appointment on success', async () => {

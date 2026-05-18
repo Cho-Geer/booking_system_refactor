@@ -1,6 +1,6 @@
-import { Injectable, Logger } from "@nestjs/common";
-import { CacheService } from "../cache/cache.service";
-import { RateLimitTier, RATE_LIMIT_DEFAULTS } from "./rate-limiter.decorator";
+import { Injectable, Logger } from '@nestjs/common';
+import { CacheService } from '../cache/cache.service';
+import { RateLimitTier, RATE_LIMIT_DEFAULTS } from './rate-limiter.decorator';
 
 /**
  * Result of a rate limit check.
@@ -82,7 +82,7 @@ const LUA_RATE_LIMIT_SCRIPT = `
 @Injectable()
 export class RateLimiterService {
   private readonly logger = new Logger(RateLimiterService.name);
-  private readonly keyPrefix = "ratelimit:";
+  private readonly keyPrefix = 'ratelimit:';
 
   constructor(private readonly cacheService: CacheService) {}
 
@@ -174,7 +174,7 @@ export class RateLimiterService {
     try {
       const client = this.cacheService.getClient();
       if (!client) {
-        throw new Error("Redis client unavailable");
+        throw new Error('Redis client unavailable');
       }
 
       const now = Date.now();
@@ -185,7 +185,7 @@ export class RateLimiterService {
       const current = await client.zcard(key);
 
       // Get the oldest entry to calculate reset time
-      const oldestEntries = await client.zrange(key, 0, 0, "WITHSCORES");
+      const oldestEntries = await client.zrange(key, 0, 0, 'WITHSCORES');
       let resetAt: Date;
       if (oldestEntries.length >= 2) {
         const oldestTimestamp = parseInt(oldestEntries[1], 10);
@@ -228,14 +228,14 @@ export class RateLimiterService {
    */
   async resetLimit(identifier: string, endpoint?: string): Promise<void> {
     if (!this.cacheService.isAvailable()) {
-      this.logger.warn("Redis unavailable. Cannot reset rate limit.");
+      this.logger.warn('Redis unavailable. Cannot reset rate limit.');
       return;
     }
 
     try {
       const client = this.cacheService.getClient();
       if (!client) {
-        throw new Error("Redis client unavailable");
+        throw new Error('Redis client unavailable');
       }
 
       if (endpoint) {
@@ -244,21 +244,15 @@ export class RateLimiterService {
       } else {
         // Use SCAN to find all keys for this identifier
         const pattern = `${this.keyPrefix}${identifier}:*`;
-        let cursor = "0";
+        let cursor = '0';
         do {
-          const result = await client.scan(
-            cursor,
-            "MATCH",
-            pattern,
-            "COUNT",
-            100,
-          );
+          const result = await client.scan(cursor, 'MATCH', pattern, 'COUNT', 100);
           cursor = result[0];
           const keys = result[1];
           if (keys.length > 0) {
             await client.del(...keys);
           }
-        } while (cursor !== "0");
+        } while (cursor !== '0');
       }
     } catch (error: unknown) {
       this.logger.error(
@@ -284,7 +278,7 @@ export class RateLimiterService {
    */
   private buildKey(identifier: string, endpoint: string): string {
     // Sanitize endpoint to remove special characters
-    const sanitizedEndpoint = endpoint.replace(/[^a-zA-Z0-9/_-]/g, "");
+    const sanitizedEndpoint = endpoint.replace(/[^a-zA-Z0-9/_-]/g, '');
     return `${this.keyPrefix}${identifier}:${sanitizedEndpoint}`;
   }
 
@@ -313,7 +307,7 @@ export class RateLimiterService {
   ): Promise<RateLimitResult> {
     const client = this.cacheService.getClient();
     if (!client) {
-      throw new Error("Redis client unavailable");
+      throw new Error('Redis client unavailable');
     }
 
     const now = Date.now();
@@ -337,7 +331,7 @@ export class RateLimiterService {
 
     if (!allowed) {
       // Calculate retry-after using the oldest entry remaining
-      const oldestEntries = await client.zrange(key, 0, 0, "WITHSCORES");
+      const oldestEntries = await client.zrange(key, 0, 0, 'WITHSCORES');
       let retryAfter = window * 1000;
       if (oldestEntries.length >= 2) {
         const oldestTimestamp = parseInt(oldestEntries[1], 10);

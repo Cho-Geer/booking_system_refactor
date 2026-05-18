@@ -5,17 +5,17 @@ import {
   HttpException,
   HttpStatus,
   Logger,
-} from "@nestjs/common";
-import { Reflector } from "@nestjs/core";
-import { Request, Response } from "express";
-import { ClsService } from "nestjs-cls";
-import { RateLimiterService } from "./rate-limiter.service";
+} from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import { Request, Response } from 'express';
+import { ClsService } from 'nestjs-cls';
+import { RateLimiterService } from './rate-limiter.service';
 import {
   RATE_LIMIT_KEY,
   RateLimitOptions,
   RateLimitKey,
   resolveRateLimitOptions,
-} from "./rate-limiter.decorator";
+} from './rate-limiter.decorator';
 
 interface AuthenticatedRequest extends Request {
   user?: {
@@ -67,7 +67,7 @@ export class RateLimitGuard implements CanActivate {
     const response = context.switchToHttp().getResponse<Response>();
 
     // Disable rate limiting in test environment
-    if (process.env.NODE_ENV === "test") {
+    if (process.env.NODE_ENV === 'test') {
       return true;
     }
 
@@ -83,7 +83,7 @@ export class RateLimitGuard implements CanActivate {
     const identifier = this.extractIdentifier(request, options.key!);
     if (!identifier) {
       // If we can't extract identifier, allow the request
-      this.logger.warn("Unable to extract identifier for rate limiting");
+      this.logger.warn('Unable to extract identifier for rate limiting');
       return true;
     }
 
@@ -112,8 +112,7 @@ export class RateLimitGuard implements CanActivate {
     this.setRateLimitHeaders(response, status, result.retryAfter);
 
     if (!result.allowed) {
-      const requestId =
-        this.cls.get<string>("requestId") ?? `req-${crypto.randomUUID()}`;
+      const requestId = this.cls.get<string>('requestId') ?? `req-${crypto.randomUUID()}`;
       this.logger.warn(
         `[${requestId}] Rate limit exceeded for ${identifier} on ${endpoint} ` +
           `(${result.current}/${result.limit} in ${result.window}s)`,
@@ -122,8 +121,8 @@ export class RateLimitGuard implements CanActivate {
       throw new HttpException(
         {
           statusCode: HttpStatus.TOO_MANY_REQUESTS,
-          message: "Too many requests. Please try again later.",
-          error: "Too Many Requests",
+          message: 'Too many requests. Please try again later.',
+          error: 'Too Many Requests',
           requestId,
         },
         HttpStatus.TOO_MANY_REQUESTS,
@@ -139,9 +138,7 @@ export class RateLimitGuard implements CanActivate {
    * @param context - Execution context
    * @returns Rate limit options or undefined if not configured
    */
-  private getRateLimitConfig(
-    context: ExecutionContext,
-  ): RateLimitOptions | undefined {
+  private getRateLimitConfig(context: ExecutionContext): RateLimitOptions | undefined {
     // Check handler (method) level first, then controller (class) level
     return (
       this.reflector.get(RATE_LIMIT_KEY, context.getHandler()) ??
@@ -156,18 +153,15 @@ export class RateLimitGuard implements CanActivate {
    * @param keyType - Identifier extraction strategy
    * @returns Extracted identifier or undefined
    */
-  private extractIdentifier(
-    request: Request,
-    keyType: RateLimitKey,
-  ): string | undefined {
+  private extractIdentifier(request: Request, keyType: RateLimitKey): string | undefined {
     switch (keyType) {
-      case "ip":
+      case 'ip':
         return this.extractIp(request);
-      case "user":
+      case 'user':
         return this.extractUserId(request);
-      case "api_key":
+      case 'api_key':
         return this.extractApiKey(request);
-      case "email":
+      case 'email':
         return this.extractEmail(request);
       default:
         return undefined;
@@ -184,12 +178,10 @@ export class RateLimitGuard implements CanActivate {
    * @returns IP address or undefined
    */
   private extractIp(request: Request): string | undefined {
-    const forwardedFor = request.headers["x-forwarded-for"];
+    const forwardedFor = request.headers['x-forwarded-for'];
     if (forwardedFor) {
       // x-forwarded-for can contain multiple IPs, take the first one
-      const ips = (
-        typeof forwardedFor === "string" ? forwardedFor : forwardedFor[0]
-      ).split(",");
+      const ips = (typeof forwardedFor === 'string' ? forwardedFor : forwardedFor[0]).split(',');
       return ips[0]?.trim();
     }
     return request.ip;
@@ -222,7 +214,7 @@ export class RateLimitGuard implements CanActivate {
    * @returns API key or undefined
    */
   private extractApiKey(request: Request): string | undefined {
-    return request.headers["x-api-key"] as string | undefined;
+    return request.headers['x-api-key'] as string | undefined;
   }
 
   /**
@@ -236,11 +228,11 @@ export class RateLimitGuard implements CanActivate {
    */
   private extractEmail(request: Request): string | undefined {
     const body = request.body as Record<string, unknown> | undefined;
-    if (body && typeof body.email === "string") {
+    if (body && typeof body.email === 'string') {
       return body.email.toLowerCase().trim();
     }
     // LoginSendCodeDto uses 'contact' field instead of 'email'
-    if (body && typeof body.contact === "string") {
+    if (body && typeof body.contact === 'string') {
       return body.contact.toLowerCase().trim();
     }
     return undefined;
@@ -258,19 +250,13 @@ export class RateLimitGuard implements CanActivate {
     status: { limit: number; remaining: number; resetAt: Date },
     retryAfter?: number,
   ): void {
-    response.setHeader("X-RateLimit-Limit", String(status.limit));
-    response.setHeader(
-      "X-RateLimit-Remaining",
-      String(Math.max(0, status.remaining)),
-    );
-    response.setHeader(
-      "X-RateLimit-Reset",
-      String(Math.floor(status.resetAt.getTime() / 1000)),
-    );
+    response.setHeader('X-RateLimit-Limit', String(status.limit));
+    response.setHeader('X-RateLimit-Remaining', String(Math.max(0, status.remaining)));
+    response.setHeader('X-RateLimit-Reset', String(Math.floor(status.resetAt.getTime() / 1000)));
 
     if (retryAfter !== undefined) {
       // Retry-After in seconds (RFC 6585)
-      response.setHeader("Retry-After", String(Math.ceil(retryAfter / 1000)));
+      response.setHeader('Retry-After', String(Math.ceil(retryAfter / 1000)));
     }
   }
 }

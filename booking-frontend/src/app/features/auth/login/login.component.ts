@@ -28,7 +28,9 @@ import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_REGEX = /^1[3-9]\d{9}$/;
 
-const passwordStrengthValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+const passwordStrengthValidator: ValidatorFn = (
+  control: AbstractControl,
+): ValidationErrors | null => {
   const value = control.value;
   if (!value) return null;
 
@@ -40,15 +42,17 @@ const passwordStrengthValidator: ValidatorFn = (control: AbstractControl): Valid
 
   const valid = hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar && isValidLength;
 
-  return valid ? null : {
-    passwordStrength: {
-      hasUpperCase,
-      hasLowerCase,
-      hasNumber,
-      hasSpecialChar,
-      isValidLength,
-    },
-  };
+  return valid
+    ? null
+    : {
+        passwordStrength: {
+          hasUpperCase,
+          hasLowerCase,
+          hasNumber,
+          hasSpecialChar,
+          isValidLength,
+        },
+      };
 };
 
 function contactFormatValidator(type: ContactType): ValidatorFn {
@@ -104,6 +108,9 @@ export class LoginComponent implements OnDestroy {
 
   // Anti-enumeration: generic message for non-existent users (no PII leakage)
   showAntiEnumMessage = signal(false);
+
+  // Password visibility toggle
+  passwordVisible = signal<boolean>(false);
 
   // Password Login Form
   passwordForm = this.fb.group({
@@ -193,7 +200,9 @@ export class LoginComponent implements OnDestroy {
         });
       },
       error: (err) => {
-        this.authStore.setError(err.message || 'Login failed. Please check your credentials and try again.');
+        this.authStore.setError(
+          err.message || 'Login failed. Please check your credentials and try again.',
+        );
       },
     });
   }
@@ -231,7 +240,9 @@ export class LoginComponent implements OnDestroy {
       },
       error: (err) => {
         this.authStore.setLoading(false);
-        this.authStore.setError(err.message || 'Failed to send verification code. Please try again later.');
+        this.authStore.setError(
+          err.message || 'Failed to send verification code. Please try again later.',
+        );
       },
     });
   }
@@ -278,7 +289,9 @@ export class LoginComponent implements OnDestroy {
         });
       },
       error: (err) => {
-        this.authStore.setError(err.message || 'Verification failed. Please check your code and try again.');
+        this.authStore.setError(
+          err.message || 'Verification failed. Please check your code and try again.',
+        );
       },
     });
   }
@@ -302,7 +315,7 @@ export class LoginComponent implements OnDestroy {
   startCountdown(): void {
     this.countdown.set(60);
     this.countdownTimer = setInterval(() => {
-      this.countdown.update(c => c - 1);
+      this.countdown.update((c) => c - 1);
       if (this.countdown() <= 0) {
         this.clearCountdown();
       }
@@ -315,6 +328,10 @@ export class LoginComponent implements OnDestroy {
       this.countdownTimer = null;
     }
     this.countdown.set(0);
+  }
+
+  togglePasswordVisibility(): void {
+    this.passwordVisible.update((v) => !v);
   }
 
   isPasswordFieldInvalid(fieldName: string): boolean {

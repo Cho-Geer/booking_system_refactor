@@ -1,13 +1,7 @@
-import {
-  Injectable,
-  NestInterceptor,
-  ExecutionContext,
-  CallHandler,
-  Logger,
-} from "@nestjs/common";
-import { Observable } from "rxjs";
-import { tap } from "rxjs/operators";
-import { ClsService } from "nestjs-cls";
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler, Logger } from '@nestjs/common';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { ClsService } from 'nestjs-cls';
 
 /**
  * Logging interceptor that records request method, URL, and response time.
@@ -35,7 +29,7 @@ export class LoggingInterceptor implements NestInterceptor {
     return next.handle().pipe(
       tap(() => {
         const responseTime = Date.now() - now;
-        const requestId = this.cls.get("requestId") ?? "no-request-id";
+        const requestId = this.cls.get('requestId') ?? 'no-request-id';
         this.logger.log(`[${requestId}] ${method} ${url} - ${responseTime}ms`);
       }),
     );

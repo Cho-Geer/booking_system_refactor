@@ -1,6 +1,6 @@
-import { Injectable, NestMiddleware } from "@nestjs/common";
-import { Request, Response, NextFunction } from "express";
-import helmet from "helmet";
+import { Injectable, NestMiddleware } from '@nestjs/common';
+import { Request, Response, NextFunction } from 'express';
+import helmet from 'helmet';
 
 /**
  * Helmet Security Middleware
@@ -26,8 +26,8 @@ export class HelmetMiddleware implements NestMiddleware {
           defaultSrc: ["'self'"],
           scriptSrc: ["'self'"],
           styleSrc: ["'self'", "'unsafe-inline'"],
-          imgSrc: ["'self'", "data:", "https:"],
-          connectSrc: ["'self'", "https://api.booking.example.com", "wss://ws.booking.example.com"],
+          imgSrc: ["'self'", 'data:', 'https:'],
+          connectSrc: ["'self'", 'https://api.booking.example.com', 'wss://ws.booking.example.com'],
           fontSrc: ["'self'"],
           objectSrc: ["'none'"],
           mediaSrc: ["'self'"],
@@ -40,9 +40,9 @@ export class HelmetMiddleware implements NestMiddleware {
       },
       crossOriginEmbedderPolicy: true,
       crossOriginOpenerPolicy: true,
-      crossOriginResourcePolicy: { policy: "same-origin" },
+      crossOriginResourcePolicy: { policy: 'same-origin' },
       dnsPrefetchControl: { allow: false },
-      frameguard: { action: "deny" },
+      frameguard: { action: 'deny' },
       hsts: {
         maxAge: 31536000,
         includeSubDomains: true,
@@ -51,8 +51,8 @@ export class HelmetMiddleware implements NestMiddleware {
       ieNoOpen: true,
       noSniff: true,
       originAgentCluster: true,
-      permittedCrossDomainPolicies: { permittedPolicies: "none" },
-      referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+      permittedCrossDomainPolicies: { permittedPolicies: 'none' },
+      referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
       xssFilter: true,
     });
   }

@@ -28,18 +28,21 @@ function generateToken(
 ): string {
   return jwtService.sign(
     { sub: user.id, email: user.email ?? '', role: user.role, name: user.name },
-    { secret: process.env.JWT_SECRET || 'test-jwt-secret-key-for-unit-tests-only', expiresIn: '15m' },
+    {
+      secret: process.env.JWT_SECRET || 'test-jwt-secret-key-for-unit-tests-only',
+      expiresIn: '15m',
+    },
   );
 }
 
 /** Generate a valid JWT refresh token */
-function generateRefreshToken(
-  jwtService: JwtService,
-  userId: string,
-): string {
+function generateRefreshToken(jwtService: JwtService, userId: string): string {
   return jwtService.sign(
     { sub: userId, tokenType: 'refresh', sid: `sess_${Date.now()}` },
-    { secret: process.env.JWT_REFRESH_SECRET || 'test-refresh-secret-key-for-unit-tests-only', expiresIn: '7d' },
+    {
+      secret: process.env.JWT_REFRESH_SECRET || 'test-refresh-secret-key-for-unit-tests-only',
+      expiresIn: '7d',
+    },
   );
 }
 
@@ -106,10 +109,7 @@ describe('App E2E Integration (Testcontainers — PostgreSQL + Redis)', () => {
       const ts = generateTestId();
       const dto = { name: `New User ${ts}`, email: `${ts}@example.com`, password: VALID_PASSWORD };
 
-      const res = await request(app.getHttpServer())
-        .post('/auth/register')
-        .send(dto)
-        .expect(201);
+      const res = await request(app.getHttpServer()).post('/auth/register').send(dto).expect(201);
 
       expect(res.body.user).toMatchObject({ email: dto.email, name: dto.name, role: 'USER' });
       expect(res.body.user).not.toHaveProperty('password');
@@ -156,7 +156,13 @@ describe('App E2E Integration (Testcontainers — PostgreSQL + Redis)', () => {
   });
 
   describe('POST /auth/login', () => {
-    let testUser: { id: string; email: string | null; role: string; name: string; passwordHash: string };
+    let testUser: {
+      id: string;
+      email: string | null;
+      role: string;
+      name: string;
+      passwordHash: string;
+    };
 
     beforeEach(async () => {
       const ts = generateTestId();
@@ -265,11 +271,25 @@ describe('App E2E Integration (Testcontainers — PostgreSQL + Redis)', () => {
       const hash = await PasswordUtil.hash(VALID_PASSWORD);
 
       adminUser = (await testModule.prisma.user.create({
-        data: { name: `Admin ${ts}`, email: `admin-${ts}@example.com`, phone: `+1${Date.now().toString().slice(-10)}`, passwordHash: hash, role: SystemRole.ADMIN, status: UserStatus.ACTIVE },
+        data: {
+          name: `Admin ${ts}`,
+          email: `admin-${ts}@example.com`,
+          phone: `+1${Date.now().toString().slice(-10)}`,
+          passwordHash: hash,
+          role: SystemRole.ADMIN,
+          status: UserStatus.ACTIVE,
+        },
       })) as typeof adminUser;
 
       customerUser = (await testModule.prisma.user.create({
-        data: { name: `Customer ${ts}`, email: `cust-${ts}@example.com`, phone: `+1${Date.now().toString().slice(-10)}`, passwordHash: hash, role: SystemRole.CUSTOMER, status: UserStatus.ACTIVE },
+        data: {
+          name: `Customer ${ts}`,
+          email: `cust-${ts}@example.com`,
+          phone: `+1${Date.now().toString().slice(-10)}`,
+          passwordHash: hash,
+          role: SystemRole.CUSTOMER,
+          status: UserStatus.ACTIVE,
+        },
       })) as typeof customerUser;
 
       adminToken = generateToken(jwtService, adminUser);
@@ -282,7 +302,12 @@ describe('App E2E Integration (Testcontainers — PostgreSQL + Redis)', () => {
         const res = await request(app.getHttpServer())
           .post('/users')
           .set('Authorization', `Bearer ${adminToken}`)
-          .send({ name: `New ${ts}`, email: `${ts}@test.com`, password: VALID_PASSWORD, role: 'CUSTOMER' })
+          .send({
+            name: `New ${ts}`,
+            email: `${ts}@test.com`,
+            password: VALID_PASSWORD,
+            role: 'CUSTOMER',
+          })
           .expect(201);
 
         expect(res.body).toHaveProperty('id');
@@ -417,11 +442,25 @@ describe('App E2E Integration (Testcontainers — PostgreSQL + Redis)', () => {
       const hash = await PasswordUtil.hash(VALID_PASSWORD);
 
       adminUser = (await testModule.prisma.user.create({
-        data: { name: `Admin ${ts}`, email: `admin-${ts}@example.com`, phone: `+1${Date.now().toString().slice(-10)}`, passwordHash: hash, role: SystemRole.ADMIN, status: UserStatus.ACTIVE },
+        data: {
+          name: `Admin ${ts}`,
+          email: `admin-${ts}@example.com`,
+          phone: `+1${Date.now().toString().slice(-10)}`,
+          passwordHash: hash,
+          role: SystemRole.ADMIN,
+          status: UserStatus.ACTIVE,
+        },
       })) as typeof adminUser;
 
       const customer = await testModule.prisma.user.create({
-        data: { name: `Cust ${ts}`, email: `cust-${ts}@example.com`, phone: `+1${Date.now().toString().slice(-10)}`, passwordHash: hash, role: SystemRole.CUSTOMER, status: UserStatus.ACTIVE },
+        data: {
+          name: `Cust ${ts}`,
+          email: `cust-${ts}@example.com`,
+          phone: `+1${Date.now().toString().slice(-10)}`,
+          passwordHash: hash,
+          role: SystemRole.CUSTOMER,
+          status: UserStatus.ACTIVE,
+        },
       });
 
       adminToken = generateToken(jwtService, adminUser);
@@ -435,7 +474,12 @@ describe('App E2E Integration (Testcontainers — PostgreSQL + Redis)', () => {
         const res = await request(app.getHttpServer())
           .post('/services')
           .set('Authorization', `Bearer ${adminToken}`)
-          .send({ categoryId: category.id, name: 'Test Service', durationMinutes: 45, price: 29.99 })
+          .send({
+            categoryId: category.id,
+            name: 'Test Service',
+            durationMinutes: 45,
+            price: 29.99,
+          })
           .expect(201);
 
         expect(res.body).toHaveProperty('id');
@@ -467,9 +511,7 @@ describe('App E2E Integration (Testcontainers — PostgreSQL + Redis)', () => {
         const category = await createTestCategory(testModule.prisma);
         await createTestService(testModule.prisma, category.id, { name: 'Haircut' });
 
-        const res = await request(app.getHttpServer())
-          .get('/services')
-          .expect(200);
+        const res = await request(app.getHttpServer()).get('/services').expect(200);
 
         expect(Array.isArray(res.body) || res.body.data).toBeTruthy();
       });
@@ -489,17 +531,13 @@ describe('App E2E Integration (Testcontainers — PostgreSQL + Redis)', () => {
         const category = await createTestCategory(testModule.prisma);
         const svc = await createTestService(testModule.prisma, category.id);
 
-        const res = await request(app.getHttpServer())
-          .get(`/services/${svc.id}`)
-          .expect(200);
+        const res = await request(app.getHttpServer()).get(`/services/${svc.id}`).expect(200);
 
         expect(res.body.id).toBe(svc.id);
       });
 
       it('returns 404 for non-existent service', async () => {
-        await request(app.getHttpServer())
-          .get('/services/nonexistent')
-          .expect(404);
+        await request(app.getHttpServer()).get('/services/nonexistent').expect(404);
       });
     });
 
@@ -562,11 +600,25 @@ describe('App E2E Integration (Testcontainers — PostgreSQL + Redis)', () => {
       const hash = await PasswordUtil.hash(VALID_PASSWORD);
 
       adminUser = (await testModule.prisma.user.create({
-        data: { name: `Admin ${ts}`, email: `admin-${ts}@example.com`, phone: `+1${Date.now().toString().slice(-10)}`, passwordHash: hash, role: SystemRole.ADMIN, status: UserStatus.ACTIVE },
+        data: {
+          name: `Admin ${ts}`,
+          email: `admin-${ts}@example.com`,
+          phone: `+1${Date.now().toString().slice(-10)}`,
+          passwordHash: hash,
+          role: SystemRole.ADMIN,
+          status: UserStatus.ACTIVE,
+        },
       })) as typeof adminUser;
 
       const customer = await testModule.prisma.user.create({
-        data: { name: `Cust ${ts}`, email: `cust-${ts}@example.com`, phone: `+1${Date.now().toString().slice(-10)}`, passwordHash: hash, role: SystemRole.CUSTOMER, status: UserStatus.ACTIVE },
+        data: {
+          name: `Cust ${ts}`,
+          email: `cust-${ts}@example.com`,
+          phone: `+1${Date.now().toString().slice(-10)}`,
+          passwordHash: hash,
+          role: SystemRole.CUSTOMER,
+          status: UserStatus.ACTIVE,
+        },
       });
 
       adminToken = generateToken(jwtService, adminUser);
@@ -615,9 +667,7 @@ describe('App E2E Integration (Testcontainers — PostgreSQL + Redis)', () => {
 
     describe('GET /time-slots', () => {
       it('returns time slots list without auth (200)', async () => {
-        const res = await request(app.getHttpServer())
-          .get('/time-slots')
-          .expect(200);
+        const res = await request(app.getHttpServer()).get('/time-slots').expect(200);
 
         expect(res.status).toBe(200);
       });
@@ -652,7 +702,10 @@ describe('App E2E Integration (Testcontainers — PostgreSQL + Redis)', () => {
       it('rejects missing serviceId (400)', async () => {
         await request(app.getHttpServer())
           .get('/time-slots/available')
-          .query({ startDate: new Date().toISOString(), endDate: new Date(Date.now() + 86400000).toISOString() })
+          .query({
+            startDate: new Date().toISOString(),
+            endDate: new Date(Date.now() + 86400000).toISOString(),
+          })
           .expect(400);
       });
     });
@@ -661,17 +714,13 @@ describe('App E2E Integration (Testcontainers — PostgreSQL + Redis)', () => {
       it('returns time slot by id (200)', async () => {
         const slot = await createTestTimeSlot(testModule.prisma, service.id);
 
-        const res = await request(app.getHttpServer())
-          .get(`/time-slots/${slot.id}`)
-          .expect(200);
+        const res = await request(app.getHttpServer()).get(`/time-slots/${slot.id}`).expect(200);
 
         expect(res.body.id).toBe(slot.id);
       });
 
       it('returns 404 for non-existent slot', async () => {
-        await request(app.getHttpServer())
-          .get('/time-slots/nonexistent')
-          .expect(404);
+        await request(app.getHttpServer()).get('/time-slots/nonexistent').expect(404);
       });
     });
 
@@ -723,7 +772,13 @@ describe('App E2E Integration (Testcontainers — PostgreSQL + Redis)', () => {
     let adminToken: string;
     let customerToken: string;
     let adminUser: { id: string; email: string | null; role: string; name: string };
-    let customerUser: { id: string; email: string | null; role: string; name: string; phone: string | null };
+    let customerUser: {
+      id: string;
+      email: string | null;
+      role: string;
+      name: string;
+      phone: string | null;
+    };
     let category: { id: string };
     let service: { id: string };
     let timeSlot: { id: string };
@@ -733,11 +788,25 @@ describe('App E2E Integration (Testcontainers — PostgreSQL + Redis)', () => {
       const hash = await PasswordUtil.hash(VALID_PASSWORD);
 
       adminUser = (await testModule.prisma.user.create({
-        data: { name: `Admin ${ts}`, email: `admin-${ts}@example.com`, phone: `+1${Date.now().toString().slice(-10)}`, passwordHash: hash, role: SystemRole.ADMIN, status: UserStatus.ACTIVE },
+        data: {
+          name: `Admin ${ts}`,
+          email: `admin-${ts}@example.com`,
+          phone: `+1${Date.now().toString().slice(-10)}`,
+          passwordHash: hash,
+          role: SystemRole.ADMIN,
+          status: UserStatus.ACTIVE,
+        },
       })) as typeof adminUser;
 
       customerUser = (await testModule.prisma.user.create({
-        data: { name: `Cust ${ts}`, email: `cust-${ts}@example.com`, phone: `+1${Date.now().toString().slice(-10)}`, passwordHash: hash, role: SystemRole.CUSTOMER, status: UserStatus.ACTIVE },
+        data: {
+          name: `Cust ${ts}`,
+          email: `cust-${ts}@example.com`,
+          phone: `+1${Date.now().toString().slice(-10)}`,
+          passwordHash: hash,
+          role: SystemRole.CUSTOMER,
+          status: UserStatus.ACTIVE,
+        },
       })) as typeof customerUser;
 
       adminToken = generateToken(jwtService, adminUser);
@@ -893,17 +962,13 @@ describe('App E2E Integration (Testcontainers — PostgreSQL + Redis)', () => {
           serviceId: service.id,
         });
 
-        const res = await request(app.getHttpServer())
-          .get(`/appointments/${apt.id}`)
-          .expect(200);
+        const res = await request(app.getHttpServer()).get(`/appointments/${apt.id}`).expect(200);
 
         expect(res.body.id).toBe(apt.id);
       });
 
       it('returns 404 for non-existent appointment', async () => {
-        await request(app.getHttpServer())
-          .get('/appointments/nonexistent')
-          .expect(404);
+        await request(app.getHttpServer()).get('/appointments/nonexistent').expect(404);
       });
     });
 
@@ -1007,11 +1072,25 @@ describe('App E2E Integration (Testcontainers — PostgreSQL + Redis)', () => {
       const hash = await PasswordUtil.hash(VALID_PASSWORD);
 
       adminUser = (await testModule.prisma.user.create({
-        data: { name: `Admin ${ts}`, email: `admin-${ts}@example.com`, phone: `+1${Date.now().toString().slice(-10)}`, passwordHash: hash, role: SystemRole.ADMIN, status: UserStatus.ACTIVE },
+        data: {
+          name: `Admin ${ts}`,
+          email: `admin-${ts}@example.com`,
+          phone: `+1${Date.now().toString().slice(-10)}`,
+          passwordHash: hash,
+          role: SystemRole.ADMIN,
+          status: UserStatus.ACTIVE,
+        },
       })) as typeof adminUser;
 
       const customer = await testModule.prisma.user.create({
-        data: { name: `Cust ${ts}`, email: `cust-${ts}@example.com`, phone: `+1${Date.now().toString().slice(-10)}`, passwordHash: hash, role: SystemRole.CUSTOMER, status: UserStatus.ACTIVE },
+        data: {
+          name: `Cust ${ts}`,
+          email: `cust-${ts}@example.com`,
+          phone: `+1${Date.now().toString().slice(-10)}`,
+          passwordHash: hash,
+          role: SystemRole.CUSTOMER,
+          status: UserStatus.ACTIVE,
+        },
       });
 
       adminToken = generateToken(jwtService, adminUser);
@@ -1118,7 +1197,13 @@ describe('App E2E Integration (Testcontainers — PostgreSQL + Redis)', () => {
   // ========================================================================
   describe('Slot Preemption (POST /slots/:slotId/reserve)', () => {
     let customerToken: string;
-    let customerUser: { id: string; email: string | null; role: string; name: string; phone: string | null };
+    let customerUser: {
+      id: string;
+      email: string | null;
+      role: string;
+      name: string;
+      phone: string | null;
+    };
     let category: { id: string };
     let service: { id: string };
     let timeSlot: { id: string };
@@ -1128,7 +1213,14 @@ describe('App E2E Integration (Testcontainers — PostgreSQL + Redis)', () => {
       const hash = await PasswordUtil.hash(VALID_PASSWORD);
 
       customerUser = (await testModule.prisma.user.create({
-        data: { name: `Cust ${ts}`, email: `cust-${ts}@example.com`, phone: `+1${Date.now().toString().slice(-10)}`, passwordHash: hash, role: SystemRole.CUSTOMER, status: UserStatus.ACTIVE },
+        data: {
+          name: `Cust ${ts}`,
+          email: `cust-${ts}@example.com`,
+          phone: `+1${Date.now().toString().slice(-10)}`,
+          passwordHash: hash,
+          role: SystemRole.CUSTOMER,
+          status: UserStatus.ACTIVE,
+        },
       })) as typeof customerUser;
 
       customerToken = generateToken(jwtService, customerUser);
@@ -1159,7 +1251,13 @@ describe('App E2E Integration (Testcontainers — PostgreSQL + Redis)', () => {
     it('rejects unauthenticated request (401)', async () => {
       await request(app.getHttpServer())
         .post(`/slots/${timeSlot.id}/reserve`)
-        .send({ preferSeq: 0, serviceId: service.id, customerName: 'X', customerEmail: 'x@x.com', customerPhone: '+15551234567' })
+        .send({
+          preferSeq: 0,
+          serviceId: service.id,
+          customerName: 'X',
+          customerEmail: 'x@x.com',
+          customerPhone: '+15551234567',
+        })
         .expect(401);
     });
 
@@ -1167,7 +1265,13 @@ describe('App E2E Integration (Testcontainers — PostgreSQL + Redis)', () => {
       await request(app.getHttpServer())
         .post(`/slots/${timeSlot.id}/reserve`)
         .set('Authorization', `Bearer ${customerToken}`)
-        .send({ preferSeq: -1, serviceId: service.id, customerName: 'X', customerEmail: 'x@x.com', customerPhone: '+15551234567' })
+        .send({
+          preferSeq: -1,
+          serviceId: service.id,
+          customerName: 'X',
+          customerEmail: 'x@x.com',
+          customerPhone: '+15551234567',
+        })
         .expect(400);
     });
 
@@ -1175,7 +1279,13 @@ describe('App E2E Integration (Testcontainers — PostgreSQL + Redis)', () => {
       await request(app.getHttpServer())
         .post(`/slots/${timeSlot.id}/reserve`)
         .set('Authorization', `Bearer ${customerToken}`)
-        .send({ preferSeq: 10, serviceId: service.id, customerName: 'X', customerEmail: 'x@x.com', customerPhone: '+15551234567' })
+        .send({
+          preferSeq: 10,
+          serviceId: service.id,
+          customerName: 'X',
+          customerEmail: 'x@x.com',
+          customerPhone: '+15551234567',
+        })
         .expect(400);
     });
 
@@ -1186,7 +1296,13 @@ describe('App E2E Integration (Testcontainers — PostgreSQL + Redis)', () => {
         .post(`/slots/${timeSlot.id}/reserve`)
         .set('Authorization', `Bearer ${customerToken}`)
         .set('Idempotency-Key', idempotencyKey)
-        .send({ preferSeq: 5, serviceId: service.id, customerName: 'Test', customerEmail: 'test@example.com', customerPhone: '+15551234567' })
+        .send({
+          preferSeq: 5,
+          serviceId: service.id,
+          customerName: 'Test',
+          customerEmail: 'test@example.com',
+          customerPhone: '+15551234567',
+        })
         .expect(201);
 
       expect(res1.body.success).toBe(true);
@@ -1203,14 +1319,31 @@ describe('App E2E Integration (Testcontainers — PostgreSQL + Redis)', () => {
       const ts = generateTestId();
       const hash = await PasswordUtil.hash(VALID_PASSWORD);
       const customer = await testModule.prisma.user.create({
-        data: { name: `Auth ${ts}`, email: `auth-${ts}@example.com`, phone: `+1${Date.now().toString().slice(-10)}`, passwordHash: hash, role: SystemRole.CUSTOMER, status: UserStatus.ACTIVE },
+        data: {
+          name: `Auth ${ts}`,
+          email: `auth-${ts}@example.com`,
+          phone: `+1${Date.now().toString().slice(-10)}`,
+          passwordHash: hash,
+          role: SystemRole.CUSTOMER,
+          status: UserStatus.ACTIVE,
+        },
       });
       customerToken = generateToken(jwtService, customer);
     });
 
-    const protectedRoutes: Array<{ method: 'get' | 'post' | 'delete'; path: string; expected: number; body?: Record<string, unknown> }> = [
+    const protectedRoutes: Array<{
+      method: 'get' | 'post' | 'delete';
+      path: string;
+      expected: number;
+      body?: Record<string, unknown>;
+    }> = [
       { method: 'get', path: '/users', expected: 403 },
-      { method: 'post', path: '/users', expected: 403, body: { name: 'Test', password: VALID_PASSWORD } },
+      {
+        method: 'post',
+        path: '/users',
+        expected: 403,
+        body: { name: 'Test', password: VALID_PASSWORD },
+      },
       { method: 'get', path: '/appointments', expected: 403 },
       { method: 'delete', path: '/appointments/some-id', expected: 403 },
       { method: 'get', path: '/stats/overview', expected: 403 },
@@ -1266,9 +1399,7 @@ describe('App E2E Integration (Testcontainers — PostgreSQL + Redis)', () => {
     });
 
     it('401 response includes proper shape', async () => {
-      const res = await request(app.getHttpServer())
-        .get('/users')
-        .expect(401);
+      const res = await request(app.getHttpServer()).get('/users').expect(401);
 
       expect(res.body).toHaveProperty('statusCode', 401);
       expect(res.body).toHaveProperty('message');
@@ -1277,7 +1408,10 @@ describe('App E2E Integration (Testcontainers — PostgreSQL + Redis)', () => {
     it('404 response includes proper shape', async () => {
       const res = await request(app.getHttpServer())
         .get('/users/nonexistent-id')
-        .set('Authorization', `Bearer ${generateToken(jwtService, { id: 'fake', email: 'a@b.com', role: 'ADMIN', name: 'X' })}`)
+        .set(
+          'Authorization',
+          `Bearer ${generateToken(jwtService, { id: 'fake', email: 'a@b.com', role: 'ADMIN', name: 'X' })}`,
+        )
         .expect(404);
 
       expect(res.body).toHaveProperty('statusCode', 404);
@@ -1311,7 +1445,14 @@ describe('App E2E Integration (Testcontainers — PostgreSQL + Redis)', () => {
       // 3. Create service + time slot (via admin — use generated admin token)
       const hash = await PasswordUtil.hash(VALID_PASSWORD);
       const adminUser = await testModule.prisma.user.create({
-        data: { name: `E2E Admin ${ts}`, email: `e2e-admin-${ts}@example.com`, phone: `+1${Date.now().toString().slice(-10)}`, passwordHash: hash, role: SystemRole.ADMIN, status: UserStatus.ACTIVE },
+        data: {
+          name: `E2E Admin ${ts}`,
+          email: `e2e-admin-${ts}@example.com`,
+          phone: `+1${Date.now().toString().slice(-10)}`,
+          passwordHash: hash,
+          role: SystemRole.ADMIN,
+          status: UserStatus.ACTIVE,
+        },
       });
       const adminToken = generateToken(jwtService, adminUser);
 
@@ -1319,7 +1460,12 @@ describe('App E2E Integration (Testcontainers — PostgreSQL + Redis)', () => {
       const svcRes = await request(app.getHttpServer())
         .post('/services')
         .set('Authorization', `Bearer ${adminToken}`)
-        .send({ categoryId: category.id, name: `E2E Service ${ts}`, durationMinutes: 60, price: 50 })
+        .send({
+          categoryId: category.id,
+          name: `E2E Service ${ts}`,
+          durationMinutes: 60,
+          price: 50,
+        })
         .expect(201);
 
       const serviceId = svcRes.body.id;
@@ -1337,7 +1483,9 @@ describe('App E2E Integration (Testcontainers — PostgreSQL + Redis)', () => {
       const timeSlotId = slotRes.body.id;
 
       // Look up the customer user id
-      const customer = await testModule.prisma.user.findFirst({ where: { email: `e2e-${ts}@example.com` } });
+      const customer = await testModule.prisma.user.findFirst({
+        where: { email: `e2e-${ts}@example.com` },
+      });
       expect(customer).not.toBeNull();
 
       // 4. Book appointment
@@ -1374,7 +1522,9 @@ describe('App E2E Integration (Testcontainers — PostgreSQL + Redis)', () => {
       expect(cancelRes.body.status).toBe('CANCELLED');
 
       // 7. Verify cancelled in DB
-      const dbApt = await testModule.prisma.appointment.findUnique({ where: { id: appointmentId } });
+      const dbApt = await testModule.prisma.appointment.findUnique({
+        where: { id: appointmentId },
+      });
       expect(dbApt?.status).toBe(AppointmentStatus.CANCELLED);
     });
   });

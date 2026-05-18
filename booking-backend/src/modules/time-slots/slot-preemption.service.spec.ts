@@ -139,13 +139,10 @@ describe('SlotPreemptionService', () => {
       expect(result.status).toBe('SUCCESS');
       expect(result.appointment).toEqual(mockAppointment);
       expect(result.allocatedSeq).toBe(3);
-      expect(prisma.$transaction).toHaveBeenCalledWith(
-        expect.any(Function),
-        {
-          isolationLevel: 'Serializable',
-          timeout: 5000,
-        },
-      );
+      expect(prisma.$transaction).toHaveBeenCalledWith(expect.any(Function), {
+        isolationLevel: 'Serializable',
+        timeout: 5000,
+      });
     });
 
     it('should retry with exponential backoff on conflict', async () => {

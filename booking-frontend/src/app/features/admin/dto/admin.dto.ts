@@ -149,6 +149,7 @@ export interface AdminAppointment {
   userName: string;
   serviceId: string;
   serviceName: string;
+  serviceActive: boolean;
   timeSlotId: string;
   appointmentDate: string;
   status: AppointmentStatus;
@@ -295,6 +296,27 @@ export interface NotificationList {
 
 export interface UnreadCount {
   count: number;
+}
+
+// ==========================================
+// Business Hours
+// ==========================================
+
+export interface BusinessHoursDay {
+  open: string;
+  close: string;
+}
+
+export interface BusinessHoursDto {
+  timezone: string;
+  monday: BusinessHoursDay[];
+  tuesday: BusinessHoursDay[];
+  wednesday: BusinessHoursDay[];
+  thursday: BusinessHoursDay[];
+  friday: BusinessHoursDay[];
+  saturday: BusinessHoursDay[];
+  sunday: BusinessHoursDay[];
+  updatedAt: string;
 }
 
 // ==========================================

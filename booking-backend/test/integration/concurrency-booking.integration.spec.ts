@@ -62,11 +62,21 @@ describe('[R6-R7] High-Concurrency Booking', () => {
     const user1Data = UserFactory.create({ email: `ccy-user1-${Date.now()}@example.com` });
     const user2Data = UserFactory.create({ email: `ccy-user2-${Date.now()}@example.com` });
 
-    const user1 = await prisma.user.create({ data: { ...user1Data as any, passwordHash: hashedPassword, status: UserStatus.ACTIVE } });
-    const user2 = await prisma.user.create({ data: { ...user2Data as any, passwordHash: hashedPassword, status: UserStatus.ACTIVE } });
+    const user1 = await prisma.user.create({
+      data: { ...(user1Data as any), passwordHash: hashedPassword, status: UserStatus.ACTIVE },
+    });
+    const user2 = await prisma.user.create({
+      data: { ...(user2Data as any), passwordHash: hashedPassword, status: UserStatus.ACTIVE },
+    });
 
-    const token1 = jwtService.sign({ sub: user1.id, role: SystemRole.CUSTOMER }, { expiresIn: '15m', secret: process.env.JWT_SECRET });
-    const token2 = jwtService.sign({ sub: user2.id, role: SystemRole.CUSTOMER }, { expiresIn: '15m', secret: process.env.JWT_SECRET });
+    const token1 = jwtService.sign(
+      { sub: user1.id, role: SystemRole.CUSTOMER },
+      { expiresIn: '15m', secret: process.env.JWT_SECRET },
+    );
+    const token2 = jwtService.sign(
+      { sub: user2.id, role: SystemRole.CUSTOMER },
+      { expiresIn: '15m', secret: process.env.JWT_SECRET },
+    );
 
     // Create category + service + time slot with capacity 1
     const category = await prisma.serviceCategory.create({
@@ -111,7 +121,11 @@ describe('[R6-R7] High-Concurrency Booking', () => {
         .send({
           timeSlotId: timeSlot.id,
           serviceId: service.id,
-          customerInfo: { name: 'Concurrent User 1', email: 'ccy1@example.com', phone: '+1111111111' },
+          customerInfo: {
+            name: 'Concurrent User 1',
+            email: 'ccy1@example.com',
+            phone: '+1111111111',
+          },
           appointmentDate,
         });
 
@@ -131,7 +145,11 @@ describe('[R6-R7] High-Concurrency Booking', () => {
         .send({
           timeSlotId: timeSlot.id,
           serviceId: service.id,
-          customerInfo: { name: 'Concurrent User 2', email: 'ccy2@example.com', phone: '+2222222222' },
+          customerInfo: {
+            name: 'Concurrent User 2',
+            email: 'ccy2@example.com',
+            phone: '+2222222222',
+          },
           appointmentDate,
         });
 

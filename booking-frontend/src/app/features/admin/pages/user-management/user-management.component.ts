@@ -16,7 +16,10 @@ import {
 } from '../../dto/admin.dto';
 import { AppCardComponent } from '../../../../shared/components/atoms/app-card/app-card.component';
 import { AppButtonComponent } from '../../../../shared/components/atoms/app-button/app-button.component';
-import { AppBadgeComponent, BadgeStatus } from '../../../../shared/components/atoms/app-badge/app-badge.component';
+import {
+  AppBadgeComponent,
+  BadgeStatus,
+} from '../../../../shared/components/atoms/app-badge/app-badge.component';
 import { AppSearchInputComponent } from '../../../../shared/components/atoms/app-search-input/app-search-input.component';
 import { AppDropdownComponent } from '../../../../shared/components/atoms/app-dropdown/app-dropdown.component';
 import { AppSpinnerComponent } from '../../../../shared/components/atoms/app-spinner/app-spinner.component';
@@ -31,11 +34,22 @@ export type ViewMode = 'grid' | 'list';
   selector: 'app-user-management',
   standalone: true,
   imports: [
-    TableModule, ButtonModule, InputTextModule, SelectModule,
-    FormsModule, DatePipe,
-    AppCardComponent, AppButtonComponent, AppBadgeComponent,
-    AppSearchInputComponent, AppDropdownComponent, AppSpinnerComponent,
-    AppFilterBarComponent, AppTableWrapperComponent, AppModalComponent, TranslatePipe,
+    TableModule,
+    ButtonModule,
+    InputTextModule,
+    SelectModule,
+    FormsModule,
+    DatePipe,
+    AppCardComponent,
+    AppButtonComponent,
+    AppBadgeComponent,
+    AppSearchInputComponent,
+    AppDropdownComponent,
+    AppSpinnerComponent,
+    AppFilterBarComponent,
+    AppTableWrapperComponent,
+    AppModalComponent,
+    TranslatePipe,
   ],
   templateUrl: './user-management.component.html',
   styleUrl: './user-management.component.scss',
@@ -84,27 +98,23 @@ export class UserManagementComponent implements OnInit {
     { label: 'Blocked', value: 'BLOCKED' as AdminUserStatus },
   ];
 
-  readonly filterRoleOptions = [
-    { label: 'All Roles', value: '' },
-    ...this.roleOptions,
-  ];
+  readonly filterRoleOptions = [{ label: 'All Roles', value: '' }, ...this.roleOptions];
 
-  readonly filterStatusOptions = [
-    { label: 'All Statuses', value: '' },
-    ...this.statusOptions,
-  ];
+  readonly filterStatusOptions = [{ label: 'All Statuses', value: '' }, ...this.statusOptions];
 
   // Stats computed from full dataset (not paginated page)
   readonly totalUsers = computed(() => this.vm().usersTotal);
-  readonly activeUsers = computed(() => this.vm().allUsersForStats.filter(u => u.status === 'ACTIVE').length);
+  readonly activeUsers = computed(
+    () => this.vm().allUsersForStats.filter((u) => u.status === 'ACTIVE').length,
+  );
   readonly newThisWeek = computed(() => {
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-    return this.vm().allUsersForStats.filter(u => new Date(u.createdAt) >= oneWeekAgo).length;
+    return this.vm().allUsersForStats.filter((u) => new Date(u.createdAt) >= oneWeekAgo).length;
   });
 
   readonly searchSuggestions = computed(() =>
-    this.vm().allUsersForStats.map(u => ({ label: u.name, value: u.id }))
+    this.vm().allUsersForStats.map((u) => ({ label: u.name, value: u.id })),
   );
 
   ngOnInit(): void {
@@ -119,28 +129,30 @@ export class UserManagementComponent implements OnInit {
     } else {
       this.store.setLoading(true);
     }
-    this.adminService.getUsers({
-      page: 1,
-      limit: 10,
-      search: this.searchQuery() || undefined,
-      role: this.selectedRoleFilter() || undefined,
-      status: this.selectedStatusFilter() || undefined,
-    }).subscribe({
-      next: (response) => {
-        this.store.setUsers(response.items, response.meta.total, response.meta.page);
-        if (isFilterOperation) {
-          this.isFiltering.set(false);
-        } else {
-          this.store.setLoading(false);
-        }
-      },
-      error: (err) => this.store.setError(err.message ?? 'Failed to load users'),
-    });
+    this.adminService
+      .getUsers({
+        page: 1,
+        limit: 10,
+        search: this.searchQuery() || undefined,
+        role: this.selectedRoleFilter() || undefined,
+        status: this.selectedStatusFilter() || undefined,
+      })
+      .subscribe({
+        next: (response) => {
+          this.store.setUsers(response.items, response.meta.total, response.meta.page);
+          if (isFilterOperation) {
+            this.isFiltering.set(false);
+          } else {
+            this.store.setLoading(false);
+          }
+        },
+        error: (err) => this.store.setError(err.message ?? 'Failed to load users'),
+      });
   }
 
   private loadAllUsersForStats(): void {
     this.adminService.getUsers({ limit: 999, page: 1 }).subscribe({
-      next: response => this.store.setAllUsersForStats(response.items),
+      next: (response) => this.store.setAllUsersForStats(response.items),
       error: () => {},
     });
   }
@@ -239,7 +251,11 @@ export class UserManagementComponent implements OnInit {
       };
       this.adminService.createUser(dto).subscribe({
         next: (user) => {
-          this.store.setUsers([...this.store.users(), user], this.store.usersTotal() + 1, this.store.usersPage());
+          this.store.setUsers(
+            [...this.store.users(), user],
+            this.store.usersTotal() + 1,
+            this.store.usersPage(),
+          );
           this.loadAllUsersForStats();
           this.closeDialog();
         },
@@ -290,19 +306,27 @@ export class UserManagementComponent implements OnInit {
 
   mapRoleToBadge(role: AdminUserRole): BadgeStatus {
     switch (role) {
-      case 'CUSTOMER': return 'confirmed';
-      case 'ADMIN': return 'processing';
-      case 'SUPER_ADMIN': return 'confirmed';
-      default: return 'pending';
+      case 'CUSTOMER':
+        return 'confirmed';
+      case 'ADMIN':
+        return 'pending';
+      case 'SUPER_ADMIN':
+        return 'pending';
+      default:
+        return 'pending';
     }
   }
 
   mapStatusToBadge(status: AdminUserStatus): BadgeStatus {
     switch (status) {
-      case 'ACTIVE': return 'confirmed';
-      case 'INACTIVE': return 'pending';
-      case 'BLOCKED': return 'cancelled';
-      default: return 'pending';
+      case 'ACTIVE':
+        return 'confirmed';
+      case 'INACTIVE':
+        return 'pending';
+      case 'BLOCKED':
+        return 'cancelled';
+      default:
+        return 'pending';
     }
   }
 

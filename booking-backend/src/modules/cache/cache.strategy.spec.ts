@@ -73,10 +73,7 @@ describe('CacheStrategy', () => {
 
       await strategy.setUserSession(sessionToken, sessionData);
 
-      expect(cacheService.setSession).toHaveBeenCalledWith(
-        `session:${sessionToken}`,
-        sessionData,
-      );
+      expect(cacheService.setSession).toHaveBeenCalledWith(`session:${sessionToken}`, sessionData);
     });
 
     it('should handle complex session data', async () => {
@@ -89,10 +86,7 @@ describe('CacheStrategy', () => {
 
       await strategy.setUserSession('complex-token', sessionData);
 
-      expect(cacheService.setSession).toHaveBeenCalledWith(
-        'session:complex-token',
-        sessionData,
-      );
+      expect(cacheService.setSession).toHaveBeenCalledWith('session:complex-token', sessionData);
     });
   });
 
@@ -225,7 +219,10 @@ describe('CacheStrategy', () => {
 
   describe('setActiveServices', () => {
     it('should cache services list with correct TTL', async () => {
-      const services = [{ id: 'svc-1', name: 'Haircut' }, { id: 'svc-2', name: 'Manicure' }];
+      const services = [
+        { id: 'svc-1', name: 'Haircut' },
+        { id: 'svc-2', name: 'Manicure' },
+      ];
 
       await strategy.setActiveServices(services);
 
@@ -239,11 +236,7 @@ describe('CacheStrategy', () => {
     it('should handle empty services list', async () => {
       await strategy.setActiveServices([]);
 
-      expect(cacheService.set).toHaveBeenCalledWith(
-        'services:active',
-        [],
-        CacheTTL.servicesActive,
-      );
+      expect(cacheService.set).toHaveBeenCalledWith('services:active', [], CacheTTL.servicesActive);
     });
   });
 
@@ -698,7 +691,9 @@ describe('CacheKeys', () => {
   });
 
   it('should generate correct email verification key', () => {
-    expect(CacheKeys.verification('user@example.com', 'email')).toBe('verification:user@example.com:email');
+    expect(CacheKeys.verification('user@example.com', 'email')).toBe(
+      'verification:user@example.com:email',
+    );
   });
 
   it('should generate correct services active key', () => {
@@ -718,8 +713,9 @@ describe('CacheKeys', () => {
   });
 
   it('should handle UUID-style slot IDs', () => {
-    expect(CacheKeys.slotRemaining('550e8400-e29b-41d4-a716-446655440000'))
-      .toBe('slot:550e8400-e29b-41d4-a716-446655440000:remaining');
+    expect(CacheKeys.slotRemaining('550e8400-e29b-41d4-a716-446655440000')).toBe(
+      'slot:550e8400-e29b-41d4-a716-446655440000:remaining',
+    );
   });
 });
 
@@ -750,7 +746,7 @@ describe('CacheTTL', () => {
 
   it('should have all TTL values as positive integers', () => {
     const ttlValues = Object.values(CacheTTL) as number[];
-    ttlValues.forEach(ttl => {
+    ttlValues.forEach((ttl) => {
       expect(Number.isInteger(ttl)).toBe(true);
       expect(ttl).toBeGreaterThan(0);
     });

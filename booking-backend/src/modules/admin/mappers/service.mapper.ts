@@ -1,4 +1,8 @@
-import { CreateAdminServiceDto, UpdateAdminServiceDto, AdminServiceDto } from "../dto/admin-service.dto";
+import {
+  CreateAdminServiceDto,
+  UpdateAdminServiceDto,
+  AdminServiceDto,
+} from '../dto/admin-service.dto';
 
 interface PrismaService {
   id: string;
@@ -21,8 +25,8 @@ export function toAdminServiceDto(service: PrismaService): AdminServiceDto {
     description: service.description,
     duration: service.durationMinutes,
     price: service.price,
-    pricePerMinute: service.pricePerMinute ?? undefined,
-    taxRate: service.taxRate ? Number(service.taxRate) : undefined,
+    pricePerMinute: service.pricePerMinute != null ? Number(service.pricePerMinute) : undefined,
+    taxRate: service.taxRate != null ? Number(service.taxRate) * 100 : undefined,
     active: service.isActive,
     imageUrl: service.imageUrl ?? undefined,
     category: service.category?.name ?? undefined,
@@ -39,6 +43,8 @@ export function fromCreateAdminServiceDto(dto: CreateAdminServiceDto) {
     pricePerMinute: dto.pricePerMinute,
     isActive: dto.active ?? true,
     imageUrl: dto.imageUrl,
+    taxRate: dto.taxRate !== undefined ? dto.taxRate / 100 : undefined,
+    category: dto.category,
   };
 }
 
@@ -51,5 +57,7 @@ export function fromUpdateAdminServiceDto(dto: UpdateAdminServiceDto) {
   if (dto.pricePerMinute !== undefined) update.pricePerMinute = dto.pricePerMinute;
   if (dto.active !== undefined) update.isActive = dto.active;
   if (dto.imageUrl !== undefined) update.imageUrl = dto.imageUrl;
+  if (dto.taxRate !== undefined) update.taxRate = dto.taxRate / 100;
+  if (dto.category !== undefined) update.category = dto.category;
   return update;
 }

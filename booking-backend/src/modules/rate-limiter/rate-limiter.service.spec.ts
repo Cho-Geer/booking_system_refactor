@@ -204,7 +204,10 @@ describe('RateLimiterService', () => {
 
     it('should reset all rate limits for identifier when no endpoint specified', async () => {
       mockRedisClient.scan
-        .mockResolvedValueOnce(['0', ['ratelimit:user123:/api/test1', 'ratelimit:user123:/api/test2']])
+        .mockResolvedValueOnce([
+          '0',
+          ['ratelimit:user123:/api/test1', 'ratelimit:user123:/api/test2'],
+        ])
         .mockResolvedValueOnce(['0', []]);
       mockRedisClient.del.mockResolvedValue(2);
 
@@ -236,7 +239,7 @@ describe('RateLimiterService', () => {
       ]);
 
       expect(results).toHaveLength(3);
-      expect(results.every(r => r.allowed)).toBe(true);
+      expect(results.every((r) => r.allowed)).toBe(true);
     });
   });
 
@@ -300,13 +303,7 @@ describe('RateLimiterService', () => {
       // Custom limit of 20 requests per 86400 seconds (1 day)
       mockRedisClient.eval.mockResolvedValue(luaResult(true, 6)); // 5 existing + 1 new
 
-      const result = await service.isAllowed(
-        'user-123',
-        '/api/bookings',
-        'api',
-        20,
-        86400,
-      );
+      const result = await service.isAllowed('user-123', '/api/bookings', 'api', 20, 86400);
 
       expect(result.allowed).toBe(true);
       expect(result.limit).toBe(20);
@@ -322,13 +319,7 @@ describe('RateLimiterService', () => {
       mockRedisClient.eval.mockResolvedValue(luaResult(false, 20));
       mockRedisClient.zrange.mockResolvedValue(['ts', String(oldestTimestamp)]);
 
-      const result = await service.isAllowed(
-        'user-123',
-        '/api/bookings',
-        'api',
-        20,
-        86400,
-      );
+      const result = await service.isAllowed('user-123', '/api/bookings', 'api', 20, 86400);
 
       expect(result.allowed).toBe(false);
       expect(result.current).toBe(20);
@@ -338,13 +329,7 @@ describe('RateLimiterService', () => {
       // Custom limit: 10 requests per 60 seconds
       mockRedisClient.eval.mockResolvedValue(luaResult(true, 4)); // 3 existing + 1 new
 
-      const result = await service.isAllowed(
-        '192.168.1.1',
-        '/api/global',
-        'api',
-        10,
-        60,
-      );
+      const result = await service.isAllowed('192.168.1.1', '/api/global', 'api', 10, 60);
 
       expect(result.allowed).toBe(true);
       expect(result.limit).toBe(10);
@@ -360,13 +345,7 @@ describe('RateLimiterService', () => {
       mockRedisClient.eval.mockResolvedValue(luaResult(false, 10));
       mockRedisClient.zrange.mockResolvedValue(['ts', String(oldestTimestamp)]);
 
-      const result = await service.isAllowed(
-        '192.168.1.1',
-        '/api/another-endpoint',
-        'api',
-        10,
-        60,
-      );
+      const result = await service.isAllowed('192.168.1.1', '/api/another-endpoint', 'api', 10, 60);
 
       expect(result.allowed).toBe(false);
       expect(result.current).toBe(10);
@@ -409,13 +388,7 @@ describe('RateLimiterService', () => {
       // Custom limit: 100 requests per 60 seconds
       mockRedisClient.eval.mockResolvedValue(luaResult(true, 51)); // 50 existing + 1 new
 
-      const result = await service.isAllowed(
-        'user-123',
-        '/api/user/global',
-        'public',
-        100,
-        60,
-      );
+      const result = await service.isAllowed('user-123', '/api/user/global', 'public', 100, 60);
 
       expect(result.allowed).toBe(true);
       expect(result.limit).toBe(100);
@@ -431,13 +404,7 @@ describe('RateLimiterService', () => {
       mockRedisClient.eval.mockResolvedValue(luaResult(false, 100));
       mockRedisClient.zrange.mockResolvedValue(['ts', String(oldestTimestamp)]);
 
-      const result = await service.isAllowed(
-        'user-123',
-        '/api/user/global',
-        'public',
-        100,
-        60,
-      );
+      const result = await service.isAllowed('user-123', '/api/user/global', 'public', 100, 60);
 
       expect(result.allowed).toBe(false);
       expect(result.current).toBe(100);
@@ -478,8 +445,8 @@ describe('RateLimiterService', () => {
         expect.any(String),
         expect.any(Number),
         expect.any(Number),
-        1,   // strict limit
-        11,  // window + buffer (1 + 10)
+        1, // strict limit
+        11, // window + buffer (1 + 10)
       );
 
       jest.clearAllMocks();
@@ -493,8 +460,8 @@ describe('RateLimiterService', () => {
         expect.any(String),
         expect.any(Number),
         expect.any(Number),
-        5,   // auth limit
-        70,  // window + buffer (60 + 10)
+        5, // auth limit
+        70, // window + buffer (60 + 10)
       );
     });
 
@@ -521,7 +488,7 @@ describe('RateLimiterService', () => {
         expect.any(String),
         expect.any(Number),
         expect.any(Number),
-        30,        // limit
+        30, // limit
         window + 10, // TTL
       );
     });
@@ -722,13 +689,11 @@ describe('RateLimiterService', () => {
 
       // 模拟 35 个并发请求
       const results = await Promise.all(
-        Array.from({ length: 35 }, () =>
-          service.isAllowed('user123', '/api/test', 'api'),
-        ),
+        Array.from({ length: 35 }, () => service.isAllowed('user123', '/api/test', 'api')),
       );
 
-      const allowedCount = results.filter(r => r.allowed).length;
-      const deniedCount = results.filter(r => !r.allowed).length;
+      const allowedCount = results.filter((r) => r.allowed).length;
+      const deniedCount = results.filter((r) => !r.allowed).length;
 
       // 前30个应该被允许，后5个被拒绝（滑动窗口限制）
       expect(allowedCount).toBe(30);

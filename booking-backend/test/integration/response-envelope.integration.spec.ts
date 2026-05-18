@@ -60,13 +60,22 @@ describe('[R21] Response Envelope Validation', () => {
   beforeEach(async () => {
     await testModule.resetDatabase();
 
-    const adminData = UserFactory.create({ email: `admin-env-${Date.now()}@example.com`, role: SystemRole.ADMIN });
+    const adminData = UserFactory.create({
+      email: `admin-env-${Date.now()}@example.com`,
+      role: SystemRole.ADMIN,
+    });
     const admin = await prisma.user.create({ data: adminData as any });
-    adminToken = jwtService.sign({ sub: admin.id, role: SystemRole.ADMIN }, { expiresIn: '15m', secret: process.env.JWT_SECRET });
+    adminToken = jwtService.sign(
+      { sub: admin.id, role: SystemRole.ADMIN },
+      { expiresIn: '15m', secret: process.env.JWT_SECRET },
+    );
 
     const customerData = UserFactory.create({ email: `customer-env-${Date.now()}@example.com` });
     const customer = await prisma.user.create({ data: customerData as any });
-    customerToken = jwtService.sign({ sub: customer.id, role: SystemRole.CUSTOMER }, { expiresIn: '15m', secret: process.env.JWT_SECRET });
+    customerToken = jwtService.sign(
+      { sub: customer.id, role: SystemRole.CUSTOMER },
+      { expiresIn: '15m', secret: process.env.JWT_SECRET },
+    );
   });
 
   /**
@@ -88,18 +97,14 @@ describe('[R21] Response Envelope Validation', () => {
 
   describe('StandardResponse Envelope — Public Endpoints', () => {
     it('GET /v1/health should have StandardResponse envelope', async () => {
-      const response = await request(app.getHttpServer())
-        .get('/v1/health')
-        .expect(200);
+      const response = await request(app.getHttpServer()).get('/v1/health').expect(200);
 
       expectStandardResponse(response);
       expect(response.body.statusCode).toBe(200);
     });
 
     it('GET /v1/translations should have StandardResponse envelope', async () => {
-      const response = await request(app.getHttpServer())
-        .get('/v1/translations')
-        .expect(200);
+      const response = await request(app.getHttpServer()).get('/v1/translations').expect(200);
 
       expectStandardResponse(response);
       expect(response.body.statusCode).toBe(200);
@@ -108,9 +113,11 @@ describe('[R21] Response Envelope Validation', () => {
 
   describe('StandardResponse Envelope — Auth Endpoints', () => {
     it('POST /v1/auth/login/password (invalid) should have error envelop', async () => {
-      const response = await request(app.getHttpServer())
-        .post('/v1/auth/login/password')
-        .send({ contact: 'nonexistent@example.com', contactType: 'email', password: 'ValidP@ss123' });
+      const response = await request(app.getHttpServer()).post('/v1/auth/login/password').send({
+        contact: 'nonexistent@example.com',
+        contactType: 'email',
+        password: 'ValidP@ss123',
+      });
 
       // 401 response - verify error envelope
       const body = response.body;
@@ -155,9 +162,7 @@ describe('[R21] Response Envelope Validation', () => {
 
   describe('Error Response Envelope', () => {
     it('401 Unauthorized should have error envelope', async () => {
-      const response = await request(app.getHttpServer())
-        .get('/v1/users/profile')
-        .expect(401);
+      const response = await request(app.getHttpServer()).get('/v1/users/profile').expect(401);
 
       expect(response.body).toHaveProperty('statusCode');
       expect(response.body).toHaveProperty('message');

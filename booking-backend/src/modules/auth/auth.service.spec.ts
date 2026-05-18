@@ -1,10 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
-import {
-  UnauthorizedException,
-  BadRequestException,
-  ConflictException,
-} from '@nestjs/common';
+import { UnauthorizedException, BadRequestException, ConflictException } from '@nestjs/common';
 import { PrismaClient, SystemRole } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcryptjs';
@@ -160,9 +156,7 @@ describe('AuthService', () => {
         contactType: ContactType.EMAIL,
       };
 
-      await expect(service.registerSendCode(dto)).rejects.toThrow(
-        ConflictException,
-      );
+      await expect(service.registerSendCode(dto)).rejects.toThrow(ConflictException);
     });
 
     it('should send verification code and return success for new user', async () => {
@@ -202,9 +196,7 @@ describe('AuthService', () => {
         contactType: ContactType.PHONE,
       };
 
-      await expect(service.registerSendCode(dto)).rejects.toThrow(
-        '该手机号已注册',
-      );
+      await expect(service.registerSendCode(dto)).rejects.toThrow('该手机号已注册');
     });
 
     it('should throw BadRequestException when email sending fails', async () => {
@@ -220,12 +212,8 @@ describe('AuthService', () => {
         contactType: ContactType.EMAIL,
       };
 
-      await expect(service.registerSendCode(dto)).rejects.toThrow(
-        BadRequestException,
-      );
-      await expect(service.registerSendCode(dto)).rejects.toThrow(
-        '发送验证码失败',
-      );
+      await expect(service.registerSendCode(dto)).rejects.toThrow(BadRequestException);
+      await expect(service.registerSendCode(dto)).rejects.toThrow('发送验证码失败');
     });
   });
 
@@ -244,9 +232,7 @@ describe('AuthService', () => {
         name: 'Test User',
       };
 
-      await expect(service.registerComplete(dto)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(service.registerComplete(dto)).rejects.toThrow(BadRequestException);
     });
 
     it('should throw ConflictException if user already exists (concurrency)', async () => {
@@ -267,9 +253,7 @@ describe('AuthService', () => {
         name: 'Test User',
       };
 
-      await expect(service.registerComplete(dto)).rejects.toThrow(
-        ConflictException,
-      );
+      await expect(service.registerComplete(dto)).rejects.toThrow(ConflictException);
     });
 
     it('should create user and return tokens for valid registration', async () => {
@@ -283,9 +267,7 @@ describe('AuthService', () => {
         createdAt: new Date(),
       });
 
-      mockJwtService.sign
-        .mockReturnValueOnce('access-token')
-        .mockReturnValueOnce('refresh-token');
+      mockJwtService.sign.mockReturnValueOnce('access-token').mockReturnValueOnce('refresh-token');
       mockPrismaClient.userSession.create.mockResolvedValue({});
 
       // Ensure encryption service returns proper value
@@ -321,9 +303,7 @@ describe('AuthService', () => {
         createdAt: new Date(),
       });
 
-      mockJwtService.sign
-        .mockReturnValueOnce('access-token')
-        .mockReturnValueOnce('refresh-token');
+      mockJwtService.sign.mockReturnValueOnce('access-token').mockReturnValueOnce('refresh-token');
       mockPrismaClient.userSession.create.mockResolvedValue({});
 
       mockEncryptionService.encrypt.mockResolvedValue({
@@ -369,9 +349,7 @@ describe('AuthService', () => {
         name: 'Test User',
       };
 
-      await expect(service.registerComplete(dto)).rejects.toThrow(
-        '该手机号已被注册',
-      );
+      await expect(service.registerComplete(dto)).rejects.toThrow('该手机号已被注册');
     });
   });
 
@@ -385,9 +363,7 @@ describe('AuthService', () => {
         password: 'ValidPass123!',
       };
 
-      await expect(service.loginPassword(dto)).rejects.toThrow(
-        UnauthorizedException,
-      );
+      await expect(service.loginPassword(dto)).rejects.toThrow(UnauthorizedException);
     });
 
     it('should throw UnauthorizedException if password is invalid', async () => {
@@ -404,9 +380,7 @@ describe('AuthService', () => {
         password: 'wrong-password',
       };
 
-      await expect(service.loginPassword(dto)).rejects.toThrow(
-        UnauthorizedException,
-      );
+      await expect(service.loginPassword(dto)).rejects.toThrow(UnauthorizedException);
     });
 
     it('should return tokens for valid credentials', async () => {
@@ -423,9 +397,7 @@ describe('AuthService', () => {
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
       mockPrismaClient.user.update.mockResolvedValue(mockUser);
 
-      mockJwtService.sign
-        .mockReturnValueOnce('access-token')
-        .mockReturnValueOnce('refresh-token');
+      mockJwtService.sign.mockReturnValueOnce('access-token').mockReturnValueOnce('refresh-token');
       mockPrismaClient.userSession.create.mockResolvedValue({});
 
       const dto: LoginPasswordDto = {
@@ -453,9 +425,7 @@ describe('AuthService', () => {
         password: 'some-password',
       };
 
-      await expect(service.loginPassword(dto)).rejects.toThrow(
-        UnauthorizedException,
-      );
+      await expect(service.loginPassword(dto)).rejects.toThrow(UnauthorizedException);
     });
 
     it('should throw UnauthorizedException when user status is not ACTIVE', async () => {
@@ -471,9 +441,7 @@ describe('AuthService', () => {
         password: 'correct-password',
       };
 
-      await expect(service.loginPassword(dto)).rejects.toThrow(
-        UnauthorizedException,
-      );
+      await expect(service.loginPassword(dto)).rejects.toThrow(UnauthorizedException);
     });
 
     it('should update lastLoginAt on successful login', async () => {
@@ -489,9 +457,7 @@ describe('AuthService', () => {
       mockPrismaClient.user.findFirst.mockResolvedValue(mockUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
       mockPrismaClient.user.update.mockResolvedValue(mockUser);
-      mockJwtService.sign
-        .mockReturnValueOnce('access-token')
-        .mockReturnValueOnce('refresh-token');
+      mockJwtService.sign.mockReturnValueOnce('access-token').mockReturnValueOnce('refresh-token');
       mockPrismaClient.userSession.create.mockResolvedValue({});
 
       const dto: LoginPasswordDto = {
@@ -517,9 +483,7 @@ describe('AuthService', () => {
         password: 'some-password',
       };
 
-      await expect(service.loginPassword(dto)).rejects.toThrow(
-        UnauthorizedException,
-      );
+      await expect(service.loginPassword(dto)).rejects.toThrow(UnauthorizedException);
       expect(mockHashService.hashWithPepper).toHaveBeenCalledWith('13800138000');
     });
 
@@ -653,9 +617,7 @@ describe('AuthService', () => {
         contactType: ContactType.EMAIL,
       };
 
-      await expect(service.loginSendCode(dto)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(service.loginSendCode(dto)).rejects.toThrow(BadRequestException);
       await expect(service.loginSendCode(dto)).rejects.toThrow('用户账户已被禁用');
     });
 
@@ -710,9 +672,7 @@ describe('AuthService', () => {
         contactType: ContactType.EMAIL,
       };
 
-      await expect(service.loginSendCode(dto)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(service.loginSendCode(dto)).rejects.toThrow(BadRequestException);
       await expect(service.loginSendCode(dto)).rejects.toThrow('发送验证码失败');
     });
 
@@ -740,12 +700,8 @@ describe('AuthService', () => {
         code: '123456',
       };
 
-      await expect(service.loginVerifyCode(dto)).rejects.toThrow(
-        UnauthorizedException,
-      );
-      await expect(service.loginVerifyCode(dto)).rejects.toThrow(
-        '用户不存在或账户已禁用',
-      );
+      await expect(service.loginVerifyCode(dto)).rejects.toThrow(UnauthorizedException);
+      await expect(service.loginVerifyCode(dto)).rejects.toThrow('用户不存在或账户已禁用');
     });
 
     it('should throw UnauthorizedException if user status is not ACTIVE', async () => {
@@ -760,12 +716,8 @@ describe('AuthService', () => {
         code: '123456',
       };
 
-      await expect(service.loginVerifyCode(dto)).rejects.toThrow(
-        UnauthorizedException,
-      );
-      await expect(service.loginVerifyCode(dto)).rejects.toThrow(
-        '用户不存在或账户已禁用',
-      );
+      await expect(service.loginVerifyCode(dto)).rejects.toThrow(UnauthorizedException);
+      await expect(service.loginVerifyCode(dto)).rejects.toThrow('用户不存在或账户已禁用');
     });
 
     it('should throw UnauthorizedException if verification code is invalid', async () => {
@@ -787,12 +739,8 @@ describe('AuthService', () => {
         code: '000000',
       };
 
-      await expect(service.loginVerifyCode(dto)).rejects.toThrow(
-        UnauthorizedException,
-      );
-      await expect(service.loginVerifyCode(dto)).rejects.toThrow(
-        '验证码无效或已过期',
-      );
+      await expect(service.loginVerifyCode(dto)).rejects.toThrow(UnauthorizedException);
+      await expect(service.loginVerifyCode(dto)).rejects.toThrow('验证码无效或已过期');
     });
 
     it('should return tokens for valid code verification', async () => {
@@ -805,9 +753,7 @@ describe('AuthService', () => {
       };
       mockPrismaClient.user.findFirst.mockResolvedValue(mockUser);
       mockPrismaClient.user.update.mockResolvedValue(mockUser);
-      mockJwtService.sign
-        .mockReturnValueOnce('access-token')
-        .mockReturnValueOnce('refresh-token');
+      mockJwtService.sign.mockReturnValueOnce('access-token').mockReturnValueOnce('refresh-token');
       mockPrismaClient.userSession.create.mockResolvedValue({});
 
       const dto: LoginVerifyCodeDto = {
@@ -833,9 +779,7 @@ describe('AuthService', () => {
       };
       mockPrismaClient.user.findFirst.mockResolvedValue(mockUser);
       mockPrismaClient.user.update.mockResolvedValue(mockUser);
-      mockJwtService.sign
-        .mockReturnValueOnce('access-token')
-        .mockReturnValueOnce('refresh-token');
+      mockJwtService.sign.mockReturnValueOnce('access-token').mockReturnValueOnce('refresh-token');
       mockPrismaClient.userSession.create.mockResolvedValue({});
 
       const dto: LoginVerifyCodeDto = {
@@ -861,9 +805,7 @@ describe('AuthService', () => {
         code: '123456',
       };
 
-      await expect(service.loginVerifyCode(dto)).rejects.toThrow(
-        UnauthorizedException,
-      );
+      await expect(service.loginVerifyCode(dto)).rejects.toThrow(UnauthorizedException);
       expect(mockHashService.hashWithPepper).toHaveBeenCalledWith('13800138000');
     });
   });
@@ -972,7 +914,9 @@ describe('AuthService', () => {
 
       // Each blacklist key should contain a predictable jti, not a randomUUID
       for (const key of blacklistKeys) {
-        expect(key).not.toMatch(/^token:blacklist:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+        expect(key).not.toMatch(
+          /^token:blacklist:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
+        );
       }
       // The blacklist key should contain the jti from the decoded token
       expect(blacklistKeys[0]).toBe(`token:blacklist:${TEST_JTI}`);
@@ -1006,9 +950,7 @@ describe('AuthService', () => {
 
       const dto: RefreshTokenRequestDto = { refreshToken: 'invalid-token' };
 
-      await expect(service.refreshTokens(dto)).rejects.toThrow(
-        UnauthorizedException,
-      );
+      await expect(service.refreshTokens(dto)).rejects.toThrow(UnauthorizedException);
     });
 
     it('should throw UnauthorizedException for wrong token type', async () => {
@@ -1020,9 +962,7 @@ describe('AuthService', () => {
 
       const dto: RefreshTokenRequestDto = { refreshToken: 'some-token' };
 
-      await expect(service.refreshTokens(dto)).rejects.toThrow(
-        UnauthorizedException,
-      );
+      await expect(service.refreshTokens(dto)).rejects.toThrow(UnauthorizedException);
     });
 
     it('should detect token reuse when session not found', async () => {
@@ -1035,9 +975,7 @@ describe('AuthService', () => {
 
       const dto: RefreshTokenRequestDto = { refreshToken: 'reused-token' };
 
-      await expect(service.refreshTokens(dto)).rejects.toThrow(
-        UnauthorizedException,
-      );
+      await expect(service.refreshTokens(dto)).rejects.toThrow(UnauthorizedException);
     });
 
     it('should throw UnauthorizedException when session is inactive', async () => {
@@ -1059,9 +997,7 @@ describe('AuthService', () => {
 
       const dto: RefreshTokenRequestDto = { refreshToken: 'valid-token' };
 
-      await expect(service.refreshTokens(dto)).rejects.toThrow(
-        UnauthorizedException,
-      );
+      await expect(service.refreshTokens(dto)).rejects.toThrow(UnauthorizedException);
     });
 
     it('should throw UnauthorizedException when session is expired', async () => {
@@ -1083,12 +1019,8 @@ describe('AuthService', () => {
 
       const dto: RefreshTokenRequestDto = { refreshToken: 'valid-token' };
 
-      await expect(service.refreshTokens(dto)).rejects.toThrow(
-        UnauthorizedException,
-      );
-      await expect(service.refreshTokens(dto)).rejects.toThrow(
-        'Refresh Token 已过期或已吊销',
-      );
+      await expect(service.refreshTokens(dto)).rejects.toThrow(UnauthorizedException);
+      await expect(service.refreshTokens(dto)).rejects.toThrow('Refresh Token 已过期或已吊销');
     });
 
     it('should successfully refresh token with atomic rotation', async () => {
@@ -1139,7 +1071,6 @@ describe('AuthService', () => {
       expect(result.refreshToken).toBe('new-refresh-token');
     });
   });
-
 });
 
 // ============================================================
@@ -1149,7 +1080,12 @@ describe('AuthService - Constructor Validation', () => {
   const mockDependencies = {
     prisma: {
       user: { findFirst: jest.fn(), findUnique: jest.fn(), update: jest.fn(), create: jest.fn() },
-      userSession: { findUnique: jest.fn(), update: jest.fn(), updateMany: jest.fn(), create: jest.fn() },
+      userSession: {
+        findUnique: jest.fn(),
+        update: jest.fn(),
+        updateMany: jest.fn(),
+        create: jest.fn(),
+      },
       $transaction: jest.fn(),
       $disconnect: jest.fn(),
     },
@@ -1173,7 +1109,9 @@ describe('AuthService - Constructor Validation', () => {
     delete process.env.JWT_SECRET;
     process.env.JWT_REFRESH_SECRET = 'test-refresh';
 
-    jest.spyOn(require('@prisma/client'), 'PrismaClient').mockImplementation(() => mockDependencies.prisma);
+    jest
+      .spyOn(require('@prisma/client'), 'PrismaClient')
+      .mockImplementation(() => mockDependencies.prisma);
 
     await expect(
       Test.createTestingModule({
@@ -1195,7 +1133,9 @@ describe('AuthService - Constructor Validation', () => {
     process.env.JWT_SECRET = 'test-secret';
     delete process.env.JWT_REFRESH_SECRET;
 
-    jest.spyOn(require('@prisma/client'), 'PrismaClient').mockImplementation(() => mockDependencies.prisma);
+    jest
+      .spyOn(require('@prisma/client'), 'PrismaClient')
+      .mockImplementation(() => mockDependencies.prisma);
 
     await expect(
       Test.createTestingModule({
@@ -1328,12 +1268,14 @@ if (isIntegrationMode()) {
       await testModule.resetDatabase();
 
       // Re-setup all mocks after resetMocks clears implementations
-      mockJwtService.sign.mockImplementation((payload: unknown, options: Record<string, unknown>) => {
-        if (options && options.secret === 'test-jwt-secret') {
-          return 'mock-access-jwt-token';
-        }
-        return 'mock-refresh-jwt-token';
-      });
+      mockJwtService.sign.mockImplementation(
+        (payload: unknown, options: Record<string, unknown>) => {
+          if (options && options.secret === 'test-jwt-secret') {
+            return 'mock-access-jwt-token';
+          }
+          return 'mock-refresh-jwt-token';
+        },
+      );
 
       mockEncryptionService.encrypt.mockResolvedValue({
         iv: 'test-iv',
@@ -1372,9 +1314,10 @@ if (isIntegrationMode()) {
         expect(result.refreshToken).toBeDefined();
 
         // Verify user exists in database (query by emailHash since service stores hashed PII)
-        const expectedHash = mockHashService.hashWithPepper.mock.results[
-          mockHashService.hashWithPepper.mock.results.length - 1
-        ]?.value;
+        const expectedHash =
+          mockHashService.hashWithPepper.mock.results[
+            mockHashService.hashWithPepper.mock.results.length - 1
+          ]?.value;
         const dbUser = await testModule.prisma.user.findFirst({
           where: { emailHash: expectedHash },
         });

@@ -225,9 +225,7 @@ describe('RateLimitInterceptor', () => {
 
     it('should get rate limit config from handler metadata first', (done) => {
       const handlerConfig = { tier: 'strict', key: 'user' };
-      mockReflector.get
-        .mockReturnValueOnce(handlerConfig)
-        .mockReturnValueOnce(undefined);
+      mockReflector.get.mockReturnValueOnce(handlerConfig).mockReturnValueOnce(undefined);
 
       const mockCtx = createMockExecutionContext() as any;
       const mockHandler = createMockCallHandler({ data: 'test' });
@@ -242,9 +240,7 @@ describe('RateLimitInterceptor', () => {
 
     it('should get rate limit config from class metadata when handler has none', (done) => {
       const classConfig = { tier: 'api', key: 'ip' };
-      mockReflector.get
-        .mockReturnValueOnce(undefined)
-        .mockReturnValueOnce(classConfig);
+      mockReflector.get.mockReturnValueOnce(undefined).mockReturnValueOnce(classConfig);
 
       const mockCtx = createMockExecutionContext() as any;
       const mockHandler = createMockCallHandler({ data: 'test' });
@@ -260,9 +256,12 @@ describe('RateLimitInterceptor', () => {
     });
 
     it('should handle requests with x-forwarded-for header', (done) => {
-      const mockCtx = createMockExecutionContext({
-        headers: { 'x-forwarded-for': '203.0.113.195, 70.41.3.18' },
-      }, 200) as any;
+      const mockCtx = createMockExecutionContext(
+        {
+          headers: { 'x-forwarded-for': '203.0.113.195, 70.41.3.18' },
+        },
+        200,
+      ) as any;
       const mockHandler = createMockCallHandler({ proxied: true });
 
       // Simulate fast request
@@ -357,9 +356,12 @@ describe('RateLimitInterceptor', () => {
     });
 
     it('should log 429 violation with extracted IP address', (done) => {
-      const mockCtx = createMockExecutionContext({
-        headers: { 'x-forwarded-for': '10.0.0.5, 172.16.0.1' },
-      }, 429) as any;
+      const mockCtx = createMockExecutionContext(
+        {
+          headers: { 'x-forwarded-for': '10.0.0.5, 172.16.0.1' },
+        },
+        429,
+      ) as any;
       const mockHandler = createMockCallHandler({ rateLimited: true });
 
       const originalDateNow = Date.now;
@@ -367,9 +369,7 @@ describe('RateLimitInterceptor', () => {
 
       interceptor.intercept(mockCtx, mockHandler).subscribe({
         complete: () => {
-          expect(loggerWarnSpy).toHaveBeenCalledWith(
-            expect.stringContaining('10.0.0.5'),
-          );
+          expect(loggerWarnSpy).toHaveBeenCalledWith(expect.stringContaining('10.0.0.5'));
           Date.now = originalDateNow;
           done();
         },
@@ -377,9 +377,12 @@ describe('RateLimitInterceptor', () => {
     });
 
     it('should handle x-forwarded-for as array of strings', (done) => {
-      const mockCtx = createMockExecutionContext({
-        headers: { 'x-forwarded-for': ['203.0.113.50, 70.41.3.18'] },
-      }, 429) as any;
+      const mockCtx = createMockExecutionContext(
+        {
+          headers: { 'x-forwarded-for': ['203.0.113.50, 70.41.3.18'] },
+        },
+        429,
+      ) as any;
       const mockHandler = createMockCallHandler({ rateLimited: true });
 
       const originalDateNow = Date.now;
@@ -387,9 +390,7 @@ describe('RateLimitInterceptor', () => {
 
       interceptor.intercept(mockCtx, mockHandler).subscribe({
         complete: () => {
-          expect(loggerWarnSpy).toHaveBeenCalledWith(
-            expect.stringContaining('203.0.113.50'),
-          );
+          expect(loggerWarnSpy).toHaveBeenCalledWith(expect.stringContaining('203.0.113.50'));
           Date.now = originalDateNow;
           done();
         },
@@ -405,9 +406,7 @@ describe('RateLimitInterceptor', () => {
 
       interceptor.intercept(mockCtx, mockHandler).subscribe({
         complete: () => {
-          expect(loggerWarnSpy).toHaveBeenCalledWith(
-            expect.stringContaining('unknown'),
-          );
+          expect(loggerWarnSpy).toHaveBeenCalledWith(expect.stringContaining('unknown'));
           Date.now = originalDateNow;
           done();
         },

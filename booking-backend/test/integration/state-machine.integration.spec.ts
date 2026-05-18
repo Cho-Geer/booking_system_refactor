@@ -66,17 +66,40 @@ describe('[R26] Appointment State Machine — Full Path', () => {
   beforeEach(async () => {
     await testModule.resetDatabase();
 
-    const adminData = UserFactory.create({ email: `admin-sm-${Date.now()}@example.com`, role: SystemRole.ADMIN });
+    const adminData = UserFactory.create({
+      email: `admin-sm-${Date.now()}@example.com`,
+      role: SystemRole.ADMIN,
+    });
     const admin = await prisma.user.create({ data: adminData as any });
     adminUserId = admin.id;
-    adminToken = jwtService.sign({ sub: admin.id, role: SystemRole.ADMIN }, { expiresIn: '15m', secret: process.env.JWT_SECRET });
+    adminToken = jwtService.sign(
+      { sub: admin.id, role: SystemRole.ADMIN },
+      { expiresIn: '15m', secret: process.env.JWT_SECRET },
+    );
   });
 
   async function createTestAppointment(status = 'PENDING') {
-    const category = await prisma.serviceCategory.create({ data: { name: `SMCat ${Date.now()}`, displayOrder: 1, isActive: true } });
-    const service = await prisma.service.create({ data: { categoryId: category.id, name: 'SM Service', durationMinutes: 60, price: 100, isActive: true } });
+    const category = await prisma.serviceCategory.create({
+      data: { name: `SMCat ${Date.now()}`, displayOrder: 1, isActive: true },
+    });
+    const service = await prisma.service.create({
+      data: {
+        categoryId: category.id,
+        name: 'SM Service',
+        durationMinutes: 60,
+        price: 100,
+        isActive: true,
+      },
+    });
     const timeSlot = await prisma.timeSlot.create({
-      data: { serviceId: service.id, startTime: new Date(Date.now() + 86400000), endTime: new Date(Date.now() + 86400000 + 3600000), capacity: 5, currentSequence: 0, isActive: true },
+      data: {
+        serviceId: service.id,
+        startTime: new Date(Date.now() + 86400000),
+        endTime: new Date(Date.now() + 86400000 + 3600000),
+        capacity: 5,
+        currentSequence: 0,
+        isActive: true,
+      },
     });
     return prisma.appointment.create({
       data: {

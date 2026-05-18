@@ -29,11 +29,7 @@ describe('Backend coding standard §3.2: No `any` type in batch 2 files', () => 
         const trimmed = line.trim();
 
         // Skip comment-only lines
-        if (
-          trimmed.startsWith('//') ||
-          trimmed.startsWith('*') ||
-          trimmed.startsWith('/*')
-        ) {
+        if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) {
           return;
         }
 

@@ -48,7 +48,7 @@ describe('App Integration (Testcontainers)', () => {
         whitelist: true,
         forbidNonWhitelisted: true,
         transform: true,
-      })
+      }),
     );
     // Set global prefix to match production (main.ts uses setGlobalPrefix('v1'))
     app.setGlobalPrefix('v1');
@@ -143,7 +143,7 @@ describe('App Integration (Testcontainers)', () => {
         {
           secret: process.env.JWT_SECRET || 'test-jwt-secret-key-for-unit-tests-only',
           expiresIn: '15m',
-        }
+        },
       );
 
       const appointmentDto = {

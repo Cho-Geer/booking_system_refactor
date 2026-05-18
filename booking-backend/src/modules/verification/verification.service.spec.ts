@@ -116,14 +116,14 @@ describe('VerificationService', () => {
 
       expect(result).toEqual({ success: true });
       expect(cacheService.getPrefixedKey).toHaveBeenCalledWith(
-        `verification:email:${testEmail}:${testType}`
+        `verification:email:${testEmail}:${testType}`,
       );
       expect(redisClient.eval).toHaveBeenCalledWith(
         expect.stringContaining('redis.call'),
         1,
         prefixedKey(`verification:email:${testEmail}:${testType}`),
         testCode,
-        '3'
+        '3',
       );
     });
 
@@ -133,9 +133,9 @@ describe('VerificationService', () => {
       };
       cacheService.getClient.mockReturnValue(redisClient);
 
-      await expect(
-        service.verifyCode(testEmail, testCode, testType)
-      ).rejects.toThrow(InvalidVerificationCodeException);
+      await expect(service.verifyCode(testEmail, testCode, testType)).rejects.toThrow(
+        InvalidVerificationCodeException,
+      );
     });
 
     it('should throw InvalidVerificationCodeException when code does not exist', async () => {
@@ -144,9 +144,9 @@ describe('VerificationService', () => {
       };
       cacheService.getClient.mockReturnValue(redisClient);
 
-      await expect(
-        service.verifyCode(testEmail, testCode, testType)
-      ).rejects.toThrow(InvalidVerificationCodeException);
+      await expect(service.verifyCode(testEmail, testCode, testType)).rejects.toThrow(
+        InvalidVerificationCodeException,
+      );
     });
 
     it('should throw InvalidVerificationCodeException when code is already used (replay attack protection)', async () => {
@@ -155,9 +155,9 @@ describe('VerificationService', () => {
       };
       cacheService.getClient.mockReturnValue(redisClient);
 
-      await expect(
-        service.verifyCode(testEmail, testCode, testType)
-      ).rejects.toThrow(InvalidVerificationCodeException);
+      await expect(service.verifyCode(testEmail, testCode, testType)).rejects.toThrow(
+        InvalidVerificationCodeException,
+      );
     });
 
     it('should increment attempts on wrong code', async () => {
@@ -166,9 +166,9 @@ describe('VerificationService', () => {
       };
       cacheService.getClient.mockReturnValue(redisClient);
 
-      await expect(
-        service.verifyCode(testEmail, testCode, testType)
-      ).rejects.toThrow(InvalidVerificationCodeException);
+      await expect(service.verifyCode(testEmail, testCode, testType)).rejects.toThrow(
+        InvalidVerificationCodeException,
+      );
 
       expect(redisClient.eval).toHaveBeenCalledTimes(1);
     });
@@ -179,9 +179,9 @@ describe('VerificationService', () => {
       };
       cacheService.getClient.mockReturnValue(redisClient);
 
-      await expect(
-        service.verifyCode(testEmail, testCode, testType)
-      ).rejects.toThrow(MaxAttemptsExceededException);
+      await expect(service.verifyCode(testEmail, testCode, testType)).rejects.toThrow(
+        MaxAttemptsExceededException,
+      );
     });
 
     it('should throw MaxAttemptsExceededException when attempts >= 3', async () => {
@@ -190,9 +190,9 @@ describe('VerificationService', () => {
       };
       cacheService.getClient.mockReturnValue(redisClient);
 
-      await expect(
-        service.verifyCode(testEmail, testCode, testType)
-      ).rejects.toThrow(MaxAttemptsExceededException);
+      await expect(service.verifyCode(testEmail, testCode, testType)).rejects.toThrow(
+        MaxAttemptsExceededException,
+      );
     });
 
     it('should delete code after successful verification', async () => {
@@ -208,7 +208,7 @@ describe('VerificationService', () => {
         expect.any(Number),
         expect.any(String),
         expect.any(String),
-        expect.any(String)
+        expect.any(String),
       );
     });
   });
@@ -220,16 +220,14 @@ describe('VerificationService', () => {
       await service.deleteCode(testEmail, testType);
 
       expect(cacheService.delete).toHaveBeenCalledWith(
-        `verification:email:${testEmail}:${testType}`
+        `verification:email:${testEmail}:${testType}`,
       );
     });
 
     it('should not throw when code does not exist', async () => {
       cacheService.delete.mockResolvedValue(undefined);
 
-      await expect(
-        service.deleteCode(testEmail, testType)
-      ).resolves.not.toThrow();
+      await expect(service.deleteCode(testEmail, testType)).resolves.not.toThrow();
     });
   });
 
@@ -240,9 +238,7 @@ describe('VerificationService', () => {
       const result = await service.exists(testEmail, testType);
 
       expect(result).toBe(true);
-      expect(cacheService.has).toHaveBeenCalledWith(
-        `verification:email:${testEmail}:${testType}`
-      );
+      expect(cacheService.has).toHaveBeenCalledWith(`verification:email:${testEmail}:${testType}`);
     });
 
     it('should return false when code does not exist', async () => {
@@ -306,26 +302,26 @@ describe('VerificationService', () => {
     it('should throw VerificationUnavailableException when Redis is unavailable during generateCode', async () => {
       cacheService.isAvailable.mockReturnValue(false);
 
-      await expect(
-        service.generateCode(testEmail, testType)
-      ).rejects.toThrow(VerificationUnavailableException);
+      await expect(service.generateCode(testEmail, testType)).rejects.toThrow(
+        VerificationUnavailableException,
+      );
     });
 
     it('should throw VerificationUnavailableException when Redis is unavailable during verifyCode', async () => {
       cacheService.isAvailable.mockReturnValue(false);
 
-      await expect(
-        service.verifyCode(testEmail, testCode, testType)
-      ).rejects.toThrow(VerificationUnavailableException);
+      await expect(service.verifyCode(testEmail, testCode, testType)).rejects.toThrow(
+        VerificationUnavailableException,
+      );
     });
 
     it('should throw VerificationUnavailableException when CacheService getClient returns null', async () => {
       cacheService.isAvailable.mockReturnValue(true);
       cacheService.getClient.mockReturnValue(null);
 
-      await expect(
-        service.verifyCode(testEmail, testCode, testType)
-      ).rejects.toThrow(VerificationUnavailableException);
+      await expect(service.verifyCode(testEmail, testCode, testType)).rejects.toThrow(
+        VerificationUnavailableException,
+      );
     });
 
     it('should throw VerificationUnavailableException when Redis eval fails', async () => {
@@ -334,9 +330,9 @@ describe('VerificationService', () => {
       };
       cacheService.getClient.mockReturnValue(redisClient);
 
-      await expect(
-        service.verifyCode(testEmail, testCode, testType)
-      ).rejects.toThrow(VerificationUnavailableException);
+      await expect(service.verifyCode(testEmail, testCode, testType)).rejects.toThrow(
+        VerificationUnavailableException,
+      );
     });
   });
 
@@ -350,7 +346,7 @@ describe('VerificationService', () => {
         expect(cacheService.set).toHaveBeenCalledWith(
           `verification:email:${testEmail}:${type}`,
           expect.any(Object),
-          300
+          300,
         );
         jest.clearAllMocks();
       }

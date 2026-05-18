@@ -79,7 +79,9 @@ describe('TimeSlotsController', () => {
         })(),
       );
 
-      await expect(controller.create(createTimeSlotDto)).rejects.toThrow('Time slot already exists');
+      await expect(controller.create(createTimeSlotDto)).rejects.toThrow(
+        'Time slot already exists',
+      );
     });
   });
 
@@ -186,18 +188,26 @@ describe('TimeSlotsController', () => {
 
   describe('getAvailableSlots', () => {
     const mockAvailableSlots = [
-      { id: 'slot-1', startTime: new Date('2024-06-15T10:00:00.000Z'), endTime: new Date('2024-06-15T10:30:00.000Z'), capacity: 5, bookedCount: 2 },
-      { id: 'slot-2', startTime: new Date('2024-06-15T11:00:00.000Z'), endTime: new Date('2024-06-15T11:30:00.000Z'), capacity: 5, bookedCount: 0 },
+      {
+        id: 'slot-1',
+        startTime: new Date('2024-06-15T10:00:00.000Z'),
+        endTime: new Date('2024-06-15T10:30:00.000Z'),
+        capacity: 5,
+        bookedCount: 2,
+      },
+      {
+        id: 'slot-2',
+        startTime: new Date('2024-06-15T11:00:00.000Z'),
+        endTime: new Date('2024-06-15T11:30:00.000Z'),
+        capacity: 5,
+        bookedCount: 0,
+      },
     ];
 
     it('should call service.getAvailableSlots with correct parameters', async () => {
       mockTimeSlotsService.getAvailableSlots.mockResolvedValue(mockAvailableSlots);
 
-      const result = await controller.getAvailableSlots(
-        'service-1',
-        '2024-06-15',
-        '2024-06-16',
-      );
+      const result = await controller.getAvailableSlots('service-1', '2024-06-15', '2024-06-16');
 
       expect(service.getAvailableSlots).toHaveBeenCalledWith(
         'service-1',
@@ -211,11 +221,7 @@ describe('TimeSlotsController', () => {
     it('should return empty array when no slots are available', async () => {
       mockTimeSlotsService.getAvailableSlots.mockResolvedValue([]);
 
-      const result = await controller.getAvailableSlots(
-        'service-1',
-        '2024-12-25',
-        '2024-12-26',
-      );
+      const result = await controller.getAvailableSlots('service-1', '2024-12-25', '2024-12-26');
 
       expect(result).toEqual([]);
     });
@@ -245,7 +251,9 @@ describe('TimeSlotsController', () => {
       );
 
       await expect(controller.findOne('invalid-id')).rejects.toThrow(NotFoundException);
-      await expect(controller.findOne('invalid-id')).rejects.toThrow('Time slot with ID invalid-id not found');
+      await expect(controller.findOne('invalid-id')).rejects.toThrow(
+        'Time slot with ID invalid-id not found',
+      );
     });
   });
 
@@ -276,7 +284,9 @@ describe('TimeSlotsController', () => {
         new NotFoundException('Time slot with ID invalid-id not found'),
       );
 
-      await expect(controller.update('invalid-id', updateTimeSlotDto)).rejects.toThrow(NotFoundException);
+      await expect(controller.update('invalid-id', updateTimeSlotDto)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 

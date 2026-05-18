@@ -27,7 +27,7 @@ export class AdminServiceDto {
   @ApiPropertyOptional({ description: 'Image URL (placeholder)' })
   imageUrl?: string;
 
-  @ApiPropertyOptional({ description: 'Tax rate' })
+  @ApiPropertyOptional({ description: 'Tax rate in percentage (e.g., 8 for 8%)' })
   taxRate?: number;
 
   @ApiPropertyOptional({ description: 'Service category name' })
@@ -53,11 +53,13 @@ export class CreateAdminServiceDto {
   description?: string;
 
   @ApiProperty({ description: 'Duration in minutes' })
+  @Type(() => Number)
   @IsNumber()
   @Min(0)
   duration!: number;
 
   @ApiProperty()
+  @Type(() => Number)
   @IsNumber()
   @Min(0)
   price!: number;
@@ -69,6 +71,7 @@ export class CreateAdminServiceDto {
 
   @ApiPropertyOptional({ description: 'Price per minute (auto-calculated)' })
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   @Min(0)
   pricePerMinute?: number;
@@ -78,8 +81,9 @@ export class CreateAdminServiceDto {
   @IsString()
   imageUrl?: string;
 
-  @ApiPropertyOptional({ description: 'Tax rate' })
+  @ApiPropertyOptional({ description: 'Tax rate in percentage (e.g., 8 for 8%)' })
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   @Min(0)
   taxRate?: number;
@@ -98,12 +102,14 @@ export class UpdateAdminServiceDto {
 
   @ApiPropertyOptional({ description: 'Duration in minutes' })
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   @Min(0)
   duration?: number;
 
   @ApiPropertyOptional()
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   @Min(0)
   price?: number;
@@ -115,6 +121,7 @@ export class UpdateAdminServiceDto {
 
   @ApiPropertyOptional({ description: 'Price per minute (auto-calculated)' })
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   @Min(0)
   pricePerMinute?: number;
@@ -123,6 +130,18 @@ export class UpdateAdminServiceDto {
   @IsOptional()
   @IsString()
   imageUrl?: string;
+
+  @ApiPropertyOptional({ description: 'Tax rate in percentage (e.g., 8 for 8%)' })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  taxRate?: number;
+
+  @ApiPropertyOptional({ description: 'Service category name' })
+  @IsOptional()
+  @IsString()
+  category?: string;
 }
 
 export class AdminServicesQueryDto {

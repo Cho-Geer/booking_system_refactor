@@ -49,7 +49,13 @@ describe('AppointmentsController', () => {
         },
         {
           provide: REDIS_CONFIG_TOKEN,
-          useValue: { host: 'localhost', port: 6379, keyPrefix: 'test:', ttlDefault: 300, ttlSession: 604800 },
+          useValue: {
+            host: 'localhost',
+            port: 6379,
+            keyPrefix: 'test:',
+            ttlDefault: 300,
+            ttlSession: 604800,
+          },
         },
         {
           provide: CacheService,
@@ -156,8 +162,12 @@ describe('AppointmentsController', () => {
         new NotFoundException('Time slot not found'),
       );
 
-      await expect(controller.create(createAppointmentDto, mockReq, 'test-key')).rejects.toThrow(NotFoundException);
-      await expect(controller.create(createAppointmentDto, mockReq, 'test-key')).rejects.toThrow('Time slot not found');
+      await expect(controller.create(createAppointmentDto, mockReq, 'test-key')).rejects.toThrow(
+        NotFoundException,
+      );
+      await expect(controller.create(createAppointmentDto, mockReq, 'test-key')).rejects.toThrow(
+        'Time slot not found',
+      );
     });
 
     it('should propagate ConflictException from service.create', async () => {
@@ -176,7 +186,9 @@ describe('AppointmentsController', () => {
         })(),
       );
 
-      await expect(controller.create(createAppointmentDto, mockReq, 'test-key')).rejects.toThrow('Time slot is not available');
+      await expect(controller.create(createAppointmentDto, mockReq, 'test-key')).rejects.toThrow(
+        'Time slot is not available',
+      );
     });
   });
 
@@ -196,12 +208,19 @@ describe('AppointmentsController', () => {
           totalPages: 1,
           hasNext: false,
           hasPrev: false,
-        }
+        },
       });
 
       const result = await controller.findAll();
 
-      expect(service.findAll).toHaveBeenCalledWith(1, 20, undefined, undefined, undefined, undefined);
+      expect(service.findAll).toHaveBeenCalledWith(
+        1,
+        20,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+      );
       expect(result.items).toEqual(mockAppointments);
       expect(result.meta.total).toBe(2);
     });
@@ -216,12 +235,19 @@ describe('AppointmentsController', () => {
           totalPages: 1,
           hasNext: false,
           hasPrev: true,
-        }
+        },
       });
 
       const result = await controller.findAll(2, 5);
 
-      expect(service.findAll).toHaveBeenCalledWith(2, 5, undefined, undefined, undefined, undefined);
+      expect(service.findAll).toHaveBeenCalledWith(
+        2,
+        5,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+      );
       expect(result.meta.page).toBe(2);
       expect(result.meta.limit).toBe(5);
     });
@@ -236,12 +262,19 @@ describe('AppointmentsController', () => {
           totalPages: 1,
           hasNext: false,
           hasPrev: false,
-        }
+        },
       });
 
       await controller.findAll(1, 10, AppointmentStatus.PENDING);
 
-      expect(service.findAll).toHaveBeenCalledWith(1, 10, AppointmentStatus.PENDING, undefined, undefined, undefined);
+      expect(service.findAll).toHaveBeenCalledWith(
+        1,
+        10,
+        AppointmentStatus.PENDING,
+        undefined,
+        undefined,
+        undefined,
+      );
     });
 
     // BUG-001 Test 4: Admin findAll endpoint still supports userId query param for filtering
@@ -255,12 +288,19 @@ describe('AppointmentsController', () => {
           totalPages: 1,
           hasNext: false,
           hasPrev: false,
-        }
+        },
       });
 
       await controller.findAll(1, 10, undefined, 'filter-user-id');
 
-      expect(service.findAll).toHaveBeenCalledWith(1, 10, undefined, 'filter-user-id', undefined, undefined);
+      expect(service.findAll).toHaveBeenCalledWith(
+        1,
+        10,
+        undefined,
+        'filter-user-id',
+        undefined,
+        undefined,
+      );
     });
 
     it('should call service.findAll with all filters', async () => {
@@ -273,19 +313,24 @@ describe('AppointmentsController', () => {
           totalPages: 0,
           hasNext: false,
           hasPrev: false,
-        }
+        },
       });
 
       await controller.findAll(1, 10, AppointmentStatus.CANCELLED, 'user-2');
 
-      expect(service.findAll).toHaveBeenCalledWith(1, 10, AppointmentStatus.CANCELLED, 'user-2', undefined, undefined);
+      expect(service.findAll).toHaveBeenCalledWith(
+        1,
+        10,
+        AppointmentStatus.CANCELLED,
+        'user-2',
+        undefined,
+        undefined,
+      );
     });
   });
 
   describe('getMyAppointments', () => {
-    const mockAppointments = [
-      { id: 'apt-1', status: AppointmentStatus.PENDING },
-    ];
+    const mockAppointments = [{ id: 'apt-1', status: AppointmentStatus.PENDING }];
 
     // BUG-001 Test 2: GET /v1/appointments/my should use JWT userId, not query param
     it('[BUG-001] should ignore userId from query param and use userId from JWT token', async () => {
@@ -298,7 +343,7 @@ describe('AppointmentsController', () => {
           totalPages: 1,
           hasNext: false,
           hasPrev: false,
-        }
+        },
       });
 
       // Act: Call getMyAppointments with mockReq (JWT user)
@@ -321,7 +366,7 @@ describe('AppointmentsController', () => {
           totalPages: 1,
           hasNext: false,
           hasPrev: false,
-        }
+        },
       });
 
       const result = await controller.getMyAppointments(mockReq);
@@ -340,7 +385,7 @@ describe('AppointmentsController', () => {
           totalPages: 1,
           hasNext: false,
           hasPrev: true,
-        }
+        },
       });
 
       await controller.getMyAppointments(mockReq, 2, 5);
@@ -358,7 +403,7 @@ describe('AppointmentsController', () => {
           totalPages: 0,
           hasNext: false,
           hasPrev: false,
-        }
+        },
       });
 
       const result = await controller.getMyAppointments(mockReq);
@@ -390,7 +435,9 @@ describe('AppointmentsController', () => {
       );
 
       await expect(controller.findOne('invalid-id')).rejects.toThrow(NotFoundException);
-      await expect(controller.findOne('invalid-id')).rejects.toThrow('Appointment with ID invalid-id not found');
+      await expect(controller.findOne('invalid-id')).rejects.toThrow(
+        'Appointment with ID invalid-id not found',
+      );
     });
   });
 
@@ -418,7 +465,9 @@ describe('AppointmentsController', () => {
         new NotFoundException('Appointment with ID invalid-id not found'),
       );
 
-      await expect(controller.update('invalid-id', updateAppointmentDto)).rejects.toThrow(NotFoundException);
+      await expect(controller.update('invalid-id', updateAppointmentDto)).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('should allow updating with cancelReason', async () => {
@@ -460,7 +509,9 @@ describe('AppointmentsController', () => {
         new NotFoundException('Appointment with ID invalid-id not found'),
       );
 
-      await expect(controller.cancel('invalid-id', { reason: 'test' })).rejects.toThrow(NotFoundException);
+      await expect(controller.cancel('invalid-id', { reason: 'test' })).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('should propagate BadRequestException for already cancelled appointment', async () => {
@@ -468,14 +519,20 @@ describe('AppointmentsController', () => {
         new BadRequestException('Appointment is already cancelled'),
       );
 
-      await expect(controller.cancel('apt-1', { reason: 'test' })).rejects.toThrow(BadRequestException);
-      await expect(controller.cancel('apt-1', { reason: 'test' })).rejects.toThrow('Appointment is already cancelled');
+      await expect(controller.cancel('apt-1', { reason: 'test' })).rejects.toThrow(
+        BadRequestException,
+      );
+      await expect(controller.cancel('apt-1', { reason: 'test' })).rejects.toThrow(
+        'Appointment is already cancelled',
+      );
     });
   });
 
   describe('remove', () => {
     it('should call service.remove and return success message', async () => {
-      mockAppointmentsService.remove.mockResolvedValue({ message: 'Appointment deleted successfully' });
+      mockAppointmentsService.remove.mockResolvedValue({
+        message: 'Appointment deleted successfully',
+      });
 
       const result = await controller.remove('apt-1');
 

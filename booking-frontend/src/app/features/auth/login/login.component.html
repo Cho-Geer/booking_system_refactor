@@ -1,305 +1,379 @@
-<div class="login-page min-h-screen w-full gradient-page-bg flex items-center justify-center px-4 py-8">
+<div
+  class="login-page min-h-screen w-full gradient-page-bg flex items-center justify-center px-4 py-8"
+>
   <div class="max-w-[450px] w-full">
     <app-card variant="sharp" styleClass="w-full">
       <div class="p-6 lg:p-8">
-    <!-- Tabs -->
-    <div class="tabs">
-      <button
-        type="button"
-        class="tab-button w-full"
-        [class.active]="activeTab() === 'password'"
-        (click)="switchTab('password')"
-      >
-        {{ 'auth.login.title' | t }}
-      </button>
-      <button
-        type="button"
-        class="tab-button w-full"
-        [class.active]="activeTab() === 'code'"
-        (click)="switchTab('code')"
-      >
-        {{ 'auth.verificationCode.verify' | t }}
-      </button>
-    </div>
-
-    <!-- Error -->
-    @if (error()) {
-      <div class="sharp-card p-4 mb-4 border-l-4 border-red-500">
-        <p class="text-sm text-red-600">{{ error() }}</p>
-      </div>
-    }
-
-    <!-- Password Login Form -->
-    @if (activeTab() === 'password') {
-      <form [formGroup]="passwordForm" (ngSubmit)="onPasswordLogin()">
-        <div class="form-group">
-          <label>{{ 'auth.login.contactType' | t }}</label>
-          <div class="contact-type-selector">
-            <button
-              type="button"
-              class="type-btn min-touch-target"
-              [class.active]="contactType() === ContactType.EMAIL"
-              (click)="setContactType(ContactType.EMAIL)"
-            >
-              {{ 'auth.login.email' | t }}
-            </button>
-            <button
-              type="button"
-              class="type-btn min-touch-target"
-              [class.active]="contactType() === ContactType.PHONE"
-              (click)="setContactType(ContactType.PHONE)"
-            >
-              {{ 'auth.login.phone' | t }}
-            </button>
-          </div>
+        <!-- Tabs -->
+        <div class="tabs">
+          <button
+            type="button"
+            class="tab-button w-full"
+            [class.active]="activeTab() === 'password'"
+            (click)="switchTab('password')"
+          >
+            {{ 'auth.login.title' | t }}
+          </button>
+          <button
+            type="button"
+            class="tab-button w-full"
+            [class.active]="activeTab() === 'code'"
+            (click)="switchTab('code')"
+          >
+            {{ 'auth.verificationCode.verify' | t }}
+          </button>
         </div>
 
-        <div class="form-group">
-          <label for="password-contact">{{ contactType() === ContactType.EMAIL ? ('auth.login.email' | t) : ('auth.login.phone' | t) }}</label>
-          <input
-            id="password-contact"
-            class="sharp-input"
-            [type]="contactType() === ContactType.EMAIL ? 'email' : 'tel'"
-            formControlName="contact"
-            [placeholder]="(contactType() === ContactType.EMAIL ? 'auth.login.enterEmail' : 'auth.login.enterPhone') | t"
-            [class.error]="isPasswordFieldInvalid('contact')"
-          />
-          @if (isPasswordFieldInvalid('contact')) {
-            <div class="error-message">
-              @if (passwordForm.get('contact')?.errors?.['required']) {
-                <span>{{ 'auth.login.contactRequired' | t }}</span>
-              }
-              @if (passwordForm.get('contact')?.errors?.['emailFormat']) {
-                <span>{{ 'auth.login.invalidEmail' | t }}</span>
-              }
-              @if (passwordForm.get('contact')?.errors?.['phoneFormat']) {
-                <span>{{ 'auth.login.invalidPhone' | t }}</span>
-              }
-            </div>
-          }
-        </div>
-
-        <div class="form-group">
-          <label for="password">{{ 'auth.login.password' | t }}</label>
-          <input
-            id="password"
-            class="sharp-input"
-            type="password"
-            formControlName="password"
-            [placeholder]="'auth.login.enterPassword' | t"
-            [class.error]="isPasswordFieldInvalid('password')"
-          />
-          @if (isPasswordFieldInvalid('password')) {
-            <div class="error-message">
-              @if (passwordForm.get('password')?.errors?.['required']) {
-                <span>{{ 'auth.login.passwordRequired' | t }}</span>
-              }
-              @if (getPasswordStrengthError('isValidLength')) {
-                <span>{{ 'auth.login.passwordMinLength' | t }}</span>
-              }
-              @if (getPasswordStrengthError('hasUpperCase')) {
-                <span>{{ 'auth.login.passwordUppercase' | t }}</span>
-              }
-              @if (getPasswordStrengthError('hasLowerCase')) {
-                <span>{{ 'auth.login.passwordLowercase' | t }}</span>
-              }
-              @if (getPasswordStrengthError('hasNumber')) {
-                <span>{{ 'auth.login.passwordDigit' | t }}</span>
-              }
-              @if (getPasswordStrengthError('hasSpecialChar')) {
-                <span>{{ 'auth.login.passwordSpecial' | t }}</span>
-              }
-            </div>
-          }
-        </div>
-
-        <div class="terms-checkbox">
-          <label>
-            <input
-              type="checkbox"
-              [ngModel]="acceptTerms()"
-              [ngModelOptions]="{standalone: true}"
-              (ngModelChange)="acceptTerms.set($event)"
-            />
-            <span>{{ 'auth.login.agreeTerms' | t }}</span>
-            <a routerLink="/legal/terms" target="_blank">{{ 'auth.login.termsOfService' | t }}</a>
-            <span>和</span>
-            <a routerLink="/legal/privacy" target="_blank">{{ 'auth.login.privacyPolicy' | t }}</a>
-          </label>
-        </div>
-
-        <app-button
-          type="submit"
-          [label]="'auth.login.submit' | t"
-          variant="primary"
-          class="w-full"
-          [disabled]="passwordForm.invalid || isLoading() || !acceptTerms()"
-          [loading]="isLoading()"
-        />
-      </form>
-    }
-
-    <!-- Code Login Form -->
-    @if (activeTab() === 'code') {
-      <!-- Step Indicator -->
-      <div class="step-indicator">
-        <div class="step" [class.active]="codeLoginStep() === 1" [class.completed]="codeLoginStep() > 1">
-          <span class="step-number">1</span>
-          <span class="step-label">{{ 'auth.verificationCode.send' | t }}</span>
-        </div>
-        <div class="step-connector" [class.completed]="codeLoginStep() > 1"></div>
-        <div class="step" [class.active]="codeLoginStep() === 2">
-          <span class="step-number">2</span>
-          <span class="step-label">{{ 'auth.verificationCode.verify' | t }}</span>
-        </div>
-      </div>
-
-      @if (showAntiEnumMessage()) {
-        <div class="sharp-card p-3 mb-4 border-l-4 border-green-500">
-          <span class="text-sm text-green-700">{{ 'auth.login.codeSent' | t }}</span>
-        </div>
-      }
-
-      <form [formGroup]="codeLoginForm" (ngSubmit)="onSubmit()">
-        <!-- Step 1: Contact info -->
-        @if (codeLoginStep() === 1) {
-          <div class="form-group">
-            <label>{{ 'auth.login.contactType' | t }}</label>
-            <div class="contact-type-selector">
-              <button
-                type="button"
-                class="type-btn min-touch-target"
-                [class.active]="contactType() === ContactType.EMAIL"
-                (click)="setContactType(ContactType.EMAIL)"
-              >
-                {{ 'auth.login.email' | t }}
-              </button>
-              <button
-                type="button"
-                class="type-btn min-touch-target"
-                [class.active]="contactType() === ContactType.PHONE"
-                (click)="setContactType(ContactType.PHONE)"
-              >
-                {{ 'auth.login.phone' | t }}
-              </button>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="code-contact">{{ contactType() === ContactType.EMAIL ? ('auth.login.email' | t) : ('auth.login.phone' | t) }}</label>
-            <input
-              id="code-contact"
-              class="sharp-input"
-              [type]="contactType() === ContactType.EMAIL ? 'email' : 'tel'"
-              formControlName="contact"
-              [placeholder]="(contactType() === ContactType.EMAIL ? 'auth.login.enterEmail' : 'auth.login.enterPhone') | t"
-              [class.error]="isCodeFieldInvalid('contact')"
-            />
-            @if (isCodeFieldInvalid('contact')) {
-              <div class="error-message">
-                @if (codeLoginForm.get('contact')?.errors?.['required']) {
-                  <span>{{ 'auth.login.contactRequired' | t }}</span>
-                }
-                @if (codeLoginForm.get('contact')?.errors?.['emailFormat']) {
-                  <span>{{ 'auth.login.invalidEmail' | t }}</span>
-                }
-                @if (codeLoginForm.get('contact')?.errors?.['phoneFormat']) {
-                  <span>{{ 'auth.login.invalidPhone' | t }}</span>
-                }
-              </div>
-            }
+        <!-- Error -->
+        @if (error()) {
+          <div class="sharp-card p-4 mb-4 border-l-4 border-red-500">
+            <p class="text-sm text-red-600">{{ error() }}</p>
           </div>
         }
 
-        <!-- Step 2: Verification code -->
-        @if (codeLoginStep() === 2) {
-          <div class="form-group verify-group">
-            <label for="verify-code">{{ 'auth.verificationCode.code' | t }}</label>
-            <div class="verify-input-wrapper">
+        <!-- Password Login Form -->
+        @if (activeTab() === 'password') {
+          <form [formGroup]="passwordForm" (ngSubmit)="onPasswordLogin()">
+            <div class="form-group">
+              <label>{{ 'auth.login.contactType' | t }}</label>
+              <div class="contact-type-selector">
+                <button
+                  type="button"
+                  class="type-btn min-touch-target"
+                  [class.active]="contactType() === ContactType.EMAIL"
+                  (click)="setContactType(ContactType.EMAIL)"
+                >
+                  {{ 'auth.login.email' | t }}
+                </button>
+                <button
+                  type="button"
+                  class="type-btn min-touch-target"
+                  [class.active]="contactType() === ContactType.PHONE"
+                  (click)="setContactType(ContactType.PHONE)"
+                >
+                  {{ 'auth.login.phone' | t }}
+                </button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="password-contact">{{
+                contactType() === ContactType.EMAIL
+                  ? ('auth.login.email' | t)
+                  : ('auth.login.phone' | t)
+              }}</label>
               <input
-                id="verify-code"
+                id="password-contact"
                 class="sharp-input"
-                type="text"
-                inputmode="numeric"
-                pattern="\d{6}"
-                formControlName="code"
-                [placeholder]="'auth.login.enterCode' | t"
-                maxlength="6"
-                [class.error]="isCodeFieldInvalid('code')"
+                [type]="contactType() === ContactType.EMAIL ? 'email' : 'tel'"
+                formControlName="contact"
+                [placeholder]="
+                  (contactType() === ContactType.EMAIL
+                    ? 'auth.login.enterEmail'
+                    : 'auth.login.enterPhone'
+                  ) | t
+                "
+                [class.error]="isPasswordFieldInvalid('contact')"
               />
-              <button
-                type="button"
-                class="btn-get-code min-touch-target"
-                [disabled]="countdown() > 0"
-                (click)="sendVerifyCode()"
-              >
-                @if (countdown() > 0) {
-                  {{ countdown() }}s
-                } @else {
-                  {{ 'auth.login.resend' | t }}
-                }
-              </button>
+              @if (isPasswordFieldInvalid('contact')) {
+                <div class="error-message">
+                  @if (passwordForm.get('contact')?.errors?.['required']) {
+                    <span>{{ 'auth.login.contactRequired' | t }}</span>
+                  }
+                  @if (passwordForm.get('contact')?.errors?.['emailFormat']) {
+                    <span>{{ 'auth.login.invalidEmail' | t }}</span>
+                  }
+                  @if (passwordForm.get('contact')?.errors?.['phoneFormat']) {
+                    <span>{{ 'auth.login.invalidPhone' | t }}</span>
+                  }
+                </div>
+              }
             </div>
-            @if (isCodeFieldInvalid('code')) {
-              <div class="error-message">
-                <span>{{ 'auth.login.codeRequired' | t }}</span>
+
+            <div class="form-group">
+              <label for="password">{{ 'auth.login.password' | t }}</label>
+              <div class="password-input-wrapper">
+                <input
+                  id="password"
+                  class="sharp-input"
+                  [type]="passwordVisible() ? 'text' : 'password'"
+                  formControlName="password"
+                  [placeholder]="'auth.login.enterPassword' | t"
+                  [class.error]="isPasswordFieldInvalid('password')"
+                />
+                <button
+                  type="button"
+                  class="password-toggle-btn"
+                  [attr.aria-label]="(passwordVisible() ? 'auth.login.hidePassword' : 'auth.login.showPassword') | t"
+                  (click)="togglePasswordVisibility()"
+                >
+                  @if (passwordVisible()) {
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+                      />
+                      <line x1="1" y1="1" x2="23" y2="23" />
+                    </svg>
+                  } @else {
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  }
+                </button>
               </div>
-            }
-          </div>
-        }
+              @if (isPasswordFieldInvalid('password')) {
+                <div class="error-message">
+                  @if (passwordForm.get('password')?.errors?.['required']) {
+                    <span>{{ 'auth.login.passwordRequired' | t }}</span>
+                  }
+                  @if (getPasswordStrengthError('isValidLength')) {
+                    <span>{{ 'auth.login.passwordMinLength' | t }}</span>
+                  }
+                  @if (getPasswordStrengthError('hasUpperCase')) {
+                    <span>{{ 'auth.login.passwordUppercase' | t }}</span>
+                  }
+                  @if (getPasswordStrengthError('hasLowerCase')) {
+                    <span>{{ 'auth.login.passwordLowercase' | t }}</span>
+                  }
+                  @if (getPasswordStrengthError('hasNumber')) {
+                    <span>{{ 'auth.login.passwordDigit' | t }}</span>
+                  }
+                  @if (getPasswordStrengthError('hasSpecialChar')) {
+                    <span>{{ 'auth.login.passwordSpecial' | t }}</span>
+                  }
+                </div>
+              }
+            </div>
 
-        <div class="terms-checkbox">
-          <label>
-            <input
-              type="checkbox"
-              [ngModel]="acceptTerms()"
-              [ngModelOptions]="{standalone: true}"
-              (ngModelChange)="acceptTerms.set($event)"
-            />
-            <span>{{ 'auth.login.agreeTerms' | t }}</span>
-            <a routerLink="/legal/terms" target="_blank">{{ 'auth.login.termsOfService' | t }}</a>
-            <span>和</span>
-            <a routerLink="/legal/privacy" target="_blank">{{ 'auth.login.privacyPolicy' | t }}</a>
-          </label>
-        </div>
+            <div class="terms-checkbox">
+              <label>
+                <input
+                  type="checkbox"
+                  [ngModel]="acceptTerms()"
+                  [ngModelOptions]="{ standalone: true }"
+                  (ngModelChange)="acceptTerms.set($event)"
+                />
+                <span>{{ 'auth.login.agreeTerms' | t }}</span>
+                <a routerLink="/legal/terms" target="_blank">{{
+                  'auth.login.termsOfService' | t
+                }}</a>
+                <span>和</span>
+                <a routerLink="/legal/privacy" target="_blank">{{
+                  'auth.login.privacyPolicy' | t
+                }}</a>
+              </label>
+            </div>
 
-        @if (codeLoginStep() === 1) {
-          <app-button
-            type="submit"
-            [label]="'auth.verificationCode.send' | t"
-            variant="primary"
-            class="w-full"
-            [disabled]="codeLoginForm.get('contact')?.invalid || isLoading() || !acceptTerms()"
-            [loading]="isLoading()"
-          />
-        }
-
-        @if (codeLoginStep() === 2) {
-          <div class="step-actions">
-            <app-button
-              [label]="'global.cancel' | t"
-              variant="secondary"
-              class="w-full sm:w-auto"
-              (onClick)="codeLoginStep.set(1)"
-            />
             <app-button
               type="submit"
               [label]="'auth.login.submit' | t"
               variant="primary"
-              class="w-full sm:w-auto"
-              [disabled]="codeLoginForm.invalid || isLoading() || !acceptTerms()"
+              class="w-full"
+              [disabled]="passwordForm.invalid || isLoading() || !acceptTerms()"
               [loading]="isLoading()"
             />
-          </div>
+          </form>
         }
-      </form>
-    }
 
-    <!-- Register Link -->
-    <div class="footer-links">
-      <a routerLink="/auth/register" class="register-link">{{ 'auth.login.register' | t }}</a>
-    </div>
+        <!-- Code Login Form -->
+        @if (activeTab() === 'code') {
+          <!-- Step Indicator -->
+          <div class="step-indicator">
+            <div
+              class="step"
+              [class.active]="codeLoginStep() === 1"
+              [class.completed]="codeLoginStep() > 1"
+            >
+              <span class="step-number">1</span>
+              <span class="step-label">{{ 'auth.verificationCode.send' | t }}</span>
+            </div>
+            <div class="step-connector" [class.completed]="codeLoginStep() > 1"></div>
+            <div class="step" [class.active]="codeLoginStep() === 2">
+              <span class="step-number">2</span>
+              <span class="step-label">{{ 'auth.verificationCode.verify' | t }}</span>
+            </div>
+          </div>
+
+          @if (showAntiEnumMessage()) {
+            <div class="sharp-card p-3 mb-4 border-l-4 border-green-500">
+              <span class="text-sm text-green-700">{{ 'auth.login.codeSent' | t }}</span>
+            </div>
+          }
+
+          <form [formGroup]="codeLoginForm" (ngSubmit)="onSubmit()">
+            <!-- Step 1: Contact info -->
+            @if (codeLoginStep() === 1) {
+              <div class="form-group">
+                <label>{{ 'auth.login.contactType' | t }}</label>
+                <div class="contact-type-selector">
+                  <button
+                    type="button"
+                    class="type-btn min-touch-target"
+                    [class.active]="contactType() === ContactType.EMAIL"
+                    (click)="setContactType(ContactType.EMAIL)"
+                  >
+                    {{ 'auth.login.email' | t }}
+                  </button>
+                  <button
+                    type="button"
+                    class="type-btn min-touch-target"
+                    [class.active]="contactType() === ContactType.PHONE"
+                    (click)="setContactType(ContactType.PHONE)"
+                  >
+                    {{ 'auth.login.phone' | t }}
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="code-contact">{{
+                  contactType() === ContactType.EMAIL
+                    ? ('auth.login.email' | t)
+                    : ('auth.login.phone' | t)
+                }}</label>
+                <input
+                  id="code-contact"
+                  class="sharp-input"
+                  [type]="contactType() === ContactType.EMAIL ? 'email' : 'tel'"
+                  formControlName="contact"
+                  [placeholder]="
+                    (contactType() === ContactType.EMAIL
+                      ? 'auth.login.enterEmail'
+                      : 'auth.login.enterPhone'
+                    ) | t
+                  "
+                  [class.error]="isCodeFieldInvalid('contact')"
+                />
+                @if (isCodeFieldInvalid('contact')) {
+                  <div class="error-message">
+                    @if (codeLoginForm.get('contact')?.errors?.['required']) {
+                      <span>{{ 'auth.login.contactRequired' | t }}</span>
+                    }
+                    @if (codeLoginForm.get('contact')?.errors?.['emailFormat']) {
+                      <span>{{ 'auth.login.invalidEmail' | t }}</span>
+                    }
+                    @if (codeLoginForm.get('contact')?.errors?.['phoneFormat']) {
+                      <span>{{ 'auth.login.invalidPhone' | t }}</span>
+                    }
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Step 2: Verification code -->
+            @if (codeLoginStep() === 2) {
+              <div class="form-group verify-group">
+                <label for="verify-code">{{ 'auth.verificationCode.code' | t }}</label>
+                <div class="verify-input-wrapper">
+                  <input
+                    id="verify-code"
+                    class="sharp-input"
+                    type="text"
+                    inputmode="numeric"
+                    pattern="\d{6}"
+                    formControlName="code"
+                    [placeholder]="'auth.login.enterCode' | t"
+                    maxlength="6"
+                    [class.error]="isCodeFieldInvalid('code')"
+                  />
+                  <button
+                    type="button"
+                    class="btn-get-code min-touch-target"
+                    [disabled]="countdown() > 0"
+                    (click)="sendVerifyCode()"
+                  >
+                    @if (countdown() > 0) {
+                      {{ countdown() }}s
+                    } @else {
+                      {{ 'auth.login.resend' | t }}
+                    }
+                  </button>
+                </div>
+                @if (isCodeFieldInvalid('code')) {
+                  <div class="error-message">
+                    <span>{{ 'auth.login.codeRequired' | t }}</span>
+                  </div>
+                }
+              </div>
+            }
+
+            <div class="terms-checkbox">
+              <label>
+                <input
+                  type="checkbox"
+                  [ngModel]="acceptTerms()"
+                  [ngModelOptions]="{ standalone: true }"
+                  (ngModelChange)="acceptTerms.set($event)"
+                />
+                <span>{{ 'auth.login.agreeTerms' | t }}</span>
+                <a routerLink="/legal/terms" target="_blank">{{
+                  'auth.login.termsOfService' | t
+                }}</a>
+                <span>和</span>
+                <a routerLink="/legal/privacy" target="_blank">{{
+                  'auth.login.privacyPolicy' | t
+                }}</a>
+              </label>
+            </div>
+
+            @if (codeLoginStep() === 1) {
+              <app-button
+                type="submit"
+                [label]="'auth.verificationCode.send' | t"
+                variant="primary"
+                class="w-full"
+                [disabled]="codeLoginForm.get('contact')?.invalid || isLoading() || !acceptTerms()"
+                [loading]="isLoading()"
+              />
+            }
+
+            @if (codeLoginStep() === 2) {
+              <div class="step-actions">
+                <app-button
+                  [label]="'global.cancel' | t"
+                  variant="secondary"
+                  class="w-full sm:w-auto"
+                  (onClick)="codeLoginStep.set(1)"
+                />
+                <app-button
+                  type="submit"
+                  [label]="'auth.login.submit' | t"
+                  variant="primary"
+                  class="w-full sm:w-auto"
+                  [disabled]="codeLoginForm.invalid || isLoading() || !acceptTerms()"
+                  [loading]="isLoading()"
+                />
+              </div>
+            }
+          </form>
+        }
+
+        <!-- Register Link -->
+        <div class="footer-links">
+          <a routerLink="/auth/register" class="register-link">{{ 'auth.login.register' | t }}</a>
+        </div>
       </div>
-  </app-card>
+    </app-card>
   </div>
 </div>

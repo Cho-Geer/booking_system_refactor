@@ -66,7 +66,9 @@ describe('JwtAuthGuard', () => {
 
     it('should throw UnauthorizedException when user is false and no error', () => {
       expect(() => guard.handleRequest(null, false, undefined)).toThrow(UnauthorizedException);
-      expect(() => guard.handleRequest(null, false, undefined)).toThrow('Invalid or missing authentication token');
+      expect(() => guard.handleRequest(null, false, undefined)).toThrow(
+        'Invalid or missing authentication token',
+      );
     });
 
     it('should throw UnauthorizedException with specific message for TokenExpiredError', () => {

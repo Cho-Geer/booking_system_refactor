@@ -45,7 +45,6 @@ jobs:
       - name: Calculate executable tasks
         id: calculate
         run: |
-          cd booking_system_refactor
           python scripts/dag-scheduler.py \
             --dag-file Task.DAG.json \
             --state-file ../.state/task-state.json \
@@ -56,7 +55,6 @@ jobs:
           
       - name: Trigger task workflows
         run: |
-          cd booking_system_refactor
           python scripts/task-dispatcher.py \
             --tasks "${{ steps.calculate.outputs.executable_tasks }}" \
             --token ${{ secrets.GITHUB_TOKEN }}
@@ -64,7 +62,6 @@ jobs:
       - name: Update task state
         if: always()
         run: |
-          cd booking_system_refactor
           python scripts/state-updater.py \
             --action ${{ job.status }} \
             --state-file ../.state/task-state.json
@@ -90,8 +87,6 @@ jobs:
         if: success()
         run: |
           echo "📊 Generating build report..."
-          cd booking_system_refactor
-          
           # 创建报告目录
           mkdir -p reports
           

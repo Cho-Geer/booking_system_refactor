@@ -55,14 +55,14 @@ describe('[R22-R24] WebSocket Events', () => {
 
     // Start HTTP server listening for WebSocket connections
     httpServer = app.getHttpServer();
-    await new Promise<void>(resolve => httpServer.listen(0, resolve));
+    await new Promise<void>((resolve) => httpServer.listen(0, resolve));
     const addr = httpServer.address();
     const port = typeof addr === 'object' && addr ? addr.port : 3003;
     wsUrl = `http://localhost:${port}`;
   });
 
   afterAll(async () => {
-    await new Promise<void>(resolve => httpServer.close(() => resolve()));
+    await new Promise<void>((resolve) => httpServer.close(() => resolve()));
     await app?.close();
     await testModule?.disconnect();
   });
@@ -71,7 +71,10 @@ describe('[R22-R24] WebSocket Events', () => {
     await testModule.resetDatabase();
 
     // Create ADMIN user
-    const adminData = UserFactory.create({ email: `admin-ws-${Date.now()}@example.com`, role: SystemRole.ADMIN });
+    const adminData = UserFactory.create({
+      email: `admin-ws-${Date.now()}@example.com`,
+      role: SystemRole.ADMIN,
+    });
     const admin = await prisma.user.create({ data: adminData as any });
     adminUserId = admin.id;
     adminToken = jwtService.sign(
@@ -89,17 +92,35 @@ describe('[R22-R24] WebSocket Events', () => {
   });
 
   function createTestServiceAndSlot() {
-    return prisma.serviceCategory.create({
-      data: { name: `WSCat ${Date.now()}`, displayOrder: 1, isActive: true },
-    }).then(category =>
-      prisma.service.create({
-        data: { categoryId: category.id, name: 'WS Service', durationMinutes: 60, price: 100, isActive: true },
+    return prisma.serviceCategory
+      .create({
+        data: { name: `WSCat ${Date.now()}`, displayOrder: 1, isActive: true },
       })
-    ).then(service =>
-      prisma.timeSlot.create({
-        data: { serviceId: service.id, startTime: new Date(Date.now() + 86400000), endTime: new Date(Date.now() + 86400000 + 3600000), capacity: 5, currentSequence: 0, isActive: true },
-      }).then(timeSlot => ({ service, timeSlot }))
-    );
+      .then((category) =>
+        prisma.service.create({
+          data: {
+            categoryId: category.id,
+            name: 'WS Service',
+            durationMinutes: 60,
+            price: 100,
+            isActive: true,
+          },
+        }),
+      )
+      .then((service) =>
+        prisma.timeSlot
+          .create({
+            data: {
+              serviceId: service.id,
+              startTime: new Date(Date.now() + 86400000),
+              endTime: new Date(Date.now() + 86400000 + 3600000),
+              capacity: 5,
+              currentSequence: 0,
+              isActive: true,
+            },
+          })
+          .then((timeSlot) => ({ service, timeSlot })),
+      );
   }
 
   // ============================================================
@@ -173,7 +194,7 @@ describe('[R22-R24] WebSocket Events', () => {
         forceNew: true,
       });
 
-      const connectionResult = await new Promise<boolean>(resolve => {
+      const connectionResult = await new Promise<boolean>((resolve) => {
         socket.on('connect', () => {
           socket.disconnect();
           resolve(true);
@@ -201,7 +222,7 @@ describe('[R22-R24] WebSocket Events', () => {
 
       // Gateway accepts transport-level connection but disconnects after validation
       const events: string[] = [];
-      await new Promise<void>(resolve => {
+      await new Promise<void>((resolve) => {
         socket.on('connect', () => {
           events.push('connect');
         });
@@ -232,7 +253,7 @@ describe('[R22-R24] WebSocket Events', () => {
       });
 
       const events: string[] = [];
-      await new Promise<void>(resolve => {
+      await new Promise<void>((resolve) => {
         socket.on('connect', () => {
           events.push('connect');
         });

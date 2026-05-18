@@ -3,14 +3,14 @@ import {
   NotFoundException,
   ConflictException,
   BadRequestException,
-} from "@nestjs/common";
-import { PrismaService } from "../../common/database/prisma.service";
-import { CreateUserDto, UpdateUserDto } from "./dto/user.dto";
-import { UpdateProfileDto } from "./dto/update-profile.dto";
-import { UpdateTimezoneDto } from "./dto/update-timezone.dto";
-import { SystemRole, UserStatus } from "@prisma/client";
-import { HashService } from "../encryption/hash.service";
-import { PasswordUtil } from "../../common/utils/password.util";
+} from '@nestjs/common';
+import { PrismaService } from '../../common/database/prisma.service';
+import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
+import { UpdateTimezoneDto } from './dto/update-timezone.dto';
+import { SystemRole, UserStatus } from '@prisma/client';
+import { HashService } from '../encryption/hash.service';
+import { PasswordUtil } from '../../common/utils/password.util';
 
 @Injectable()
 export class UsersService {
@@ -28,7 +28,7 @@ export class UsersService {
       });
 
       if (existingUser) {
-        throw new ConflictException("User with this email already exists");
+        throw new ConflictException('User with this email already exists');
       }
     }
 
@@ -39,7 +39,7 @@ export class UsersService {
       });
 
       if (existingUser) {
-        throw new ConflictException("User with this phone already exists");
+        throw new ConflictException('User with this phone already exists');
       }
     }
 
@@ -61,16 +61,16 @@ export class UsersService {
         skip,
         take: pageSize,
         select: this.getSafeUserSelect(),
-        orderBy: { createdAt: "desc" },
+        orderBy: { createdAt: 'desc' },
       }),
       this.prisma.user.count(),
     ]);
 
-    const totalPages = Math.ceil(total / pageSize);
+    const totalPages = Math.ceil(Number(total) / pageSize);
     return {
       items: users,
       meta: {
-        total,
+        total: Number(total),
         page,
         limit: pageSize,
         totalPages,
@@ -139,7 +139,7 @@ export class UsersService {
         where: { emailHash },
       });
       if (existingUser) {
-        throw new ConflictException("User with this email already exists");
+        throw new ConflictException('User with this email already exists');
       }
     }
 
@@ -150,7 +150,7 @@ export class UsersService {
         where: { phoneHash },
       });
       if (existingUser) {
-        throw new ConflictException("User with this phone already exists");
+        throw new ConflictException('User with this phone already exists');
       }
     }
 
@@ -168,7 +168,7 @@ export class UsersService {
     }
 
     await this.prisma.user.delete({ where: { id } });
-    return { message: "User deleted successfully" };
+    return { message: 'User deleted successfully' };
   }
 
   async updateProfile(id: string, dto: UpdateProfileDto) {
@@ -179,10 +179,7 @@ export class UsersService {
     });
   }
 
-  async updateTimezone(
-    id: string,
-    dto: UpdateTimezoneDto,
-  ) {
+  async updateTimezone(id: string, dto: UpdateTimezoneDto) {
     const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
@@ -201,9 +198,9 @@ export class UsersService {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
 
-    const isPasswordValid = await PasswordUtil.compare(oldPassword, user.passwordHash ?? "");
+    const isPasswordValid = await PasswordUtil.compare(oldPassword, user.passwordHash ?? '');
     if (!isPasswordValid) {
-      throw new BadRequestException("Current password is incorrect");
+      throw new BadRequestException('Current password is incorrect');
     }
 
     const passwordHash = await PasswordUtil.hash(newPassword);
@@ -213,7 +210,7 @@ export class UsersService {
       data: { passwordHash },
     });
 
-    return { message: "Password updated successfully" };
+    return { message: 'Password updated successfully' };
   }
 
   /**

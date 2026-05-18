@@ -157,11 +157,7 @@ describe('TranslationsController (Public)', () => {
 
       // Assert
       expect(result.locale).toBe('zh');
-      expect(mockService.getTranslations).toHaveBeenCalledWith(
-        'zh',
-        undefined,
-        undefined,
-      );
+      expect(mockService.getTranslations).toHaveBeenCalledWith('zh', undefined, undefined);
     });
 
     it('should pass domain filter to service when provided', async () => {
@@ -179,11 +175,7 @@ describe('TranslationsController (Public)', () => {
 
       // Assert
       expect(Object.keys(result.translations!)).toEqual(['auth']);
-      expect(mockService.getTranslations).toHaveBeenCalledWith(
-        'en',
-        'auth',
-        undefined,
-      );
+      expect(mockService.getTranslations).toHaveBeenCalledWith('en', 'auth', undefined);
     });
 
     it('should pass since parameter and return incremental response when provided', async () => {
@@ -198,11 +190,7 @@ describe('TranslationsController (Public)', () => {
       expect(result.changes).toBeDefined();
       expect(result.deleted).toBeDefined();
       expect(result.translations).toBeUndefined();
-      expect(mockService.getTranslations).toHaveBeenCalledWith(
-        'en',
-        undefined,
-        sinceDate,
-      );
+      expect(mockService.getTranslations).toHaveBeenCalledWith('en', undefined, sinceDate);
     });
 
     it('should combine locale, domain, and since parameters together', async () => {
@@ -214,11 +202,7 @@ describe('TranslationsController (Public)', () => {
       await controller.getTranslations('zh', 'auth', sinceDate);
 
       // Assert
-      expect(mockService.getTranslations).toHaveBeenCalledWith(
-        'zh',
-        'auth',
-        sinceDate,
-      );
+      expect(mockService.getTranslations).toHaveBeenCalledWith('zh', 'auth', sinceDate);
     });
   });
 
@@ -228,18 +212,12 @@ describe('TranslationsController (Public)', () => {
   describe('Auth — Public access', () => {
     it('should have @Public() decorator on controller or getTranslations method', async () => {
       // Arrange
-      const isPublic = Reflect.getOwnPropertyDescriptor(
-        TranslationsController,
-        '__decorate',
-      ) || {};
+      const isPublic = Reflect.getOwnPropertyDescriptor(TranslationsController, '__decorate') || {};
 
       // Assert — the controller class or method should have @Public() metadata
       // This checks via reflector pattern
       const reflector = new Reflector();
-      const publicMetadata = reflector.get(
-        IS_PUBLIC_KEY,
-        TranslationsController,
-      );
+      const publicMetadata = reflector.get(IS_PUBLIC_KEY, TranslationsController);
 
       // Also check on the method level
       const methodPublic = reflector.get(
@@ -426,14 +404,12 @@ describe('AdminTranslationsController', () => {
 
     it('should return 404 when translation id does not exist', async () => {
       // Arrange
-      mockService.deleteTranslation.mockRejectedValue(
-        new Error('Translation not found'),
-      );
+      mockService.deleteTranslation.mockRejectedValue(new Error('Translation not found'));
 
       // Act & Assert
-      await expect(
-        controller.deleteTranslation('nonexistent-id'),
-      ).rejects.toThrow('Translation not found');
+      await expect(controller.deleteTranslation('nonexistent-id')).rejects.toThrow(
+        'Translation not found',
+      );
     });
 
     it('should invalidate cache after successful deletion', async () => {
@@ -455,7 +431,7 @@ describe('AdminTranslationsController', () => {
     it('should re-populate default translations and return success', async () => {
       // Arrange
       mockService.seedDefaultTranslations.mockResolvedValue({
-        message: "seed_success",
+        message: 'seed_success',
         count: 205,
       });
 
@@ -463,14 +439,14 @@ describe('AdminTranslationsController', () => {
       const result = await controller.seedDefaultTranslations();
 
       // Assert
-      expect(result.message).toBe("seed_success");
+      expect(result.message).toBe('seed_success');
       expect(result.count).toBeGreaterThan(0);
     });
 
     it('should call service.seedDefaultTranslations', async () => {
       // Arrange
       mockService.seedDefaultTranslations.mockResolvedValue({
-        message: "seed_success",
+        message: 'seed_success',
         count: 205,
       });
 
@@ -484,7 +460,7 @@ describe('AdminTranslationsController', () => {
     it('should invalidate cache after seeding', async () => {
       // Arrange
       mockService.seedDefaultTranslations.mockResolvedValue({
-        message: "seed_success",
+        message: 'seed_success',
         count: 205,
       });
 
@@ -517,10 +493,7 @@ describe('AdminTranslationsController', () => {
     it('should have @Roles("ADMIN", "SUPER_ADMIN") on PUT /admin/translations', async () => {
       // Arrange
       const reflector = new Reflector();
-      const roles = reflector.get(
-        'roles',
-        AdminTranslationsController.prototype.batchUpsert,
-      );
+      const roles = reflector.get('roles', AdminTranslationsController.prototype.batchUpsert);
 
       // Assert
       expect(roles).toBeDefined();
@@ -531,10 +504,7 @@ describe('AdminTranslationsController', () => {
     it('should have @Roles("ADMIN", "SUPER_ADMIN") on DELETE /admin/translations/:id', async () => {
       // Arrange
       const reflector = new Reflector();
-      const roles = reflector.get(
-        'roles',
-        AdminTranslationsController.prototype.deleteTranslation,
-      );
+      const roles = reflector.get('roles', AdminTranslationsController.prototype.deleteTranslation);
 
       // Assert
       expect(roles).toBeDefined();

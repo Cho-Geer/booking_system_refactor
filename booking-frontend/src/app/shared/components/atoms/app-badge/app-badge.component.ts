@@ -6,13 +6,13 @@ export type BadgeSize = 'sm' | 'md' | 'lg';
 export type BadgeShape = 'rounded' | 'pill';
 
 export const BADGE_LABELS: Record<BadgeStatus, string> = {
-  pending: '待确认',
-  confirmed: '已确认',
-  completed: '已完成',
-  cancelled: '已取消',
-  expired: '已过期',
-  processing: '处理中',
-  error: '异常',
+  pending: 'Pending',
+  confirmed: 'Confirmed',
+  completed: 'Completed',
+  cancelled: 'Cancelled',
+  expired: 'Expired',
+  processing: 'Processing',
+  error: 'Error',
 };
 
 @Component({

@@ -4,18 +4,15 @@ import {
   ConflictException,
   BadRequestException,
   Logger,
-} from "@nestjs/common";
-import { PrismaService } from "../../common/database/prisma.service";
-import { EmailService } from "../email/email.service";
-import { NotificationService } from "../notifications/notification.service";
-import { NotificationsGateway } from "../notifications/notifications.gateway";
-import {
-  CreateAppointmentDto,
-  UpdateAppointmentDto,
-} from "./dto/appointment.dto";
-import { AppointmentStatus, Prisma } from "@prisma/client";
-import { withRetry, isTransientDbError } from "../../common/utils/retry.util";
-import { sleep } from "../../common/utils/sleep.util";
+} from '@nestjs/common';
+import { PrismaService } from '../../common/database/prisma.service';
+import { EmailService } from '../email/email.service';
+import { NotificationService } from '../notifications/notification.service';
+import { NotificationsGateway } from '../notifications/notifications.gateway';
+import { CreateAppointmentDto, UpdateAppointmentDto } from './dto/appointment.dto';
+import { AppointmentStatus, Prisma } from '@prisma/client';
+import { withRetry, isTransientDbError } from '../../common/utils/retry.util';
+import { sleep } from '../../common/utils/sleep.util';
 
 // Configuration constants for high-concurrency slot preemption
 const MAX_RETRIES = 3;
@@ -58,11 +55,11 @@ export class AppointmentsService {
     });
 
     if (!timeSlot) {
-      throw new NotFoundException("Time slot not found");
+      throw new NotFoundException('Time slot not found');
     }
 
     if (!timeSlot.isActive) {
-      throw new ConflictException("Time slot is not available");
+      throw new ConflictException('Time slot is not available');
     }
 
     // Attempt atomic slot preemption with retry logic
@@ -70,16 +67,11 @@ export class AppointmentsService {
     try {
       appointment = await withRetry(
         (attempt) =>
-          this.attemptAtomicCreate(
-            createAppointmentDto,
-            timeSlot.currentSequence,
-            attempt,
-            userId,
-          ),
+          this.attemptAtomicCreate(createAppointmentDto, timeSlot.currentSequence, attempt, userId),
         {
           maxRetries: MAX_RETRIES,
           baseDelayMs: BACKOFF_BASE_MS,
-          operationName: "atomicCreateAppointment",
+          operationName: 'atomicCreateAppointment',
           logger: this.logger,
         },
       );
@@ -90,9 +82,7 @@ export class AppointmentsService {
         );
       }
       if (isTransientDbError(error)) {
-        throw new ConflictException(
-          "Slot reservation failed: Database timeout",
-        );
+        throw new ConflictException('Slot reservation failed: Database timeout');
       }
       throw error;
     }
@@ -107,14 +97,11 @@ export class AppointmentsService {
         customerName: customerInfo.name,
         customerEmail: customerInfo.email,
         serviceName: appointment.service.name,
-        date: appointment.timeSlot.startTime.toISOString().split("T")[0],
+        date: appointment.timeSlot.startTime.toISOString().split('T')[0],
         time: appointment.timeSlot.startTime.toISOString(),
       });
     } catch (error) {
-      this.logger.error(
-        "Failed to queue appointment confirmation email:",
-        error,
-      );
+      this.logger.error('Failed to queue appointment confirmation email:', error);
     }
 
     // Send real-time booking confirmation notification
@@ -123,25 +110,22 @@ export class AppointmentsService {
         appointmentId: appointment.id,
         userId: appointment.userId,
         serviceName: appointment.service.name,
-        date: appointment.timeSlot.startTime.toISOString().split("T")[0],
+        date: appointment.timeSlot.startTime.toISOString().split('T')[0],
         time: appointment.timeSlot.startTime.toISOString(),
         status: appointment.status,
         customerName: customerInfo.name,
         customerEmail: customerInfo.email,
       });
     } catch (error) {
-      this.logger.error(
-        "Failed to send booking confirmation notification:",
-        error,
-      );
+      this.logger.error('Failed to send booking confirmation notification:', error);
     }
 
     // Audit log
     await this.prisma.activityLog.create({
       data: {
         userId: appointment.userId,
-        action: "BOOKING_CREATE",
-        resourceType: "APPOINTMENT",
+        action: 'BOOKING_CREATE',
+        resourceType: 'APPOINTMENT',
         resourceId: appointment.id,
         metadata: { serviceId: appointment.serviceId, timeSlotId: appointment.timeSlotId },
       },
@@ -180,9 +164,7 @@ export class AppointmentsService {
 
           if (updateResult.count === 0) {
             // Collision detected - slot already taken or sequence mismatch
-            throw new ConflictException(
-              "Slot reservation collision: concurrent booking detected",
-            );
+            throw new ConflictException('Slot reservation collision: concurrent booking detected');
           }
 
           // Fetch service for financial fields
@@ -191,7 +173,7 @@ export class AppointmentsService {
           });
 
           if (!svc) {
-            throw new NotFoundException("Service not found");
+            throw new NotFoundException('Service not found');
           }
 
           const price = new Prisma.Decimal(svc.price ?? 0);
@@ -265,10 +247,16 @@ export class AppointmentsService {
       where.userId = userId;
     }
     if (startDate) {
-      where.appointmentDate = { ...(where.appointmentDate as object || {}), gte: new Date(startDate) };
+      where.appointmentDate = {
+        ...((where.appointmentDate as object) || {}),
+        gte: new Date(startDate),
+      };
     }
     if (endDate) {
-      where.appointmentDate = { ...(where.appointmentDate as object || {}), lte: new Date(endDate + 'T23:59:59.999Z') };
+      where.appointmentDate = {
+        ...((where.appointmentDate as object) || {}),
+        lte: new Date(endDate + 'T23:59:59.999Z'),
+      };
     }
 
     const [appointments, total] = await Promise.all([
@@ -280,16 +268,16 @@ export class AppointmentsService {
           timeSlot: true,
           service: true,
         },
-        orderBy: { createdAt: "desc" },
+        orderBy: { createdAt: 'desc' },
       }),
       this.prisma.appointment.count({ where }),
     ]);
 
-    const totalPages = Math.ceil(total / limit);
+    const totalPages = Math.ceil(Number(total) / limit);
     return {
       items: appointments,
       meta: {
-        total,
+        total: Number(total),
         page,
         limit,
         totalPages,
@@ -339,26 +327,20 @@ export class AppointmentsService {
 
     const customerInfo = updated.customerInfo as unknown as CustomerInfo;
 
-    if (
-      updateAppointmentDto.status &&
-      updateAppointmentDto.status !== appointment.status
-    ) {
+    if (updateAppointmentDto.status && updateAppointmentDto.status !== appointment.status) {
       try {
         this.notificationService.notifyAppointmentUpdate({
           appointmentId: updated.id,
           userId: updated.userId,
           serviceName: updated.service.name,
-          date: updated.timeSlot.startTime.toISOString().split("T")[0],
+          date: updated.timeSlot.startTime.toISOString().split('T')[0],
           time: updated.timeSlot.startTime.toISOString(),
           status: updated.status,
           customerName: customerInfo.name,
           customerEmail: customerInfo.email,
         });
       } catch (error) {
-        this.logger.error(
-          "Failed to send appointment update notification:",
-          error,
-        );
+        this.logger.error('Failed to send appointment update notification:', error);
       }
 
       try {
@@ -369,20 +351,21 @@ export class AppointmentsService {
           timestamp: new Date().toISOString(),
         });
       } catch (error) {
-        this.logger.error(
-          "Failed to broadcast appointment status change:",
-          error,
-        );
+        this.logger.error('Failed to broadcast appointment status change:', error);
       }
 
       // Audit log for status change
       await this.prisma.activityLog.create({
         data: {
           userId: updated.userId,
-          action: "STATUS_CHANGE",
-          resourceType: "APPOINTMENT",
+          action: 'STATUS_CHANGE',
+          resourceType: 'APPOINTMENT',
           resourceId: updated.id,
-          metadata: { previousStatus: appointment.status, newStatus: updated.status, cancelReason: updateAppointmentDto.cancelReason },
+          metadata: {
+            previousStatus: appointment.status,
+            newStatus: updated.status,
+            cancelReason: updateAppointmentDto.cancelReason,
+          },
         },
       });
     }
@@ -401,7 +384,7 @@ export class AppointmentsService {
     }
 
     if (appointment.status === AppointmentStatus.CANCELLED) {
-      throw new BadRequestException("Appointment is already cancelled");
+      throw new BadRequestException('Appointment is already cancelled');
     }
 
     const customerInfo = appointment.customerInfo as unknown as CustomerInfo;
@@ -428,15 +411,12 @@ export class AppointmentsService {
         customerName: customerInfo.name,
         customerEmail: customerInfo.email,
         serviceName: updated.service.name,
-        date: updated.timeSlot.startTime.toISOString().split("T")[0],
+        date: updated.timeSlot.startTime.toISOString().split('T')[0],
         time: updated.timeSlot.startTime.toISOString(),
         cancelReason: reason,
       });
     } catch (error) {
-      this.logger.error(
-        "Failed to queue appointment cancellation email:",
-        error,
-      );
+      this.logger.error('Failed to queue appointment cancellation email:', error);
     }
 
     try {
@@ -444,22 +424,22 @@ export class AppointmentsService {
         appointmentId: updated.id,
         userId: updated.userId,
         serviceName: updated.service.name,
-        date: updated.timeSlot.startTime.toISOString().split("T")[0],
+        date: updated.timeSlot.startTime.toISOString().split('T')[0],
         time: updated.timeSlot.startTime.toISOString(),
         cancelReason: reason,
         customerName: customerInfo.name,
         customerEmail: customerInfo.email,
       });
     } catch (error) {
-      this.logger.error("Failed to send cancellation notification:", error);
+      this.logger.error('Failed to send cancellation notification:', error);
     }
 
     // Audit log
     await this.prisma.activityLog.create({
       data: {
         userId: updated.userId,
-        action: "BOOKING_CANCEL",
-        resourceType: "APPOINTMENT",
+        action: 'BOOKING_CANCEL',
+        resourceType: 'APPOINTMENT',
         resourceId: updated.id,
         metadata: { reason },
       },
@@ -477,6 +457,6 @@ export class AppointmentsService {
     }
 
     await this.prisma.appointment.delete({ where: { id } });
-    return { message: "Appointment deleted successfully" };
+    return { message: 'Appointment deleted successfully' };
   }
 }

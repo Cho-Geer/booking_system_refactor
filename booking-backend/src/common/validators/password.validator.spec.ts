@@ -35,7 +35,9 @@ describe('password.validator', () => {
     it('should reject password without special character', () => {
       const result = validatePasswordStrength('NoSpecialChar123');
       expect(result.valid).toBe(false);
-      expect(result.errors).toContain('Password must contain at least one special character (@$!%*?&-_)');
+      expect(result.errors).toContain(
+        'Password must contain at least one special character (@$!%*?&-_)',
+      );
     });
 
     it('should reject common password', () => {

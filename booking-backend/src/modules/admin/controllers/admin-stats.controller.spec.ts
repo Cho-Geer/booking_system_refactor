@@ -72,8 +72,18 @@ describe('AdminStatsController', () => {
 
   // ─── getStats ─────────────────────────────────────────────────────
   describe('getStats', () => {
-    const sc = (value: number, change: number = 0, positive: boolean = true, target: number = 1000, progressPct: number = 0): StatCardDto => ({
-      value, changePercentage: change, isPositive: positive, target, progressPercentage: progressPct,
+    const sc = (
+      value: number,
+      change: number = 0,
+      positive: boolean = true,
+      target: number = 1000,
+      progressPct: number = 0,
+    ): StatCardDto => ({
+      value,
+      changePercentage: change,
+      isPositive: positive,
+      target,
+      progressPercentage: progressPct,
     });
 
     const mockDashboard: AdminStatsDto = {
@@ -142,7 +152,13 @@ describe('AdminStatsController', () => {
     });
 
     it('[RED] should handle empty dashboard data without totalBookings', async () => {
-      const empty = (): StatCardDto => ({ value: 0, changePercentage: 0, isPositive: true, target: 0, progressPercentage: 0 });
+      const empty = (): StatCardDto => ({
+        value: 0,
+        changePercentage: 0,
+        isPositive: true,
+        target: 0,
+        progressPercentage: 0,
+      });
       const emptyDashboard: AdminStatsDto = {
         todayBookings: empty(),
         pendingBookings: empty(),
@@ -191,7 +207,13 @@ describe('AdminStatsController', () => {
 
       const result = await controller.getBookingTrend('last7d', undefined, undefined);
 
-      expect(adminStatsService.getBookingTrend).toHaveBeenCalledWith('last7d', undefined, undefined, undefined, undefined);
+      expect(adminStatsService.getBookingTrend).toHaveBeenCalledWith(
+        'last7d',
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+      );
       expect(result).toEqual(mockTrendData);
     });
 
@@ -200,16 +222,34 @@ describe('AdminStatsController', () => {
 
       const result = await controller.getBookingTrend('custom', '2026-04-01', '2026-04-30');
 
-      expect(adminStatsService.getBookingTrend).toHaveBeenCalledWith('custom', '2026-04-01', '2026-04-30', undefined, undefined);
+      expect(adminStatsService.getBookingTrend).toHaveBeenCalledWith(
+        'custom',
+        '2026-04-01',
+        '2026-04-30',
+        undefined,
+        undefined,
+      );
       expect(result).toEqual(mockTrendData);
     });
 
     it('should pass range and granularity params correctly', async () => {
       mockAdminStatsService.getBookingTrend.mockResolvedValue(mockTrendData);
 
-      const result = await controller.getBookingTrend('last30d', undefined, undefined, 'monthly', 'week');
+      const result = await controller.getBookingTrend(
+        'last30d',
+        undefined,
+        undefined,
+        'monthly',
+        'week',
+      );
 
-      expect(adminStatsService.getBookingTrend).toHaveBeenCalledWith('last30d', undefined, undefined, 'monthly', 'week');
+      expect(adminStatsService.getBookingTrend).toHaveBeenCalledWith(
+        'last30d',
+        undefined,
+        undefined,
+        'monthly',
+        'week',
+      );
       expect(result).toEqual(mockTrendData);
     });
 
@@ -234,7 +274,11 @@ describe('AdminStatsController', () => {
 
       const result = await controller.getServiceDistribution('last7d', undefined, undefined);
 
-      expect(adminStatsService.getServiceDistribution).toHaveBeenCalledWith('last7d', undefined, undefined);
+      expect(adminStatsService.getServiceDistribution).toHaveBeenCalledWith(
+        'last7d',
+        undefined,
+        undefined,
+      );
       expect(result).toEqual(mockServiceDist);
     });
 
@@ -261,7 +305,10 @@ describe('AdminStatsController', () => {
     });
 
     it('should require ADMIN or SUPER_ADMIN role', () => {
-      const roles = Reflect.getMetadata('roles', AdminStatsController.prototype.getServiceDistribution);
+      const roles = Reflect.getMetadata(
+        'roles',
+        AdminStatsController.prototype.getServiceDistribution,
+      );
       expect(roles).toBeDefined();
       expect(roles).toContain('ADMIN');
       expect(roles).toContain('SUPER_ADMIN');
@@ -275,7 +322,11 @@ describe('AdminStatsController', () => {
 
       const result = await controller.getTimeDistribution('last7d', undefined, undefined);
 
-      expect(adminStatsService.getTimeDistribution).toHaveBeenCalledWith('last7d', undefined, undefined);
+      expect(adminStatsService.getTimeDistribution).toHaveBeenCalledWith(
+        'last7d',
+        undefined,
+        undefined,
+      );
       expect(result).toEqual(mockTimeDistribution);
     });
 
@@ -300,7 +351,10 @@ describe('AdminStatsController', () => {
     });
 
     it('should require ADMIN or SUPER_ADMIN role', () => {
-      const roles = Reflect.getMetadata('roles', AdminStatsController.prototype.getTimeDistribution);
+      const roles = Reflect.getMetadata(
+        'roles',
+        AdminStatsController.prototype.getTimeDistribution,
+      );
       expect(roles).toBeDefined();
       expect(roles).toContain('ADMIN');
       expect(roles).toContain('SUPER_ADMIN');

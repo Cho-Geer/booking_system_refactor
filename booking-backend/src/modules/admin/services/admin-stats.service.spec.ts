@@ -189,9 +189,21 @@ describe('AdminStatsService', () => {
 
       // servicePopularity mapped correctly with percentage computed from total
       expect(result.servicePopularity).toHaveLength(3);
-      expect(result.servicePopularity[0]).toEqual({ serviceName: 'Haircut', count: 200, percentage: expect.closeTo(44.44, 1) });
-      expect(result.servicePopularity[1]).toEqual({ serviceName: 'Manicure', count: 150, percentage: expect.closeTo(33.33, 1) });
-      expect(result.servicePopularity[2]).toEqual({ serviceName: 'Facial', count: 100, percentage: expect.closeTo(22.22, 1) });
+      expect(result.servicePopularity[0]).toEqual({
+        serviceName: 'Haircut',
+        count: 200,
+        percentage: expect.closeTo(44.44, 1),
+      });
+      expect(result.servicePopularity[1]).toEqual({
+        serviceName: 'Manicure',
+        count: 150,
+        percentage: expect.closeTo(33.33, 1),
+      });
+      expect(result.servicePopularity[2]).toEqual({
+        serviceName: 'Facial',
+        count: 100,
+        percentage: expect.closeTo(22.22, 1),
+      });
 
       // ── P2.2/P2.3: timeDistribution ─────────────────────────────
       expect(result.timeDistribution).toBeDefined();
@@ -267,7 +279,6 @@ describe('AdminStatsService', () => {
 
       jest.useRealTimers();
     });
-
   });
 
   // ─── getServiceDistribution (DASH-003) ────────────────────────────
@@ -279,9 +290,21 @@ describe('AdminStatsService', () => {
 
       expect(statsService.getPopularServices).toHaveBeenCalledTimes(1);
       expect(result).toHaveLength(3);
-      expect(result[0]).toEqual({ serviceName: 'Haircut', count: 200, percentage: expect.closeTo(44.44, 1) });
-      expect(result[1]).toEqual({ serviceName: 'Manicure', count: 150, percentage: expect.closeTo(33.33, 1) });
-      expect(result[2]).toEqual({ serviceName: 'Facial', count: 100, percentage: expect.closeTo(22.22, 1) });
+      expect(result[0]).toEqual({
+        serviceName: 'Haircut',
+        count: 200,
+        percentage: expect.closeTo(44.44, 1),
+      });
+      expect(result[1]).toEqual({
+        serviceName: 'Manicure',
+        count: 150,
+        percentage: expect.closeTo(33.33, 1),
+      });
+      expect(result[2]).toEqual({
+        serviceName: 'Facial',
+        count: 100,
+        percentage: expect.closeTo(22.22, 1),
+      });
     });
 
     it('should return empty array when no popular services', async () => {
@@ -379,14 +402,26 @@ describe('AdminStatsService', () => {
     });
 
     it('should accept range=monthly and granularity=week params', async () => {
-      const result = await service.getBookingTrend('last30d', undefined, undefined, 'monthly', 'week');
+      const result = await service.getBookingTrend(
+        'last30d',
+        undefined,
+        undefined,
+        'monthly',
+        'week',
+      );
 
       expect(result).toBeDefined();
       expect(Array.isArray(result)).toBe(true);
     });
 
     it('should accept range=yearly without breaking', async () => {
-      const result = await service.getBookingTrend('custom', '2025-01-01', '2025-12-31', 'yearly', 'month');
+      const result = await service.getBookingTrend(
+        'custom',
+        '2025-01-01',
+        '2025-12-31',
+        'yearly',
+        'month',
+      );
 
       expect(Array.isArray(result)).toBe(true);
     });

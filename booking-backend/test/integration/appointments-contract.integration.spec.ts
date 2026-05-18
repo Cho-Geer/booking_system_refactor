@@ -72,7 +72,7 @@ describe('[R2] POST /v1/appointments — Contract Validation', () => {
     });
     const user = await prisma.user.create({
       data: {
-        ...userData as any,
+        ...(userData as any),
         passwordHash: hashedPassword,
         status: UserStatus.ACTIVE,
       },
@@ -201,7 +201,11 @@ describe('[R2] POST /v1/appointments — Contract Validation', () => {
         .send({
           timeSlotId,
           serviceId,
-          customerInfo: { name: 'Success Test', email: 'success@example.com', phone: '+1111111111' },
+          customerInfo: {
+            name: 'Success Test',
+            email: 'success@example.com',
+            phone: '+1111111111',
+          },
           appointmentDate: new Date(Date.now() + 86400000).toISOString(),
         })
         .expect(201);

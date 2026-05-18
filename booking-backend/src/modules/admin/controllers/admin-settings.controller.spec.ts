@@ -68,9 +68,7 @@ describe('AdminSettingsController', () => {
     it('[RED] should return flattened business hours (no schedule wrapper)', async () => {
       // MEDIUM-1: Response structure is { timezone, monday, ..., sunday, updatedAt }
       // This will FAIL because AdminSettingsController does not exist
-      mockAdminSettingsService.getBusinessHours.mockResolvedValue(
-        mockFlattenedBusinessHours,
-      );
+      mockAdminSettingsService.getBusinessHours.mockResolvedValue(mockFlattenedBusinessHours);
 
       const result = await controller.getBusinessHours();
 
@@ -119,9 +117,7 @@ describe('AdminSettingsController', () => {
 
       const result = await controller.updateBusinessHours(updateDto);
 
-      expect(adminSettingsService.updateBusinessHours).toHaveBeenCalledWith(
-        updateDto,
-      );
+      expect(adminSettingsService.updateBusinessHours).toHaveBeenCalledWith(updateDto);
       expect(result).toEqual({ message: '营业时间已更新' });
     });
 

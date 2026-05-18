@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  PipeTransform,
-  ArgumentMetadata,
-  BadRequestException,
-} from "@nestjs/common";
+import { Injectable, PipeTransform, ArgumentMetadata, BadRequestException } from '@nestjs/common';
 
 /**
  * OptionalParseIntPipe - A pipe that parses a string to an integer,
@@ -23,26 +18,18 @@ import {
  *   - 'abc' → throws BadRequestException
  */
 @Injectable()
-export class OptionalParseIntPipe implements PipeTransform<
-  string | undefined,
-  number | undefined
-> {
-  transform(
-    value: string | undefined,
-    _metadata: ArgumentMetadata,
-  ): number | undefined {
+export class OptionalParseIntPipe implements PipeTransform<string | undefined, number | undefined> {
+  transform(value: string | undefined, _metadata: ArgumentMetadata): number | undefined {
     // If value is undefined or empty string, return undefined
     // This allows the parameter's default value to be used
-    if (value === undefined || value === "") {
+    if (value === undefined || value === '') {
       return undefined;
     }
 
     const val = parseInt(value, 10);
 
     if (isNaN(val)) {
-      throw new BadRequestException(
-        `Validation failed: "${value}" is not a valid integer`,
-      );
+      throw new BadRequestException(`Validation failed: "${value}" is not a valid integer`);
     }
 
     return val;

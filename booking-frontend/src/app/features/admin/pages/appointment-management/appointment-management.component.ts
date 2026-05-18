@@ -1,5 +1,6 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { Subscription, interval } from 'rxjs';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
@@ -17,13 +18,17 @@ import {
   AdminAppointment,
   AdminServiceItem,
   AppointmentStatus,
+  BusinessHoursDto,
   UpdateAppointmentStatusRequest,
   CreateAdminAppointmentRequest,
 } from '../../dto/admin.dto';
 import { TimeSlot } from '../../../../shared/dto/time-slot.dto';
 import { AppCardComponent } from '../../../../shared/components/atoms/app-card/app-card.component';
 import { AppButtonComponent } from '../../../../shared/components/atoms/app-button/app-button.component';
-import { AppBadgeComponent, BadgeStatus } from '../../../../shared/components/atoms/app-badge/app-badge.component';
+import {
+  AppBadgeComponent,
+  BadgeStatus,
+} from '../../../../shared/components/atoms/app-badge/app-badge.component';
 import { AppSearchInputComponent } from '../../../../shared/components/atoms/app-search-input/app-search-input.component';
 import { AppDropdownComponent } from '../../../../shared/components/atoms/app-dropdown/app-dropdown.component';
 import { AppSpinnerComponent } from '../../../../shared/components/atoms/app-spinner/app-spinner.component';
@@ -31,6 +36,18 @@ import { AppFilterBarComponent } from '../../../../shared/components/molecules/a
 import { AppTableWrapperComponent } from '../../../../shared/components/molecules/app-table-wrapper/app-table-wrapper.component';
 import { AppModalComponent } from '../../../../shared/components/atoms/app-modal/app-modal.component';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+
+/**
+ * Converts a Date to a local timezone-aware 'YYYY-MM-DD' string.
+ * Unlike `.toISOString().split('T')[0]`, this does NOT shift to UTC,
+ * preventing date mismatches when the browser is in a positive UTC offset.
+ */
+export function toLocalDateString(date: Date): string {
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}
 
 export type ViewMode = 'list' | 'calendar';
 
@@ -45,16 +62,32 @@ export interface CalendarEvent {
   selector: 'app-appointment-management',
   standalone: true,
   imports: [
-    TableModule, ButtonModule, SelectModule, FormsModule,
-    InputTextModule, InputNumberModule, MultiSelectModule, Textarea, DatePicker, DatePipe,
-    AppCardComponent, AppButtonComponent, AppBadgeComponent,
-    AppSearchInputComponent, AppDropdownComponent, AppSpinnerComponent,
-    AppFilterBarComponent, AppTableWrapperComponent, AppModalComponent, Tooltip, TranslatePipe,
+    TableModule,
+    ButtonModule,
+    SelectModule,
+    FormsModule,
+    InputTextModule,
+    InputNumberModule,
+    MultiSelectModule,
+    Textarea,
+    DatePicker,
+    DatePipe,
+    AppCardComponent,
+    AppButtonComponent,
+    AppBadgeComponent,
+    AppSearchInputComponent,
+    AppDropdownComponent,
+    AppSpinnerComponent,
+    AppFilterBarComponent,
+    AppTableWrapperComponent,
+    AppModalComponent,
+    Tooltip,
+    TranslatePipe,
   ],
   templateUrl: './appointment-management.component.html',
   styleUrl: './appointment-management.component.scss',
 })
-export class AppointmentManagementComponent implements OnInit {
+export class AppointmentManagementComponent implements OnInit, OnDestroy {
   private readonly store = inject(AdminStore);
   private readonly adminService = inject(AdminService);
   private readonly apiService = inject(ApiService);
@@ -91,6 +124,10 @@ export class AppointmentManagementComponent implements OnInit {
   readonly statusUpdateReason = signal('');
   readonly newStatus = signal<AppointmentStatus>('PENDING');
 
+  // Batch cancel dialog
+  readonly batchCancelDialogVisible = signal(false);
+  readonly batchCancelReason = signal('');
+
   // Filters
   readonly isFiltering = signal(false);
   readonly filterStatus = signal<AppointmentStatus | ''>('');
@@ -118,24 +155,25 @@ export class AppointmentManagementComponent implements OnInit {
   // Stats computed from full dataset (not paginated page)
   readonly todayCount = computed(() => {
     const today = new Date();
-    const todayStr = today.toISOString().split('T')[0];
-    return this.vm().allAppointmentsForStats.filter(a => a.appointmentDate.startsWith(todayStr)).length;
+    const todayStr = toLocalDateString(today);
+    return this.vm().allAppointmentsForStats.filter((a) => a.appointmentDate.startsWith(todayStr))
+      .length;
   });
 
-  readonly pendingCount = computed(() =>
-    this.vm().allAppointmentsForStats.filter(a => a.status === 'PENDING').length
+  readonly pendingCount = computed(
+    () => this.vm().allAppointmentsForStats.filter((a) => a.status === 'PENDING').length,
   );
 
-  readonly confirmedCount = computed(() =>
-    this.vm().allAppointmentsForStats.filter(a => a.status === 'CONFIRMED').length
+  readonly confirmedCount = computed(
+    () => this.vm().allAppointmentsForStats.filter((a) => a.status === 'CONFIRMED').length,
   );
 
-  readonly cancelledCount = computed(() =>
-    this.vm().allAppointmentsForStats.filter(a => a.status === 'CANCELLED').length
+  readonly cancelledCount = computed(
+    () => this.vm().allAppointmentsForStats.filter((a) => a.status === 'CANCELLED').length,
   );
 
   readonly searchSuggestions = computed(() =>
-    this.vm().allAppointmentsForStats.map(a => ({ label: a.userName, value: a.id }))
+    this.vm().allAppointmentsForStats.map((a) => ({ label: a.userName, value: a.id })),
   );
 
   // Calendar day headers
@@ -143,12 +181,12 @@ export class AppointmentManagementComponent implements OnInit {
 
   // Calendar events computed from full dataset
   readonly calendarEvents = computed<CalendarEvent[]>(() =>
-    this.vm().allAppointmentsForStats.map(a => ({
+    this.vm().allAppointmentsForStats.map((a) => ({
       date: new Date(a.appointmentDate),
       title: `${a.serviceName} - ${a.userName}`,
       status: a.status,
       id: a.id,
-    }))
+    })),
   );
 
   // Calendar weeks structure for rendering
@@ -162,8 +200,22 @@ export class AppointmentManagementComponent implements OnInit {
     const totalDays = lastDay.getDate();
 
     const events = this.calendarEvents();
-    const weeks: Array<Array<{ day: number; currentMonth: boolean; isToday: boolean; hasEvents: boolean; events: CalendarEvent[] }>> = [];
-    let week: Array<{ day: number; currentMonth: boolean; isToday: boolean; hasEvents: boolean; events: CalendarEvent[] }> = [];
+    const weeks: Array<
+      Array<{
+        day: number;
+        currentMonth: boolean;
+        isToday: boolean;
+        hasEvents: boolean;
+        events: CalendarEvent[];
+      }>
+    > = [];
+    let week: Array<{
+      day: number;
+      currentMonth: boolean;
+      isToday: boolean;
+      hasEvents: boolean;
+      events: CalendarEvent[];
+    }> = [];
 
     // Previous month padding
     for (let i = 0; i < startPad; i++) {
@@ -173,8 +225,14 @@ export class AppointmentManagementComponent implements OnInit {
     for (let d = 1; d <= totalDays; d++) {
       const date = new Date(year, month, d);
       const isToday = date.toDateString() === now.toDateString();
-      const dayEvents = events.filter(e => e.date.toDateString() === date.toDateString());
-      week.push({ day: d, currentMonth: true, isToday, hasEvents: dayEvents.length > 0, events: dayEvents });
+      const dayEvents = events.filter((e) => e.date.toDateString() === date.toDateString());
+      week.push({
+        day: d,
+        currentMonth: true,
+        isToday,
+        hasEvents: dayEvents.length > 0,
+        events: dayEvents,
+      });
 
       if (week.length === 7) {
         weeks.push(week);
@@ -193,9 +251,7 @@ export class AppointmentManagementComponent implements OnInit {
     return weeks;
   });
 
-  readonly filterServiceOptions = [
-    { label: 'All Services', value: '' },
-  ];
+  readonly filterServiceOptions = [{ label: 'All Services', value: '' }];
 
   // Quick Booking dialog
   readonly bookingDialogVisible = signal(false);
@@ -204,13 +260,48 @@ export class AppointmentManagementComponent implements OnInit {
   readonly formAppointmentDate = signal<Date | undefined>(undefined);
   readonly formTimeSlotId = signal('');
   readonly formNotes = signal('');
-  readonly formErrors = signal<{ userId?: string; serviceId?: string; appointmentDate?: string; timeSlotId?: string }>({});
+  readonly formErrors = signal<{
+    userId?: string;
+    serviceId?: string;
+    appointmentDate?: string;
+    timeSlotId?: string;
+  }>({});
   readonly customerOptions = signal<{ label: string; value: string }[]>([]);
   readonly serviceOptions = signal<{ label: string; value: string }[]>([]);
   readonly availableTimeSlots = signal<{ label: string; value: string; disabled: boolean }[]>([]);
   readonly timeSlotUnavailable = signal(false);
   readonly timeSlotLoading = signal(false);
   readonly formSubmitted = signal(false);
+
+  // Business hours for disabled-day computation
+  readonly businessHours = signal<BusinessHoursDto | null>(null);
+
+  /** Days of the week that should be disabled (not selectable) in the date picker.
+   *  0=Sunday, 1=Monday, ..., 6=Saturday
+   *  Derived from business hours: any day with an empty array is a closed day. */
+  readonly disabledDays = computed<number[]>(() => {
+    const bh = this.businessHours();
+    if (!bh) return [];
+    const dayMap: Array<keyof BusinessHoursDto> = [
+      'sunday',
+      'monday',
+      'tuesday',
+      'wednesday',
+      'thursday',
+      'friday',
+      'saturday',
+    ];
+    return dayMap
+      .map((key, index) => ((bh[key] as Array<unknown>).length === 0 ? index : -1))
+      .filter((i): i is number => i !== -1);
+  });
+
+  /** Whether the currently selected appointment date falls on a closed day. */
+  readonly businessClosedOnDate = computed<boolean>(() => {
+    const date = this.formAppointmentDate();
+    if (!date) return false;
+    return this.disabledDays().includes(date.getDay());
+  });
 
   /** Browser timezone label displayed above time slot dropdown */
   readonly timezoneLabel = computed(() => {
@@ -259,7 +350,14 @@ export class AppointmentManagementComponent implements OnInit {
     this.loadAllAppointmentsForStats();
     this.loadCustomerOptions();
     this.loadServiceOptions();
+    // Periodically refresh service options so newly created services appear without
+    // reloading on dialog open (which would cause PrimeNG p-select timing issues)
+    this.serviceOptionsPollInterval = interval(30000).subscribe(() => {
+      this.loadServiceOptions();
+    });
   }
+
+  private serviceOptionsPollInterval?: Subscription;
 
   loadAppointments(isFilterOperation = false): void {
     if (isFilterOperation) {
@@ -267,29 +365,31 @@ export class AppointmentManagementComponent implements OnInit {
     } else {
       this.store.setLoading(true);
     }
-    this.adminService.getAdminAppointments({
-      page: 1,
-      limit: 10,
-      status: this.filterStatus() || undefined,
-      startDate: this.filterStartDate()?.toISOString().split('T')[0],
-      endDate: this.filterEndDate()?.toISOString().split('T')[0],
-      search: this.filterSearch() || undefined,
-    }).subscribe({
-      next: (response) => {
-        this.store.setAppointments(response.items, response.meta.total, response.meta.page);
-        if (isFilterOperation) {
-          this.isFiltering.set(false);
-        } else {
-          this.store.setLoading(false);
-        }
-      },
-      error: (err) => this.store.setError(err.message ?? 'Failed to load appointments'),
-    });
+    this.adminService
+      .getAdminAppointments({
+        page: 1,
+        limit: 10,
+        status: this.filterStatus() || undefined,
+        startDate: this.filterStartDate() ? toLocalDateString(this.filterStartDate()!) : undefined,
+        endDate: this.filterEndDate() ? toLocalDateString(this.filterEndDate()!) : undefined,
+        search: this.filterSearch() || undefined,
+      })
+      .subscribe({
+        next: (response) => {
+          this.store.setAppointments(response.items, response.meta.total, response.meta.page);
+          if (isFilterOperation) {
+            this.isFiltering.set(false);
+          } else {
+            this.store.setLoading(false);
+          }
+        },
+        error: (err) => this.store.setError(err.message ?? 'Failed to load appointments'),
+      });
   }
 
   private loadAllAppointmentsForStats(): void {
     this.adminService.getAdminAppointments({ limit: 999, page: 1 }).subscribe({
-      next: response => this.store.setAllAppointmentsForStats(response.items),
+      next: (response) => this.store.setAllAppointmentsForStats(response.items),
       error: () => {},
     });
   }
@@ -311,6 +411,15 @@ export class AppointmentManagementComponent implements OnInit {
     this.formOvertimeMinutes.set(0);
     this.formSelectedServiceData.set(null);
     this.bookingDialogVisible.set(true);
+
+    // Fetch business hours to compute disabled days and closed-day detection
+    this.adminService.getBusinessHours().subscribe({
+      next: (bh) => this.businessHours.set(bh),
+      error: () => {
+        // If business hours fail to load, silently degrade — all days remain enabled
+        this.businessHours.set(null);
+      },
+    });
   }
 
   closeBooking(): void {
@@ -319,7 +428,12 @@ export class AppointmentManagementComponent implements OnInit {
 
   saveBooking(): void {
     this.formSubmitted.set(true);
-    const errors: { userId?: string; serviceId?: string; appointmentDate?: string; timeSlotId?: string } = {};
+    const errors: {
+      userId?: string;
+      serviceId?: string;
+      appointmentDate?: string;
+      timeSlotId?: string;
+    } = {};
 
     const userId = this.formUserId();
     const serviceId = this.formServiceId();
@@ -329,17 +443,19 @@ export class AppointmentManagementComponent implements OnInit {
     if (!userId) errors.userId = 'Please select a customer.';
     if (!serviceId) errors.serviceId = 'Please select a service.';
     if (!appointmentDate) errors.appointmentDate = 'Please select a date.';
-    if (!timeSlotId && !this.timeSlotUnavailable()) errors.appointmentDate = 'Please select a time slot.';
+    if (!timeSlotId && !this.timeSlotUnavailable())
+      errors.appointmentDate = 'Please select a time slot.';
 
     this.formErrors.set(errors);
 
-    if (!userId || !serviceId || !appointmentDate || (!timeSlotId && !this.timeSlotUnavailable())) return;
+    if (!userId || !serviceId || !appointmentDate || (!timeSlotId && !this.timeSlotUnavailable()))
+      return;
 
     const dto: CreateAdminAppointmentRequest = {
       userId,
       serviceId,
       timeSlotId,
-      appointmentDate: appointmentDate.toISOString(),
+      appointmentDate: toLocalDateString(appointmentDate) + 'T00:00:00.000Z',
       notes: this.formNotes() || undefined,
       overtimeMinutes: this.formOvertimeMinutes() > 0 ? this.formOvertimeMinutes() : undefined,
     };
@@ -360,9 +476,9 @@ export class AppointmentManagementComponent implements OnInit {
 
   private loadCustomerOptions(): void {
     this.adminService.getUsers({ limit: 999, page: 1 }).subscribe({
-      next: response => {
+      next: (response) => {
         this.customerOptions.set(
-          response.items.map(u => ({ label: `${u.name} (${u.email})`, value: u.id }))
+          response.items.map((u) => ({ label: `${u.name} (${u.email})`, value: u.id })),
         );
       },
       error: () => {},
@@ -370,11 +486,11 @@ export class AppointmentManagementComponent implements OnInit {
   }
 
   private loadServiceOptions(): void {
-    this.adminService.getAdminServices({ limit: 999, page: 1 }).subscribe({
-      next: response => {
+    this.adminService.getAdminServices({ limit: 999, page: 1, active: true }).subscribe({
+      next: (response) => {
         this.rawServiceItems.set(response.items);
         this.serviceOptions.set(
-          response.items.map(s => ({ label: `${s.name} - $${s.price}`, value: s.id }))
+          response.items.map((s) => ({ label: `${s.name} - $${s.price}`, value: s.id })),
         );
       },
       error: () => {},
@@ -388,7 +504,7 @@ export class AppointmentManagementComponent implements OnInit {
     this.timeSlotUnavailable.set(false);
     this.formOvertimeMinutes.set(0);
     // Look up full service data for cost estimation
-    const service = this.rawServiceItems().find(s => s.id === serviceId) ?? null;
+    const service = this.rawServiceItems().find((s) => s.id === serviceId) ?? null;
     this.formSelectedServiceData.set(service);
     if (serviceId) {
       this.loadAvailableTimeSlots(serviceId);
@@ -415,24 +531,24 @@ export class AppointmentManagementComponent implements OnInit {
     }
 
     const now = new Date();
-    const startDate = selectedDate.toISOString().split('T')[0];
+    const startDate = toLocalDateString(selectedDate);
     this.timeSlotLoading.set(true);
 
     this.apiService.getAvailableSlots(serviceId, startDate, startDate).subscribe({
       next: (slots: TimeSlot[]) => {
         // Filter out past time slots where endTime <= now
-        const futureSlots = slots.filter(s => new Date(s.endTime) > now);
+        const futureSlots = slots.filter((s) => new Date(s.endTime) > now);
         if (futureSlots.length === 0) {
           this.timeSlotUnavailable.set(true);
           this.availableTimeSlots.set([]);
         } else {
           this.timeSlotUnavailable.set(false);
           this.availableTimeSlots.set(
-            futureSlots.map(s => ({
+            futureSlots.map((s) => ({
               label: `${this.formatTime(s.startTime)} - ${this.formatTime(s.endTime)}`,
               value: s.id,
               disabled: !s.available,
-            }))
+            })),
           );
         }
         this.timeSlotLoading.set(false);
@@ -481,17 +597,40 @@ export class AppointmentManagementComponent implements OnInit {
     });
   }
 
-  batchCancel(): void {
-    const ids = this.selectedAppointments().map(a => a.id);
+  openBatchCancelDialog(): void {
+    this.batchCancelDialogVisible.set(true);
+    this.batchCancelReason.set('');
+  }
+
+  confirmBatchCancel(): void {
+    const ids = this.selectedAppointments().map((a) => a.id);
     if (ids.length === 0) return;
 
+    const reason = this.batchCancelReason();
     this.store.setLoading(true);
-    this.adminService.batchCancelAppointments({ ids, reason: 'Admin batch cancel' }).subscribe({
-      next: () => {
-        this.store.removeAppointmentsFromList(ids);
+    this.adminService.batchCancelAppointments({ ids, reason: reason || undefined }).subscribe({
+      next: (response) => {
+        // Compute successfully cancelled IDs by excluding failed ones
+        const failedIdSet = new Set(response.failedIds);
+        const successIds = ids.filter((id) => !failedIdSet.has(id));
+
+        // Only remove successfully cancelled appointments from the list
+        if (successIds.length > 0) {
+          this.store.removeAppointmentsFromList(successIds);
+        }
+
         this.loadAllAppointmentsForStats();
         this.selectedAppointments.set([]);
+        this.batchCancelDialogVisible.set(false);
         this.store.setLoading(false);
+
+        // Show failure summary if any failures occurred
+        if (response.failedCount > 0) {
+          const failedSample = response.failedIds.slice(0, 3).join(', ');
+          this.store.setError(
+            `${response.failedCount} appointment(s) failed to cancel (IDs: ${failedSample}${response.failedIds.length > 3 ? ', ...' : ''}). ${response.successCount} cancelled successfully.`,
+          );
+        }
       },
       error: (err) => {
         this.store.setError(err.message ?? 'Failed to batch cancel');
@@ -519,12 +658,18 @@ export class AppointmentManagementComponent implements OnInit {
 
   getStatusSeverity(status: string): 'success' | 'warn' | 'danger' | 'info' | undefined {
     switch (status) {
-      case 'CONFIRMED': return 'success';
-      case 'PENDING': return 'warn';
-      case 'CANCELLED': return 'danger';
-      case 'COMPLETED': return 'info';
-      case 'EXPIRED': return undefined;
-      default: return undefined;
+      case 'CONFIRMED':
+        return 'success';
+      case 'PENDING':
+        return 'warn';
+      case 'CANCELLED':
+        return 'danger';
+      case 'COMPLETED':
+        return 'info';
+      case 'EXPIRED':
+        return undefined;
+      default:
+        return undefined;
     }
   }
 
@@ -535,23 +680,39 @@ export class AppointmentManagementComponent implements OnInit {
 
   getStatusBadge(status: AppointmentStatus): BadgeStatus {
     switch (status) {
-      case 'CONFIRMED': return 'confirmed';
-      case 'PENDING': return 'pending';
-      case 'CANCELLED': return 'cancelled';
-      case 'COMPLETED': return 'completed';
-      case 'EXPIRED': return 'expired';
-      default: return 'pending';
+      case 'CONFIRMED':
+        return 'confirmed';
+      case 'PENDING':
+        return 'pending';
+      case 'CANCELLED':
+        return 'cancelled';
+      case 'COMPLETED':
+        return 'completed';
+      case 'EXPIRED':
+        return 'expired';
+      default:
+        return 'pending';
     }
   }
 
   getCalendarEventColor(status: AppointmentStatus): string {
     switch (status) {
-      case 'CONFIRMED': return '#00B42A';
-      case 'PENDING': return '#FF7D00';
-      case 'CANCELLED': return '#F53F3F';
-      case 'COMPLETED': return '#27ae60';
-      case 'EXPIRED': return '#C9CDD4';
-      default: return '#2ecc71';
+      case 'CONFIRMED':
+        return '#00B42A';
+      case 'PENDING':
+        return '#FF7D00';
+      case 'CANCELLED':
+        return '#F53F3F';
+      case 'COMPLETED':
+        return '#27ae60';
+      case 'EXPIRED':
+        return '#C9CDD4';
+      default:
+        return '#2ecc71';
     }
+  }
+
+  ngOnDestroy(): void {
+    this.serviceOptionsPollInterval?.unsubscribe();
   }
 }

@@ -1,4 +1,4 @@
-import { SetMetadata } from "@nestjs/common";
+import { SetMetadata } from '@nestjs/common';
 
 /**
  * Roles Decorator
@@ -24,7 +24,7 @@ import { SetMetadata } from "@nestjs/common";
  * getUserData() {}
  * ```
  */
-export const Roles = (...roles: string[]) => SetMetadata("roles", roles);
+export const Roles = (...roles: string[]) => SetMetadata('roles', roles);
 
 /**
  * AdminOnly Decorator (convenience decorator)
@@ -39,7 +39,7 @@ export const Roles = (...roles: string[]) => SetMetadata("roles", roles);
  * getAdminOnlyData() {}
  * ```
  */
-export const AdminOnly = () => Roles("ADMIN");
+export const AdminOnly = () => Roles('ADMIN');
 
 /**
  * CustomerOnly Decorator (convenience decorator)
@@ -54,7 +54,7 @@ export const AdminOnly = () => Roles("ADMIN");
  * getCustomerOnlyData() {}
  * ```
  */
-export const CustomerOnly = () => Roles("CUSTOMER");
+export const CustomerOnly = () => Roles('CUSTOMER');
 
 /**
  * AuthenticatedOnly Decorator (convenience decorator)
@@ -69,4 +69,4 @@ export const CustomerOnly = () => Roles("CUSTOMER");
  * getAuthenticatedData() {}
  * ```
  */
-export const AuthenticatedOnly = () => Roles("CUSTOMER", "ADMIN");
+export const AuthenticatedOnly = () => Roles('CUSTOMER', 'ADMIN');

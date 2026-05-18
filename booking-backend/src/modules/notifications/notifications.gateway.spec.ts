@@ -24,7 +24,8 @@ const mockSocket = {
 };
 
 // Mock JWT token
-const VALID_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LXVzZXIiLCJpYXQiOjE2MTYyMzkwMjJ9.mock';
+const VALID_JWT =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LXVzZXIiLCJpYXQiOjE2MTYyMzkwMjJ9.mock';
 
 describe('NotificationsGateway', () => {
   let gateway: NotificationsGateway;
@@ -54,7 +55,7 @@ describe('NotificationsGateway', () => {
     gateway = module.get<NotificationsGateway>(NotificationsGateway);
     jwtService = module.get<JwtService>(JwtService);
     wsJwtGuard = module.get<WsJwtGuard>(WsJwtGuard);
-    
+
     // Replace the server with our mock
     (gateway as any).server = mockServer;
   });
@@ -72,20 +73,20 @@ describe('NotificationsGateway', () => {
      * GREEN-PHASE TEST: Architecture separation
      * The gateway must use WsJwtGuard.validateToken() for WebSocket authentication
      * instead of calling jwtService.verify() directly.
-     * 
+     *
      * In the GREEN implementation, JwtService is NOT injected into the gateway;
      * instead WsJwtGuard is injected. The gateway delegates authentication
      * to WsJwtGuard.validateToken(), which internally uses JwtService.
-     * 
+     *
      * This test verifies:
      * 1. WsJwtGuard.validateToken() IS called during handleConnection
      * 2. The gateway does NOT expose jwtService as a constructor dependency
      */
     it('should delegate authentication to WsJwtGuard.validateToken instead of direct jwtService.verify', async () => {
       const validateTokenSpy = jest.spyOn(wsJwtGuard, 'validateToken');
-      
+
       await gateway.handleConnection(mockSocket as any);
-      
+
       // The gateway should delegate to WsJwtGuard.validateToken()
       expect(validateTokenSpy).toHaveBeenCalled();
       // WsJwtGuard.validateToken internally calls jwtService.verify, so
@@ -109,10 +110,12 @@ describe('NotificationsGateway', () => {
      */
     it('should extract token via WsJwtGuard.extractToken and pass to validateToken', async () => {
       const extractTokenSpy = jest.spyOn(WsJwtGuard, 'extractToken');
-      const validateTokenSpy = jest.spyOn(wsJwtGuard, 'validateToken').mockResolvedValue({ userId: 'test-user', roles: [] });
-      
+      const validateTokenSpy = jest
+        .spyOn(wsJwtGuard, 'validateToken')
+        .mockResolvedValue({ userId: 'test-user', roles: [] });
+
       await gateway.handleConnection(mockSocket as any);
-      
+
       // Token should be extracted first
       expect(extractTokenSpy).toHaveBeenCalledWith(mockSocket);
       // Then validated via WsJwtGuard
@@ -149,9 +152,12 @@ describe('NotificationsGateway', () => {
       (socketWithoutToken as any).disconnect = disconnectSpy;
 
       gateway.handleConnection(socketWithoutToken as any);
-      
+
       expect(disconnectSpy).toHaveBeenCalled();
-      expect((socketWithoutToken as any).emit).toHaveBeenCalledWith('error', 'Authentication required');
+      expect((socketWithoutToken as any).emit).toHaveBeenCalledWith(
+        'error',
+        'Authentication required',
+      );
     });
 
     it('should reject connection with invalid token', async () => {
@@ -167,7 +173,7 @@ describe('NotificationsGateway', () => {
       (socketWithInvalidToken as any).disconnect = disconnectSpy;
 
       await gateway.handleConnection(socketWithInvalidToken as any);
-      
+
       expect(disconnectSpy).toHaveBeenCalled();
       expect((socketWithInvalidToken as any).emit).toHaveBeenCalledWith('error', 'Invalid token');
     });
@@ -308,7 +314,7 @@ describe('NotificationsGateway', () => {
       };
       // Don't call handleConnection - leave unauthenticated
       (gateway as any).connectedClients.set('unauth-socket', { socket: unauthenticatedSocket });
-      
+
       const data = { room: 'user:test-user' };
       const result = gateway.handleJoin(data, unauthenticatedSocket as any);
 
@@ -405,7 +411,9 @@ describe('NotificationsGateway', () => {
       const loggerSpy = jest.spyOn((gateway as any).logger, 'log');
       gateway.sendAppointmentUpdate('user-1', { appointmentId: '123' });
 
-      expect(loggerSpy).toHaveBeenCalledWith(expect.stringContaining('Emitting appointment_updated'));
+      expect(loggerSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Emitting appointment_updated'),
+      );
     });
   });
 
@@ -603,7 +611,12 @@ describe('NotificationsGateway', () => {
 
   describe('sendAppointmentStatusChanged', () => {
     it('should emit appointment.status_changed event to admin:broadcast room', () => {
-      const data = { appointmentId: 'apt-123', status: 'CONFIRMED', previousStatus: 'PENDING', timestamp: '2024-01-01T00:00:00.000Z' };
+      const data = {
+        appointmentId: 'apt-123',
+        status: 'CONFIRMED',
+        previousStatus: 'PENDING',
+        timestamp: '2024-01-01T00:00:00.000Z',
+      };
 
       gateway.sendAppointmentStatusChanged(data);
 
@@ -615,13 +628,17 @@ describe('NotificationsGateway', () => {
       const loggerSpy = jest.spyOn((gateway as any).logger, 'log');
       gateway.sendAppointmentStatusChanged({ appointmentId: 'apt-123', status: 'CONFIRMED' });
 
-      expect(loggerSpy).toHaveBeenCalledWith(expect.stringContaining('Broadcasting appointment.status_changed'));
+      expect(loggerSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Broadcasting appointment.status_changed'),
+      );
     });
   });
 
   describe('handleJoin (admin room)', () => {
     it('should allow ADMIN user to join admin:broadcast room', async () => {
-      jest.spyOn(wsJwtGuard, 'validateToken').mockResolvedValue({ userId: 'admin-user', roles: ['ADMIN'] });
+      jest
+        .spyOn(wsJwtGuard, 'validateToken')
+        .mockResolvedValue({ userId: 'admin-user', roles: ['ADMIN'] });
 
       const adminSocket = {
         ...mockSocket,
@@ -641,7 +658,9 @@ describe('NotificationsGateway', () => {
     });
 
     it('should allow SUPER_ADMIN user to join admin:broadcast room', async () => {
-      jest.spyOn(wsJwtGuard, 'validateToken').mockResolvedValue({ userId: 'super-admin-user', roles: ['SUPER_ADMIN'] });
+      jest
+        .spyOn(wsJwtGuard, 'validateToken')
+        .mockResolvedValue({ userId: 'super-admin-user', roles: ['SUPER_ADMIN'] });
 
       const superAdminSocket = {
         ...mockSocket,
@@ -661,7 +680,9 @@ describe('NotificationsGateway', () => {
     });
 
     it('should reject non-admin user from joining admin:broadcast room', async () => {
-      jest.spyOn(wsJwtGuard, 'validateToken').mockResolvedValue({ userId: 'test-user', roles: ['CUSTOMER'] });
+      jest
+        .spyOn(wsJwtGuard, 'validateToken')
+        .mockResolvedValue({ userId: 'test-user', roles: ['CUSTOMER'] });
 
       await gateway.handleConnection(mockSocket as any);
       const data = { room: 'admin:broadcast' };

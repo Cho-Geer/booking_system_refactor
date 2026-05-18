@@ -213,9 +213,7 @@ describe('Appointments Module (Integration)', () => {
     });
 
     it('should return 401 when fetching appointments without authentication', async () => {
-      await request(app.getHttpServer())
-        .get('/v1/appointments')
-        .expect(401);
+      await request(app.getHttpServer()).get('/v1/appointments').expect(401);
     });
   });
 
@@ -540,9 +538,7 @@ describe('Appointments Module (Integration)', () => {
     });
 
     it('should return 401 when deleting without authentication', async () => {
-      await request(app.getHttpServer())
-        .delete(`/v1/appointments/${appointmentId}`)
-        .expect(401);
+      await request(app.getHttpServer()).delete(`/v1/appointments/${appointmentId}`).expect(401);
     });
   });
 });

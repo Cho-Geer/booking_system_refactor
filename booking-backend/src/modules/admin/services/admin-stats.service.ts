@@ -1,5 +1,5 @@
-import { Injectable } from "@nestjs/common";
-import { StatsService } from "../../stats/stats.service";
+import { Injectable } from '@nestjs/common';
+import { StatsService } from '../../stats/stats.service';
 import {
   AdminStatsDto,
   StatCardDto,
@@ -7,23 +7,16 @@ import {
   SystemStatusDto,
   SystemMetricsDto,
   TimeDistributionItem,
-} from "../dto/admin-stats.dto";
+} from '../dto/admin-stats.dto';
 
 @Injectable()
 export class AdminStatsService {
   constructor(private readonly statsService: StatsService) {}
 
-  private toStatCard(
-    value: number,
-    previous: number,
-    target: number,
-  ): StatCardDto {
+  private toStatCard(value: number, previous: number, target: number): StatCardDto {
     const changePercentage =
-      previous > 0
-        ? Math.round(((value - previous) / previous) * 100 * 100) / 100
-        : 0;
-    const progressPercentage =
-      target > 0 ? Math.min(100, Math.round((value / target) * 100)) : 0;
+      previous > 0 ? Math.round(((value - previous) / previous) * 100 * 100) / 100 : 0;
+    const progressPercentage = target > 0 ? Math.min(100, Math.round((value / target) * 100)) : 0;
     return {
       value,
       changePercentage,
@@ -39,26 +32,18 @@ export class AdminStatsService {
     _endDate?: string,
     _timezone?: string,
   ): Promise<AdminStatsDto> {
-    const [
-      overview,
-      revenue,
-      userStats,
-      popularServices,
-      dailyBookings,
-      timeDistribution,
-    ] = await Promise.all([
-      this.statsService.getOverview(),
-      this.statsService.getRevenue(),
-      this.statsService.getUserStats(),
-      this.statsService.getPopularServices(),
-      this.statsService.getDailyBookings(),
-      this.statsService.getTimeDistribution(),
-    ]);
+    const [overview, revenue, userStats, popularServices, dailyBookings, timeDistribution] =
+      await Promise.all([
+        this.statsService.getOverview(),
+        this.statsService.getRevenue(),
+        this.statsService.getUserStats(),
+        this.statsService.getPopularServices(),
+        this.statsService.getDailyBookings(),
+        this.statsService.getTimeDistribution(),
+      ]);
 
     const today = new Date().toISOString().slice(0, 10);
-    const yesterday = new Date(Date.now() - 86400000)
-      .toISOString()
-      .slice(0, 10);
+    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
 
     const todayCount = dailyBookings
       .filter((d) => d.date === today)
@@ -71,41 +56,27 @@ export class AdminStatsService {
       .slice(-7)
       .map((d) => ({ date: d.date, count: d.bookings, revenue: d.revenue }));
 
-    const totalServiceBookings = popularServices.reduce(
-      (sum, s) => sum + s.bookingCount,
-      0,
-    );
+    const totalServiceBookings = popularServices.reduce((sum, s) => sum + s.bookingCount, 0);
     const servicePopularity = popularServices.map((s) => ({
       serviceName: s.serviceName,
       count: s.bookingCount,
       percentage:
         totalServiceBookings > 0
-          ? Math.round((s.bookingCount / totalServiceBookings) * 100 * 100) /
-            100
+          ? Math.round((s.bookingCount / totalServiceBookings) * 100 * 100) / 100
           : 0,
     }));
 
     // activeUsers change: last month vs month before from usersByMonth
     const userMonths = userStats.usersByMonth;
-    const prevUserMonth =
-      userMonths.length >= 2 ? userMonths[userMonths.length - 2].count : 0;
+    const prevUserMonth = userMonths.length >= 2 ? userMonths[userMonths.length - 2].count : 0;
 
     // totalRevenue change: last month vs month before from revenueByMonth
     const revMonths = revenue.revenueByMonth;
-    const prevRevMonth =
-      revMonths.length >= 2 ? revMonths[revMonths.length - 2].revenue : 0;
+    const prevRevMonth = revMonths.length >= 2 ? revMonths[revMonths.length - 2].revenue : 0;
 
     return {
-      todayBookings: this.toStatCard(
-        todayCount,
-        yesterdayCount,
-        Math.max(50, todayCount * 2),
-      ),
-      pendingBookings: this.toStatCard(
-        overview.appointmentsByStatus.PENDING ?? 0,
-        0,
-        50,
-      ),
+      todayBookings: this.toStatCard(todayCount, yesterdayCount, Math.max(50, todayCount * 2)),
+      pendingBookings: this.toStatCard(overview.appointmentsByStatus.PENDING ?? 0, 0, 50),
       activeUsers: this.toStatCard(
         userStats.activeUsers,
         prevUserMonth,
@@ -142,19 +113,19 @@ export class AdminStatsService {
     let daysToInclude = 7;
 
     switch (timeRange) {
-      case "last24h":
+      case 'last24h':
         daysToInclude = 1;
         break;
-      case "last7d":
+      case 'last7d':
         daysToInclude = 7;
         break;
-      case "last30d":
+      case 'last30d':
         daysToInclude = 30;
         break;
-      case "thisMonth":
+      case 'thisMonth':
         daysToInclude = now.getDate();
         break;
-      case "lastMonth":
+      case 'lastMonth':
         daysToInclude = 30;
         break;
       default:
@@ -162,8 +133,8 @@ export class AdminStatsService {
     }
 
     // Apply range override for weekly/monthly/yearly
-    if (range === "monthly") daysToInclude = 30;
-    else if (range === "yearly") daysToInclude = 365;
+    if (range === 'monthly') daysToInclude = 30;
+    else if (range === 'yearly') daysToInclude = 365;
 
     const cutoff = new Date(now.getTime() - daysToInclude * 86400000);
     const cutoffStr = cutoff.toISOString().slice(0, 10);
@@ -218,27 +189,25 @@ export class AdminStatsService {
     const uptimeDays = uptimeSeconds / 86400;
     // Simulate 99.9%+ uptime if running less than 30 days, otherwise compute
     const uptimePercent =
-      uptimeDays < 30
-        ? 99.9
-        : Math.min(100, Math.round((1 - 0.001 * uptimeDays) * 1000) / 10);
-    const uptimeStr = uptimePercent.toFixed(1) + "%";
+      uptimeDays < 30 ? 99.9 : Math.min(100, Math.round((1 - 0.001 * uptimeDays) * 1000) / 10);
+    const uptimeStr = uptimePercent.toFixed(1) + '%';
 
     // lastBackup: simulate last backup 24h ago (in real app, query backup logs)
     const lastBackup = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
     return {
-      server: "Online",
-      database: "Online",
-      api: "Online",
-      redis: "Online",
+      server: 'Online',
+      database: 'Online',
+      api: 'Online',
+      redis: 'Online',
       lastBackup: lastBackup.toISOString(),
       uptime: uptimeStr,
     };
   }
 
   async getSystemMetrics(): Promise<SystemMetricsDto> {
-    const os = await import("os");
-    const fs = await import("fs");
+    const os = await import('os');
+    const fs = await import('fs');
 
     const totalMem = os.totalmem();
     const freeMem = os.freemem();
@@ -248,7 +217,7 @@ export class AdminStatsService {
     // Real disk usage via native fs.statvfs (metadata-only, non-blocking)
     let diskUsage = 78; // fallback
     try {
-      const stats = await fs.promises.statfs("/");
+      const stats = await fs.promises.statfs('/');
       const totalBytes = stats.blocks * stats.bsize;
       const freeBytes = stats.bavail * stats.bsize;
       if (totalBytes > 0) {
@@ -264,5 +233,4 @@ export class AdminStatsService {
       diskUsage,
     };
   }
-
 }

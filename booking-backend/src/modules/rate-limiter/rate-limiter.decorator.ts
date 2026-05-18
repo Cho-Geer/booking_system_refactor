@@ -1,4 +1,4 @@
-import { SetMetadata } from "@nestjs/common";
+import { SetMetadata } from '@nestjs/common';
 
 /**
  * Rate limit tier definitions defining request limits and time windows.
@@ -8,7 +8,7 @@ import { SetMetadata } from "@nestjs/common";
  * - api: 30 requests per minute (general API endpoints)
  * - public: 100 requests per minute (public endpoints)
  */
-export type RateLimitTier = "strict" | "auth" | "api" | "public";
+export type RateLimitTier = 'strict' | 'auth' | 'api' | 'public';
 
 /**
  * Identifier extraction strategy for rate limiting.
@@ -18,7 +18,7 @@ export type RateLimitTier = "strict" | "auth" | "api" | "public";
  * - api_key: Extract from x-api-key header
  * - email: Extract from request body email field (for verification code endpoints)
  */
-export type RateLimitKey = "ip" | "user" | "api_key" | "email";
+export type RateLimitKey = 'ip' | 'user' | 'api_key' | 'email';
 
 /**
  * Configuration options for the @RateLimit decorator.
@@ -37,15 +37,12 @@ export interface RateLimitOptions {
 /**
  * Metadata key used to store rate limit configuration on route handlers.
  */
-export const RATE_LIMIT_KEY = "rate_limit_config";
+export const RATE_LIMIT_KEY = 'rate_limit_config';
 
 /**
  * Default configuration for each rate limit tier.
  */
-export const RATE_LIMIT_DEFAULTS: Record<
-  RateLimitTier,
-  { limit: number; window: number }
-> = {
+export const RATE_LIMIT_DEFAULTS: Record<RateLimitTier, { limit: number; window: number }> = {
   strict: { limit: 1, window: 1 },
   auth: { limit: 5, window: 60 },
   api: { limit: 30, window: 60 },
@@ -82,14 +79,14 @@ export function resolveRateLimitOptions(
   limitConfig: RateLimitOptions | undefined,
 ): RateLimitOptions {
   if (!limitConfig) {
-    return { tier: "api", key: "ip" };
+    return { tier: 'api', key: 'ip' };
   }
 
   const defaults = RATE_LIMIT_DEFAULTS[limitConfig.tier];
 
   return {
     tier: limitConfig.tier,
-    key: limitConfig.key || "ip",
+    key: limitConfig.key || 'ip',
     limit: limitConfig.limit ?? defaults.limit,
     window: limitConfig.window ?? defaults.window,
   };

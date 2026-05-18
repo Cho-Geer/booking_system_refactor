@@ -1,17 +1,17 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
 /**
  * 认证响应 DTO
  * 符合 pii_encryption_contract 规范：不含 user 对象
  */
 export class AuthResponseDto {
-  @ApiProperty({ description: "JWT Access Token" })
+  @ApiProperty({ description: 'JWT Access Token' })
   accessToken!: string;
 
-  @ApiProperty({ description: "Access Token 过期时间（秒）", example: 900 })
+  @ApiProperty({ description: 'Access Token 过期时间（秒）', example: 900 })
   expiresIn!: number;
 
-  @ApiProperty({ description: "Token 类型", example: "Bearer" })
+  @ApiProperty({ description: 'Token 类型', example: 'Bearer' })
   tokenType!: string;
 
   // refreshToken 通过 HttpOnly cookie 传输，不在 JSON 响应体中暴露
@@ -21,7 +21,7 @@ export class AuthResponseDto {
  * Refresh Token 请求 DTO
  */
 export class RefreshTokenRequestDto {
-  @ApiProperty({ description: "Refresh Token" })
+  @ApiProperty({ description: 'Refresh Token' })
   refreshToken!: string;
 }
 
@@ -29,7 +29,7 @@ export class RefreshTokenRequestDto {
  * 登出响应 DTO
  */
 export class LogoutResponseDto {
-  @ApiProperty({ description: "登出成功消息", example: "登出成功" })
+  @ApiProperty({ description: '登出成功消息', example: '登出成功' })
   message!: string;
 }
 
@@ -38,12 +38,12 @@ export class LogoutResponseDto {
  */
 export class SendCodeResponseDto {
   @ApiProperty({
-    description: "脱敏后的联系方式",
-    example: "138****5678",
+    description: '脱敏后的联系方式',
+    example: '138****5678',
     required: false,
   })
   maskedContact?: string;
 
-  @ApiProperty({ description: "验证码过期时间（秒）", example: 300 })
+  @ApiProperty({ description: '验证码过期时间（秒）', example: 300 })
   expiresIn!: number;
 }

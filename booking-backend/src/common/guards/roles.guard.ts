@@ -1,10 +1,5 @@
-import {
-  Injectable,
-  CanActivate,
-  ExecutionContext,
-  ForbiddenException,
-} from "@nestjs/common";
-import { Reflector } from "@nestjs/core";
+import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 
 interface RequestUser {
   id: string;
@@ -36,7 +31,7 @@ export class RolesGuard implements CanActivate {
    */
   canActivate(context: ExecutionContext): boolean {
     // Get required roles from the handler or class metadata
-    const requiredRoles = this.reflector.getAllAndOverride<string[]>("roles", [
+    const requiredRoles = this.reflector.getAllAndOverride<string[]>('roles', [
       context.getHandler(),
       context.getClass(),
     ]);
@@ -51,7 +46,7 @@ export class RolesGuard implements CanActivate {
     const user = request.user;
 
     if (!user) {
-      throw new ForbiddenException("User not authenticated");
+      throw new ForbiddenException('User not authenticated');
     }
 
     // Check if user has at least one of the required roles
@@ -61,9 +56,7 @@ export class RolesGuard implements CanActivate {
 
     if (!hasRole) {
       this.logAccessDenied(user, requiredRoles, context);
-      throw new ForbiddenException(
-        `Access denied. Required roles: ${requiredRoles.join(", ")}`,
-      );
+      throw new ForbiddenException(`Access denied. Required roles: ${requiredRoles.join(', ')}`);
     }
 
     return true;
@@ -85,11 +78,10 @@ export class RolesGuard implements CanActivate {
       requiredRoles,
       endpoint: `${request.method} ${request.url}`,
       ipAddress: request.ip,
-      userAgent: request.get("user-agent"),
+      userAgent: request.get('user-agent'),
     };
 
     // In production, this would log to a security monitoring system
-    console.warn("Access denied - insufficient role:", logData);
+    console.warn('Access denied - insufficient role:', logData);
   }
-
 }

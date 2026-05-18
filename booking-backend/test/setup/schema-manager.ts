@@ -1,4 +1,4 @@
-import * as crypto from "crypto";
+import * as crypto from 'crypto';
 
 /**
  * SchemaManager — Manages per-test-file PostgreSQL schema isolation.
@@ -22,12 +22,9 @@ export class SchemaManager {
    * @param databaseUrl - Base database URL (without schema)
    * @returns Schema-qualified DATABASE_URL
    */
-  static async createTestSchema(
-    schemaName: string,
-    databaseUrl: string,
-  ): Promise<string> {
+  static async createTestSchema(schemaName: string, databaseUrl: string): Promise<string> {
     if (!databaseUrl) {
-      throw new Error("Database URL is required to create a test schema");
+      throw new Error('Database URL is required to create a test schema');
     }
 
     // In production, this would execute:
@@ -37,19 +34,16 @@ export class SchemaManager {
     console.log(`[SchemaManager] Created schema: ${schemaName}`);
 
     // Return schema-qualified URL
-    const separator = databaseUrl.includes("?") ? "&" : "?";
+    const separator = databaseUrl.includes('?') ? '&' : '?';
     return `${databaseUrl}${separator}schema=${schemaName}`;
   }
 
   /**
    * Drop a test schema and all its contents.
    */
-  static async dropTestSchema(
-    schemaName: string,
-    databaseUrl: string,
-  ): Promise<void> {
+  static async dropTestSchema(schemaName: string, databaseUrl: string): Promise<void> {
     if (!databaseUrl) {
-      throw new Error("Database URL is required to drop a test schema");
+      throw new Error('Database URL is required to drop a test schema');
     }
 
     // In production, this would execute:
@@ -62,12 +56,9 @@ export class SchemaManager {
    * Run Prisma migrations on a specific schema.
    * Uses: SET search_path TO schema_name; then runs migrations.
    */
-  static async migrateSchema(
-    schemaName: string,
-    databaseUrl: string,
-  ): Promise<void> {
+  static async migrateSchema(schemaName: string, databaseUrl: string): Promise<void> {
     if (!databaseUrl) {
-      throw new Error("Database URL is required to run migrations");
+      throw new Error('Database URL is required to run migrations');
     }
 
     // In production, this would:
@@ -84,18 +75,11 @@ export class SchemaManager {
    * Format: w{workerId}_f{fileHash}
    * Example: w1_fa1b2c3d
    */
-  static generateSchemaName(context?: {
-    workerId?: string;
-    filePath?: string;
-  }): string {
-    const workerId = context?.workerId || process.env.JEST_WORKER_ID || "0";
+  static generateSchemaName(context?: { workerId?: string; filePath?: string }): string {
+    const workerId = context?.workerId || process.env.JEST_WORKER_ID || '0';
     const fileHash = context?.filePath
-      ? crypto
-          .createHash("md5")
-          .update(context.filePath)
-          .digest("hex")
-          .substring(0, 8)
-      : crypto.randomBytes(4).toString("hex");
+      ? crypto.createHash('md5').update(context.filePath).digest('hex').substring(0, 8)
+      : crypto.randomBytes(4).toString('hex');
 
     return `w${workerId}_f${fileHash}`;
   }

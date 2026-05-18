@@ -33,7 +33,7 @@ describe('UsersService', () => {
 
   beforeEach(async () => {
     mockHashService = createMockHashService();
-    
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UsersService,
@@ -84,7 +84,9 @@ describe('UsersService', () => {
       expect(mockHashService.hashWithPepper('test')).toBe('hash-test');
 
       await expect(service.create(createUserDto)).rejects.toThrow(ConflictException);
-      await expect(service.create(createUserDto)).rejects.toThrow('User with this email already exists');
+      await expect(service.create(createUserDto)).rejects.toThrow(
+        'User with this email already exists',
+      );
 
       // The service calls findUnique twice (email + phone), so we check emailHash was a string
       expect(prisma.user.findUnique).toHaveBeenNthCalledWith(1, {
@@ -254,7 +256,9 @@ describe('UsersService', () => {
       prisma.user.findUnique.mockResolvedValue(null);
 
       await expect(service.findOne('nonexistent-id')).rejects.toThrow(NotFoundException);
-      await expect(service.findOne('nonexistent-id')).rejects.toThrow('User with ID nonexistent-id not found');
+      await expect(service.findOne('nonexistent-id')).rejects.toThrow(
+        'User with ID nonexistent-id not found',
+      );
     });
   });
 
@@ -299,8 +303,12 @@ describe('UsersService', () => {
     it('should throw NotFoundException if user not found', async () => {
       prisma.user.findUnique.mockResolvedValue(null);
 
-      await expect(service.update('nonexistent-id', updateUserDto)).rejects.toThrow(NotFoundException);
-      await expect(service.update('nonexistent-id', updateUserDto)).rejects.toThrow('User with ID nonexistent-id not found');
+      await expect(service.update('nonexistent-id', updateUserDto)).rejects.toThrow(
+        NotFoundException,
+      );
+      await expect(service.update('nonexistent-id', updateUserDto)).rejects.toThrow(
+        'User with ID nonexistent-id not found',
+      );
     });
 
     it('should throw ConflictException if updating email to one that already exists', async () => {
@@ -311,7 +319,9 @@ describe('UsersService', () => {
         .mockResolvedValueOnce({ ...mockUser, email: currentEmail })
         .mockResolvedValueOnce({ ...mockUser, email: newEmail });
 
-      await expect(service.update('user-1', { email: newEmail })).rejects.toThrow(ConflictException);
+      await expect(service.update('user-1', { email: newEmail })).rejects.toThrow(
+        ConflictException,
+      );
     });
 
     it('should include correct message in ConflictException for duplicate email', async () => {
@@ -322,7 +332,9 @@ describe('UsersService', () => {
         .mockResolvedValueOnce({ ...mockUser, email: currentEmail })
         .mockResolvedValueOnce({ ...mockUser, email: newEmail });
 
-      await expect(service.update('user-1', { email: newEmail })).rejects.toThrow('User with this email already exists');
+      await expect(service.update('user-1', { email: newEmail })).rejects.toThrow(
+        'User with this email already exists',
+      );
     });
 
     it('should allow updating email to the same value', async () => {
@@ -379,7 +391,9 @@ describe('UsersService', () => {
       prisma.user.findUnique.mockResolvedValue(null);
 
       await expect(service.remove('nonexistent-id')).rejects.toThrow(NotFoundException);
-      await expect(service.remove('nonexistent-id')).rejects.toThrow('User with ID nonexistent-id not found');
+      await expect(service.remove('nonexistent-id')).rejects.toThrow(
+        'User with ID nonexistent-id not found',
+      );
     });
 
     it('should delete user and return success message', async () => {
@@ -395,12 +409,12 @@ describe('UsersService', () => {
 
   describe('updatePassword', () => {
     it('should throw BadRequestException as password management is not supported', async () => {
-      await expect(
-        service.updatePassword('user-1', 'oldPass', 'newPass'),
-      ).rejects.toThrow(BadRequestException);
-      await expect(
-        service.updatePassword('user-1', 'oldPass', 'newPass'),
-      ).rejects.toThrow('Password management is not supported');
+      await expect(service.updatePassword('user-1', 'oldPass', 'newPass')).rejects.toThrow(
+        BadRequestException,
+      );
+      await expect(service.updatePassword('user-1', 'oldPass', 'newPass')).rejects.toThrow(
+        'Password management is not supported',
+      );
     });
   });
 
@@ -497,7 +511,9 @@ if (isIntegrationMode()) {
       });
 
       it('should throw NotFoundException for non-existent user', async () => {
-        await expect(usersService.findOne('00000000-0000-0000-0000-000000000000')).rejects.toThrow(NotFoundException);
+        await expect(usersService.findOne('00000000-0000-0000-0000-000000000000')).rejects.toThrow(
+          NotFoundException,
+        );
       });
     });
   });

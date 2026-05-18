@@ -99,11 +99,9 @@ describe('RequestIdInterceptor', () => {
 
     clsService.run({} as any, () => {
       let result: unknown;
-      interceptor
-        .intercept(mockContext, mockCallHandler)
-        .subscribe((val) => {
-          result = val;
-        });
+      interceptor.intercept(mockContext, mockCallHandler).subscribe((val) => {
+        result = val;
+      });
 
       expect(result).toEqual(responseData);
     });

@@ -1,6 +1,6 @@
-import { ContainerPool } from "./container-pool";
+import { ContainerPool } from './container-pool';
 
-describe("ContainerPool", () => {
+describe('ContainerPool', () => {
   // Reset the singleton between tests
   afterEach(async () => {
     // Ensure cleanup
@@ -11,8 +11,8 @@ describe("ContainerPool", () => {
     }
   });
 
-  describe("singleton pattern", () => {
-    it("should return the same instance on multiple calls", () => {
+  describe('singleton pattern', () => {
+    it('should return the same instance on multiple calls', () => {
       const instance1 = (ContainerPool as any).instance;
       const instance2 = (ContainerPool as any).instance;
       // Both should be the same (or undefined on first call)
@@ -20,32 +20,26 @@ describe("ContainerPool", () => {
     });
   });
 
-  describe("getConnectionInfo", () => {
-    it("should throw when pool is not initialized", () => {
-      expect(() => ContainerPool.getConnectionInfo()).toThrow(
-        /not initialized/i,
-      );
+  describe('getConnectionInfo', () => {
+    it('should throw when pool is not initialized', () => {
+      expect(() => ContainerPool.getConnectionInfo()).toThrow(/not initialized/i);
     });
   });
 
-  describe("acquireSchema", () => {
-    it("should throw when pool is not initialized", async () => {
-      await expect(ContainerPool.acquireSchema("test_schema")).rejects.toThrow(
-        /not initialized/i,
-      );
+  describe('acquireSchema', () => {
+    it('should throw when pool is not initialized', async () => {
+      await expect(ContainerPool.acquireSchema('test_schema')).rejects.toThrow(/not initialized/i);
     });
   });
 
-  describe("releaseSchema", () => {
-    it("should throw when pool is not initialized", async () => {
-      await expect(ContainerPool.releaseSchema("test_schema")).rejects.toThrow(
-        /not initialized/i,
-      );
+  describe('releaseSchema', () => {
+    it('should throw when pool is not initialized', async () => {
+      await expect(ContainerPool.releaseSchema('test_schema')).rejects.toThrow(/not initialized/i);
     });
   });
 
-  describe("destroy", () => {
-    it("should not throw when called multiple times", async () => {
+  describe('destroy', () => {
+    it('should not throw when called multiple times', async () => {
       await ContainerPool.destroy();
       await ContainerPool.destroy();
       // Should not throw

@@ -84,8 +84,18 @@ describe('[R11] Admin Users CRUD', () => {
   describe('GET /v1/admin/users', () => {
     it('should return paginated user list for ADMIN', async () => {
       // Create additional users
-      await prisma.user.create({ data: { ...UserFactory.create({ email: `user1-${Date.now()}@example.com` }), status: UserStatus.ACTIVE } as any });
-      await prisma.user.create({ data: { ...UserFactory.create({ email: `user2-${Date.now()}@example.com` }), status: UserStatus.ACTIVE } as any });
+      await prisma.user.create({
+        data: {
+          ...UserFactory.create({ email: `user1-${Date.now()}@example.com` }),
+          status: UserStatus.ACTIVE,
+        } as any,
+      });
+      await prisma.user.create({
+        data: {
+          ...UserFactory.create({ email: `user2-${Date.now()}@example.com` }),
+          status: UserStatus.ACTIVE,
+        } as any,
+      });
 
       const response = await request(app.getHttpServer())
         .get('/v1/admin/users')
@@ -101,7 +111,12 @@ describe('[R11] Admin Users CRUD', () => {
     });
 
     it('should support role filter', async () => {
-      await prisma.user.create({ data: { ...UserFactory.create({ email: `customer-${Date.now()}@example.com` }), status: UserStatus.ACTIVE } as any });
+      await prisma.user.create({
+        data: {
+          ...UserFactory.create({ email: `customer-${Date.now()}@example.com` }),
+          status: UserStatus.ACTIVE,
+        } as any,
+      });
 
       const response = await request(app.getHttpServer())
         .get('/v1/admin/users')
@@ -118,7 +133,10 @@ describe('[R11] Admin Users CRUD', () => {
     });
 
     it('should return 403 for CUSTOMER role', async () => {
-      const customerData = UserFactory.create({ email: `customer-${Date.now()}@example.com`, phone: undefined });
+      const customerData = UserFactory.create({
+        email: `customer-${Date.now()}@example.com`,
+        phone: undefined,
+      });
       const customer = await prisma.user.create({ data: customerData as any });
       const customerToken = jwtService.sign(
         { sub: customer.id, role: SystemRole.CUSTOMER },
@@ -157,7 +175,12 @@ describe('[R11] Admin Users CRUD', () => {
 
   describe('PUT /v1/admin/users/:id', () => {
     it('should update user name for ADMIN', async () => {
-      const target = await prisma.user.create({ data: { ...UserFactory.create({ email: `target-${Date.now()}@example.com` }), status: UserStatus.ACTIVE } as any });
+      const target = await prisma.user.create({
+        data: {
+          ...UserFactory.create({ email: `target-${Date.now()}@example.com` }),
+          status: UserStatus.ACTIVE,
+        } as any,
+      });
 
       const response = await request(app.getHttpServer())
         .put(`/v1/admin/users/${target.id}`)
@@ -171,7 +194,12 @@ describe('[R11] Admin Users CRUD', () => {
 
   describe('DELETE /v1/admin/users/:id', () => {
     it('should return 403 for ADMIN role (SUPER_ADMIN only)', async () => {
-      const target = await prisma.user.create({ data: { ...UserFactory.create({ email: `deletetarget-${Date.now()}@example.com` }), status: UserStatus.ACTIVE } as any });
+      const target = await prisma.user.create({
+        data: {
+          ...UserFactory.create({ email: `deletetarget-${Date.now()}@example.com` }),
+          status: UserStatus.ACTIVE,
+        } as any,
+      });
 
       await request(app.getHttpServer())
         .delete(`/v1/admin/users/${target.id}`)
@@ -180,7 +208,12 @@ describe('[R11] Admin Users CRUD', () => {
     });
 
     it('should return 200 for SUPER_ADMIN role', async () => {
-      const target = await prisma.user.create({ data: { ...UserFactory.create({ email: `deletetarget-${Date.now()}@example.com` }), status: UserStatus.ACTIVE } as any });
+      const target = await prisma.user.create({
+        data: {
+          ...UserFactory.create({ email: `deletetarget-${Date.now()}@example.com` }),
+          status: UserStatus.ACTIVE,
+        } as any,
+      });
 
       const response = await request(app.getHttpServer())
         .delete(`/v1/admin/users/${target.id}`)

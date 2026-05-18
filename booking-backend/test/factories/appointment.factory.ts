@@ -1,6 +1,10 @@
 import { AppointmentStatus } from '@prisma/client';
 import { UserFactory, type UserFactoryOverrides } from './user.factory';
-import { ServiceFactory, ServiceCategoryFactory, type ServiceFactoryOverrides } from './service.factory';
+import {
+  ServiceFactory,
+  ServiceCategoryFactory,
+  type ServiceFactoryOverrides,
+} from './service.factory';
 import { TimeSlotFactory, type TimeSlotFactoryOverrides } from './time-slot.factory';
 
 /**
@@ -58,11 +62,14 @@ export class AppointmentFactory {
   static createSharedDependencies(
     userOverrides: UserFactoryOverrides = {},
     serviceOverrides: ServiceFactoryOverrides = {},
-    timeSlotOverrides: TimeSlotFactoryOverrides = {}
+    timeSlotOverrides: TimeSlotFactoryOverrides = {},
   ): AppointmentDependencies {
     const categoryData = ServiceCategoryFactory.create();
     const serviceData = ServiceFactory.create({ ...serviceOverrides, categoryId: categoryData.id });
-    const timeSlotData = TimeSlotFactory.create({ ...timeSlotOverrides, serviceId: serviceData.id });
+    const timeSlotData = TimeSlotFactory.create({
+      ...timeSlotOverrides,
+      serviceId: serviceData.id,
+    });
     const userData = UserFactory.create(userOverrides);
 
     return {
@@ -85,18 +92,21 @@ export class AppointmentFactory {
     const userId = overrides.userId ?? `user-${uid}`;
 
     // Generate a future appointment date by default
-    const appointmentDate = overrides.appointmentDate ?? (() => {
-      const d = new Date();
-      d.setDate(d.getDate() + Math.floor(Math.random() * 30) + 1);
-      d.setHours(9 + Math.floor(Math.random() * 8), 0, 0, 0);
-      return d;
-    })();
+    const appointmentDate =
+      overrides.appointmentDate ??
+      (() => {
+        const d = new Date();
+        d.setDate(d.getDate() + Math.floor(Math.random() * 30) + 1);
+        d.setHours(9 + Math.floor(Math.random() * 8), 0, 0, 0);
+        return d;
+      })();
 
     return {
       userId,
       timeSlotId,
       serviceId,
-      appointmentNumber: overrides.appointmentNumber ?? AppointmentFactory.generateAppointmentNumber(),
+      appointmentNumber:
+        overrides.appointmentNumber ?? AppointmentFactory.generateAppointmentNumber(),
       appointmentDate,
       slotSequence: overrides.slotSequence ?? 1,
       status: overrides.status ?? AppointmentStatus.PENDING,
@@ -125,7 +135,7 @@ export class AppointmentFactory {
   static createMany(
     count: number,
     overrides: AppointmentFactoryOverrides = {},
-    sharedDeps?: AppointmentDependencies
+    sharedDeps?: AppointmentDependencies,
   ) {
     return Array.from({ length: count }, () =>
       AppointmentFactory.create({
@@ -133,7 +143,7 @@ export class AppointmentFactory {
         timeSlotId: sharedDeps?.timeSlotId ?? overrides.timeSlotId,
         serviceId: sharedDeps?.serviceId ?? overrides.serviceId,
         ...overrides,
-      })
+      }),
     );
   }
 }

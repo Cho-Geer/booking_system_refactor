@@ -154,15 +154,16 @@ describe('GlobalExceptionFilter', () => {
       const prismaError = {
         code: 'P2003',
         message: 'Foreign key constraint failed',
-        meta: { field_name: 'userId' },
+        meta: { field_name: 'serviceId' },
       };
 
       filter.catch(prismaError, mockHost);
 
-      expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
+      expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.CONFLICT);
       expect(mockResponse.json).toHaveBeenCalledWith({
-        statusCode: HttpStatus.BAD_REQUEST,
-        message: 'Related resource not found',
+        statusCode: HttpStatus.CONFLICT,
+        message:
+          'This service cannot be deleted because it has associated appointments. Disable the service (set isActive=false) instead to achieve the same effect.',
         error: 'PrismaError',
         timestamp: expect.any(String),
         path: '/api/test-endpoint',
@@ -376,10 +377,7 @@ describe('GlobalExceptionFilter', () => {
 
       filter.catch(error, mockHost);
 
-      expect(loggerSpy).toHaveBeenCalledWith(
-        'Exception: Error - Test error',
-        expect.any(String),
-      );
+      expect(loggerSpy).toHaveBeenCalledWith('Exception: Error - Test error', expect.any(String));
     });
 
     it('should log error without stack trace for non-Error exceptions', () => {

@@ -1,8 +1,8 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { PrismaService } from "../../common/database/prisma.service";
-import { CacheService } from "../cache/cache.service";
-import { NotificationsGateway } from "../notifications/notifications.gateway";
-import { seedDefaultTranslations as runSeed } from "./translations-seed.service";
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../../common/database/prisma.service';
+import { CacheService } from '../cache/cache.service';
+import { NotificationsGateway } from '../notifications/notifications.gateway';
+import { seedDefaultTranslations as runSeed } from './translations-seed.service';
 
 // ============================================================
 // Types
@@ -49,7 +49,7 @@ export interface PaginatedTranslationsResult {
 }
 
 const CACHE_TTL = 3600; // 1 hour
-const DEFAULT_LOCALE = "en";
+const DEFAULT_LOCALE = 'en';
 
 @Injectable()
 export class TranslationService {
@@ -101,9 +101,7 @@ export class TranslationService {
     // or current time if no entries were returned.
     const updatedAt =
       entries.length > 0
-        ? new Date(
-            Math.max(...entries.map((e) => e.updatedAt.getTime())),
-          ).toISOString()
+        ? new Date(Math.max(...entries.map((e) => e.updatedAt.getTime()))).toISOString()
         : new Date().toISOString();
 
     if (since) {
@@ -193,10 +191,7 @@ export class TranslationService {
     }
 
     const firstEntry = entries[0];
-    this.notificationsGateway.sendTranslationsUpdated(
-      firstEntry?.domain,
-      firstEntry?.locale,
-    );
+    this.notificationsGateway.sendTranslationsUpdated(firstEntry?.domain, firstEntry?.locale);
 
     return { updated: updatedCount, created: createdCount };
   }
@@ -215,7 +210,7 @@ export class TranslationService {
     const where: Record<string, unknown> = {};
     if (locale) where.locale = locale;
     if (domain) where.domain = domain;
-    if (isCustom !== undefined) where.isCustom = isCustom === true || isCustom === "true";
+    if (isCustom !== undefined) where.isCustom = isCustom === true || isCustom === 'true';
 
     const skip = (page - 1) * limit;
     const [data, total] = await Promise.all([
@@ -226,10 +221,10 @@ export class TranslationService {
     return {
       data: data as unknown as Record<string, unknown>[],
       meta: {
-        total,
+        total: Number(total),
         page,
         limit,
-        totalPages: Math.ceil(total / limit),
+        totalPages: Math.ceil(Number(total) / limit),
       },
     };
   }
@@ -248,7 +243,7 @@ export class TranslationService {
     });
 
     if (!existing) {
-      throw new NotFoundException("Translation not found");
+      throw new NotFoundException('Translation not found');
     }
 
     await this.prisma.translationDictionary.delete({
@@ -272,12 +267,12 @@ export class TranslationService {
 
     // Count total default English records after seeding
     const count = await this.prisma.translationDictionary.count({
-      where: { isCustom: false, locale: "en" },
+      where: { isCustom: false, locale: 'en' },
     });
 
     this.notificationsGateway.sendTranslationsUpdated();
 
-    return { message: "seed_success", count };
+    return { message: 'seed_success', count };
   }
 
   // ============================================================

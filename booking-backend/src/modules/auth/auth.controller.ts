@@ -10,35 +10,22 @@ import {
   Req,
   Res,
   UnauthorizedException,
-} from "@nestjs/common";
-import { Request, Response } from "express";
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBody,
-  ApiBearerAuth,
-} from "@nestjs/swagger";
-import { AuthService } from "./auth.service";
-import { RegisterSendCodeDto } from "./dto/register-send-code.dto";
-import { RegisterCompleteDto } from "./dto/register-complete.dto";
-import { LoginSendCodeDto } from "./dto/login-send-code.dto";
-import { LoginVerifyCodeDto } from "./dto/login-verify-code.dto";
-import { LoginPasswordDto } from "./dto/login-password.dto";
-import {
-  ResetPasswordSendCodeDto,
-  ResetPasswordVerifyDto,
-} from "./dto/reset-password.dto";
-import {
-  AuthResponseDto,
-  SendCodeResponseDto,
-  LogoutResponseDto,
-} from "./dto/auth-response.dto";
-import { Public } from "../../common/decorators/public.decorator";
-import { RateLimit } from "../rate-limiter/rate-limiter.decorator";
+} from '@nestjs/common';
+import { Request, Response } from 'express';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
+import { AuthService } from './auth.service';
+import { RegisterSendCodeDto } from './dto/register-send-code.dto';
+import { RegisterCompleteDto } from './dto/register-complete.dto';
+import { LoginSendCodeDto } from './dto/login-send-code.dto';
+import { LoginVerifyCodeDto } from './dto/login-verify-code.dto';
+import { LoginPasswordDto } from './dto/login-password.dto';
+import { ResetPasswordSendCodeDto, ResetPasswordVerifyDto } from './dto/reset-password.dto';
+import { AuthResponseDto, SendCodeResponseDto, LogoutResponseDto } from './dto/auth-response.dto';
+import { Public } from '../../common/decorators/public.decorator';
+import { RateLimit } from '../rate-limiter/rate-limiter.decorator';
 
-@ApiTags("authentication")
-@Controller("auth")
+@ApiTags('authentication')
+@Controller('auth')
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -46,60 +33,58 @@ export class AuthController {
   /** HttpOnly cookie configuration for refresh token */
   private readonly REFRESH_COOKIE_OPTIONS = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict" as const,
-    path: "/",
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict' as const,
+    path: '/',
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in ms
   };
 
   /** Cookie name for refresh token */
-  private readonly REFRESH_COOKIE_NAME = "refreshToken";
+  private readonly REFRESH_COOKIE_NAME = 'refreshToken';
 
   // ==================== 注册流程 ====================
 
   @Public()
-  @Post("register/send-code")
-  @RateLimit({ tier: "auth", key: "email" })
+  @Post('register/send-code')
+  @RateLimit({ tier: 'auth', key: 'email' })
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: "注册第一步：发送验证码" })
+  @ApiOperation({ summary: '注册第一步：发送验证码' })
   @ApiBody({ type: RegisterSendCodeDto })
   @ApiResponse({
     status: 200,
-    description: "验证码发送成功",
+    description: '验证码发送成功',
     type: SendCodeResponseDto,
   })
   @ApiResponse({
     status: 409,
-    description: "手机号/邮箱已注册",
+    description: '手机号/邮箱已注册',
   })
   @ApiResponse({
     status: 429,
-    description: "超出限流",
+    description: '超出限流',
   })
-  async registerSendCode(
-    @Body() sendDto: RegisterSendCodeDto,
-  ): Promise<SendCodeResponseDto> {
+  async registerSendCode(@Body() sendDto: RegisterSendCodeDto): Promise<SendCodeResponseDto> {
     return this.authService.registerSendCode(sendDto);
   }
 
   @Public()
-  @Post("register/complete")
-  @RateLimit({ tier: "auth", key: "ip", limit: 10 })
+  @Post('register/complete')
+  @RateLimit({ tier: 'auth', key: 'ip', limit: 10 })
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: "注册第二步：完成注册" })
+  @ApiOperation({ summary: '注册第二步：完成注册' })
   @ApiBody({ type: RegisterCompleteDto })
   @ApiResponse({
     status: 201,
-    description: "注册成功，返回 Token（refreshToken 通过 HttpOnly Cookie 传输）",
+    description: '注册成功，返回 Token（refreshToken 通过 HttpOnly Cookie 传输）',
     type: AuthResponseDto,
   })
   @ApiResponse({
     status: 400,
-    description: "验证码无效或已过期",
+    description: '验证码无效或已过期',
   })
   @ApiResponse({
     status: 409,
-    description: "手机号/邮箱已注册（并发）",
+    description: '手机号/邮箱已注册（并发）',
   })
   async registerComplete(
     @Body() completeDto: RegisterCompleteDto,
@@ -107,46 +92,44 @@ export class AuthController {
   ): Promise<AuthResponseDto & { _message: string }> {
     const result = await this.authService.registerComplete(completeDto);
     this.setRefreshCookie(res, result.refreshToken);
-    return { ...this.stripRefreshToken(result), _message: "注册成功" };
+    return { ...this.stripRefreshToken(result), _message: '注册成功' };
   }
 
   // ==================== 登录流程 ====================
 
   @Public()
-  @Post("login/send-code")
-  @RateLimit({ tier: "auth", key: "email" })
+  @Post('login/send-code')
+  @RateLimit({ tier: 'auth', key: 'email' })
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: "登录第一步：发送验证码" })
+  @ApiOperation({ summary: '登录第一步：发送验证码' })
   @ApiBody({ type: LoginSendCodeDto })
   @ApiResponse({
     status: 200,
-    description: "验证码发送成功（防枚举，用户不存在也返回 200）",
+    description: '验证码发送成功（防枚举，用户不存在也返回 200）',
     type: SendCodeResponseDto,
   })
-  async loginSendCode(
-    @Body() sendDto: LoginSendCodeDto,
-  ): Promise<SendCodeResponseDto> {
+  async loginSendCode(@Body() sendDto: LoginSendCodeDto): Promise<SendCodeResponseDto> {
     return this.authService.loginSendCode(sendDto);
   }
 
   @Public()
-  @Post("login/verify-code")
-  @RateLimit({ tier: "auth", key: "email", limit: 10 })
+  @Post('login/verify-code')
+  @RateLimit({ tier: 'auth', key: 'email', limit: 10 })
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: "验证码登录" })
+  @ApiOperation({ summary: '验证码登录' })
   @ApiBody({ type: LoginVerifyCodeDto })
   @ApiResponse({
     status: 200,
-    description: "登录成功，返回 Token（refreshToken 通过 HttpOnly Cookie 传输）",
+    description: '登录成功，返回 Token（refreshToken 通过 HttpOnly Cookie 传输）',
     type: AuthResponseDto,
   })
   @ApiResponse({
     status: 401,
-    description: "验证码无效或已过期",
+    description: '验证码无效或已过期',
   })
   @ApiResponse({
     status: 404,
-    description: "用户不存在",
+    description: '用户不存在',
   })
   async loginVerifyCode(
     @Body() verifyDto: LoginVerifyCodeDto,
@@ -156,30 +139,30 @@ export class AuthController {
     const result = await this.authService.loginVerifyCode(
       verifyDto,
       req.ip,
-      req.headers["user-agent"],
+      req.headers['user-agent'],
     );
     this.setRefreshCookie(res, result.refreshToken);
-    return { ...this.stripRefreshToken(result), _message: "登录成功" };
+    return { ...this.stripRefreshToken(result), _message: '登录成功' };
   }
 
   @Public()
-  @Post("login/password")
-  @RateLimit({ tier: "auth", key: "email" })
+  @Post('login/password')
+  @RateLimit({ tier: 'auth', key: 'email' })
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: "密码登录" })
+  @ApiOperation({ summary: '密码登录' })
   @ApiBody({ type: LoginPasswordDto })
   @ApiResponse({
     status: 200,
-    description: "登录成功，返回 Token（refreshToken 通过 HttpOnly Cookie 传输）",
+    description: '登录成功，返回 Token（refreshToken 通过 HttpOnly Cookie 传输）',
     type: AuthResponseDto,
   })
   @ApiResponse({
     status: 401,
-    description: "凭证无效",
+    description: '凭证无效',
   })
   @ApiResponse({
     status: 429,
-    description: "超出限流",
+    description: '超出限流',
   })
   async loginPassword(
     @Body() loginDto: LoginPasswordDto,
@@ -189,23 +172,23 @@ export class AuthController {
     const result = await this.authService.loginPassword(
       loginDto,
       req.ip,
-      req.headers["user-agent"],
+      req.headers['user-agent'],
     );
     this.setRefreshCookie(res, result.refreshToken);
-    return { ...this.stripRefreshToken(result), _message: "登录成功" };
+    return { ...this.stripRefreshToken(result), _message: '登录成功' };
   }
 
   // ==================== 重置密码流程 ====================
 
   @Public()
-  @Post("reset-password/send-code")
-  @RateLimit({ tier: "auth", key: "email" })
+  @Post('reset-password/send-code')
+  @RateLimit({ tier: 'auth', key: 'email' })
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: "重置密码第一步：发送验证码" })
+  @ApiOperation({ summary: '重置密码第一步：发送验证码' })
   @ApiBody({ type: ResetPasswordSendCodeDto })
   @ApiResponse({
     status: 200,
-    description: "验证码发送成功（防枚举，用户不存在也返回 200）",
+    description: '验证码发送成功（防枚举，用户不存在也返回 200）',
     type: SendCodeResponseDto,
   })
   async resetPasswordSendCode(
@@ -215,41 +198,41 @@ export class AuthController {
   }
 
   @Public()
-  @Post("reset-password/verify")
-  @RateLimit({ tier: "auth", key: "email", limit: 10 })
+  @Post('reset-password/verify')
+  @RateLimit({ tier: 'auth', key: 'email', limit: 10 })
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: "重置密码第二步：验证码校验并更新密码" })
+  @ApiOperation({ summary: '重置密码第二步：验证码校验并更新密码' })
   @ApiBody({ type: ResetPasswordVerifyDto })
   @ApiResponse({
     status: 200,
-    description: "密码重置成功",
+    description: '密码重置成功',
   })
   @ApiResponse({
     status: 400,
-    description: "验证码无效或已过期",
+    description: '验证码无效或已过期',
   })
   async resetPasswordVerify(
     @Body() verifyDto: ResetPasswordVerifyDto,
   ): Promise<{ _message: string } & { message: string }> {
     const result = await this.authService.resetPasswordVerify(verifyDto);
-    return { ...result, _message: "密码重置成功" };
+    return { ...result, _message: '密码重置成功' };
   }
 
   // ==================== Token 管理 ====================
 
   @Public()
-  @Post("refresh")
-  @RateLimit({ tier: "auth", key: "ip", limit: 10 })
+  @Post('refresh')
+  @RateLimit({ tier: 'auth', key: 'ip', limit: 10 })
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: "刷新 Token（旋转模式，refreshToken 来自 Cookie）" })
+  @ApiOperation({ summary: '刷新 Token（旋转模式，refreshToken 来自 Cookie）' })
   @ApiResponse({
     status: 200,
-    description: "刷新成功，返回新 Token（refreshToken 通过 HttpOnly Cookie 传输）",
+    description: '刷新成功，返回新 Token（refreshToken 通过 HttpOnly Cookie 传输）',
     type: AuthResponseDto,
   })
   @ApiResponse({
     status: 401,
-    description: "Refresh Token 无效或已过期",
+    description: 'Refresh Token 无效或已过期',
   })
   async refreshTokens(
     @Req() req: Request,
@@ -257,39 +240,38 @@ export class AuthController {
   ): Promise<AuthResponseDto> {
     const refreshToken = req.cookies?.[this.REFRESH_COOKIE_NAME];
     if (!refreshToken) {
-      throw new UnauthorizedException("Refresh token not found");
+      throw new UnauthorizedException('Refresh token not found');
     }
     const result = await this.authService.refreshTokens({ refreshToken });
     this.setRefreshCookie(res, result.refreshToken);
     return this.stripRefreshToken(result);
   }
 
-  @Post("logout")
+  @Post('logout')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: "登出" })
-  @ApiBearerAuth("JWT-auth")
+  @ApiOperation({ summary: '登出' })
+  @ApiBearerAuth('JWT-auth')
   @ApiResponse({
     status: 200,
-    description: "登出成功",
+    description: '登出成功',
     type: LogoutResponseDto,
   })
   @ApiResponse({
     status: 401,
-    description: "未认证",
+    description: '未认证',
   })
   async logout(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
-    @Headers("Authorization") authHeader: string,
+    @Headers('Authorization') authHeader: string,
   ): Promise<LogoutResponseDto> {
-    const accessToken = authHeader?.replace("Bearer ", "") || "";
-    const refreshToken =
-      req.cookies?.[this.REFRESH_COOKIE_NAME] || "";
+    const accessToken = authHeader?.replace('Bearer ', '') || '';
+    const refreshToken = req.cookies?.[this.REFRESH_COOKIE_NAME] || '';
     const user = req.user as { id?: string; sub?: string } | undefined;
     const userId = user?.id || user?.sub;
 
     if (!userId) {
-      throw new UnauthorizedException("无法获取用户身份");
+      throw new UnauthorizedException('无法获取用户身份');
     }
 
     this.clearRefreshCookie(res);
@@ -318,9 +300,7 @@ export class AuthController {
    * Strip the refreshToken from the response body before sending JSON.
    * The refreshToken is transmitted via HttpOnly cookie, not in the response body.
    */
-  private stripRefreshToken(
-    result: AuthResponseDto & { refreshToken: string },
-  ): AuthResponseDto {
+  private stripRefreshToken(result: AuthResponseDto & { refreshToken: string }): AuthResponseDto {
     return {
       accessToken: result.accessToken,
       expiresIn: result.expiresIn,

@@ -1,18 +1,18 @@
-import { Injectable } from "@nestjs/common";
-import { PrismaService } from "../../../common/database/prisma.service";
-import { UsersService } from "../../users/users.service";
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../../../common/database/prisma.service';
+import { UsersService } from '../../users/users.service';
 import {
   AdminUsersQueryDto,
   CreateAdminUserDto,
   UpdateAdminUserDto,
   AdminUserDto,
-} from "../dto/admin-user.dto";
+} from '../dto/admin-user.dto';
 import {
   toAdminUserDto,
   fromCreateAdminUserDto,
   fromUpdateAdminUserDto,
-} from "../mappers/user.mapper";
-import { PaginatedResponseDto, MetaDto } from "../../../common/dto/base.dto";
+} from '../mappers/user.mapper';
+import { PaginatedResponseDto, MetaDto } from '../../../common/dto/base.dto';
 
 @Injectable()
 export class AdminUsersService {
@@ -37,9 +37,9 @@ export class AdminUsersService {
     // Search filter: OR on name, email, phone
     if (query.search) {
       where.OR = [
-        { name: { contains: query.search, mode: "insensitive" } },
-        { email: { contains: query.search, mode: "insensitive" } },
-        { phone: { contains: query.search, mode: "insensitive" } },
+        { name: { contains: query.search, mode: 'insensitive' } },
+        { email: { contains: query.search, mode: 'insensitive' } },
+        { phone: { contains: query.search, mode: 'insensitive' } },
       ];
     }
 
@@ -58,15 +58,15 @@ export class AdminUsersService {
         skip,
         take: limit,
         where,
-        orderBy: { createdAt: "desc" },
+        orderBy: { createdAt: 'desc' },
       }),
       this.prisma.user.count({ where }),
     ]);
 
-    const totalPages = Math.ceil(total / limit);
+    const totalPages = Math.ceil(Number(total) / limit);
 
     const meta: MetaDto = {
-      total,
+      total: Number(total),
       page,
       limit,
       totalPages,

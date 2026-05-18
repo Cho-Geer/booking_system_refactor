@@ -1,4 +1,4 @@
-import * as crypto from "crypto";
+import * as crypto from 'crypto';
 
 /**
  * LocalJwtSigner — Uses Node.js crypto module for real JWT sign/verify.
@@ -23,20 +23,17 @@ import * as crypto from "crypto";
  * ```
  */
 export class LocalJwtSigner {
-  private readonly algorithm = "HS256";
+  private readonly algorithm = 'HS256';
 
   constructor(private readonly secret: string) {}
 
   /**
    * Synchronously sign a payload into a JWT token.
    */
-  sign(
-    payload: Record<string, any>,
-    options?: { expiresIn?: string | number },
-  ): string {
+  sign(payload: Record<string, any>, options?: { expiresIn?: string | number }): string {
     const header = {
       alg: this.algorithm,
-      typ: "JWT",
+      typ: 'JWT',
     };
 
     const now = Math.floor(Date.now() / 1000);
@@ -50,9 +47,7 @@ export class LocalJwtSigner {
 
     const headerEncoded = this.base64UrlEncode(JSON.stringify(header));
     const payloadEncoded = this.base64UrlEncode(JSON.stringify(fullPayload));
-    const signature = this.createSignature(
-      `${headerEncoded}.${payloadEncoded}`,
-    );
+    const signature = this.createSignature(`${headerEncoded}.${payloadEncoded}`);
 
     return `${headerEncoded}.${payloadEncoded}.${signature}`;
   }
@@ -72,19 +67,17 @@ export class LocalJwtSigner {
    * Throws if the token is invalid or expired.
    */
   verify<T = any>(token: string, options?: { ignoreExpiration?: boolean }): T {
-    const parts = token.split(".");
+    const parts = token.split('.');
     if (parts.length !== 3) {
-      throw new Error("jwt malformed");
+      throw new Error('jwt malformed');
     }
 
     const [headerEncoded, payloadEncoded, signature] = parts;
 
     // Verify signature
-    const expectedSignature = this.createSignature(
-      `${headerEncoded}.${payloadEncoded}`,
-    );
+    const expectedSignature = this.createSignature(`${headerEncoded}.${payloadEncoded}`);
     if (signature !== expectedSignature) {
-      throw new Error("invalid signature");
+      throw new Error('invalid signature');
     }
 
     // Decode payload
@@ -92,14 +85,14 @@ export class LocalJwtSigner {
     try {
       payload = JSON.parse(this.base64UrlDecode(payloadEncoded));
     } catch {
-      throw new Error("jwt malformed");
+      throw new Error('jwt malformed');
     }
 
     // Check expiration
     if (!options?.ignoreExpiration) {
       const now = Math.floor(Date.now() / 1000);
       if (payload.exp && payload.exp <= now) {
-        throw new Error("jwt expired");
+        throw new Error('jwt expired');
       }
     }
 
@@ -109,10 +102,7 @@ export class LocalJwtSigner {
   /**
    * Asynchronously verify and decode a JWT token.
    */
-  async verifyAsync<T = any>(
-    token: string,
-    options?: { ignoreExpiration?: boolean },
-  ): Promise<T> {
+  async verifyAsync<T = any>(token: string, options?: { ignoreExpiration?: boolean }): Promise<T> {
     return this.verify<T>(token, options);
   }
 
@@ -122,7 +112,7 @@ export class LocalJwtSigner {
    */
   decode<T = any>(token: string, options?: { complete?: boolean }): T | null {
     try {
-      const parts = token.split(".");
+      const parts = token.split('.');
       if (parts.length !== 3) {
         return null;
       }
@@ -150,7 +140,7 @@ export class LocalJwtSigner {
    * Create a HMAC-SHA256 signature.
    */
   private createSignature(input: string): string {
-    const hmac = crypto.createHmac("sha256", this.secret);
+    const hmac = crypto.createHmac('sha256', this.secret);
     hmac.update(input);
     return this.base64UrlEncode(hmac.digest());
   }
@@ -164,7 +154,7 @@ export class LocalJwtSigner {
       return now + 3600;
     }
 
-    if (typeof expiresIn === "number") {
+    if (typeof expiresIn === 'number') {
       return now + expiresIn;
     }
 
@@ -178,13 +168,13 @@ export class LocalJwtSigner {
     const unit = match[2];
 
     switch (unit) {
-      case "s":
+      case 's':
         return now + value;
-      case "m":
+      case 'm':
         return now + value * 60;
-      case "h":
+      case 'h':
         return now + value * 3600;
-      case "d":
+      case 'd':
         return now + value * 86400;
       default:
         return now + 3600;
@@ -195,22 +185,18 @@ export class LocalJwtSigner {
    * Base64url encode.
    */
   private base64UrlEncode(data: Buffer | string): string {
-    const buffer = typeof data === "string" ? Buffer.from(data, "utf8") : data;
-    return buffer
-      .toString("base64")
-      .replace(/=/g, "")
-      .replace(/\+/g, "-")
-      .replace(/\//g, "_");
+    const buffer = typeof data === 'string' ? Buffer.from(data, 'utf8') : data;
+    return buffer.toString('base64').replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
   }
 
   /**
    * Base64url decode.
    */
   private base64UrlDecode(data: string): string {
-    let base64 = data.replace(/-/g, "+").replace(/_/g, "/");
+    let base64 = data.replace(/-/g, '+').replace(/_/g, '/');
     while (base64.length % 4 !== 0) {
-      base64 += "=";
+      base64 += '=';
     }
-    return Buffer.from(base64, "base64").toString("utf8");
+    return Buffer.from(base64, 'base64').toString('utf8');
   }
 }

@@ -1,9 +1,9 @@
-import { Processor, WorkerHost, OnWorkerEvent } from "@nestjs/bullmq";
-import { Logger } from "@nestjs/common";
-import { Inject } from "@nestjs/common";
-import { Job } from "bullmq";
-import type { Transporter } from "nodemailer";
-import { EmailProcessor } from "./email.processor";
+import { Processor, WorkerHost, OnWorkerEvent } from '@nestjs/bullmq';
+import { Logger } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
+import { Job } from 'bullmq';
+import type { Transporter } from 'nodemailer';
+import { EmailProcessor } from './email.processor';
 
 export interface EmailJobData {
   to: string;
@@ -18,22 +18,20 @@ export interface EmailJobData {
   cancelReason?: string;
 }
 
-@Processor("email")
+@Processor('email')
 export class EmailWorker extends WorkerHost {
   private readonly logger = new Logger(EmailWorker.name);
 
   constructor(
-    @Inject("EMAIL_TRANSPORTER") private readonly transporter: Transporter,
+    @Inject('EMAIL_TRANSPORTER') private readonly transporter: Transporter,
     private readonly emailProcessor: EmailProcessor,
   ) {
     super();
   }
 
-  async process(
-    job: Job<EmailJobData>,
-  ): Promise<{ sent: boolean; messageId?: string }> {
+  async process(job: Job<EmailJobData>): Promise<{ sent: boolean; messageId?: string }> {
     // Delegate verification-email jobs to the dedicated EmailProcessor
-    if (job.name === "verification-email") {
+    if (job.name === 'verification-email') {
       return this.emailProcessor.sendVerificationEmail(job.data);
     }
 
@@ -49,7 +47,7 @@ export class EmailWorker extends WorkerHost {
       this.logger.debug(`Job ${job.id}: Sending email...`);
 
       const info = await this.transporter.sendMail({
-        from: process.env.SMTP_FROM || "noreply@bookingsystem.com",
+        from: process.env.SMTP_FROM || 'noreply@bookingsystem.com',
         to,
         subject,
         html,
@@ -71,14 +69,12 @@ export class EmailWorker extends WorkerHost {
     }
   }
 
-  @OnWorkerEvent("completed")
+  @OnWorkerEvent('completed')
   onCompleted(job: Job<EmailJobData>) {
-    this.logger.log(
-      `Email job ${job.id} completed successfully for ${job.data.to}`,
-    );
+    this.logger.log(`Email job ${job.id} completed successfully for ${job.data.to}`);
   }
 
-  @OnWorkerEvent("failed")
+  @OnWorkerEvent('failed')
   onFailed(job: Job<EmailJobData>, error: Error) {
     this.logger.error(
       `Email job ${job.id} failed for ${job.data.to}: ${error.message}`,
@@ -86,10 +82,10 @@ export class EmailWorker extends WorkerHost {
     );
   }
 
-  @OnWorkerEvent("progress")
+  @OnWorkerEvent('progress')
   onProgress(job: Job<EmailJobData>, progress: number | object) {
     this.logger.debug(
-      `Email job ${job.id} progress: ${typeof progress === "number" ? `${progress}%` : JSON.stringify(progress)}`,
+      `Email job ${job.id} progress: ${typeof progress === 'number' ? `${progress}%` : JSON.stringify(progress)}`,
     );
   }
 }

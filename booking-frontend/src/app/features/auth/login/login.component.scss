@@ -68,21 +68,46 @@
   }
 }
 
-[data-theme="dark"] .login-page {
+.password-input-wrapper {
+  position: relative;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary, #94a3b8);
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: var(--color-primary, #2ecc71);
+  }
+}
+
+[data-theme='dark'] .login-page {
   .tab-button {
-    color: #A0A8B0;
-    border-bottom-color: #4E5969;
+    color: #a0a8b0;
+    border-bottom-color: #4e5969;
 
     &.active {
-      color: #F2F3F5;
+      color: #f2f3f5;
       border-bottom-color: #2ecc71;
     }
   }
 
   .type-btn {
-    background: #272E3B;
-    border-color: #4E5969;
-    color: #A0A8B0;
+    background: #272e3b;
+    border-color: #4e5969;
+    color: #a0a8b0;
 
     &.active {
       background: var(--color-primary, #2ecc71);
@@ -92,10 +117,10 @@
   }
 
   label {
-    color: #A0A8B0;
+    color: #a0a8b0;
   }
 
   .terms-text {
-    color: #A0A8B0;
+    color: #a0a8b0;
   }
 }

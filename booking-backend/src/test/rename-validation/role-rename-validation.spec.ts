@@ -34,7 +34,7 @@ describe('[RoleRename] DTO Contract (RED-phase)', () => {
   describe('CreateUserDto', () => {
     it('should use role field instead of userType', () => {
       const dto = new CreateUserDto();
-      
+
       // TARGET: dto should have `role` property
       // CURRENT: dto has `userType` property
       // This assertion FAILS because role doesn't exist in current code
@@ -43,7 +43,7 @@ describe('[RoleRename] DTO Contract (RED-phase)', () => {
 
     it('should NOT have userType field anymore', () => {
       const dto = new CreateUserDto();
-      
+
       // TARGET: userType should be removed
       // CURRENT: userType still exists
       // This assertion FAILS because userType still exists
@@ -53,14 +53,14 @@ describe('[RoleRename] DTO Contract (RED-phase)', () => {
     it('should use SystemRole enum for validation decorator', () => {
       const dto = new CreateUserDto();
       const metadata = Reflect.getMetadataKeys(dto, 'userType');
-      
+
       // TARGET: validation decorator references SystemRole, not UserType
       // CURRENT: validation decorator references UserType
       // TEST: Check if the property descriptor contains 'SystemRole'
       const proto = Object.getPrototypeOf(dto);
       const descriptors = Object.getOwnPropertyDescriptors(proto.constructor.prototype);
       const userTypeDescriptor = descriptors['userType'];
-      
+
       // Target: property should be named 'role' not 'userType'
       // This FAILS because it's named 'userType'
       expect(descriptors).not.toHaveProperty('userType');
@@ -70,7 +70,7 @@ describe('[RoleRename] DTO Contract (RED-phase)', () => {
   describe('UpdateUserDto', () => {
     it('should use role field instead of userType', () => {
       const dto = new UpdateUserDto();
-      
+
       // TARGET: role
       // CURRENT: userType
       expect(dto).toHaveProperty('role');
@@ -78,7 +78,7 @@ describe('[RoleRename] DTO Contract (RED-phase)', () => {
 
     it('should NOT have userType field anymore', () => {
       const dto = new UpdateUserDto();
-      
+
       expect(dto).not.toHaveProperty('userType');
     });
   });
@@ -87,10 +87,10 @@ describe('[RoleRename] DTO Contract (RED-phase)', () => {
     it('should expose role instead of userType', () => {
       // Check that the class has a `role` static property or prototype field
       const keys = Object.keys(new UserResponseDto());
-      
+
       // TARGET: should be role, not userType
       expect(keys).toContain('role');
-      
+
       // CURRENT: keys contains 'userType', which should NOT be there in target
       expect(keys).not.toContain('userType');
     });
@@ -99,7 +99,7 @@ describe('[RoleRename] DTO Contract (RED-phase)', () => {
   describe('ProfileResponseDto', () => {
     it('should expose role instead of userType', () => {
       const keys = Object.keys(new ProfileResponseDto());
-      
+
       expect(keys).toContain('role');
       expect(keys).not.toContain('userType');
     });
@@ -160,17 +160,17 @@ describe('[RoleRename] Auth Service Contract (RED-phase)', () => {
     it('should use role field instead of userType in token generation', async () => {
       // Import AuthService dynamically to test its interface
       const { AuthService } = await import('../../modules/auth/auth.service');
-      
+
       // Check that the AuthService constructor or prototype
       // references `role` not `userType` in token-related methods
       const authServiceProto = AuthService.prototype;
       const tokenMethods = ['buildTokenPair', 'generateTokens', '_createTokenPair'];
-      
-      tokenMethods.forEach(methodName => {
+
+      tokenMethods.forEach((methodName) => {
         const method = (authServiceProto as any)[methodName];
         if (method) {
           const methodStr = method.toString();
-          
+
           // TARGET: methods reference `role` not `userType`
           // CURRENT: methods reference `userType`
           expect(methodStr).not.toContain('userType');
@@ -181,10 +181,10 @@ describe('[RoleRename] Auth Service Contract (RED-phase)', () => {
     it('should reference role in JWT payload construction', async () => {
       const { AuthService } = await import('../../modules/auth/auth.service');
       const buildTokenPair = (AuthService.prototype as any).buildTokenPair;
-      
+
       if (buildTokenPair) {
         const methodStr = buildTokenPair.toString();
-        
+
         // TARGET: JWT payload uses roles directly from user.role
         // CURRENT: uses mapUserTypeToRole(user.userType)
         expect(methodStr).not.toContain('mapUserTypeToRole');
@@ -210,7 +210,7 @@ describe('[RoleRename] Guard Contract (RED-phase)', () => {
   describe('RolesGuard should use role field', () => {
     it('should read user.role instead of user.userType', () => {
       jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['ADMIN']);
-      
+
       const mockRequest = {
         method: 'GET',
         url: '/api/admin/users',
@@ -229,7 +229,7 @@ describe('[RoleRename] Guard Contract (RED-phase)', () => {
 
       // TARGET: guard reads user.role and returns true for ADMIN role
       // CURRENT: guard reads user.userType which doesn't exist → role check fails
-      // 
+      //
       // Two possible outcomes:
       // 1. Guard throws ForbiddenException because userType is undefined
       // 2. Guard falls through to some default behavior
@@ -237,7 +237,7 @@ describe('[RoleRename] Guard Contract (RED-phase)', () => {
       // Either way, this test documents the behavior change needed
 
       const result = guard.canActivate(mockExecutionContext);
-      
+
       // TARGET: role is 'ADMIN' which matches required 'ADMIN' → true
       // CURRENT: userType is undefined, check fails → false or throws
       // This assertion FAILS in current code
@@ -246,7 +246,7 @@ describe('[RoleRename] Guard Contract (RED-phase)', () => {
 
     it('should deny access when user.role does not have required role', () => {
       jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['ADMIN']);
-      
+
       const mockRequest = {
         method: 'GET',
         url: '/api/admin/users',
@@ -270,7 +270,7 @@ describe('[RoleRename] Guard Contract (RED-phase)', () => {
 
     it('should prefer roles array over role field when both exist', () => {
       jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['ADMIN']);
-      
+
       const mockRequest = {
         method: 'GET',
         url: '/api/admin/users',
@@ -278,7 +278,7 @@ describe('[RoleRename] Guard Contract (RED-phase)', () => {
         get: jest.fn(),
         user: {
           id: 'user-1',
-          role: 'CUSTOMER',    // role says CUSTOMER
+          role: 'CUSTOMER', // role says CUSTOMER
           roles: ['CUSTOMER', 'ADMIN'], // but roles array includes ADMIN
         },
       };
@@ -302,7 +302,7 @@ describe('[RoleRename] Guard Contract (RED-phase)', () => {
       // Check the source file text for userType references
       // Read the guard source and verify no userType references remain
       const guardSource = RolesGuard.prototype.canActivate.toString();
-      
+
       // TARGET: no reference to userType in guard source
       // CURRENT: guard references user.userType
       expect(guardSource).not.toContain('userType');
@@ -313,16 +313,16 @@ describe('[RoleRename] Guard Contract (RED-phase)', () => {
     it('should set request.user with role from JWT roles array', async () => {
       // Read JwtAuthGuard source and check it sets `role` from JWT
       const jwtGuardSource = JwtAuthGuard.prototype.canActivate.toString();
-      
+
       // TARGET: guard extracts role from JWT roles array
       // The exact implementation depends on the validate/canActivate pattern
       // After GREEN, user object should have role, not userType
       const mockJwtUser = {
         id: 'user-1',
         roles: ['CUSTOMER'],
-        role: 'CUSTOMER',  // TARGET: role extracted from roles[0]
+        role: 'CUSTOMER', // TARGET: role extracted from roles[0]
       };
-      
+
       expect(mockJwtUser.role).toBe('CUSTOMER');
       expect(mockJwtUser).not.toHaveProperty('userType');
     });
@@ -330,31 +330,31 @@ describe('[RoleRename] Guard Contract (RED-phase)', () => {
 });
 
 // ============================================================
-// 5. AUTH TOKEN / JWT TESTS  
+// 5. AUTH TOKEN / JWT TESTS
 // ============================================================
 
 describe('[RoleRename] JWT Token Contract (RED-phase)', () => {
   it('should use user.role directly in JWT roles array', async () => {
     const { AuthService } = await import('../../modules/auth/auth.service');
     const buildTokenPair = (AuthService.prototype as any).buildTokenPair;
-    
+
     if (buildTokenPair) {
       const source = buildTokenPair.toString();
-      
+
       // TARGET: code should use user.role not user.userType
       // CURRENT: code uses getPermissionsForRole(user.userType) and mapUserTypeToRole(user.userType)
-      
+
       // These assertions check that the source code no longer references userType
       // in the JWT token building logic
       expect(source).not.toContain('mapUserTypeToRole');
       expect(source).not.toContain('user.userType');
     }
   });
-  
+
   it('should remove mapUserTypeToRole function', async () => {
     const { AuthService } = await import('../../modules/auth/auth.service');
     const proto = AuthService.prototype;
-    
+
     // TARGET: mapUserTypeToRole should not exist
     // CURRENT: it exists and is used in token generation
     expect((proto as any).mapUserTypeToRole).toBeUndefined();
@@ -370,17 +370,26 @@ describe('[RoleRename] field_mappings no userType', () => {
     // Read and check schema.prisma for userType references
     const fs = require('fs');
     const path = require('path');
-    const schemaPath = path.join(__dirname, '..', '..', '..', '..', 'booking-backend', 'prisma', 'schema.prisma');
+    const schemaPath = path.join(
+      __dirname,
+      '..',
+      '..',
+      '..',
+      '..',
+      'booking-backend',
+      'prisma',
+      'schema.prisma',
+    );
     const schemaContent = fs.readFileSync(schemaPath, 'utf-8');
-    
+
     // TARGET: schema has enum SystemRole, not UserType
     // CURRENT: schema has enum UserType
     expect(schemaContent).not.toContain('enum UserType');
-    
+
     // TARGET: model User uses `role SystemRole` not `userType UserType`
     // CURRENT: model User uses `userType UserType`
     expect(schemaContent).not.toContain('userType');
-    
+
     // TARGET: @map("role") not @map("user_type")
     expect(schemaContent).not.toContain('@map("user_type")');
   });
@@ -390,7 +399,7 @@ describe('[RoleRename] field_mappings no userType', () => {
     const path = require('path');
     const contractPath = path.join(__dirname, '..', '..', '..', '..', 'contract.yaml');
     const contractContent = fs.readFileSync(contractPath, 'utf-8');
-    
+
     // TARGET: contract.yaml field_mappings reference role not userType
     // CURRENT: line 1444 has `fields: ["userType", "status"]` and line 2026 has `frontend_field: "userType"`
     expect(contractContent).not.toContain('userType');
@@ -404,57 +413,62 @@ describe('[RoleRename] field_mappings no userType', () => {
 describe('[RoleRename] All modules sanitized - no userType references', () => {
   const fs = require('fs');
   const path = require('path');
-  
+
   // Directories to check for userType references (source files only, not node_modules)
   const srcDir = path.join(__dirname, '..', '..');
-  
+
   // Collect all TypeScript files in src (excluding .spec.ts, node_modules and test/rename-validation)
   function collectSourceFiles(dir: string): string[] {
     const entries = fs.readdirSync(dir, { withFileTypes: true });
     const files: string[] = [];
-    
+
     for (const entry of entries) {
       const fullPath = path.join(dir, entry.name);
       if (entry.isDirectory() && !entry.name.startsWith('.') && entry.name !== 'node_modules') {
         files.push(...collectSourceFiles(fullPath));
-      } else if (entry.isFile() && entry.name.endsWith('.ts') && !entry.name.endsWith('.spec.ts') && !entry.name.endsWith('.d.ts')) {
+      } else if (
+        entry.isFile() &&
+        entry.name.endsWith('.ts') &&
+        !entry.name.endsWith('.spec.ts') &&
+        !entry.name.endsWith('.d.ts')
+      ) {
         files.push(fullPath);
       }
     }
-    
+
     return files;
   }
-  
+
   const srcFiles = collectSourceFiles(srcDir);
-  
+
   // file allowlist - these files are expected to still have userType references before the rename
-  // After GREEN phase, these should all be updated  
+  // After GREEN phase, these should all be updated
   it('should have zero source files (except .spec.ts) containing userType string', () => {
     const filesWithUserType: string[] = [];
-    
+
     for (const file of srcFiles) {
       const content = fs.readFileSync(file, 'utf-8');
       if (content.includes('userType')) {
         filesWithUserType.push(path.relative(srcDir, file));
       }
     }
-    
+
     // TARGET: zero files contain userType
     // CURRENT: many files contain userType
     // This FAILS because at least the source files still have userType
     expect(filesWithUserType).toHaveLength(0);
   });
-  
+
   it('should have zero source files containing UserType (enum ref)', () => {
     const filesWithUserTypeEnum: string[] = [];
-    
+
     for (const file of srcFiles) {
       const content = fs.readFileSync(file, 'utf-8');
       if (content.includes('UserType')) {
         filesWithUserTypeEnum.push(path.relative(srcDir, file));
       }
     }
-    
+
     // TARGET: zero files reference UserType enum
     // CURRENT: many files still import UserType from @prisma/client
     expect(filesWithUserTypeEnum).toHaveLength(0);

@@ -21,9 +21,7 @@ describe('Contract.yaml v1.7.6', () => {
 
   it('[RED] should have keystone state hash header present', () => {
     // The x-keystone-state-hash header must be present and non-empty
-    const headerMatch = contractContent.match(
-      /^# x-keystone-state-hash:\s*(.+)$/m,
-    );
+    const headerMatch = contractContent.match(/^# x-keystone-state-hash:\s*(.+)$/m);
     expect(headerMatch).not.toBeNull();
     expect(headerMatch![1].trim()).toBeTruthy();
   });

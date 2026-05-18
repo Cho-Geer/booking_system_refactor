@@ -1,48 +1,42 @@
-import {
-  IsString,
-  IsDateString,
-  IsBoolean,
-  IsOptional,
-  IsInt,
-} from "class-validator";
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { IsString, IsDateString, IsBoolean, IsOptional, IsInt } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateTimeSlotDto {
-  @ApiProperty({ description: "Service ID" })
+  @ApiProperty({ description: 'Service ID' })
   @IsString()
   serviceId!: string;
 
-  @ApiProperty({ description: "Slot start time (ISO string)" })
+  @ApiProperty({ description: 'Slot start time (ISO string)' })
   @IsDateString()
   startTime!: string;
 
-  @ApiProperty({ description: "Slot end time (ISO string)" })
+  @ApiProperty({ description: 'Slot end time (ISO string)' })
   @IsDateString()
   endTime!: string;
 
-  @ApiPropertyOptional({ description: "Capacity", default: 1 })
+  @ApiPropertyOptional({ description: 'Capacity', default: 1 })
   @IsOptional()
   @IsInt()
   capacity?: number;
 }
 
 export class UpdateTimeSlotDto {
-  @ApiPropertyOptional({ description: "Slot start time (ISO string)" })
+  @ApiPropertyOptional({ description: 'Slot start time (ISO string)' })
   @IsOptional()
   @IsDateString()
   startTime?: string;
 
-  @ApiPropertyOptional({ description: "Slot end time (ISO string)" })
+  @ApiPropertyOptional({ description: 'Slot end time (ISO string)' })
   @IsOptional()
   @IsDateString()
   endTime?: string;
 
-  @ApiPropertyOptional({ description: "Capacity" })
+  @ApiPropertyOptional({ description: 'Capacity' })
   @IsOptional()
   @IsInt()
   capacity?: number;
 
-  @ApiPropertyOptional({ description: "Is active" })
+  @ApiPropertyOptional({ description: 'Is active' })
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;

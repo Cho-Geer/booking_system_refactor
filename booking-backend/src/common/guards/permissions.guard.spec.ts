@@ -86,7 +86,9 @@ describe('PermissionsGuard', () => {
     });
 
     it('should throw ForbiddenException with descriptive message listing required permissions', () => {
-      jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['service:create', 'service:delete']);
+      jest
+        .spyOn(reflector, 'getAllAndOverride')
+        .mockReturnValue(['service:create', 'service:delete']);
       mockRequest.user = { id: 'user-1', role: 'USER' };
 
       try {
@@ -99,7 +101,9 @@ describe('PermissionsGuard', () => {
     });
 
     it('should allow access when user has all required permissions', () => {
-      jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['booking:create', 'timeslot:read']);
+      jest
+        .spyOn(reflector, 'getAllAndOverride')
+        .mockReturnValue(['booking:create', 'timeslot:read']);
       mockRequest.user = { id: 'user-1', role: 'USER' };
 
       const result = guard.canActivate(mockExecutionContext);

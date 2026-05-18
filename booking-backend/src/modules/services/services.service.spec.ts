@@ -54,7 +54,7 @@ describe('ServicesService', () => {
     name: 'Haircut',
     description: 'Standard haircut',
     durationMinutes: 30,
-    price: 25.00,
+    price: 25.0,
     maxCapacity: 1,
     isActive: true,
     createdAt: new Date('2024-01-01'),
@@ -68,7 +68,7 @@ describe('ServicesService', () => {
       name: 'Haircut',
       description: 'Standard haircut',
       durationMinutes: 30,
-      price: 25.00,
+      price: 25.0,
       maxCapacity: 1,
     };
 
@@ -92,7 +92,7 @@ describe('ServicesService', () => {
         categoryId: 'cat-1',
         name: 'Basic Service',
         durationMinutes: 15,
-        price: 10.00,
+        price: 10.0,
       };
       const minimalService = {
         ...mockService,
@@ -175,6 +175,7 @@ describe('ServicesService', () => {
 
       const result = await service.findAll(1, 10, true);
 
+      expect(result.items.length).toBeGreaterThan(0);
       expect(prisma.service.findMany).toHaveBeenCalledWith({
         skip: 0,
         take: 10,
@@ -188,9 +189,7 @@ describe('ServicesService', () => {
     });
 
     it('should filter by inactive status when isActive is false', async () => {
-      const inactiveServices = [
-        { ...mockService, id: 'service-3', isActive: false },
-      ];
+      const inactiveServices = [{ ...mockService, id: 'service-3', isActive: false }];
       prisma.service.findMany.mockResolvedValue(inactiveServices);
       prisma.service.count.mockResolvedValue(1);
 
@@ -280,21 +279,27 @@ describe('ServicesService', () => {
       prisma.service.findUnique.mockResolvedValue(null);
 
       await expect(service.findOne('nonexistent-id')).rejects.toThrow(NotFoundException);
-      await expect(service.findOne('nonexistent-id')).rejects.toThrow('Service with ID nonexistent-id not found');
+      await expect(service.findOne('nonexistent-id')).rejects.toThrow(
+        'Service with ID nonexistent-id not found',
+      );
     });
   });
 
   describe('update', () => {
     const updateServiceDto: UpdateServiceDto = {
       name: 'Updated Haircut',
-      price: 30.00,
+      price: 30.0,
     };
 
     it('should throw NotFoundException if service not found', async () => {
       prisma.service.findUnique.mockResolvedValue(null);
 
-      await expect(service.update('nonexistent-id', updateServiceDto)).rejects.toThrow(NotFoundException);
-      await expect(service.update('nonexistent-id', updateServiceDto)).rejects.toThrow('Service with ID nonexistent-id not found');
+      await expect(service.update('nonexistent-id', updateServiceDto)).rejects.toThrow(
+        NotFoundException,
+      );
+      await expect(service.update('nonexistent-id', updateServiceDto)).rejects.toThrow(
+        'Service with ID nonexistent-id not found',
+      );
     });
 
     it('should update service successfully', async () => {
@@ -366,7 +371,7 @@ describe('ServicesService', () => {
         name: 'Service Without Category',
         description: 'Test service with null category',
         durationMinutes: 45,
-        price: 100.00,
+        price: 100.0,
         // categoryId intentionally omitted — causes TypeScript compilation error
       };
 
@@ -392,7 +397,7 @@ describe('ServicesService', () => {
         categoryId: null, // TypeScript error: null is not assignable to string
         name: 'Service With Null Category',
         durationMinutes: 30,
-        price: 50.00,
+        price: 50.0,
       };
 
       const expectedService = {
@@ -424,9 +429,9 @@ describe('ServicesService', () => {
 
       const result = await service.findAll(1, 10, undefined);
 
-      const nullCategoryServices = result.items.filter(s => s.categoryId === null);
+      const nullCategoryServices = result.items.filter((s) => s.categoryId === null);
       expect(nullCategoryServices.length).toBeGreaterThan(0);
-      nullCategoryServices.forEach(s => {
+      nullCategoryServices.forEach((s) => {
         expect(s.categoryId).toBeNull();
       });
     });
@@ -453,27 +458,42 @@ describe('ServicesService', () => {
       prisma.service.findUnique.mockResolvedValue(null);
 
       await expect(service.remove('nonexistent-id')).rejects.toThrow(NotFoundException);
-      await expect(service.remove('nonexistent-id')).rejects.toThrow('Service with ID nonexistent-id not found');
+      await expect(service.remove('nonexistent-id')).rejects.toThrow(
+        'Service with ID nonexistent-id not found',
+      );
     });
 
-    it('should delete service and return success message', async () => {
+    it('should soft-delete service by setting isActive to false', async () => {
       prisma.service.findUnique.mockResolvedValue(mockService);
-      prisma.service.delete.mockResolvedValue(mockService);
+      const disabledService = { ...mockService, isActive: false };
+      prisma.service.update.mockResolvedValue(disabledService);
+
+      await service.remove('service-1');
+
+      expect(prisma.service.update).toHaveBeenCalledWith({
+        where: { id: 'service-1' },
+        data: { isActive: false },
+      });
+      expect(prisma.service.delete).not.toHaveBeenCalled();
+    });
+
+    it('should return disabled success message', async () => {
+      prisma.service.findUnique.mockResolvedValue(mockService);
+      prisma.service.update.mockResolvedValue({ ...mockService, isActive: false });
 
       const result = await service.remove('service-1');
 
-      expect(prisma.service.delete).toHaveBeenCalledWith({ where: { id: 'service-1' } });
-      expect(result).toEqual({ message: 'Service deleted successfully' });
+      expect(result).toEqual({ message: 'Service disabled successfully' });
     });
 
-    it('should check existence before deletion', async () => {
+    it('should check existence before soft-deleting', async () => {
       prisma.service.findUnique.mockResolvedValue(mockService);
-      prisma.service.delete.mockResolvedValue(mockService);
+      prisma.service.update.mockResolvedValue({ ...mockService, isActive: false });
 
       await service.remove('service-1');
 
       expect(prisma.service.findUnique).toHaveBeenCalledWith({ where: { id: 'service-1' } });
-      expect(prisma.service.delete).toHaveBeenCalled();
+      expect(prisma.service.update).toHaveBeenCalled();
     });
   });
 });

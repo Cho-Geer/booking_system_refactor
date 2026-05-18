@@ -11,26 +11,21 @@ import {
   UseGuards,
   Req,
   ForbiddenException,
-} from "@nestjs/common";
-import { OptionalParseIntPipe } from "../../common/pipes/optional-parse-int.pipe";
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-} from "@nestjs/swagger";
-import { UsersService } from "./users.service";
-import { CreateUserDto, UpdateUserDto, UserResponseDto } from "./dto/user.dto";
-import { ProfileResponseDto } from "./dto/profile-response.dto";
-import { UpdatePasswordDto } from "./dto/update-password.dto";
-import { UpdateTimezoneDto } from "./dto/update-timezone.dto";
-import { UpdateProfileDto } from "./dto/update-profile.dto";
-import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
-import { RolesGuard } from "../../common/guards/roles.guard";
-import { Roles } from "../../common/decorators/roles.decorator";
-import { SystemRole } from "@prisma/client";
-import { RateLimit } from "../rate-limiter/rate-limiter.decorator";
-import { Request } from "express";
+} from '@nestjs/common';
+import { OptionalParseIntPipe } from '../../common/pipes/optional-parse-int.pipe';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { UsersService } from './users.service';
+import { CreateUserDto, UpdateUserDto, UserResponseDto } from './dto/user.dto';
+import { ProfileResponseDto } from './dto/profile-response.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
+import { UpdateTimezoneDto } from './dto/update-timezone.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { SystemRole } from '@prisma/client';
+import { RateLimit } from '../rate-limiter/rate-limiter.decorator';
+import { Request } from 'express';
 
 interface JwtUser {
   id: string;
@@ -48,69 +43,64 @@ interface JwtUser {
 function enforceOwnership(
   reqUser: JwtUser | undefined,
   targetUserId: string,
-  actionDescription = "access",
+  actionDescription = 'access',
 ): void {
   if (!reqUser) {
-    throw new ForbiddenException("User not authenticated");
+    throw new ForbiddenException('User not authenticated');
   }
   const isOwner = reqUser.id === targetUserId;
-  const isAdmin =
-    reqUser.roles?.includes("ADMIN") || reqUser.roles?.includes("SUPER_ADMIN");
+  const isAdmin = reqUser.roles?.includes('ADMIN') || reqUser.roles?.includes('SUPER_ADMIN');
   if (!isOwner && !isAdmin) {
-    throw new ForbiddenException(
-      `You can only ${actionDescription} your own profile`,
-    );
+    throw new ForbiddenException(`You can only ${actionDescription} your own profile`);
   }
 }
 
-@ApiTags("Users")
-@Controller("users")
+@ApiTags('Users')
+@Controller('users')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@ApiBearerAuth("JWT-auth")
-@RateLimit({ tier: "api", key: "user" })
+@ApiBearerAuth('JWT-auth')
+@RateLimit({ tier: 'api', key: 'user' })
 export class UsersController {
-  constructor(
-    private readonly usersService: UsersService,
-  ) {}
+  constructor(private readonly usersService: UsersService) {}
 
   @Post()
   @Roles(SystemRole.ADMIN)
-  @ApiOperation({ summary: "Create a new user" })
+  @ApiOperation({ summary: 'Create a new user' })
   @ApiResponse({
     status: 201,
-    description: "User created successfully",
+    description: 'User created successfully',
     type: UserResponseDto,
   })
-  @ApiResponse({ status: 409, description: "User with email already exists" })
+  @ApiResponse({ status: 409, description: 'User with email already exists' })
   async create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
   @Get()
   @Roles(SystemRole.ADMIN)
-  @ApiOperation({ summary: "Get all users with pagination" })
-  @ApiResponse({ status: 200, description: "List of users" })
+  @ApiOperation({ summary: 'Get all users with pagination' })
+  @ApiResponse({ status: 200, description: 'List of users' })
   async findAll(
-    @Query("page", OptionalParseIntPipe) page: number = 1,
-    @Query("limit", OptionalParseIntPipe) limit: number = 20,
+    @Query('page', OptionalParseIntPipe) page: number = 1,
+    @Query('limit', OptionalParseIntPipe) limit: number = 20,
   ) {
     return this.usersService.findAll(page, limit);
   }
 
-  @Get("profile")
-  @ApiOperation({ summary: "获取当前用户资料" })
-  @ApiBearerAuth("JWT-auth")
+  @Get('profile')
+  @ApiOperation({ summary: '获取当前用户资料' })
+  @ApiBearerAuth('JWT-auth')
   @ApiResponse({
     status: 200,
-    description: "获取成功",
+    description: '获取成功',
     type: ProfileResponseDto,
   })
-  @ApiResponse({ status: 401, description: "未授权" })
+  @ApiResponse({ status: 401, description: '未授权' })
   @UseGuards(JwtAuthGuard)
   async getProfile(@Req() req: Request) {
     const user = req.user as JwtUser | undefined;
     if (!user) {
-      throw new ForbiddenException("User not authenticated");
+      throw new ForbiddenException('User not authenticated');
     }
 
     const profile = await this.usersService.getProfile(user.id);
@@ -118,85 +108,81 @@ export class UsersController {
     return profile;
   }
 
-  @Get(":id")
-  @ApiOperation({ summary: "Get user by ID" })
+  @Get(':id')
+  @ApiOperation({ summary: 'Get user by ID' })
   @ApiResponse({
     status: 200,
-    description: "User found",
+    description: 'User found',
     type: UserResponseDto,
   })
-  @ApiResponse({ status: 404, description: "User not found" })
-  async findOne(@Param("id") id: string, @Req() req: Request) {
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async findOne(@Param('id') id: string, @Req() req: Request) {
     // FIX-P0-003 REFACTOR: 使用统一的所有权检查函数
-    enforceOwnership(req.user as JwtUser | undefined, id, "access");
+    enforceOwnership(req.user as JwtUser | undefined, id, 'access');
     return this.usersService.findOne(id);
   }
 
-  @Patch(":id")
-  @ApiOperation({ summary: "Update user" })
+  @Patch(':id')
+  @ApiOperation({ summary: 'Update user' })
   @ApiResponse({
     status: 200,
-    description: "User updated",
+    description: 'User updated',
     type: UserResponseDto,
   })
-  @ApiResponse({ status: 404, description: "User not found" })
-  async update(
-    @Param("id") id: string,
-    @Body() updateUserDto: UpdateUserDto,
-    @Req() req: Request,
-  ) {
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @Req() req: Request) {
     // FIX-P0-003 REFACTOR: 使用统一的所有权检查函数
-    enforceOwnership(req.user as JwtUser | undefined, id, "update");
+    enforceOwnership(req.user as JwtUser | undefined, id, 'update');
     return this.usersService.update(id, updateUserDto);
   }
 
-  @Delete(":id")
+  @Delete(':id')
   @Roles(SystemRole.ADMIN)
-  @ApiOperation({ summary: "Delete user" })
-  @ApiResponse({ status: 200, description: "User deleted" })
-  @ApiResponse({ status: 404, description: "User not found" })
-  async remove(@Param("id") id: string) {
+  @ApiOperation({ summary: 'Delete user' })
+  @ApiResponse({ status: 200, description: 'User deleted' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async remove(@Param('id') id: string) {
     return this.usersService.remove(id);
   }
 
-  @Put("profile")
+  @Put('profile')
   @Roles(SystemRole.CUSTOMER, SystemRole.ADMIN, SystemRole.SUPER_ADMIN)
   async updateProfile(@Req() req: Request, @Body() dto: UpdateProfileDto) {
-    const result = await this.usersService.updateProfile((req.user as { sub: string } | undefined)?.sub ?? '', dto);
-    return { ...result, _message: "资料已更新" };
+    const result = await this.usersService.updateProfile(
+      (req.user as { sub: string } | undefined)?.sub ?? '',
+      dto,
+    );
+    return { ...result, _message: '资料已更新' };
   }
 
-  @Patch("profile/timezone")
+  @Patch('profile/timezone')
   @Roles(SystemRole.CUSTOMER, SystemRole.ADMIN, SystemRole.SUPER_ADMIN)
-  @RateLimit({ tier: "api", key: "ip" })
-  @ApiOperation({ summary: "Update preferred timezone" })
-  @ApiResponse({ status: 200, description: "Timezone updated" })
+  @RateLimit({ tier: 'api', key: 'ip' })
+  @ApiOperation({ summary: 'Update preferred timezone' })
+  @ApiResponse({ status: 200, description: 'Timezone updated' })
   async updateTimezone(@Body() dto: UpdateTimezoneDto, @Req() req: Request) {
     const user = req.user as JwtUser | undefined;
     if (!user) {
-      throw new ForbiddenException("User not authenticated");
+      throw new ForbiddenException('User not authenticated');
     }
     const result = await this.usersService.updateTimezone(user.id, dto);
-    return { ...result, _message: "时区已更新" };
+    return { ...result, _message: '时区已更新' };
   }
 
-  @Put("profile/password")
-  @ApiOperation({ summary: "Change current user password" })
-  @ApiResponse({ status: 200, description: "Password changed" })
-  @ApiResponse({ status: 400, description: "Current password is incorrect" })
-  async changePassword(
-    @Body() dto: UpdatePasswordDto,
-    @Req() req: Request,
-  ) {
+  @Put('profile/password')
+  @ApiOperation({ summary: 'Change current user password' })
+  @ApiResponse({ status: 200, description: 'Password changed' })
+  @ApiResponse({ status: 400, description: 'Current password is incorrect' })
+  async changePassword(@Body() dto: UpdatePasswordDto, @Req() req: Request) {
     const user = req.user as JwtUser | undefined;
     if (!user) {
-      throw new ForbiddenException("User not authenticated");
+      throw new ForbiddenException('User not authenticated');
     }
     const result = await this.usersService.updatePassword(
       user.id,
       dto.currentPassword,
       dto.newPassword,
     );
-    return { ...result, _message: "密码修改成功" };
+    return { ...result, _message: '密码修改成功' };
   }
 }

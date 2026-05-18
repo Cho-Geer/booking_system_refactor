@@ -262,7 +262,12 @@ describe('Rate Limiter Decorator', () => {
       expect(layer1.window).toBe(1);
 
       // Layer 2: User Daily (20/day)
-      const layer2 = resolveRateLimitOptions({ tier: 'api', key: 'user', limit: 20, window: 86400 });
+      const layer2 = resolveRateLimitOptions({
+        tier: 'api',
+        key: 'user',
+        limit: 20,
+        window: 86400,
+      });
       expect(layer2.limit).toBe(20);
       expect(layer2.window).toBe(86400);
 
@@ -277,7 +282,12 @@ describe('Rate Limiter Decorator', () => {
       expect(layer4.window).toBe(60);
 
       // Layer 5: Global User (100/min)
-      const layer5 = resolveRateLimitOptions({ tier: 'public', key: 'user', limit: 100, window: 60 });
+      const layer5 = resolveRateLimitOptions({
+        tier: 'public',
+        key: 'user',
+        limit: 100,
+        window: 60,
+      });
       expect(layer5.limit).toBe(100);
       expect(layer5.window).toBe(60);
     });

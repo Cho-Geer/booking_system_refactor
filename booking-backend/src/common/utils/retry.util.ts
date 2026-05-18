@@ -1,5 +1,5 @@
-import { Logger } from "@nestjs/common";
-import { sleep } from "./sleep.util";
+import { Logger } from '@nestjs/common';
+import { sleep } from './sleep.util';
 
 /**
  * Reusable retry-with-exponential-backoff utility.
@@ -16,7 +16,7 @@ export interface RetryOptions {
  * Re-export sleep for backward compatibility.
  * New code should import directly from './sleep.util'.
  */
-export { sleep } from "./sleep.util";
+export { sleep } from './sleep.util';
 
 /**
  * Determines whether an error is a transient database error.
@@ -24,9 +24,8 @@ export { sleep } from "./sleep.util";
 export function isTransientDbError(error: unknown): boolean {
   const err = error as Record<string, unknown>;
   return (
-    err["code"] === "P2034" ||
-    (typeof err["message"] === "string" &&
-      (err["message"] as string).includes("timeout"))
+    err['code'] === 'P2034' ||
+    (typeof err['message'] === 'string' && (err['message'] as string).includes('timeout'))
   );
 }
 
@@ -39,7 +38,7 @@ export async function withRetry<T>(
   options: RetryOptions,
 ): Promise<T> {
   const { maxRetries, baseDelayMs, operationName, logger } = options;
-  const log = logger ?? new Logger("RetryUtil");
+  const log = logger ?? new Logger('RetryUtil');
 
   let lastError: unknown;
 

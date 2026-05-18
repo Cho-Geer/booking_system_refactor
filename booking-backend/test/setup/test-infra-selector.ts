@@ -1,10 +1,7 @@
-import { Provider, Type } from "@nestjs/common";
-import {
-  checkDockerAvailable,
-  resetDockerCache as resetDocker,
-} from "./docker-checker";
-import { FakePrismaClient } from "../fakes/fake-prisma-client";
-import { LocalJwtSigner } from "../fakes/local-jwt-signer";
+import { Provider, Type } from '@nestjs/common';
+import { checkDockerAvailable, resetDockerCache as resetDocker } from './docker-checker';
+import { FakePrismaClient } from '../fakes/fake-prisma-client';
+import { LocalJwtSigner } from '../fakes/local-jwt-signer';
 
 // Re-export resetDockerCache for convenience
 export const resetDockerCache = resetDocker;
@@ -43,8 +40,7 @@ export interface FakeInfrastructureMap {
  */
 export function selectInfrastructure(options?: TestModuleOptions): Provider[] {
   const useReal = checkDockerAvailable();
-  const schema =
-    options?.schema || `worker_${process.env.JEST_WORKER_ID || "0"}`;
+  const schema = options?.schema || `worker_${process.env.JEST_WORKER_ID || '0'}`;
 
   if (useReal) {
     return getRealInfrastructureProviders(schema);
@@ -62,15 +58,15 @@ function getRealInfrastructureProviders(schema: string): Provider[] {
     // PrismaService uses the real PrismaClient with schema-qualified URL
     // ContainerPool handles schema creation via global setup
     {
-      provide: "SCHEMA_NAME",
+      provide: 'SCHEMA_NAME',
       useValue: schema,
     },
     // Real Redis provider (via ioredis)
     {
-      provide: "REDIS_CONFIG",
+      provide: 'REDIS_CONFIG',
       useFactory: () => ({
-        host: process.env.REDIS_HOST || "localhost",
-        port: parseInt(process.env.REDIS_PORT || "6379", 10),
+        host: process.env.REDIS_HOST || 'localhost',
+        port: parseInt(process.env.REDIS_PORT || '6379', 10),
       }),
     },
   ];
@@ -79,21 +75,19 @@ function getRealInfrastructureProviders(schema: string): Provider[] {
 /**
  * Get fake infrastructure providers for local TDD without Docker.
  */
-function getFakeInfrastructureProviders(
-  overrides?: Partial<FakeInfrastructureMap>,
-): Provider[] {
+function getFakeInfrastructureProviders(overrides?: Partial<FakeInfrastructureMap>): Provider[] {
   const fakePrisma = overrides?.prismaService
-    ? { provide: "PrismaService", useClass: overrides.prismaService }
-    : { provide: "PrismaService", useClass: FakePrismaClient };
+    ? { provide: 'PrismaService', useClass: overrides.prismaService }
+    : { provide: 'PrismaService', useClass: FakePrismaClient };
 
   const fakeJwt = overrides?.jwtService
-    ? { provide: "JwtService", useClass: overrides.jwtService }
-    : { provide: "JwtService", useClass: LocalJwtSigner };
+    ? { provide: 'JwtService', useClass: overrides.jwtService }
+    : { provide: 'JwtService', useClass: LocalJwtSigner };
 
   return [
     fakePrisma,
     fakeJwt,
     // Additional fake providers can be added as needed
-    { provide: "FAKE_MODE", useValue: true },
+    { provide: 'FAKE_MODE', useValue: true },
   ];
 }

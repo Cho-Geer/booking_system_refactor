@@ -122,7 +122,7 @@ describe('AppointmentsService', () => {
     id: 'service-1',
     name: 'Haircut',
     durationMinutes: 30,
-    price: 25.00,
+    price: 25.0,
     isActive: true,
   };
 
@@ -156,8 +156,12 @@ describe('AppointmentsService', () => {
     it('should throw NotFoundException if time slot does not exist', async () => {
       prisma.timeSlot.findUnique.mockResolvedValue(null);
 
-      await expect(service.create(createAppointmentDto, 'user-1')).rejects.toThrow(NotFoundException);
-      await expect(service.create(createAppointmentDto, 'user-1')).rejects.toThrow('Time slot not found');
+      await expect(service.create(createAppointmentDto, 'user-1')).rejects.toThrow(
+        NotFoundException,
+      );
+      await expect(service.create(createAppointmentDto, 'user-1')).rejects.toThrow(
+        'Time slot not found',
+      );
 
       expect(prisma.timeSlot.findUnique).toHaveBeenCalledWith({
         where: { id: createAppointmentDto.timeSlotId },
@@ -169,8 +173,12 @@ describe('AppointmentsService', () => {
       const unavailableSlot = { ...mockTimeSlot, isActive: false };
       prisma.timeSlot.findUnique.mockResolvedValue(unavailableSlot);
 
-      await expect(service.create(createAppointmentDto, 'user-1')).rejects.toThrow(ConflictException);
-      await expect(service.create(createAppointmentDto, 'user-1')).rejects.toThrow('Time slot is not available');
+      await expect(service.create(createAppointmentDto, 'user-1')).rejects.toThrow(
+        ConflictException,
+      );
+      await expect(service.create(createAppointmentDto, 'user-1')).rejects.toThrow(
+        'Time slot is not available',
+      );
 
       expect(prisma.$transaction).not.toHaveBeenCalled();
     });
@@ -311,7 +319,9 @@ describe('AppointmentsService', () => {
       });
 
       // Mock sleep to resolve immediately
-      jest.spyOn(service as unknown as { sleep: () => Promise<void> }, 'sleep').mockResolvedValue(undefined);
+      jest
+        .spyOn(service as unknown as { sleep: () => Promise<void> }, 'sleep')
+        .mockResolvedValue(undefined);
 
       const result = await service.create(createAppointmentDto, 'user-1');
 
@@ -339,10 +349,16 @@ describe('AppointmentsService', () => {
       });
 
       // Mock sleep to resolve immediately
-      jest.spyOn(service as unknown as { sleep: () => Promise<void> }, 'sleep').mockResolvedValue(undefined);
+      jest
+        .spyOn(service as unknown as { sleep: () => Promise<void> }, 'sleep')
+        .mockResolvedValue(undefined);
 
-      await expect(service.create(createAppointmentDto, 'user-1')).rejects.toThrow(ConflictException);
-      await expect(service.create(createAppointmentDto, 'user-1')).rejects.toThrow(/maximum retries exceeded/);
+      await expect(service.create(createAppointmentDto, 'user-1')).rejects.toThrow(
+        ConflictException,
+      );
+      await expect(service.create(createAppointmentDto, 'user-1')).rejects.toThrow(
+        /maximum retries exceeded/,
+      );
 
       // Should have attempted MAX_RETRIES (3) times
       expect(prisma.$transaction).toHaveBeenCalledTimes(6); // 3 attempts per call × 2 calls
@@ -412,7 +428,9 @@ describe('AppointmentsService', () => {
       prisma.$transaction.mockImplementation(async (callback) => {
         return callback(mockTx);
       });
-      mockEmailService.sendAppointmentConfirmation.mockRejectedValue(new Error('Email service error'));
+      mockEmailService.sendAppointmentConfirmation.mockRejectedValue(
+        new Error('Email service error'),
+      );
 
       const result = await service.create(createAppointmentDto, 'user-1');
 
@@ -466,7 +484,9 @@ describe('AppointmentsService', () => {
       });
 
       // Mock sleep to resolve immediately
-      jest.spyOn(service as unknown as { sleep: () => Promise<void> }, 'sleep').mockResolvedValue(undefined);
+      jest
+        .spyOn(service as unknown as { sleep: () => Promise<void> }, 'sleep')
+        .mockResolvedValue(undefined);
 
       const result = await service.create(createAppointmentDto, 'user-1');
       expect(result).toEqual(mockAppointment);
@@ -481,10 +501,16 @@ describe('AppointmentsService', () => {
       prisma.$transaction.mockRejectedValue(timeoutError);
 
       // Mock sleep to resolve immediately
-      jest.spyOn(service as unknown as { sleep: () => Promise<void> }, 'sleep').mockResolvedValue(undefined);
+      jest
+        .spyOn(service as unknown as { sleep: () => Promise<void> }, 'sleep')
+        .mockResolvedValue(undefined);
 
-      await expect(service.create(createAppointmentDto, 'user-1')).rejects.toThrow(ConflictException);
-      await expect(service.create(createAppointmentDto, 'user-1')).rejects.toThrow(/Database timeout/);
+      await expect(service.create(createAppointmentDto, 'user-1')).rejects.toThrow(
+        ConflictException,
+      );
+      await expect(service.create(createAppointmentDto, 'user-1')).rejects.toThrow(
+        /Database timeout/,
+      );
       expect(prisma.$transaction).toHaveBeenCalledTimes(6); // 3 attempts per call × 2 calls
     });
 
@@ -508,7 +534,9 @@ describe('AppointmentsService', () => {
       });
 
       // Mock sleep to resolve immediately
-      jest.spyOn(service as unknown as { sleep: () => Promise<void> }, 'sleep').mockResolvedValue(undefined);
+      jest
+        .spyOn(service as unknown as { sleep: () => Promise<void> }, 'sleep')
+        .mockResolvedValue(undefined);
 
       const result = await service.create(createAppointmentDto, 'user-1');
       expect(result).toEqual(mockAppointment);
@@ -519,7 +547,11 @@ describe('AppointmentsService', () => {
   describe('findAll', () => {
     const mockAppointments = [
       { ...mockAppointment, id: 'apt-1' },
-      { ...mockAppointment, id: 'apt-2', customerInfo: { name: 'Jane Smith', email: 'jane@example.com', phone: '0987654321' } },
+      {
+        ...mockAppointment,
+        id: 'apt-2',
+        customerInfo: { name: 'Jane Smith', email: 'jane@example.com', phone: '0987654321' },
+      },
     ];
 
     it('should return paginated appointments with default pagination', async () => {
@@ -548,7 +580,7 @@ describe('AppointmentsService', () => {
           totalPages: 1,
           hasNext: false,
           hasPrev: false,
-        }
+        },
       });
     });
 
@@ -628,7 +660,7 @@ describe('AppointmentsService', () => {
           totalPages: 0,
           hasNext: false,
           hasPrev: false,
-        }
+        },
       });
     });
 
@@ -687,7 +719,9 @@ describe('AppointmentsService', () => {
       prisma.appointment.findUnique.mockResolvedValue(null);
 
       await expect(service.findOne('nonexistent-id')).rejects.toThrow(NotFoundException);
-      await expect(service.findOne('nonexistent-id')).rejects.toThrow('Appointment with ID nonexistent-id not found');
+      await expect(service.findOne('nonexistent-id')).rejects.toThrow(
+        'Appointment with ID nonexistent-id not found',
+      );
     });
   });
 
@@ -699,8 +733,12 @@ describe('AppointmentsService', () => {
     it('should throw NotFoundException if appointment not found', async () => {
       prisma.appointment.findUnique.mockResolvedValue(null);
 
-      await expect(service.update('nonexistent-id', updateAppointmentDto)).rejects.toThrow(NotFoundException);
-      await expect(service.update('nonexistent-id', updateAppointmentDto)).rejects.toThrow('Appointment with ID nonexistent-id not found');
+      await expect(service.update('nonexistent-id', updateAppointmentDto)).rejects.toThrow(
+        NotFoundException,
+      );
+      await expect(service.update('nonexistent-id', updateAppointmentDto)).rejects.toThrow(
+        'Appointment with ID nonexistent-id not found',
+      );
     });
 
     it('should update appointment status', async () => {
@@ -730,7 +768,10 @@ describe('AppointmentsService', () => {
       };
       prisma.appointment.update.mockResolvedValue(cancelledAppointment);
 
-      const result = await service.update('apt-1', { status: AppointmentStatus.CANCELLED, cancelReason: 'Customer requested cancellation' });
+      const result = await service.update('apt-1', {
+        status: AppointmentStatus.CANCELLED,
+        cancelReason: 'Customer requested cancellation',
+      });
 
       expect(prisma.appointment.update).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -853,7 +894,9 @@ describe('AppointmentsService', () => {
       prisma.appointment.findUnique.mockResolvedValue(null);
 
       await expect(service.cancel('nonexistent-id', 'Reason')).rejects.toThrow(NotFoundException);
-      await expect(service.cancel('nonexistent-id', 'Reason')).rejects.toThrow('Appointment with ID nonexistent-id not found');
+      await expect(service.cancel('nonexistent-id', 'Reason')).rejects.toThrow(
+        'Appointment with ID nonexistent-id not found',
+      );
     });
 
     it('should throw BadRequestException if appointment is already cancelled', async () => {
@@ -863,8 +906,12 @@ describe('AppointmentsService', () => {
       };
       prisma.appointment.findUnique.mockResolvedValue(cancelledAppointment);
 
-      await expect(service.cancel('apt-1', 'Double cancellation')).rejects.toThrow(BadRequestException);
-      await expect(service.cancel('apt-1', 'Double cancellation')).rejects.toThrow('Appointment is already cancelled');
+      await expect(service.cancel('apt-1', 'Double cancellation')).rejects.toThrow(
+        BadRequestException,
+      );
+      await expect(service.cancel('apt-1', 'Double cancellation')).rejects.toThrow(
+        'Appointment is already cancelled',
+      );
     });
 
     it('should cancel appointment in a transaction', async () => {
@@ -1059,7 +1106,9 @@ describe('AppointmentsService', () => {
       prisma.$transaction.mockImplementation(async (callback) => {
         return callback(mockTx);
       });
-      mockEmailService.sendAppointmentCancellation.mockRejectedValue(new Error('Email service error'));
+      mockEmailService.sendAppointmentCancellation.mockRejectedValue(
+        new Error('Email service error'),
+      );
 
       const result = await service.cancel('apt-1', 'Customer request');
 
@@ -1101,7 +1150,9 @@ describe('AppointmentsService', () => {
       prisma.appointment.findUnique.mockResolvedValue(null);
 
       await expect(service.remove('nonexistent-id')).rejects.toThrow(NotFoundException);
-      await expect(service.remove('nonexistent-id')).rejects.toThrow('Appointment with ID nonexistent-id not found');
+      await expect(service.remove('nonexistent-id')).rejects.toThrow(
+        'Appointment with ID nonexistent-id not found',
+      );
     });
 
     it('should delete appointment and return success message', async () => {
@@ -1146,11 +1197,18 @@ if (isIntegrationMode()) {
           },
           {
             provide: EmailService,
-            useValue: { sendAppointmentConfirmation: jest.fn(), sendAppointmentCancellation: jest.fn() },
+            useValue: {
+              sendAppointmentConfirmation: jest.fn(),
+              sendAppointmentCancellation: jest.fn(),
+            },
           },
           {
             provide: NotificationService,
-            useValue: { notifyBookingConfirmation: jest.fn(), notifyAppointmentUpdate: jest.fn(), notifyCancellation: jest.fn() },
+            useValue: {
+              notifyBookingConfirmation: jest.fn(),
+              notifyAppointmentUpdate: jest.fn(),
+              notifyCancellation: jest.fn(),
+            },
           },
           {
             provide: Logger,
@@ -1180,12 +1238,19 @@ if (isIntegrationMode()) {
         const service = await createTestService(testModule.prisma);
         const timeSlot = await createTestTimeSlot(testModule.prisma, service.id);
 
-        const result = await appointmentsService.create({
-          serviceId: service.id,
-          timeSlotId: timeSlot.id,
-          customerInfo: { name: user.name, email: user.email || 'test@example.com', phone: user.phone || '1234567890' },
-          appointmentDate: '2024-01-15T10:00:00Z',
-        }, user.id);
+        const result = await appointmentsService.create(
+          {
+            serviceId: service.id,
+            timeSlotId: timeSlot.id,
+            customerInfo: {
+              name: user.name,
+              email: user.email || 'test@example.com',
+              phone: user.phone || '1234567890',
+            },
+            appointmentDate: '2024-01-15T10:00:00Z',
+          },
+          user.id,
+        );
 
         expect(result).toHaveProperty('id');
         expect(result.serviceId).toBe(service.id);
@@ -1222,7 +1287,7 @@ if (isIntegrationMode()) {
 
       it('should throw NotFoundException for non-existent appointment', async () => {
         await expect(
-          appointmentsService.findOne('00000000-0000-0000-0000-000000000000')
+          appointmentsService.findOne('00000000-0000-0000-0000-000000000000'),
         ).rejects.toThrow(NotFoundException);
       });
     });

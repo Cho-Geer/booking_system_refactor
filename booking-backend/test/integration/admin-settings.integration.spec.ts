@@ -56,13 +56,25 @@ describe('[R14] Admin Settings — Business Hours', () => {
   beforeEach(async () => {
     await testModule.resetDatabase();
 
-    const adminData = UserFactory.create({ email: `admin-set-${Date.now()}@example.com`, role: SystemRole.ADMIN });
+    const adminData = UserFactory.create({
+      email: `admin-set-${Date.now()}@example.com`,
+      role: SystemRole.ADMIN,
+    });
     const admin = await prisma.user.create({ data: adminData as any });
-    adminToken = jwtService.sign({ sub: admin.id, role: SystemRole.ADMIN }, { expiresIn: '15m', secret: process.env.JWT_SECRET });
+    adminToken = jwtService.sign(
+      { sub: admin.id, role: SystemRole.ADMIN },
+      { expiresIn: '15m', secret: process.env.JWT_SECRET },
+    );
 
-    const saData = UserFactory.create({ email: `sa-set-${Date.now()}@example.com`, role: SystemRole.SUPER_ADMIN });
+    const saData = UserFactory.create({
+      email: `sa-set-${Date.now()}@example.com`,
+      role: SystemRole.SUPER_ADMIN,
+    });
     const sa = await prisma.user.create({ data: saData as any });
-    superAdminToken = jwtService.sign({ sub: sa.id, role: SystemRole.SUPER_ADMIN }, { expiresIn: '15m', secret: process.env.JWT_SECRET });
+    superAdminToken = jwtService.sign(
+      { sub: sa.id, role: SystemRole.SUPER_ADMIN },
+      { expiresIn: '15m', secret: process.env.JWT_SECRET },
+    );
   });
 
   describe('GET /v1/admin/settings/business-hours', () => {
@@ -80,7 +92,10 @@ describe('[R14] Admin Settings — Business Hours', () => {
     it('should return 403 for CUSTOMER role', async () => {
       const customerData = UserFactory.create({ email: `customer-set-${Date.now()}@example.com` });
       const customer = await prisma.user.create({ data: customerData as any });
-      const customerToken = jwtService.sign({ sub: customer.id, role: SystemRole.CUSTOMER }, { expiresIn: '15m', secret: process.env.JWT_SECRET });
+      const customerToken = jwtService.sign(
+        { sub: customer.id, role: SystemRole.CUSTOMER },
+        { expiresIn: '15m', secret: process.env.JWT_SECRET },
+      );
 
       await request(app.getHttpServer())
         .get('/v1/admin/settings/business-hours')
@@ -94,7 +109,10 @@ describe('[R14] Admin Settings — Business Hours', () => {
       await request(app.getHttpServer())
         .put('/v1/admin/settings/business-hours')
         .set('Authorization', `Bearer ${adminToken}`)
-        .send({ timezone: 'Asia/Shanghai', monday: { isOpen: true, startTime: '09:00', endTime: '18:00' } })
+        .send({
+          timezone: 'Asia/Shanghai',
+          monday: { isOpen: true, startTime: '09:00', endTime: '18:00' },
+        })
         .expect(403);
     });
 
@@ -102,7 +120,10 @@ describe('[R14] Admin Settings — Business Hours', () => {
       const response = await request(app.getHttpServer())
         .put('/v1/admin/settings/business-hours')
         .set('Authorization', `Bearer ${superAdminToken}`)
-        .send({ timezone: 'Asia/Shanghai', monday: { isOpen: true, startTime: '09:00', endTime: '18:00' } });
+        .send({
+          timezone: 'Asia/Shanghai',
+          monday: { isOpen: true, startTime: '09:00', endTime: '18:00' },
+        });
 
       // Accept 200 (success) or 500 (if implementation requires additional fields)
       expect([200, 201, 500]).toContain(response.status);

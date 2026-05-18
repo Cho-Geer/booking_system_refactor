@@ -1,7 +1,7 @@
-import { Module } from "@nestjs/common";
-import { UsersService } from "./users.service";
-import { UsersController } from "./users.controller";
-import { EncryptionModule } from "../encryption/encryption.module";
+import { Module } from '@nestjs/common';
+import { UsersService } from './users.service';
+import { UsersController } from './users.controller';
+import { EncryptionModule } from '../encryption/encryption.module';
 
 @Module({
   imports: [EncryptionModule],

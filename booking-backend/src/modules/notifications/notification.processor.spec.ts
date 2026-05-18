@@ -23,7 +23,7 @@ const createMockJob = (
     id,
     data,
     updateProgress: jest.fn().mockResolvedValue(undefined),
-  } as unknown as jest.Mocked<Job<NotificationJobData>>);
+  }) as unknown as jest.Mocked<Job<NotificationJobData>>;
 
 describe('NotificationProcessor', () => {
   let processor: NotificationProcessor;
@@ -317,15 +317,9 @@ describe('NotificationProcessor', () => {
 
       processor.onCompleted(mockJob);
 
-      expect(loggerLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining('completed successfully'),
-      );
-      expect(loggerLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining('booking_confirmation'),
-      );
-      expect(loggerLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining('user-1'),
-      );
+      expect(loggerLogSpy).toHaveBeenCalledWith(expect.stringContaining('completed successfully'));
+      expect(loggerLogSpy).toHaveBeenCalledWith(expect.stringContaining('booking_confirmation'));
+      expect(loggerLogSpy).toHaveBeenCalledWith(expect.stringContaining('user-1'));
     });
 
     it('should handle broadcast completion (no userId)', () => {
@@ -333,12 +327,8 @@ describe('NotificationProcessor', () => {
 
       processor.onCompleted(mockJob);
 
-      expect(loggerLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining('completed successfully'),
-      );
-      expect(loggerLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining('broadcast'),
-      );
+      expect(loggerLogSpy).toHaveBeenCalledWith(expect.stringContaining('completed successfully'));
+      expect(loggerLogSpy).toHaveBeenCalledWith(expect.stringContaining('broadcast'));
     });
   });
 
@@ -350,10 +340,7 @@ describe('NotificationProcessor', () => {
 
       processor.onFailed(mockJob, error);
 
-      expect(loggerErrorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('failed'),
-        error.stack,
-      );
+      expect(loggerErrorSpy).toHaveBeenCalledWith(expect.stringContaining('failed'), error.stack);
     });
 
     it('should include notification type in failure log', () => {
@@ -387,9 +374,7 @@ describe('NotificationProcessor', () => {
 
       processor.onProgress(mockJob, 50);
 
-      expect(loggerDebugSpy).toHaveBeenCalledWith(
-        expect.stringContaining('50%'),
-      );
+      expect(loggerDebugSpy).toHaveBeenCalledWith(expect.stringContaining('50%'));
     });
 
     it('should log object progress as JSON', () => {
@@ -408,9 +393,7 @@ describe('NotificationProcessor', () => {
 
       processor.onProgress(mockJob, 25);
 
-      expect(loggerDebugSpy).toHaveBeenCalledWith(
-        expect.stringContaining('20'),
-      );
+      expect(loggerDebugSpy).toHaveBeenCalledWith(expect.stringContaining('20'));
     });
   });
 });

@@ -42,14 +42,14 @@ describe('AppHeaderComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [AppHeaderComponent, StubThemeToggleComponent],
-      providers: [
-        { provide: TranslationService, useValue: mockTranslationService },
-      ],
-    }).overrideComponent(AppHeaderComponent, {
-      set: {
-        imports: [StubThemeToggleComponent, TranslatePipe],
-      },
-    }).compileComponents();
+      providers: [{ provide: TranslationService, useValue: mockTranslationService }],
+    })
+      .overrideComponent(AppHeaderComponent, {
+        set: {
+          imports: [StubThemeToggleComponent, TranslatePipe],
+        },
+      })
+      .compileComponents();
 
     fixture = TestBed.createComponent(AppHeaderComponent);
     component = fixture.componentInstance;
@@ -106,17 +106,19 @@ describe('AppHeaderComponent', () => {
     expect(fixture.nativeElement.textContent).toContain('Test User');
   });
 
-  it('should render admin badge with translated text', () => {
+  it('should render admin badge with the actual role value', () => {
     setupDefaultInputs();
     const adminBadge = fixture.nativeElement.querySelector('[data-testid="admin-badge"]');
     expect(adminBadge).toBeTruthy();
-    expect(adminBadge.textContent.trim()).toBe('{{auth.role.admin}}');
+    expect(adminBadge.textContent.trim()).toBe('ADMIN');
   });
 
   it('should emit menuToggle when hamburger button is clicked', () => {
     setupDefaultInputs();
     const menuToggleSpy = jest.spyOn(component.menuToggle, 'emit');
-    const hamburgerBtn = fixture.nativeElement.querySelector('button[aria-label="{{global.toggleMenu}}"]');
+    const hamburgerBtn = fixture.nativeElement.querySelector(
+      'button[aria-label="{{global.toggleMenu}}"]',
+    );
     hamburgerBtn.click();
     expect(menuToggleSpy).toHaveBeenCalledTimes(1);
   });

@@ -4,10 +4,7 @@ import { PrismaClient, SystemRole, UserStatus } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
-import {
-  createTestUser,
-  cleanupAllTestData,
-} from './fixtures/database.fixture';
+import { createTestUser, cleanupAllTestData } from './fixtures/database.fixture';
 import { UserFactory } from './factories';
 import * as bcrypt from 'bcryptjs';
 
@@ -116,22 +113,19 @@ describe('Users Module (E2E)', () => {
     });
 
     it('should return 401 when GET /users is called without token', async () => {
-      const response = await request(app.getHttpServer())
-        .get('/users');
+      const response = await request(app.getHttpServer()).get('/users');
 
       expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
     });
 
     it('should return 401 when DELETE /users/:id is called without token', async () => {
-      const response = await request(app.getHttpServer())
-        .delete(`/users/${customerUser.id}`);
+      const response = await request(app.getHttpServer()).delete(`/users/${customerUser.id}`);
 
       expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
     });
 
     it('should return 401 when GET /users/:id is called without token', async () => {
-      const response = await request(app.getHttpServer())
-        .get(`/users/${customerUser.id}`);
+      const response = await request(app.getHttpServer()).get(`/users/${customerUser.id}`);
 
       expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
     });
@@ -248,8 +242,7 @@ describe('Users Module (E2E)', () => {
         ),
       );
 
-      const response = await authenticatedRequest(adminToken)
-        .get('/users');
+      const response = await authenticatedRequest(adminToken).get('/users');
 
       expect(response.status).toBe(HttpStatus.OK);
       expect(response.body).toHaveProperty('data');
@@ -404,8 +397,9 @@ describe('Users Module (E2E)', () => {
         name: 'Delete Target User',
       });
 
-      const response = await authenticatedRequest(superAdminToken)
-        .delete(`/users/${targetUser.id}`);
+      const response = await authenticatedRequest(superAdminToken).delete(
+        `/users/${targetUser.id}`,
+      );
 
       expect(response.status).toBe(HttpStatus.OK);
       expect(response.body.message).toBe('User deleted successfully');
@@ -419,8 +413,9 @@ describe('Users Module (E2E)', () => {
 
     it('should return 404 when deleting a non-existent user', async () => {
       const nonExistentId = '00000000-0000-0000-0000-000000000000';
-      const response = await authenticatedRequest(superAdminToken)
-        .delete(`/users/${nonExistentId}`);
+      const response = await authenticatedRequest(superAdminToken).delete(
+        `/users/${nonExistentId}`,
+      );
 
       expect(response.status).toBe(HttpStatus.NOT_FOUND);
     });
@@ -432,13 +427,15 @@ describe('Users Module (E2E)', () => {
       });
 
       // First deletion
-      const firstResponse = await authenticatedRequest(superAdminToken)
-        .delete(`/users/${targetUser.id}`);
+      const firstResponse = await authenticatedRequest(superAdminToken).delete(
+        `/users/${targetUser.id}`,
+      );
       expect(firstResponse.status).toBe(HttpStatus.OK);
 
       // Second deletion should fail
-      const secondResponse = await authenticatedRequest(superAdminToken)
-        .delete(`/users/${targetUser.id}`);
+      const secondResponse = await authenticatedRequest(superAdminToken).delete(
+        `/users/${targetUser.id}`,
+      );
       expect(secondResponse.status).toBe(HttpStatus.NOT_FOUND);
     });
   });
@@ -449,8 +446,7 @@ describe('Users Module (E2E)', () => {
 
   describe('Unauthorized Access - Role-Based Restrictions', () => {
     it('should return 403 when customer tries to GET /users (admin listing)', async () => {
-      const response = await authenticatedRequest(customerToken)
-        .get('/users');
+      const response = await authenticatedRequest(customerToken).get('/users');
 
       expect(response.status).toBe(HttpStatus.FORBIDDEN);
     });
@@ -461,8 +457,7 @@ describe('Users Module (E2E)', () => {
         name: 'Forbidden Delete Target',
       });
 
-      const response = await authenticatedRequest(customerToken)
-        .delete(`/users/${targetUser.id}`);
+      const response = await authenticatedRequest(customerToken).delete(`/users/${targetUser.id}`);
 
       expect(response.status).toBe(HttpStatus.FORBIDDEN);
     });
@@ -489,8 +484,7 @@ describe('Users Module (E2E)', () => {
     });
 
     it('should allow admin to GET /users (not forbidden)', async () => {
-      const response = await authenticatedRequest(adminToken)
-        .get('/users');
+      const response = await authenticatedRequest(adminToken).get('/users');
 
       expect(response.status).toBe(HttpStatus.OK);
       expect(response.status).not.toBe(HttpStatus.FORBIDDEN);
@@ -502,8 +496,7 @@ describe('Users Module (E2E)', () => {
         name: 'Admin Delete Target',
       });
 
-      const response = await authenticatedRequest(adminToken)
-        .delete(`/users/${targetUser.id}`);
+      const response = await authenticatedRequest(adminToken).delete(`/users/${targetUser.id}`);
 
       expect(response.status).toBe(HttpStatus.OK);
       expect(response.status).not.toBe(HttpStatus.FORBIDDEN);
@@ -516,8 +509,7 @@ describe('Users Module (E2E)', () => {
 
   describe('Get Single User', () => {
     it('should return user details for a valid ID', async () => {
-      const response = await authenticatedRequest(adminToken)
-        .get(`/users/${customerUser.id}`);
+      const response = await authenticatedRequest(adminToken).get(`/users/${customerUser.id}`);
 
       expect(response.status).toBe(HttpStatus.OK);
       expect(response.body.id).toBe(customerUser.id);
@@ -531,15 +523,13 @@ describe('Users Module (E2E)', () => {
 
     it('should return 404 for non-existent user ID', async () => {
       const nonExistentId = '00000000-0000-0000-0000-000000000000';
-      const response = await authenticatedRequest(adminToken)
-        .get(`/users/${nonExistentId}`);
+      const response = await authenticatedRequest(adminToken).get(`/users/${nonExistentId}`);
 
       expect(response.status).toBe(HttpStatus.NOT_FOUND);
     });
 
     it('should return 404 for invalid UUID format', async () => {
-      const response = await authenticatedRequest(adminToken)
-        .get('/users/not-a-uuid');
+      const response = await authenticatedRequest(adminToken).get('/users/not-a-uuid');
 
       // Prisma will throw for invalid UUID, mapped to 400 or 404
       expect([HttpStatus.BAD_REQUEST, HttpStatus.NOT_FOUND]).toContain(response.status);
@@ -558,9 +548,7 @@ describe('Users Module (E2E)', () => {
         role: SystemRole.CUSTOMER,
       });
 
-      const response = await authenticatedRequest(adminToken)
-        .post('/users')
-        .send(newUser);
+      const response = await authenticatedRequest(adminToken).post('/users').send(newUser);
 
       expect(response.status).toBe(HttpStatus.CREATED);
       expect(response.body.name).toBe(newUser.name);
@@ -597,10 +585,12 @@ describe('Users Module (E2E)', () => {
     it('should create user as ADMIN type when specified', async () => {
       const response = await authenticatedRequest(adminToken)
         .post('/users')
-        .send(UserFactory.create({
-          email: `admin-created-${Date.now()}@e2e.com`,
-          role: SystemRole.ADMIN,
-        }));
+        .send(
+          UserFactory.create({
+            email: `admin-created-${Date.now()}@e2e.com`,
+            role: SystemRole.ADMIN,
+          }),
+        );
 
       expect(response.status).toBe(HttpStatus.CREATED);
       expect(response.body.role).toBe(SystemRole.ADMIN);

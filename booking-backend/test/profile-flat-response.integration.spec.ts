@@ -72,9 +72,11 @@ describe('Profile API Flat Response (Integration)', () => {
     await prisma.userSession.deleteMany({
       where: { user: { email: ADMIN_EMAIL } },
     });
-    await prisma.user.deleteMany({
-      where: { email: ADMIN_EMAIL },
-    }).catch(() => {});
+    await prisma.user
+      .deleteMany({
+        where: { email: ADMIN_EMAIL },
+      })
+      .catch(() => {});
 
     // Seed admin user with hashed password
     const hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, 12);
@@ -173,9 +175,7 @@ describe('Profile API Flat Response (Integration)', () => {
     });
 
     it('[RED] should return 401 when not authenticated', async () => {
-      await request(app.getHttpServer())
-        .get('/v1/users/profile')
-        .expect(401);
+      await request(app.getHttpServer()).get('/v1/users/profile').expect(401);
     });
   });
 
@@ -217,7 +217,12 @@ describe('Profile API Flat Response (Integration)', () => {
 
       // Generate CUSTOMER JWT
       const customerToken = jwtService.sign(
-        { sub: customerUser.id, email: customerUser.email, name: customerUser.name, role: customerUser.role },
+        {
+          sub: customerUser.id,
+          email: customerUser.email,
+          name: customerUser.name,
+          role: customerUser.role,
+        },
         { expiresIn: '15m', secret: process.env.JWT_SECRET },
       );
 

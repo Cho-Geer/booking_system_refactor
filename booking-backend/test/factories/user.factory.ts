@@ -40,7 +40,10 @@ export class UserFactory {
    */
   private static hashValue(value: string): string {
     const PEPPER = 'test-pepper-for-integration-tests-only';
-    return crypto.createHash('sha256').update(value + PEPPER).digest('hex');
+    return crypto
+      .createHash('sha256')
+      .update(value + PEPPER)
+      .digest('hex');
   }
 
   /**
@@ -51,7 +54,8 @@ export class UserFactory {
   static create(overrides: UserFactoryOverrides = {}) {
     const uid = UserFactory.uid();
     const email = overrides.email ?? `user-${uid}@example.com`;
-    const phone = overrides.phone ?? `+1555${String(1000000 + Math.floor(Math.random() * 9000000))}`;
+    const phone =
+      overrides.phone ?? `+1555${String(1000000 + Math.floor(Math.random() * 9000000))}`;
 
     return {
       name: overrides.name ?? `User ${uid}`,
@@ -59,7 +63,8 @@ export class UserFactory {
       email,
       phoneHash: this.hashValue(phone),
       emailHash: this.hashValue(email),
-      passwordHash: overrides.passwordHash ?? '$2b$12$LJ3m4ys4Lk0RHBmRFr4xMOuMqBNfT8nVbV8oWqYqJ5ZmJvZqVqHmG',
+      passwordHash:
+        overrides.passwordHash ?? '$2b$12$LJ3m4ys4Lk0RHBmRFr4xMOuMqBNfT8nVbV8oWqYqJ5ZmJvZqVqHmG',
       role: overrides.role ?? SystemRole.CUSTOMER,
       status: overrides.status ?? UserStatus.ACTIVE,
       lastLoginAt: overrides.lastLoginAt ?? new Date(),

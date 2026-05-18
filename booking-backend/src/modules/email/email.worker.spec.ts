@@ -20,7 +20,7 @@ const createMockJob = (data: EmailJobData, id: string = '1'): jest.Mocked<Job<Em
     id,
     data,
     updateProgress: jest.fn().mockResolvedValue(undefined),
-  } as unknown as jest.Mocked<Job<EmailJobData>>);
+  }) as unknown as jest.Mocked<Job<EmailJobData>>;
 
 describe('EmailWorker', () => {
   let worker: EmailWorker;
@@ -76,7 +76,6 @@ describe('EmailWorker', () => {
   };
 
   describe('process', () => {
-
     it('should send email successfully and return sent confirmation', async () => {
       const mockJob = createMockJob(mockEmailData, '1');
       mockTransporter.sendMail.mockResolvedValue({ messageId: 'msg-123' });
@@ -240,12 +239,8 @@ describe('EmailWorker', () => {
 
       worker.onCompleted(mockJob);
 
-      expect(loggerLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining('completed successfully'),
-      );
-      expect(loggerLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining('user@example.com'),
-      );
+      expect(loggerLogSpy).toHaveBeenCalledWith(expect.stringContaining('completed successfully'));
+      expect(loggerLogSpy).toHaveBeenCalledWith(expect.stringContaining('user@example.com'));
     });
   });
 
@@ -257,10 +252,7 @@ describe('EmailWorker', () => {
 
       worker.onFailed(mockJob, error);
 
-      expect(loggerErrorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('failed'),
-        error.stack,
-      );
+      expect(loggerErrorSpy).toHaveBeenCalledWith(expect.stringContaining('failed'), error.stack);
     });
 
     it('should include recipient email in failure log', () => {
@@ -282,9 +274,7 @@ describe('EmailWorker', () => {
 
       worker.onProgress(mockJob, 50);
 
-      expect(loggerDebugSpy).toHaveBeenCalledWith(
-        expect.stringContaining('50%'),
-      );
+      expect(loggerDebugSpy).toHaveBeenCalledWith(expect.stringContaining('50%'));
     });
 
     it('should log object progress as JSON', () => {

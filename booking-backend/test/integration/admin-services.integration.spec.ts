@@ -74,8 +74,24 @@ describe('[R12] Admin Services CRUD', () => {
       const category = await prisma.serviceCategory.create({
         data: { name: `SvcCat ${Date.now()}`, displayOrder: 1, isActive: true },
       });
-      await prisma.service.create({ data: { categoryId: category.id, name: 'Service A', durationMinutes: 30, price: 50, isActive: true } });
-      await prisma.service.create({ data: { categoryId: category.id, name: 'Service B', durationMinutes: 60, price: 100, isActive: true } });
+      await prisma.service.create({
+        data: {
+          categoryId: category.id,
+          name: 'Service A',
+          durationMinutes: 30,
+          price: 50,
+          isActive: true,
+        },
+      });
+      await prisma.service.create({
+        data: {
+          categoryId: category.id,
+          name: 'Service B',
+          durationMinutes: 60,
+          price: 100,
+          isActive: true,
+        },
+      });
 
       const response = await request(app.getHttpServer())
         .get('/v1/admin/services')
@@ -89,10 +105,30 @@ describe('[R12] Admin Services CRUD', () => {
     });
 
     it('should support category filter', async () => {
-      const cat1 = await prisma.serviceCategory.create({ data: { name: `Cat1 ${Date.now()}`, displayOrder: 1, isActive: true } });
-      const cat2 = await prisma.serviceCategory.create({ data: { name: `Cat2 ${Date.now()}`, displayOrder: 2, isActive: true } });
-      await prisma.service.create({ data: { categoryId: cat1.id, name: 'In Cat1', durationMinutes: 30, price: 50, isActive: true } });
-      await prisma.service.create({ data: { categoryId: cat2.id, name: 'In Cat2', durationMinutes: 60, price: 100, isActive: true } });
+      const cat1 = await prisma.serviceCategory.create({
+        data: { name: `Cat1 ${Date.now()}`, displayOrder: 1, isActive: true },
+      });
+      const cat2 = await prisma.serviceCategory.create({
+        data: { name: `Cat2 ${Date.now()}`, displayOrder: 2, isActive: true },
+      });
+      await prisma.service.create({
+        data: {
+          categoryId: cat1.id,
+          name: 'In Cat1',
+          durationMinutes: 30,
+          price: 50,
+          isActive: true,
+        },
+      });
+      await prisma.service.create({
+        data: {
+          categoryId: cat2.id,
+          name: 'In Cat2',
+          durationMinutes: 60,
+          price: 100,
+          isActive: true,
+        },
+      });
 
       const response = await request(app.getHttpServer())
         .get('/v1/admin/services')
@@ -122,9 +158,27 @@ describe('[R12] Admin Services CRUD', () => {
 
   describe('GET /v1/admin/services/summary', () => {
     it('should return service summary stats', async () => {
-      const category = await prisma.serviceCategory.create({ data: { name: `SumCat ${Date.now()}`, displayOrder: 1, isActive: true } });
-      await prisma.service.create({ data: { categoryId: category.id, name: 'Active Svc', durationMinutes: 30, price: 50, isActive: true } });
-      await prisma.service.create({ data: { categoryId: category.id, name: 'Inactive Svc', durationMinutes: 60, price: 100, isActive: false } });
+      const category = await prisma.serviceCategory.create({
+        data: { name: `SumCat ${Date.now()}`, displayOrder: 1, isActive: true },
+      });
+      await prisma.service.create({
+        data: {
+          categoryId: category.id,
+          name: 'Active Svc',
+          durationMinutes: 30,
+          price: 50,
+          isActive: true,
+        },
+      });
+      await prisma.service.create({
+        data: {
+          categoryId: category.id,
+          name: 'Inactive Svc',
+          durationMinutes: 60,
+          price: 100,
+          isActive: false,
+        },
+      });
 
       const response = await request(app.getHttpServer())
         .get('/v1/admin/services/summary')
@@ -142,7 +196,9 @@ describe('[R12] Admin Services CRUD', () => {
 
   describe('POST /v1/admin/services', () => {
     it('should create a new service', async () => {
-      const category = await prisma.serviceCategory.create({ data: { name: `CreateCat ${Date.now()}`, displayOrder: 1, isActive: true } });
+      const category = await prisma.serviceCategory.create({
+        data: { name: `CreateCat ${Date.now()}`, displayOrder: 1, isActive: true },
+      });
 
       const response = await request(app.getHttpServer())
         .post('/v1/admin/services')
@@ -166,8 +222,18 @@ describe('[R12] Admin Services CRUD', () => {
 
   describe('PUT /v1/admin/services/:id', () => {
     it('should update an existing service', async () => {
-      const category = await prisma.serviceCategory.create({ data: { name: `UpdCat ${Date.now()}`, displayOrder: 1, isActive: true } });
-      const service = await prisma.service.create({ data: { categoryId: category.id, name: 'Original', durationMinutes: 30, price: 50, isActive: true } });
+      const category = await prisma.serviceCategory.create({
+        data: { name: `UpdCat ${Date.now()}`, displayOrder: 1, isActive: true },
+      });
+      const service = await prisma.service.create({
+        data: {
+          categoryId: category.id,
+          name: 'Original',
+          durationMinutes: 30,
+          price: 50,
+          isActive: true,
+        },
+      });
 
       const response = await request(app.getHttpServer())
         .put(`/v1/admin/services/${service.id}`)
@@ -181,8 +247,18 @@ describe('[R12] Admin Services CRUD', () => {
 
   describe('DELETE /v1/admin/services/:id', () => {
     it('should delete a service', async () => {
-      const category = await prisma.serviceCategory.create({ data: { name: `DelCat ${Date.now()}`, displayOrder: 1, isActive: true } });
-      const service = await prisma.service.create({ data: { categoryId: category.id, name: 'To Delete', durationMinutes: 30, price: 50, isActive: true } });
+      const category = await prisma.serviceCategory.create({
+        data: { name: `DelCat ${Date.now()}`, displayOrder: 1, isActive: true },
+      });
+      const service = await prisma.service.create({
+        data: {
+          categoryId: category.id,
+          name: 'To Delete',
+          durationMinutes: 30,
+          price: 50,
+          isActive: true,
+        },
+      });
 
       const response = await request(app.getHttpServer())
         .delete(`/v1/admin/services/${service.id}`)

@@ -1,5 +1,5 @@
-import { Injectable, NestMiddleware } from "@nestjs/common";
-import { Request, Response, NextFunction } from "express";
+import { Injectable, NestMiddleware } from '@nestjs/common';
+import { Request, Response, NextFunction } from 'express';
 
 /**
  * CORS configuration options
@@ -23,12 +23,12 @@ export interface CorsOptions {
  * Default CORS configuration
  */
 const DEFAULT_CORS_OPTIONS: CorsOptions = {
-  allowedOrigins: ["http://localhost:4200"],
-  allowedMethods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+  allowedOrigins: ['http://localhost:4200'],
+  allowedMethods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   allowCredentials: true,
   maxAge: 86400,
-  exposedHeaders: ["X-Request-Id"],
+  exposedHeaders: ['X-Request-Id'],
 };
 
 /**
@@ -72,44 +72,35 @@ export class CorsMiddleware implements NestMiddleware {
       res.status(403).json({
         statusCode: 403,
         message: `Origin '${origin}' is not allowed by CORS policy`,
-        error: "Forbidden",
+        error: 'Forbidden',
       });
       return;
     }
 
     // Set CORS headers
-    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader('Access-Control-Allow-Origin', origin);
 
     if (this.options.allowCredentials) {
-      res.setHeader("Access-Control-Allow-Credentials", "true");
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
     }
 
     // Handle preflight requests
-    if (req.method === "OPTIONS") {
+    if (req.method === 'OPTIONS') {
       this.handlePreflight(req, res);
       return;
     }
 
     // Set headers for actual requests
     if (this.options.allowedMethods) {
-      res.setHeader(
-        "Access-Control-Allow-Methods",
-        this.options.allowedMethods.join(", "),
-      );
+      res.setHeader('Access-Control-Allow-Methods', this.options.allowedMethods.join(', '));
     }
 
     if (this.options.allowedHeaders) {
-      res.setHeader(
-        "Access-Control-Allow-Headers",
-        this.options.allowedHeaders.join(", "),
-      );
+      res.setHeader('Access-Control-Allow-Headers', this.options.allowedHeaders.join(', '));
     }
 
     if (this.options.exposedHeaders) {
-      res.setHeader(
-        "Access-Control-Expose-Headers",
-        this.options.exposedHeaders.join(", "),
-      );
+      res.setHeader('Access-Control-Expose-Headers', this.options.exposedHeaders.join(', '));
     }
 
     next();
@@ -123,11 +114,11 @@ export class CorsMiddleware implements NestMiddleware {
   private isOriginAllowed(origin: string): boolean {
     return this.options.allowedOrigins.some((allowed) => {
       // Support wildcard
-      if (allowed === "*") {
+      if (allowed === '*') {
         return true;
       }
       // Support regex patterns
-      if (allowed.startsWith("/") && allowed.endsWith("/")) {
+      if (allowed.startsWith('/') && allowed.endsWith('/')) {
         const regex = new RegExp(allowed.slice(1, -1));
         return regex.test(origin);
       }
@@ -143,25 +134,19 @@ export class CorsMiddleware implements NestMiddleware {
    */
   private handlePreflight(req: Request, res: Response): void {
     if (this.options.allowedMethods) {
-      res.setHeader(
-        "Access-Control-Allow-Methods",
-        this.options.allowedMethods.join(", "),
-      );
+      res.setHeader('Access-Control-Allow-Methods', this.options.allowedMethods.join(', '));
     }
 
     // Use requested headers or fall back to configured allowed headers
-    const requestedHeaders = req.headers["access-control-request-headers"];
+    const requestedHeaders = req.headers['access-control-request-headers'];
     if (requestedHeaders) {
-      res.setHeader("Access-Control-Allow-Headers", requestedHeaders);
+      res.setHeader('Access-Control-Allow-Headers', requestedHeaders);
     } else if (this.options.allowedHeaders) {
-      res.setHeader(
-        "Access-Control-Allow-Headers",
-        this.options.allowedHeaders.join(", "),
-      );
+      res.setHeader('Access-Control-Allow-Headers', this.options.allowedHeaders.join(', '));
     }
 
     if (this.options.maxAge) {
-      res.setHeader("Access-Control-Max-Age", String(this.options.maxAge));
+      res.setHeader('Access-Control-Max-Age', String(this.options.maxAge));
     }
 
     res.status(204).end();

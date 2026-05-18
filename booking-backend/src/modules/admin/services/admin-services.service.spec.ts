@@ -8,6 +8,7 @@ import {
   UpdateAdminServiceDto,
   AdminServicesQueryDto,
 } from '../dto/admin-service.dto';
+import { AdminAppointmentsService } from './admin-appointments.service';
 import {
   toAdminServiceDto,
   fromCreateAdminServiceDto,
@@ -21,11 +22,26 @@ jest.mock('../mappers/service.mapper', () => ({
 }));
 
 // ── Mocks ──────────────────────────────────────────────────────────────
-const mockPrismaService = {
+const mockPrismaServiceCategory = {
+  findUnique: jest.fn(),
+};
+
+const mockPrismaService: Record<string, any> = {
   service: {
     findMany: jest.fn(),
     count: jest.fn(),
+    findUnique: jest.fn(),
   },
+  serviceCategory: mockPrismaServiceCategory,
+  appointment: {
+    findMany: jest.fn(),
+    count: jest.fn(),
+    update: jest.fn(),
+  },
+  activityLog: {
+    create: jest.fn(),
+  },
+  $transaction: jest.fn((cb: any) => cb(mockPrismaService)),
 };
 
 const mockServicesService = {
@@ -33,6 +49,10 @@ const mockServicesService = {
   findOne: jest.fn(),
   update: jest.fn(),
   remove: jest.fn(),
+};
+
+const mockAdminAppointmentsService = {
+  updateStatus: jest.fn(),
 };
 
 // ── Prisma fixtures ────────────────────────────────────────────────────
@@ -84,9 +104,20 @@ const adminServiceDtoFixture2 = {
   createdAt: new Date('2024-01-01'),
 };
 
+// ── Category fixtures ──────────────────────────────────────────────────
+const serviceCategoryFixture = {
+  id: 'cat-therapy',
+  name: 'Therapy',
+};
+
+const serviceCategoryFixture2 = {
+  id: 'cat-wellness',
+  name: 'Wellness',
+};
+
 describe('AdminServicesService', () => {
   let adminService: AdminServicesService;
-  let prisma: typeof mockPrismaService;
+  let prisma: Record<string, any>;
   let servicesService: typeof mockServicesService;
 
   beforeEach(async () => {
@@ -95,6 +126,7 @@ describe('AdminServicesService', () => {
         AdminServicesService,
         { provide: PrismaService, useValue: mockPrismaService },
         { provide: ServicesService, useValue: mockServicesService },
+        { provide: AdminAppointmentsService, useValue: mockAdminAppointmentsService },
       ],
     }).compile();
 
@@ -137,6 +169,7 @@ describe('AdminServicesService', () => {
         skip: 0,
         take: 20,
         where: {},
+        include: { category: true },
         orderBy: { createdAt: 'desc' },
       });
       expect(prisma.service.count).toHaveBeenCalledWith({ where: {} });
@@ -154,9 +187,7 @@ describe('AdminServicesService', () => {
     });
 
     it('should filter by active status', async () => {
-      mockPrismaService.service.findMany.mockResolvedValue([
-        prismaServiceFixture,
-      ]);
+      mockPrismaService.service.findMany.mockResolvedValue([prismaServiceFixture]);
       mockPrismaService.service.count.mockResolvedValue(1);
 
       const query: AdminServicesQueryDto = { page: 1, limit: 20, active: true };
@@ -190,9 +221,7 @@ describe('AdminServicesService', () => {
     });
 
     it('should search by name or description using LIKE', async () => {
-      mockPrismaService.service.findMany.mockResolvedValue([
-        prismaServiceFixture,
-      ]);
+      mockPrismaService.service.findMany.mockResolvedValue([prismaServiceFixture]);
       mockPrismaService.service.count.mockResolvedValue(1);
 
       const query: AdminServicesQueryDto = { page: 1, limit: 20, search: 'hair' };
@@ -212,9 +241,7 @@ describe('AdminServicesService', () => {
     });
 
     it('should combine search AND active filter together', async () => {
-      mockPrismaService.service.findMany.mockResolvedValue([
-        prismaServiceFixture,
-      ]);
+      mockPrismaService.service.findMany.mockResolvedValue([prismaServiceFixture]);
       mockPrismaService.service.count.mockResolvedValue(1);
 
       const query: AdminServicesQueryDto = {
@@ -255,9 +282,7 @@ describe('AdminServicesService', () => {
     });
 
     it('should calculate pagination metadata correctly', async () => {
-      mockPrismaService.service.findMany.mockResolvedValue([
-        prismaServiceFixture,
-      ]);
+      mockPrismaService.service.findMany.mockResolvedValue([prismaServiceFixture]);
       mockPrismaService.service.count.mockResolvedValue(25);
 
       const query: AdminServicesQueryDto = { page: 3, limit: 10 };
@@ -289,9 +314,7 @@ describe('AdminServicesService', () => {
         new NotFoundException('Service with ID invalid-id not found'),
       );
 
-      await expect(adminService.findOne('invalid-id')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(adminService.findOne('invalid-id')).rejects.toThrow(NotFoundException);
       await expect(adminService.findOne('invalid-id')).rejects.toThrow(
         'Service with ID invalid-id not found',
       );
@@ -320,9 +343,7 @@ describe('AdminServicesService', () => {
     };
 
     it('should map DTO, delegate to ServicesService.create, and map result', async () => {
-      (fromCreateAdminServiceDto as jest.Mock).mockReturnValue(
-        prismaCreateDataWithPricePerMinute,
-      );
+      (fromCreateAdminServiceDto as jest.Mock).mockReturnValue(prismaCreateDataWithPricePerMinute);
       mockServicesService.create.mockResolvedValue(prismaServiceFixture);
       (toAdminServiceDto as jest.Mock).mockReturnValue({
         ...adminServiceDtoFixture,
@@ -339,9 +360,7 @@ describe('AdminServicesService', () => {
         ...createDto,
         pricePerMinute: 1.78,
       });
-      expect(servicesService.create).toHaveBeenCalledWith(
-        prismaCreateDataWithPricePerMinute,
-      );
+      expect(servicesService.create).toHaveBeenCalledWith(prismaCreateDataWithPricePerMinute);
       expect(toAdminServiceDto).toHaveBeenCalledWith(prismaServiceFixture);
       expect(result).toBeDefined();
       expect(result).toHaveProperty('pricePerMinute', 1.78);
@@ -445,6 +464,102 @@ describe('AdminServicesService', () => {
         expect.not.objectContaining({ pricePerMinute: expect.any(Number) }),
       );
     });
+
+    // ── Category resolution ──────────────────────────────────────────
+    it('[RED] should resolve category name to categoryId when creating with category', async () => {
+      const dtoWithCategory: CreateAdminServiceDto = {
+        name: 'Massage',
+        description: 'Relaxing massage',
+        duration: 60,
+        price: 120,
+        category: 'Therapy',
+      };
+
+      const prismaDataWithCategory = {
+        name: 'Massage',
+        description: 'Relaxing massage',
+        durationMinutes: 60,
+        price: 120,
+        isActive: true,
+        category: 'Therapy',
+      };
+
+      (fromCreateAdminServiceDto as jest.Mock).mockReturnValue(prismaDataWithCategory);
+      mockPrismaServiceCategory.findUnique.mockResolvedValue(serviceCategoryFixture);
+      mockServicesService.create.mockResolvedValue({
+        ...prismaServiceFixture,
+        categoryId: 'cat-therapy',
+      });
+      (toAdminServiceDto as jest.Mock).mockReturnValue({
+        ...adminServiceDtoFixture,
+        name: 'Massage',
+        category: 'Therapy',
+      });
+
+      const result = await adminService.create(dtoWithCategory);
+
+      // Should have looked up the category by name
+      expect(mockPrismaServiceCategory.findUnique).toHaveBeenCalledWith({
+        where: { name: 'Therapy' },
+      });
+      // Should have passed categoryId (resolved) to the services service
+      expect(servicesService.create).toHaveBeenCalledWith(
+        expect.objectContaining({ categoryId: 'cat-therapy' }),
+      );
+      expect(result).toBeDefined();
+    });
+
+    it('[RED] should not resolve category when category is not provided on create', async () => {
+      const dtoWithoutCategory: CreateAdminServiceDto = {
+        name: 'No Category Service',
+        duration: 30,
+        price: 50,
+      };
+
+      const prismaDataNoCategory = {
+        name: 'No Category Service',
+        durationMinutes: 30,
+        price: 50,
+        isActive: true,
+      };
+
+      (fromCreateAdminServiceDto as jest.Mock).mockReturnValue(prismaDataNoCategory);
+      mockServicesService.create.mockResolvedValue(prismaServiceFixture);
+      (toAdminServiceDto as jest.Mock).mockReturnValue(adminServiceDtoFixture);
+
+      await adminService.create(dtoWithoutCategory);
+
+      // Should NOT have looked up any category
+      expect(mockPrismaServiceCategory.findUnique).not.toHaveBeenCalled();
+    });
+
+    it('[RED] should throw NotFoundException when category name does not exist on create', async () => {
+      const dtoWithBadCategory: CreateAdminServiceDto = {
+        name: 'Bad Cat Service',
+        duration: 30,
+        price: 50,
+        category: 'NonExistentCategory',
+      };
+
+      const prismaData = {
+        name: 'Bad Cat Service',
+        durationMinutes: 30,
+        price: 50,
+        isActive: true,
+        category: 'NonExistentCategory',
+      };
+
+      (fromCreateAdminServiceDto as jest.Mock).mockReturnValue(prismaData);
+      mockPrismaServiceCategory.findUnique.mockResolvedValue(null); // Category not found
+
+      await expect(adminService.create(dtoWithBadCategory)).rejects.toThrow(NotFoundException);
+      await expect(adminService.create(dtoWithBadCategory)).rejects.toThrow(
+        "Category 'NonExistentCategory' not found",
+      );
+
+      // ServicesService.create should NOT have been called
+      expect(servicesService.create).not.toHaveBeenCalled();
+    });
   });
 
   // ─── update ──────────────────────────────────────────────────────────
@@ -459,10 +574,13 @@ describe('AdminServicesService', () => {
       price: 100,
     };
 
+    beforeEach(() => {
+      mockServicesService.findOne.mockResolvedValue({ ...prismaServiceFixture, isActive: true });
+      mockPrismaService.appointment.findMany.mockResolvedValue([]);
+    });
+
     it('should map DTO, delegate to ServicesService.update, and map result', async () => {
-      (fromUpdateAdminServiceDto as jest.Mock).mockReturnValue(
-        prismaUpdateData,
-      );
+      (fromUpdateAdminServiceDto as jest.Mock).mockReturnValue(prismaUpdateData);
       const updatedPrisma = {
         ...prismaServiceFixture,
         name: 'Updated Service',
@@ -478,25 +596,18 @@ describe('AdminServicesService', () => {
       const result = await adminService.update('svc-1', updateDto);
 
       expect(fromUpdateAdminServiceDto).toHaveBeenCalledWith(updateDto);
-      expect(servicesService.update).toHaveBeenCalledWith(
-        'svc-1',
-        prismaUpdateData,
-      );
+      expect(servicesService.update).toHaveBeenCalledWith('svc-1', prismaUpdateData);
       expect(toAdminServiceDto).toHaveBeenCalledWith(updatedPrisma);
       expect(result).toBeDefined();
     });
 
     it('should propagate NotFoundException from ServicesService.update', async () => {
-      (fromUpdateAdminServiceDto as jest.Mock).mockReturnValue(
-        prismaUpdateData,
-      );
+      (fromUpdateAdminServiceDto as jest.Mock).mockReturnValue(prismaUpdateData);
       mockServicesService.update.mockRejectedValue(
         new NotFoundException('Service with ID invalid-id not found'),
       );
 
-      await expect(
-        adminService.update('invalid-id', updateDto),
-      ).rejects.toThrow(NotFoundException);
+      await expect(adminService.update('invalid-id', updateDto)).rejects.toThrow(NotFoundException);
     });
 
     it('should map isActive field correctly', async () => {
@@ -514,10 +625,7 @@ describe('AdminServicesService', () => {
       const result = await adminService.update('svc-1', deactivateDto);
 
       expect(fromUpdateAdminServiceDto).toHaveBeenCalledWith(deactivateDto);
-      expect(servicesService.update).toHaveBeenCalledWith(
-        'svc-1',
-        prismaUpdate,
-      );
+      expect(servicesService.update).toHaveBeenCalledWith('svc-1', prismaUpdate);
       expect(result).toBeDefined();
     });
 
@@ -574,6 +682,86 @@ describe('AdminServicesService', () => {
         expect.not.objectContaining({ pricePerMinute: expect.any(Number) }),
       );
     });
+
+    // ── Category resolution ──────────────────────────────────────────
+    it('[RED] should resolve category name to categoryId when updating with category', async () => {
+      const updateDtoWithCategory: UpdateAdminServiceDto = {
+        name: 'Updated Massage',
+        category: 'Wellness',
+      };
+
+      const prismaUpdateData = {
+        name: 'Updated Massage',
+        category: 'Wellness',
+      };
+
+      (fromUpdateAdminServiceDto as jest.Mock).mockReturnValue(prismaUpdateData);
+      mockPrismaServiceCategory.findUnique.mockResolvedValue(serviceCategoryFixture2);
+      const updatedPrisma = {
+        ...prismaServiceFixture,
+        name: 'Updated Massage',
+        categoryId: 'cat-wellness',
+      };
+      mockServicesService.update.mockResolvedValue(updatedPrisma);
+      (toAdminServiceDto as jest.Mock).mockReturnValue({
+        ...adminServiceDtoFixture,
+        name: 'Updated Massage',
+        category: 'Wellness',
+      });
+
+      const result = await adminService.update('svc-1', updateDtoWithCategory);
+
+      expect(mockPrismaServiceCategory.findUnique).toHaveBeenCalledWith({
+        where: { name: 'Wellness' },
+      });
+      expect(servicesService.update).toHaveBeenCalledWith(
+        'svc-1',
+        expect.objectContaining({ categoryId: 'cat-wellness' }),
+      );
+      expect(result).toBeDefined();
+    });
+
+    it('[RED] should not resolve category when category is not provided on update', async () => {
+      const updateDtoWithoutCategory: UpdateAdminServiceDto = {
+        name: 'Just Name',
+      };
+
+      const prismaUpdateData = {
+        name: 'Just Name',
+      };
+
+      (fromUpdateAdminServiceDto as jest.Mock).mockReturnValue(prismaUpdateData);
+      mockServicesService.update.mockResolvedValue(prismaServiceFixture);
+      (toAdminServiceDto as jest.Mock).mockReturnValue(adminServiceDtoFixture);
+
+      await adminService.update('svc-1', updateDtoWithoutCategory);
+
+      expect(mockPrismaServiceCategory.findUnique).not.toHaveBeenCalled();
+    });
+
+    it('[RED] should throw NotFoundException when category name does not exist on update', async () => {
+      const updateDtoWithBadCategory: UpdateAdminServiceDto = {
+        name: 'Bad Cat',
+        category: 'MissingCategory',
+      };
+
+      const prismaUpdateData = {
+        name: 'Bad Cat',
+        category: 'MissingCategory',
+      };
+
+      (fromUpdateAdminServiceDto as jest.Mock).mockReturnValue(prismaUpdateData);
+      mockPrismaServiceCategory.findUnique.mockResolvedValue(null);
+
+      await expect(adminService.update('svc-1', updateDtoWithBadCategory)).rejects.toThrow(
+        NotFoundException,
+      );
+      await expect(adminService.update('svc-1', updateDtoWithBadCategory)).rejects.toThrow(
+        "Category 'MissingCategory' not found",
+      );
+
+      expect(servicesService.update).not.toHaveBeenCalled();
+    });
   });
 
   // ─── remove ──────────────────────────────────────────────────────────
@@ -594,9 +782,185 @@ describe('AdminServicesService', () => {
         new NotFoundException('Service with ID invalid-id not found'),
       );
 
-      await expect(adminService.remove('invalid-id')).rejects.toThrow(
-        NotFoundException,
+      await expect(adminService.remove('invalid-id')).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  // ─── update — cascade ──────────────────────────────────────────────
+  describe('update — cascade on active=false', () => {
+    const updatedDeactivatedService = {
+      ...prismaServiceFixture,
+      name: 'Haircut',
+      isActive: false,
+    };
+
+    const pendingAppointment = {
+      id: 'apt-pending-1',
+      status: 'PENDING',
+      serviceId: 'svc-1',
+    };
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+      (fromUpdateAdminServiceDto as jest.Mock).mockReturnValue({ isActive: false });
+      mockServicesService.update.mockResolvedValue(updatedDeactivatedService);
+      // Service was previously active before cascade check
+      mockServicesService.findOne.mockResolvedValue({ ...prismaServiceFixture, isActive: true });
+    });
+
+    it('[RED] should cancel PENDING appointments when active is set to false', async () => {
+      // Arrange
+      mockPrismaService.appointment.findMany.mockResolvedValue([pendingAppointment]);
+      mockAdminAppointmentsService.updateStatus.mockResolvedValue({
+        id: 'apt-pending-1',
+        status: 'CANCELLED',
+        updatedAt: new Date(),
+      });
+      (toAdminServiceDto as jest.Mock).mockReturnValue({
+        ...adminServiceDtoFixture,
+        active: false,
+      });
+
+      // Act
+      await adminService.update('svc-1', { active: false });
+
+      // Assert
+      expect(mockPrismaService.appointment.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { serviceId: 'svc-1', status: 'PENDING' },
+        }),
       );
+      expect(mockAdminAppointmentsService.updateStatus).toHaveBeenCalledWith(
+        'apt-pending-1',
+        { status: 'CANCELLED', reason: expect.stringContaining('disabled by admin') },
+      );
+    });
+
+    it('[RED] should skip CONFIRMED appointments when cascading', async () => {
+      // Arrange — the query filters by status PENDING, so only PENDING is returned
+      mockPrismaService.appointment.findMany.mockResolvedValue([
+        pendingAppointment,
+      ]);
+      mockAdminAppointmentsService.updateStatus.mockResolvedValue({
+        id: 'apt-pending-1',
+        status: 'CANCELLED',
+        updatedAt: new Date(),
+      });
+      (toAdminServiceDto as jest.Mock).mockReturnValue({
+        ...adminServiceDtoFixture,
+        active: false,
+      });
+
+      // Act
+      await adminService.update('svc-1', { active: false });
+
+      // Assert
+      // Query filters by PENDING status, so CONFIRMED appointments are not touched
+      expect(mockPrismaService.appointment.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { serviceId: 'svc-1', status: 'PENDING' },
+        }),
+      );
+      // Only the PENDING one gets cancelled
+      expect(mockAdminAppointmentsService.updateStatus).toHaveBeenCalledTimes(1);
+      expect(mockAdminAppointmentsService.updateStatus).toHaveBeenCalledWith(
+        'apt-pending-1',
+        expect.objectContaining({ status: 'CANCELLED' }),
+      );
+    });
+
+    it('[RED] should not cascade when active is not being changed to false', async () => {
+      // Arrange
+      (fromUpdateAdminServiceDto as jest.Mock).mockReturnValue({ name: 'Just rename' });
+      mockServicesService.update.mockResolvedValue(prismaServiceFixture);
+      (toAdminServiceDto as jest.Mock).mockReturnValue(adminServiceDtoFixture);
+
+      // Act
+      await adminService.update('svc-1', { name: 'Just rename' });
+
+      // Assert — no appointment queries should be made
+      expect(mockPrismaService.appointment.findMany).not.toHaveBeenCalled();
+      expect(mockAdminAppointmentsService.updateStatus).not.toHaveBeenCalled();
+    });
+
+    it('[RED] should not cascade when service was already inactive', async () => {
+      // Arrange
+      const alreadyInactive = { ...prismaServiceFixture, isActive: false };
+      mockServicesService.findOne.mockResolvedValue(alreadyInactive);
+      mockServicesService.update.mockResolvedValue(alreadyInactive);
+      (toAdminServiceDto as jest.Mock).mockReturnValue({
+        ...adminServiceDtoFixture,
+        active: false,
+      });
+
+      // Act
+      await adminService.update('svc-1', { active: false });
+
+      // Assert
+      expect(mockPrismaService.appointment.findMany).not.toHaveBeenCalled();
+    });
+
+    it('[RED] should return cascade info in response', async () => {
+      // Arrange
+      mockPrismaService.appointment.findMany.mockResolvedValue([pendingAppointment]);
+      mockAdminAppointmentsService.updateStatus.mockResolvedValue({
+        id: 'apt-pending-1',
+        status: 'CANCELLED',
+        updatedAt: new Date(),
+      });
+      (toAdminServiceDto as jest.Mock).mockReturnValue({
+        ...adminServiceDtoFixture,
+        active: false,
+      });
+
+      // Act
+      const result: any = await adminService.update('svc-1', { active: false });
+
+      // Assert
+      expect(result.cascade).toBeDefined();
+      expect(result.cascade.cancelledCount).toBe(1);
+      expect(result.cascade.failedCount).toBe(0);
+    });
+  });
+
+  // ─── getAffectedAppointments ────────────────────────────────────────
+  describe('getAffectedAppointments', () => {
+    it('[RED] should return appointment counts for a service', async () => {
+      // Arrange
+      mockServicesService.findOne.mockResolvedValue(prismaServiceFixture);
+      mockPrismaService.appointment.count
+        .mockResolvedValueOnce(3)  // pending count
+        .mockResolvedValueOnce(5); // confirmed count
+
+      // Act
+      const result = await adminService.getAffectedAppointments('svc-1');
+
+      // Assert
+      expect(result).toEqual({
+        serviceName: 'Haircut',
+        pendingCount: 3,
+        confirmedCount: 5,
+        totalAffected: 8,
+      });
+    });
+
+    it('[RED] should return zeros when no appointments exist', async () => {
+      // Arrange
+      mockServicesService.findOne.mockResolvedValue(prismaServiceFixture2);
+      mockPrismaService.appointment.count
+        .mockResolvedValueOnce(0)
+        .mockResolvedValueOnce(0);
+
+      // Act
+      const result = await adminService.getAffectedAppointments('svc-2');
+
+      // Assert
+      expect(result).toEqual({
+        serviceName: 'Manicure',
+        pendingCount: 0,
+        confirmedCount: 0,
+        totalAffected: 0,
+      });
     });
   });
 });

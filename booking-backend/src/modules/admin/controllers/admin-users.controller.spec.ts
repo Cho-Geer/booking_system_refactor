@@ -1,15 +1,15 @@
-import { Test, TestingModule } from "@nestjs/testing";
-import { AdminUsersController } from "./admin-users.controller";
-import { AdminUsersService } from "../services/admin-users.service";
+import { Test, TestingModule } from '@nestjs/testing';
+import { AdminUsersController } from './admin-users.controller';
+import { AdminUsersService } from '../services/admin-users.service';
 import {
   AdminUsersQueryDto,
   CreateAdminUserDto,
   UpdateAdminUserDto,
   AdminUserDto,
-} from "../dto/admin-user.dto";
-import { PaginatedResponseDto, MetaDto } from "../../../common/dto/base.dto";
-import { JwtAuthGuard } from "../../../common/guards/jwt-auth.guard";
-import { RolesGuard } from "../../../common/guards/roles.guard";
+} from '../dto/admin-user.dto';
+import { PaginatedResponseDto, MetaDto } from '../../../common/dto/base.dto';
+import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../../../common/guards/roles.guard';
 
 // Mock AdminUsersService
 const mockAdminUsersService = {
@@ -20,7 +20,7 @@ const mockAdminUsersService = {
   remove: jest.fn(),
 };
 
-describe("AdminUsersController", () => {
+describe('AdminUsersController', () => {
   let controller: AdminUsersController;
   let service: typeof mockAdminUsersService;
 
@@ -50,23 +50,23 @@ describe("AdminUsersController", () => {
     jest.clearAllMocks();
   });
 
-  it("should be defined", () => {
+  it('should be defined', () => {
     expect(controller).toBeDefined();
   });
 
   // ============================================================
   // findAll
   // ============================================================
-  describe("GET /admin/users", () => {
-    it("should call service.findAll with query params and return paginated result", async () => {
+  describe('GET /admin/users', () => {
+    it('should call service.findAll with query params and return paginated result', async () => {
       const mockItems: AdminUserDto[] = [
         {
-          id: "user-1",
-          name: "John Doe",
-          email: "john@example.com",
-          role: "ADMIN",
-          status: "ACTIVE",
-          createdAt: new Date("2024-01-01"),
+          id: 'user-1',
+          name: 'John Doe',
+          email: 'john@example.com',
+          role: 'ADMIN',
+          status: 'ACTIVE',
+          createdAt: new Date('2024-01-01'),
         },
       ];
       const mockMeta: MetaDto = {
@@ -84,8 +84,8 @@ describe("AdminUsersController", () => {
       const query: AdminUsersQueryDto = {
         page: 1,
         limit: 20,
-        search: "john",
-        role: "ADMIN",
+        search: 'john',
+        role: 'ADMIN',
       };
       const result = await controller.findAll(query);
 
@@ -95,7 +95,7 @@ describe("AdminUsersController", () => {
       expect(result.meta.total).toBe(1);
     });
 
-    it("should call service.findAll with default empty query", async () => {
+    it('should call service.findAll with default empty query', async () => {
       const mockItems: AdminUserDto[] = [];
       const mockMeta: MetaDto = {
         total: 0,
@@ -123,22 +123,22 @@ describe("AdminUsersController", () => {
   // ============================================================
   // create
   // ============================================================
-  describe("POST /admin/users", () => {
-    it("should call service.create and return the created user", async () => {
+  describe('POST /admin/users', () => {
+    it('should call service.create and return the created user', async () => {
       const dto: CreateAdminUserDto = {
-        name: "New Admin",
-        email: "newadmin@example.com",
-        password: "SecurePass123!",
-        role: "ADMIN",
+        name: 'New Admin',
+        email: 'newadmin@example.com',
+        password: 'SecurePass123!',
+        role: 'ADMIN',
       };
 
       const createdUser: AdminUserDto = {
-        id: "new-user-1",
-        name: "New Admin",
-        email: "newadmin@example.com",
-        role: "ADMIN",
-        status: "ACTIVE",
-        createdAt: new Date("2024-01-01"),
+        id: 'new-user-1',
+        name: 'New Admin',
+        email: 'newadmin@example.com',
+        role: 'ADMIN',
+        status: 'ACTIVE',
+        createdAt: new Date('2024-01-01'),
       };
 
       mockAdminUsersService.create.mockResolvedValue(createdUser);
@@ -153,27 +153,27 @@ describe("AdminUsersController", () => {
   // ============================================================
   // update
   // ============================================================
-  describe("PUT /admin/users/:id", () => {
-    it("should call service.update and return the updated user", async () => {
+  describe('PUT /admin/users/:id', () => {
+    it('should call service.update and return the updated user', async () => {
       const dto: UpdateAdminUserDto = {
-        name: "Updated Admin",
-        role: "SUPER_ADMIN",
+        name: 'Updated Admin',
+        role: 'SUPER_ADMIN',
       };
 
       const updatedUser: AdminUserDto = {
-        id: "user-1",
-        name: "Updated Admin",
-        email: "john@example.com",
-        role: "SUPER_ADMIN",
-        status: "ACTIVE",
-        createdAt: new Date("2024-01-01"),
+        id: 'user-1',
+        name: 'Updated Admin',
+        email: 'john@example.com',
+        role: 'SUPER_ADMIN',
+        status: 'ACTIVE',
+        createdAt: new Date('2024-01-01'),
       };
 
       mockAdminUsersService.update.mockResolvedValue(updatedUser);
 
-      const result = await controller.update("user-1", dto);
+      const result = await controller.update('user-1', dto);
 
-      expect(service.update).toHaveBeenCalledWith("user-1", dto);
+      expect(service.update).toHaveBeenCalledWith('user-1', dto);
       expect(result).toEqual(updatedUser);
     });
   });
@@ -181,13 +181,13 @@ describe("AdminUsersController", () => {
   // ============================================================
   // remove
   // ============================================================
-  describe("DELETE /admin/users/:id", () => {
-    it("should call service.remove and return void (204)", async () => {
+  describe('DELETE /admin/users/:id', () => {
+    it('should call service.remove and return void (204)', async () => {
       mockAdminUsersService.remove.mockResolvedValue(undefined);
 
-      const result = await controller.remove("user-1");
+      const result = await controller.remove('user-1');
 
-      expect(service.remove).toHaveBeenCalledWith("user-1");
+      expect(service.remove).toHaveBeenCalledWith('user-1');
       expect(result).toBeUndefined();
     });
   });

@@ -69,10 +69,29 @@ describe('[R13] Admin Appointments', () => {
   async function createTestData() {
     const customerData = UserFactory.create({ email: `customer-apt-${Date.now()}@example.com` });
     const customer = await prisma.user.create({ data: customerData as any });
-    const category = await prisma.serviceCategory.create({ data: { name: `AptCat ${Date.now()}`, displayOrder: 1, isActive: true } });
-    const service = await prisma.service.create({ data: { categoryId: category.id, name: 'Apt Service', durationMinutes: 60, price: 100, isActive: true } });
+    const category = await prisma.serviceCategory.create({
+      data: { name: `AptCat ${Date.now()}`, displayOrder: 1, isActive: true },
+    });
+    const service = await prisma.service.create({
+      data: {
+        categoryId: category.id,
+        name: 'Apt Service',
+        durationMinutes: 60,
+        price: 100,
+        isActive: true,
+      },
+    });
     const startTime = new Date(Date.now() + 48 * 3600000);
-    const timeSlot = await prisma.timeSlot.create({ data: { serviceId: service.id, startTime, endTime: new Date(startTime.getTime() + 3600000), capacity: 5, currentSequence: 0, isActive: true } });
+    const timeSlot = await prisma.timeSlot.create({
+      data: {
+        serviceId: service.id,
+        startTime,
+        endTime: new Date(startTime.getTime() + 3600000),
+        capacity: 5,
+        currentSequence: 0,
+        isActive: true,
+      },
+    });
     return { customer, service, timeSlot, category };
   }
 
@@ -109,7 +128,12 @@ describe('[R13] Admin Appointments', () => {
       await request(app.getHttpServer())
         .post('/v1/admin/appointments')
         .set('Authorization', `Bearer ${customerToken}`)
-        .send({ userId: 'any', serviceId: 'any', timeSlotId: 'any', appointmentDate: new Date().toISOString() })
+        .send({
+          userId: 'any',
+          serviceId: 'any',
+          timeSlotId: 'any',
+          appointmentDate: new Date().toISOString(),
+        })
         .expect(403);
     });
   });
@@ -177,7 +201,10 @@ describe('[R13] Admin Appointments', () => {
 
     it('should transition CONFIRMED → COMPLETED', async () => {
       // First transition to CONFIRMED
-      await prisma.appointment.update({ where: { id: appointmentId }, data: { status: 'CONFIRMED' } });
+      await prisma.appointment.update({
+        where: { id: appointmentId },
+        data: { status: 'CONFIRMED' },
+      });
 
       const response = await request(app.getHttpServer())
         .put(`/v1/admin/appointments/${appointmentId}/status`)

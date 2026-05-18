@@ -1,9 +1,9 @@
-import { Module } from "@nestjs/common";
-import { APP_GUARD, APP_INTERCEPTOR } from "@nestjs/core";
-import { CacheModule } from "../cache/cache.module";
-import { RateLimiterService } from "./rate-limiter.service";
-import { RateLimitGuard } from "./rate-limiter.guard";
-import { RateLimitInterceptor } from "./rate-limiter.interceptor";
+import { Module } from '@nestjs/common';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { CacheModule } from '../cache/cache.module';
+import { RateLimiterService } from './rate-limiter.service';
+import { RateLimitGuard } from './rate-limiter.guard';
+import { RateLimitInterceptor } from './rate-limiter.interceptor';
 
 /**
  * Rate limiter module providing Redis-based distributed rate limiting.
