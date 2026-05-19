@@ -19,6 +19,13 @@ Object.defineProperty(window, 'MutationObserver', {
   configurable: true,
   value: MockMutationObserver,
 });
+// Mock IntersectionObserver (for @defer viewport triggers in JSDOM)
+Object.defineProperty(window, 'IntersectionObserver', {{
+  writable: true,
+  configurable: true,
+  value: class {{ observe() {{}} disconnect() {{}} }},
+}});
+
 
 // Mock HTMLCanvasElement for Chart.js in JSDOM
 Object.defineProperty(HTMLCanvasElement.prototype, 'getContext', {
@@ -56,7 +63,14 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { DashboardComponent } from './dashboard.component';
 import { AdminStore } from '../../stores/admin.store';
 import { AdminService } from '../../services/admin.service';
-import { AdminAppointment, AdminStats, AppointmentStatus, PaginatedResponse, StatCard, SystemHealth } from '../../dto/admin.dto';
+import {
+  AdminAppointment,
+  AdminStats,
+  AppointmentStatus,
+  PaginatedResponse,
+  StatCard,
+  SystemHealth,
+} from '../../dto/admin.dto';
 import { of, throwError } from 'rxjs';
 import { AppCardComponent } from '../../../../shared/components/atoms/app-card/app-card.component';
 import { AppBadgeComponent } from '../../../../shared/components/atoms/app-badge/app-badge.component';
@@ -71,8 +85,18 @@ describe('DashboardComponent', () => {
   let store: InstanceType<typeof AdminStore>;
   let mockAdminService: jest.Mocked<AdminService>;
 
-  const sc = (value: number, change = 0, positive = true, target = 1000, progressPct = 0): StatCard => ({
-    value, changePercentage: change, isPositive: positive, target, progressPercentage: progressPct,
+  const sc = (
+    value: number,
+    change = 0,
+    positive = true,
+    target = 1000,
+    progressPct = 0,
+  ): StatCard => ({
+    value,
+    changePercentage: change,
+    isPositive: positive,
+    target,
+    progressPercentage: progressPct,
   });
 
   const defaultStats: AdminStats = {
@@ -121,43 +145,118 @@ describe('DashboardComponent', () => {
 
   beforeEach(async () => {
     const mockSystemHealth: SystemHealth = {
-      server: 'Online', database: 'Online', api: 'Online',
-      lastBackup: 'Today, 02:15 AM', uptime: '99.9%',
+      server: 'Online',
+      database: 'Online',
+      api: 'Online',
+      lastBackup: 'Today, 02:15 AM',
+      uptime: '99.9%',
     };
 
     mockAdminService = {
       getStats: jest.fn().mockReturnValue(of(defaultStats)),
-      getUsers: jest.fn().mockReturnValue(of({
-        items: [
-          { id: 'u1', name: 'Alice Johnson', email: 'alice@example.com', phone: '+1234567890', role: 'CUSTOMER', status: 'ACTIVE', createdAt: '2026-01-01T00:00:00Z' },
-          { id: 'u2', name: 'Bob Smith', email: 'bob@example.com', phone: '+0987654321', role: 'ADMIN', status: 'ACTIVE', createdAt: '2026-01-02T00:00:00Z' },
-        ], total: 2, page: 1, limit: 5,
-      })),
+      getUsers: jest.fn().mockReturnValue(
+        of({
+          items: [
+            {
+              id: 'u1',
+              name: 'Alice Johnson',
+              email: 'alice@example.com',
+              phone: '+1234567890',
+              role: 'CUSTOMER',
+              status: 'ACTIVE',
+              createdAt: '2026-01-01T00:00:00Z',
+            },
+            {
+              id: 'u2',
+              name: 'Bob Smith',
+              email: 'bob@example.com',
+              phone: '+0987654321',
+              role: 'ADMIN',
+              status: 'ACTIVE',
+              createdAt: '2026-01-02T00:00:00Z',
+            },
+          ],
+          total: 2,
+          page: 1,
+          limit: 5,
+        }),
+      ),
       createUser: jest.fn(),
       updateUser: jest.fn(),
       deleteUser: jest.fn(),
-      getAdminServices: jest.fn().mockReturnValue(of({
-        items: [
-          { id: 'svc1', name: 'Haircut', description: 'Standard haircut service', duration: 30, price: 25, active: true, createdAt: '2026-01-01T00:00:00Z' },
-          { id: 'svc2', name: 'Massage', description: 'Full body massage', duration: 60, price: 60, active: true, createdAt: '2026-01-02T00:00:00Z' },
-        ], total: 2, page: 1, limit: 5,
-      })),
+      getAdminServices: jest.fn().mockReturnValue(
+        of({
+          items: [
+            {
+              id: 'svc1',
+              name: 'Haircut',
+              description: 'Standard haircut service',
+              duration: 30,
+              price: 25,
+              active: true,
+              createdAt: '2026-01-01T00:00:00Z',
+            },
+            {
+              id: 'svc2',
+              name: 'Massage',
+              description: 'Full body massage',
+              duration: 60,
+              price: 60,
+              active: true,
+              createdAt: '2026-01-02T00:00:00Z',
+            },
+          ],
+          total: 2,
+          page: 1,
+          limit: 5,
+        }),
+      ),
       createAdminService: jest.fn(),
       updateAdminService: jest.fn(),
       deleteAdminService: jest.fn(),
-      getAdminAppointments: jest.fn().mockReturnValue(of({
-        items: [
-          { id: '1', appointmentNumber: 'APT-001', userId: 'u1', userName: 'Alice Johnson', serviceId: 'svc1', serviceName: 'Haircut', timeSlotId: 'ts1', appointmentDate: '2026-05-06T14:00:00Z', status: 'CONFIRMED' as AppointmentStatus, createdAt: '2026-05-05T10:00:00Z' },
-          { id: '2', appointmentNumber: 'APT-002', userId: 'u2', userName: 'Bob Smith', serviceId: 'svc2', serviceName: 'Massage', timeSlotId: 'ts2', appointmentDate: '2026-05-06T15:00:00Z', status: 'PENDING' as AppointmentStatus, createdAt: '2026-05-05T11:00:00Z' },
-        ], total: 2, page: 1, limit: 5,
-      })),
+      getAdminAppointments: jest.fn().mockReturnValue(
+        of({
+          items: [
+            {
+              id: '1',
+              appointmentNumber: 'APT-001',
+              userId: 'u1',
+              userName: 'Alice Johnson',
+              serviceId: 'svc1',
+              serviceName: 'Haircut',
+              timeSlotId: 'ts1',
+              appointmentDate: '2026-05-06T14:00:00Z',
+              status: 'CONFIRMED' as AppointmentStatus,
+              createdAt: '2026-05-05T10:00:00Z',
+            },
+            {
+              id: '2',
+              appointmentNumber: 'APT-002',
+              userId: 'u2',
+              userName: 'Bob Smith',
+              serviceId: 'svc2',
+              serviceName: 'Massage',
+              timeSlotId: 'ts2',
+              appointmentDate: '2026-05-06T15:00:00Z',
+              status: 'PENDING' as AppointmentStatus,
+              createdAt: '2026-05-05T11:00:00Z',
+            },
+          ],
+          total: 2,
+          page: 1,
+          limit: 5,
+        }),
+      ),
       updateAppointmentStatus: jest.fn(),
       batchCancelAppointments: jest.fn(),
       getSystemStatus: jest.fn().mockReturnValue(of(mockSystemHealth)),
       getTimeDistribution: jest.fn(),
+      getBookingTrend: jest.fn(),
       getUnreadCount: jest.fn().mockReturnValue(of({ count: 0 })),
       getNotifications: jest.fn().mockReturnValue(of({ items: [], total: 0, page: 1, limit: 5 })),
-      getSystemMetrics: jest.fn().mockReturnValue(of({ cpuUsage: 0, memoryUsage: 0, diskUsage: 0 })),
+      getSystemMetrics: jest
+        .fn()
+        .mockReturnValue(of({ cpuUsage: 0, memoryUsage: 0, diskUsage: 0 })),
       markNotificationRead: jest.fn().mockReturnValue(of(undefined)),
     } as unknown as jest.Mocked<AdminService>;
 
@@ -171,6 +270,40 @@ describe('DashboardComponent', () => {
             'dashboard.revenue': 'Total Revenue',
             'dashboard.appointments': 'Recent Appointments',
             'dashboard.popularServices': 'Recent Services',
+            'stats.todayBookings': "Today's Bookings",
+            'stats.pendingBookings': 'Pending Confirmation',
+            'stats.activeUsers': 'Total Customers',
+            'stats.totalRevenue': 'Total Revenue',
+            'stats.target': 'Target',
+            'table.customer': 'Customer',
+            'table.service': 'Service',
+            'table.date': 'Date',
+            'table.status': 'Status',
+            'table.actions': 'Actions',
+            'recent.viewAll': 'View All',
+            'system.title': 'System Status',
+            'system.server': 'Server',
+            'system.database': 'Database',
+            'system.api': 'API',
+            'system.redis': 'Redis',
+            'system.lastBackup': 'Last Backup',
+            'system.uptime': 'Uptime',
+            'notifications.title': 'Notifications',
+            'notifications.empty': 'No notifications',
+            'distribution.title': 'Booking Distribution',
+            'distribution.services': 'Services',
+            'distribution.selectDateRange': 'Select Date Range',
+            'distribution.from': 'From',
+            'distribution.to': 'To',
+          },
+          global: {
+            'apply': 'Apply',
+            'cancel': 'Cancel',
+            'close': 'Close',
+            'search': 'Search...',
+            'toggleMenu': 'Toggle Menu',
+            'messages': 'Messages',
+            'settings': 'Settings',
           },
         };
         return translations?.[domain]?.[key] ?? `{{${domain}.${key}}}`;
@@ -220,9 +353,7 @@ describe('DashboardComponent', () => {
   });
 
   it('should handle error when loading stats', () => {
-    mockAdminService.getStats.mockReturnValue(
-      throwError(() => new Error('Failed to load'))
-    );
+    mockAdminService.getStats.mockReturnValue(throwError(() => new Error('Failed to load')));
     component['loadStats']();
     expect(store.error()).toBe('Failed to load');
   });
@@ -255,7 +386,7 @@ describe('DashboardComponent', () => {
       expect(cards.length).toBe(4);
     });
 
-    it('should display Today\'s Bookings card with value and trend', () => {
+    it("should display Today's Bookings card with value and trend", () => {
       const cards = fixture.debugElement.queryAll(By.css('app-stat-card'));
       const cardEl = cards[0].nativeElement;
       expect(cardEl.textContent).toContain("Today's Bookings");
@@ -410,8 +541,19 @@ describe('DashboardComponent', () => {
     it('should display Pending Confirmation label', () => {
       const cards = fixture.debugElement.queryAll(By.css('app-stat-card'));
       expect(cards.length).toBe(4);
-      const texts = cards.map(c => c.nativeElement.textContent);
-      expect(texts.some(t => t.includes('Pending Confirmation'))).toBe(true);
+      const texts = cards.map((c) => c.nativeElement.textContent);
+      expect(texts.some((t) => t.includes('Pending Confirmation'))).toBe(true);
+    });
+  });
+
+  // ==========================================
+  // NOTIFICATION BELL CONSOLIDATION (v1.7.2)
+  // ==========================================
+
+  describe('[RED] Notification bell consolidation', () => {
+    it('should NOT contain app-notification-bell in the dashboard after consolidation', () => {
+      const bell = fixture.debugElement.query(By.css('app-notification-bell'));
+      expect(bell).toBeFalsy();
     });
   });
 
@@ -445,6 +587,87 @@ describe('DashboardComponent', () => {
       fixture.detectChanges();
       const compiled = fixture.nativeElement;
       expect(compiled.textContent).not.toContain('APT-001');
+    });
+  });
+
+  // ==========================================
+  // [RED] BUG-1: Chart loaded flags (empty results should not fallback to stale stats)
+  // These tests will FAIL until dashboard.component.ts computed signals
+  // use the loaded* flags instead of the ?.length heuristic.
+  // ==========================================
+
+  describe('[RED] BUG-1: Chart data uses loaded flags, not ?.length heuristic', () => {
+    beforeEach(() => {
+      store.setStats(mockStats);
+      fixture.detectChanges();
+    });
+
+    it('[RED] should fail: store has loadedServicePopularity signal', () => {
+      expect(store.loadedServicePopularity).toBeDefined();
+    });
+
+    it('[RED] should fail: store has loadedBookingTrend signal', () => {
+      expect(store.loadedBookingTrend).toBeDefined();
+    });
+
+    it('[RED] should fail: store has loadedDistribution signal', () => {
+      expect(store.loadedDistribution).toBeDefined();
+    });
+
+    it('[RED] should fail: when loadedServicePopularity is true but data is empty, chart uses empty data not stats fallback', async () => {
+      // Given: stats have popular services (Haircut, Massage, Facial, Manicure)
+      expect(store.stats()?.servicePopularity?.length).toBe(4);
+
+      // When: loadDistributionByTimeRange returns empty arrays (legitimate empty result)
+      mockAdminService.getStats.mockReturnValue(
+        of({
+          servicePopularity: [],
+          timeDistribution: [],
+        } as any),
+      );
+      store.loadDistributionByTimeRange({} as any);
+      fixture.detectChanges();
+
+      // Then: loadedServicePopularity is true and servicePopularity is empty
+      expect(store.loadedServicePopularity()).toBe(true);
+      expect(store.servicePopularity()).toEqual([]);
+
+      // And: chart data should NOT fall back to stats servicePopularity
+      const chartData = component.servicePopularityChartData();
+      expect(chartData).toBeDefined();
+    });
+
+    it('[RED] should fail: when loadedBookingTrend is true but data is empty, chart does not use stale stats bookingTrend', async () => {
+      expect(store.stats()?.bookingTrend?.length).toBe(7);
+
+      mockAdminService.getBookingTrend.mockReturnValue(of([]));
+      await store.loadBookingTrend();
+      fixture.detectChanges();
+
+      expect(store.loadedBookingTrend()).toBe(true);
+      expect(store.bookingTrend()).toEqual([]);
+
+      const chartData = component.bookingTrendChartData();
+      expect(chartData).toBeDefined();
+    });
+
+    it('[RED] should fail: when loadedDistribution is true but data is empty, chart uses empty data', () => {
+      expect(store.stats()?.timeDistribution?.length).toBe(8);
+
+      mockAdminService.getStats.mockReturnValue(
+        of({
+          servicePopularity: [],
+          timeDistribution: [],
+        } as any),
+      );
+      store.loadDistributionByTimeRange({} as any);
+      fixture.detectChanges();
+
+      expect(store.loadedDistribution()).toBe(true);
+      expect(store.timeDistribution()).toEqual([]);
+
+      const chartData = component.timeDistributionChartData();
+      expect(chartData).toBeDefined();
     });
   });
 });

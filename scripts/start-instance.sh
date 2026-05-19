@@ -21,7 +21,6 @@ PG_PORT=$((5431 + N))
 REDIS_PORT=$((6378 + N))
 BACKEND_PORT=$((2999 + N))
 FRONTEND_PORT=$((4199 + N))
-SOCKET_PORT=$((3000 + N))
 
 DB_NAME="booking_db_${INSTANCE_ID}"
 CONTAINER_PREFIX="booking-${INSTANCE_ID}"
@@ -35,7 +34,6 @@ echo "  PostgreSQL: ${PG_PORT}"
 echo "  Redis:      ${REDIS_PORT}"
 echo "  Backend:    ${BACKEND_PORT}"
 echo "  Frontend:   ${FRONTEND_PORT}"
-echo "  Socket:     ${SOCKET_PORT}"
 
 mkdir -p "${INSTANCE_DIR}"
 
@@ -84,7 +82,6 @@ services:
       - backend.env
     environment:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/${DB_NAME}?schema=public
-      REDIS_URL: redis://redis:6379
       REDIS_HOST: redis
       REDIS_PORT: 6379
     ports:
@@ -99,7 +96,7 @@ services:
         condition: service_healthy
     networks:
       - ${NETWORK_NAME}
-    command: npm run start:dev
+    command: sh -c 'npx prisma migrate deploy && (npx prisma db seed || true) && npm run start:dev'
 
 volumes:
   ${VOLUME_PREFIX}-postgres-data:
@@ -116,15 +113,16 @@ NODE_ENV=development
 BACKEND_ENV_EOF
 echo "PORT=${BACKEND_PORT}" >> "${INSTANCE_DIR}/backend.env"
 echo "DATABASE_URL=postgresql://postgres:postgres@localhost:${PG_PORT}/${DB_NAME}?schema=public" >> "${INSTANCE_DIR}/backend.env"
-echo "REDIS_URL=redis://localhost:${REDIS_PORT}" >> "${INSTANCE_DIR}/backend.env"
 echo "REDIS_HOST=localhost" >> "${INSTANCE_DIR}/backend.env"
 echo "REDIS_PORT=${REDIS_PORT}" >> "${INSTANCE_DIR}/backend.env"
+echo "REDIS_KEY_PREFIX=booking-${INSTANCE_ID}:" >> "${INSTANCE_DIR}/backend.env"
 echo "JWT_SECRET=dev-secret-${INSTANCE_ID}" >> "${INSTANCE_DIR}/backend.env"
+# NOTE: JWT_EXPIRATION overrides the default 15-minute access token lifetime
 echo "JWT_EXPIRATION=1h" >> "${INSTANCE_DIR}/backend.env"
 echo "JWT_REFRESH_SECRET=dev-refresh-secret-${INSTANCE_ID}" >> "${INSTANCE_DIR}/backend.env"
+# NOTE: JWT_REFRESH_EXPIRATION overrides the default 7-day refresh token lifetime
 echo "JWT_REFRESH_EXPIRATION=7d" >> "${INSTANCE_DIR}/backend.env"
 echo "CORS_ORIGIN=http://localhost:${FRONTEND_PORT}" >> "${INSTANCE_DIR}/backend.env"
-echo "SOCKET_PORT=${SOCKET_PORT}" >> "${INSTANCE_DIR}/backend.env"
 {
   echo "SMTP_HOST=smtp.gmail.com"
   echo "SMTP_PORT=587"
@@ -149,7 +147,7 @@ cat > "${INSTANCE_DIR}/proxy.conf.json" << PROXY_EOF
     }
   },
   "/socket.io": {
-    "target": "http://localhost:${SOCKET_PORT}",
+    "target": "http://localhost:${BACKEND_PORT}",
     "ws": true,
     "logLevel": "debug"
   }
@@ -161,7 +159,7 @@ cat > "${INSTANCE_DIR}/environment.ts" << ENV_TS_EOF
 export const environment = {
   production: false,
   apiUrl: 'http://localhost:${BACKEND_PORT}/v1',
-  socketUrl: 'http://localhost:${SOCKET_PORT}',
+  socketUrl: 'http://localhost:${BACKEND_PORT}',
 };
 ENV_TS_EOF
 echo "  OK instances/${INSTANCE_ID}/environment.ts"
@@ -170,7 +168,7 @@ cat > "${INSTANCE_DIR}/environment.prod.ts" << ENV_PROD_TS_EOF
 export const environment = {
   production: true,
   apiUrl: 'http://localhost:${BACKEND_PORT}/v1',
-  socketUrl: 'http://localhost:${SOCKET_PORT}',
+  socketUrl: 'http://localhost:${BACKEND_PORT}',
 };
 ENV_PROD_TS_EOF
 echo "  OK instances/${INSTANCE_ID}/environment.prod.ts"
@@ -187,4 +185,4 @@ echo "  cd ${PROJECT_ROOT}/booking-backend"
 echo "  PII_HASH_PEPPER=dev-pepper-${INSTANCE_ID} DATABASE_URL=\"postgresql://postgres:postgres@localhost:${PG_PORT}/${DB_NAME}?schema=public\" npm run prisma:seed"
 echo ""
 echo "To start the frontend (separate terminal):"
-echo "  cd ${PROJECT_ROOT}/booking-frontend && npx ng serve --port=${FRONTEND_PORT} --proxyConfig=../instances/${INSTANCE_ID}/proxy.conf.json"
+echo "  cd ${PROJECT_ROOT}/booking-frontend && npx ng serve --port=${FRONTEND_PORT} --proxyConfig=../instances/${INSTANCE_ID}/proxy.conf.json --fileReplacements=src/environments/environment.ts:../instances/${INSTANCE_ID}/environment.ts"

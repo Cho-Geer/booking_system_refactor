@@ -17,14 +17,23 @@ import { BookingTrendItem, ServicePopularityItem, TimeDistributionItem } from '.
 
 export function buildBookingTrendChartData(trend: BookingTrendItem[]): ChartData {
   if (trend.length === 0) {
-    return { labels: [], datasets: [{ label: 'Bookings', data: [] }, { label: 'Revenue ($)', data: [] }] };
+    return {
+      labels: [],
+      datasets: [
+        { label: 'Bookings', data: [] },
+        { label: 'Revenue ($)', data: [] },
+      ],
+    };
   }
   return {
-    labels: trend.map(t => { const d = new Date(t.date); return d.toLocaleDateString('en-US', { weekday: 'short' }); }),
+    labels: trend.map((t) => {
+      const d = new Date(t.date);
+      return d.toLocaleDateString('en-US', { weekday: 'short' });
+    }),
     datasets: [
       {
         label: 'Bookings',
-        data: trend.map(t => t.count),
+        data: trend.map((t) => t.count),
         borderColor: '#2ecc71',
         backgroundColor: (context: any) => {
           const { chart } = context;
@@ -35,17 +44,25 @@ export function buildBookingTrendChartData(trend: BookingTrendItem[]): ChartData
           gradient.addColorStop(1, 'rgba(46, 204, 113, 0.35)');
           return gradient;
         },
-        fill: true, tension: 0.4, borderWidth: 2, pointRadius: 3, pointHoverRadius: 5,
+        fill: true,
+        tension: 0.4,
+        borderWidth: 2,
+        pointRadius: 3,
+        pointHoverRadius: 5,
         pointBackgroundColor: '#2ecc71',
         pointBorderColor: '#fff',
         pointBorderWidth: 2,
       },
       {
         label: 'Revenue ($)',
-        data: trend.map(t => t.revenue ?? 0),
+        data: trend.map((t) => t.revenue ?? 0),
         borderColor: '#2ecc71',
         backgroundColor: 'rgba(46, 204, 113, 0.1)',
-        fill: true, tension: 0.4, borderWidth: 2, pointRadius: 3, pointHoverRadius: 5,
+        fill: true,
+        tension: 0.4,
+        borderWidth: 2,
+        pointRadius: 3,
+        pointHoverRadius: 5,
         pointBackgroundColor: '#2ecc71',
         pointBorderColor: '#fff',
         pointBorderWidth: 2,
@@ -56,30 +73,35 @@ export function buildBookingTrendChartData(trend: BookingTrendItem[]): ChartData
 }
 
 export const BOOKING_TREND_CHART_OPTIONS: ChartOptions = {
-  responsive: true, maintainAspectRatio: false,
+  responsive: true,
+  maintainAspectRatio: false,
   plugins: {
     legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 6, color: '#94a3b8' } }, // --color-text-secondary
     tooltip: {
-      mode: 'index', intersect: false,
+      mode: 'index',
+      intersect: false,
       backgroundColor: 'rgba(22, 32, 50, 0.9)', // --color-bg-secondary @ 0.9
-      titleColor: '#e2e8f0',                    // --color-text-primary
-      bodyColor: '#94a3b8',                     // --color-text-secondary
-      borderColor: 'rgba(42, 58, 80, 0.5)',    // --color-border @ 0.5
-      borderWidth: 1, padding: 10, usePointStyle: true,
+      titleColor: '#e2e8f0', // --color-text-primary
+      bodyColor: '#94a3b8', // --color-text-secondary
+      borderColor: 'rgba(42, 58, 80, 0.5)', // --color-border @ 0.5
+      borderWidth: 1,
+      padding: 10,
+      usePointStyle: true,
     },
   },
   scales: {
     x: {
-      grid: { color: 'rgba(42, 58, 80, 0.2)' },  // --color-border @ 0.2
-      ticks: { color: '#94a3b8' },                 // --color-text-secondary
+      grid: { color: 'rgba(42, 58, 80, 0.2)' }, // --color-border @ 0.2
+      ticks: { color: '#94a3b8' }, // --color-text-secondary
     },
     y: {
       beginAtZero: true,
-      grid: { color: 'rgba(42, 58, 80, 0.2)' },  // --color-border @ 0.2
-      ticks: { color: '#94a3b8' },                 // --color-text-secondary
+      grid: { color: 'rgba(42, 58, 80, 0.2)' }, // --color-border @ 0.2
+      ticks: { color: '#94a3b8' }, // --color-text-secondary
     },
     y1: {
-      beginAtZero: true, position: 'right',
+      beginAtZero: true,
+      position: 'right',
       grid: { display: false },
       ticks: { color: '#94a3b8', callback: (val: any) => '$' + val }, // --color-text-secondary
     },
@@ -92,18 +114,22 @@ export function buildServicePopularityChartData(pop: ServicePopularityItem[]): C
     return { labels: [], datasets: [{ data: [] }] };
   }
   return {
-    labels: pop.map(p => p.serviceName),
-    datasets: [{
-      data: pop.map(p => p.count),
-      backgroundColor: [
-        '#2ecc71',  // --color-accent-green
-        '#9b59b6',  // --color-accent-purple
-        '#2ecc71',  // --color-accent-green / --color-success
-        '#f39c12',  // --color-accent-yellow / --color-warning
-        '#e74c3c',  // --color-accent-red / --color-danger
-      ],
-      borderWidth: 0, hoverOffset: 4,
-    }],
+    labels: pop.map((p) => p.serviceName),
+    datasets: [
+      {
+        data: pop.map((p) => p.count),
+        backgroundColor: [
+          '#2ecc71', // --color-accent-green    (1st)
+          '#9b59b6', // --color-accent-purple   (2nd)
+          '#1abc9c', // --color-accent-teal     (3rd)
+          '#f39c12', // --color-accent-yellow   (4th)
+          '#e74c3c', // --color-accent-red      (5th)
+          '#00c6ff', // --color-accent-blue     (6th)
+        ],
+        borderWidth: 0,
+        hoverOffset: 4,
+      },
+    ],
   };
 }
 
@@ -144,7 +170,7 @@ export const centerTextPlugin = {
     ctx.fillText('Bookings', centerX, centerY + 14);
 
     ctx.restore();
-  }
+  },
 };
 
 export const barDataLabelsPlugin = {
@@ -173,13 +199,15 @@ export const barDataLabelsPlugin = {
     });
 
     ctx.restore();
-  }
+  },
 };
 
 Chart.register(centerTextPlugin, barDataLabelsPlugin);
 
 export const DOUGHNUT_CHART_OPTIONS: ChartOptions = {
-  responsive: true, maintainAspectRatio: false, cutout: '70%',
+  responsive: true,
+  maintainAspectRatio: false,
+  cutout: '70%',
   plugins: {
     legend: {
       position: 'bottom',
@@ -187,10 +215,12 @@ export const DOUGHNUT_CHART_OPTIONS: ChartOptions = {
     },
     tooltip: {
       backgroundColor: 'rgba(22, 32, 50, 0.9)', // --color-bg-secondary @ 0.9
-      titleColor: '#e2e8f0',                    // --color-text-primary
-      bodyColor: '#94a3b8',                     // --color-text-secondary
-      borderColor: 'rgba(42, 58, 80, 0.5)',    // --color-border @ 0.5
-      borderWidth: 1, padding: 10, usePointStyle: true,
+      titleColor: '#e2e8f0', // --color-text-primary
+      bodyColor: '#94a3b8', // --color-text-secondary
+      borderColor: 'rgba(42, 58, 80, 0.5)', // --color-border @ 0.5
+      borderWidth: 1,
+      padding: 10,
+      usePointStyle: true,
     },
     centerText: true as any,
   },
@@ -201,27 +231,34 @@ export function buildTimeDistributionChartData(td: TimeDistributionItem[]): Char
     return { labels: [], datasets: [{ label: 'Bookings', data: [] }] };
   }
   return {
-    labels: td.map(t => t.hour),
-    datasets: [{
-      label: 'Bookings',
-      data: td.map(t => t.count),
-      backgroundColor: 'rgba(46, 204, 113, 0.7)', // --color-accent-green @ 0.7
-      borderColor: '#2ecc71',                    // --color-accent-green
-      borderWidth: 1, borderRadius: 0, barThickness: 12,
-    }],
+    labels: td.map((t) => t.hour),
+    datasets: [
+      {
+        label: 'Bookings',
+        data: td.map((t) => t.count),
+        backgroundColor: 'rgba(46, 204, 113, 0.7)', // --color-accent-green @ 0.7
+        borderColor: '#2ecc71', // --color-accent-green
+        borderWidth: 1,
+        borderRadius: 0,
+        barThickness: 12,
+      },
+    ],
   };
 }
 
 export const BAR_CHART_OPTIONS: ChartOptions = {
-  responsive: true, maintainAspectRatio: false,
+  responsive: true,
+  maintainAspectRatio: false,
   plugins: {
     legend: { display: false },
     tooltip: {
       backgroundColor: 'rgba(22, 32, 50, 0.9)', // --color-bg-secondary @ 0.9
-      titleColor: '#e2e8f0',                    // --color-text-primary
-      bodyColor: '#94a3b8',                     // --color-text-secondary
-      borderColor: 'rgba(42, 58, 80, 0.5)',    // --color-border @ 0.5
-      borderWidth: 1, padding: 10, usePointStyle: true,
+      titleColor: '#e2e8f0', // --color-text-primary
+      bodyColor: '#94a3b8', // --color-text-secondary
+      borderColor: 'rgba(42, 58, 80, 0.5)', // --color-border @ 0.5
+      borderWidth: 1,
+      padding: 10,
+      usePointStyle: true,
     },
   },
   scales: {
@@ -231,7 +268,7 @@ export const BAR_CHART_OPTIONS: ChartOptions = {
     },
     y: {
       beginAtZero: true,
-      grid: { color: 'rgba(42, 58, 80, 0.2)' },  // --color-border @ 0.2
+      grid: { color: 'rgba(42, 58, 80, 0.2)' }, // --color-border @ 0.2
       ticks: { color: '#94a3b8', font: { size: 10 } }, // --color-text-secondary
     },
   },

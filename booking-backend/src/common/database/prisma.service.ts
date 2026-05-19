@@ -1,16 +1,19 @@
 import { PrismaClient } from '@prisma/client';
 import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(PrismaService.name);
 
-  constructor() {
-    // Force database URL from environment at runtime
+  constructor(private readonly configService: ConfigService) {
+    // Force database URL from ConfigService at runtime,
+    // falling back to process.env for backward compatibility
+    const databaseUrl = configService.get<string>('DATABASE_URL');
     super({
       datasources: {
         db: {
-          url: process.env.DATABASE_URL,
+          url: databaseUrl,
         },
       },
     });
@@ -20,7 +23,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
    * Initialize the Prisma client connection when the module is loaded.
    */
   async onModuleInit() {
-    const dbUrl = process.env.DATABASE_URL;
+    const dbUrl = this.configService.get<string>('DATABASE_URL');
     if (!dbUrl) {
       this.logger.warn('DATABASE_URL is not set');
     } else if (process.env.NODE_ENV !== 'production') {

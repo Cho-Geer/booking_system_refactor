@@ -5,6 +5,7 @@ import {
   ConflictException,
   Logger,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../../common/database/prisma.service';
 import { UserStatus, SystemRole } from '@prisma/client';
@@ -67,6 +68,7 @@ export class AuthService {
     private readonly cacheService: CacheService,
     private readonly encryptionService: EncryptionService,
     private readonly hashService: HashService,
+    private readonly configService: ConfigService,
   ) {
     this.validateJwtSecrets();
   }
@@ -623,6 +625,8 @@ export class AuthService {
 
     // Access Token Payload（移除 email，符合 NIST SP 800-63B 最小化原则）
     const permissions = this.getPermissionsForRole(user.role);
+    const accessTokenExpiration: string | number =
+      this.configService.get<string>('JWT_EXPIRATION') ?? ACCESS_TOKEN_EXPIRES_IN_SECONDS;
     const accessToken = this.jwtService.sign(
       {
         sub: user.id,
@@ -632,11 +636,13 @@ export class AuthService {
       },
       {
         secret: process.env.JWT_SECRET!,
-        expiresIn: ACCESS_TOKEN_EXPIRES_IN_SECONDS,
+        expiresIn: accessTokenExpiration as any,
       },
     );
 
     // Refresh Token Payload
+    const refreshTokenExpiration: string | number =
+      this.configService.get<string>('JWT_REFRESH_EXPIRATION') ?? REFRESH_TOKEN_EXPIRES_IN_SECONDS;
     const refreshToken = this.jwtService.sign(
       {
         sub: user.id,
@@ -645,7 +651,7 @@ export class AuthService {
       },
       {
         secret: process.env.JWT_REFRESH_SECRET!,
-        expiresIn: REFRESH_TOKEN_EXPIRES_IN_SECONDS,
+        expiresIn: refreshTokenExpiration as any,
       },
     );
 

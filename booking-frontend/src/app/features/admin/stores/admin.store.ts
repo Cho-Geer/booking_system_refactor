@@ -1,6 +1,7 @@
 import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
 import { computed, inject } from '@angular/core';
-import { lastValueFrom } from 'rxjs';
+import { lastValueFrom, pipe, switchMap, tap } from 'rxjs';
+import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import {
   AdminStats,
   AdminUser,
@@ -74,9 +75,21 @@ export interface AdminState {
   // Notifications
   unreadCount: number;
 
+  // Loaded flags (BUG-1: distinguish "not yet loaded" from "loaded but empty")
+  loadedServicePopularity: boolean;
+  loadedBookingTrend: boolean;
+  loadedDistribution: boolean;
+
   // UI state
   isLoading: boolean;
   error: string | null;
+}
+
+/** Parameters for loadDistributionByTimeRange with rxMethod */
+export interface TimeRangeParams {
+  timeRange?: TimeRange;
+  startDate?: string;
+  endDate?: string;
 }
 
 export const initialAdminState: AdminState = {
@@ -101,6 +114,11 @@ export const initialAdminState: AdminState = {
   appointmentsTotal: 0,
   appointmentsPage: 1,
   unreadCount: 0,
+  // Loaded flags: default to false (data not yet fetched)
+  loadedServicePopularity: false,
+  loadedBookingTrend: false,
+  loadedDistribution: false,
+
   isLoading: false,
   error: null,
 };
@@ -108,7 +126,7 @@ export const initialAdminState: AdminState = {
 export const AdminStore = signalStore(
   { providedIn: 'root' },
   withState<AdminState>(initialAdminState),
-  withComputed(({ isLoading, error, stats, servicePopularity, bookingTrend, timeDistribution, systemHealth, users, usersTotal, usersPage, recentUsers, allUsersForStats, services, servicesTotal, servicesPage, recentServices, servicesSummary, allServicesForStats, allAppointmentsForStats, appointments, appointmentsTotal, appointmentsPage, unreadCount }) => ({
+  withComputed(({ isLoading, error, stats, servicePopularity, bookingTrend, timeDistribution, loadedServicePopularity, loadedBookingTrend, loadedDistribution, systemHealth, users, usersTotal, usersPage, recentUsers, allUsersForStats, services, servicesTotal, servicesPage, recentServices, servicesSummary, allServicesForStats, allAppointmentsForStats, appointments, appointmentsTotal, appointmentsPage, unreadCount }) => ({
     vm: computed(() => ({
       isLoading: isLoading(),
       error: error(),
@@ -133,6 +151,9 @@ export const AdminStore = signalStore(
       appointmentsTotal: appointmentsTotal(),
       appointmentsPage: appointmentsPage(),
       unreadCount: unreadCount(),
+      loadedServicePopularity: loadedServicePopularity(),
+      loadedBookingTrend: loadedBookingTrend(),
+      loadedDistribution: loadedDistribution(),
     })),
     hasError: computed(() => error() !== null),
   })),
@@ -147,18 +168,32 @@ export const AdminStore = signalStore(
 
     /**
      * Load servicePopularity + timeDistribution from DASH-001 filtered by time range.
+     * Uses rxMethod + switchMap to cancel previous in-flight request when a new
+     * time range is selected, preventing race conditions on rapid Time filter clicks.
      * Patches isolated state fields so only distribution panel charts reload.
      */
-    async loadDistributionByTimeRange(timeRange?: TimeRange, startDate?: string, endDate?: string): Promise<void> {
-      patchState(store, { error: null });
-      try {
-        const stats = await lastValueFrom(adminService.getStats(timeRange, startDate, endDate));
-        patchState(store, { servicePopularity: stats.servicePopularity, timeDistribution: stats.timeDistribution });
-      } catch (err) {
-        const message = err instanceof Error ? err.message : 'Failed to load distribution data';
-        patchState(store, { error: message });
-      }
-    },
+    loadDistributionByTimeRange: rxMethod<TimeRangeParams>(
+      pipe(
+        tap(() => patchState(store, { error: null })),
+        switchMap(({ timeRange, startDate, endDate }) =>
+          adminService.getStats(timeRange, startDate, endDate).pipe(
+            tap({
+              next: (stats) =>
+                patchState(store, {
+                  servicePopularity: stats.servicePopularity,
+                  timeDistribution: stats.timeDistribution,
+                  loadedServicePopularity: true,
+                  loadedDistribution: true,
+                }),
+              error: (err) => {
+                const message = err instanceof Error ? err.message : 'Failed to load distribution data';
+                patchState(store, { error: message });
+              },
+            }),
+          ),
+        ),
+      ),
+    ),
 
     /**
      * Load bookingTrend data (DASH-002 standalone endpoint) filtered by time range.
@@ -168,7 +203,7 @@ export const AdminStore = signalStore(
       patchState(store, { error: null });
       try {
         const data = await lastValueFrom(adminService.getBookingTrend(timeRange));
-        patchState(store, { bookingTrend: data });
+        patchState(store, { bookingTrend: data, loadedBookingTrend: true });
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Failed to load booking trend';
         patchState(store, { error: message });
@@ -191,7 +226,7 @@ export const AdminStore = signalStore(
       patchState(store, { error: null });
       try {
         const data = await lastValueFrom(adminService.getTimeDistribution(timeRange, startDate, endDate));
-        patchState(store, { timeDistribution: data });
+        patchState(store, { timeDistribution: data, loadedDistribution: true });
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Failed to load time distribution';
         patchState(store, { error: message });

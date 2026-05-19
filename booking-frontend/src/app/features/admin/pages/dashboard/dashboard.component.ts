@@ -2,11 +2,25 @@ import { Component, computed, inject, OnInit, OnDestroy, signal } from '@angular
 import { Router } from '@angular/router';
 import { AdminStore } from '../../stores/admin.store';
 import { AdminService } from '../../services/admin.service';
-import { StatCard, SystemHealthDetail, TimeRange, TimeRangeSelection, BookingTableRow, RecentUserRow, RecentServiceRow } from '../../dto/admin.dto';
+import {
+  StatCard,
+  SystemHealthDetail,
+  TimeRange,
+  TimeRangeSelection,
+  BookingTableRow,
+  RecentUserRow,
+  RecentServiceRow,
+} from '../../dto/admin.dto';
 import { getInitials, getInitialsBg, mapStatus } from '../../shared/admin-utils';
-import { buildBookingTrendChartData, BOOKING_TREND_CHART_OPTIONS, buildServicePopularityChartData, DOUGHNUT_CHART_OPTIONS, buildTimeDistributionChartData, BAR_CHART_OPTIONS } from '../../shared/dashboard-chart-factories';
+import {
+  buildBookingTrendChartData,
+  BOOKING_TREND_CHART_OPTIONS,
+  buildServicePopularityChartData,
+  DOUGHNUT_CHART_OPTIONS,
+  buildTimeDistributionChartData,
+  BAR_CHART_OPTIONS,
+} from '../../shared/dashboard-chart-factories';
 import { WelcomeCardComponent } from '../../organisms/welcome-card/welcome-card.component';
-import { NotificationBellComponent } from '../../molecules/notification-bell/notification-bell.component';
 import { StatsCardsRowComponent } from '../../organisms/stats-cards-row/stats-cards-row.component';
 import { ChartsSectionComponent } from '../../organisms/charts-section/charts-section.component';
 import { RecentBookingsPanelComponent } from '../../organisms/recent-bookings-panel/recent-bookings-panel.component';
@@ -20,8 +34,13 @@ import { Subscription, interval, lastValueFrom } from 'rxjs';
   selector: 'app-dashboard',
   standalone: true,
   imports: [
-    WelcomeCardComponent, NotificationBellComponent, StatsCardsRowComponent, ChartsSectionComponent,
-    RecentBookingsPanelComponent, RecentUsersPanelComponent, RecentServicesPanelComponent, SystemStatusPanelComponent,
+    WelcomeCardComponent,
+    StatsCardsRowComponent,
+    ChartsSectionComponent,
+    RecentBookingsPanelComponent,
+    RecentUsersPanelComponent,
+    RecentServicesPanelComponent,
+    SystemStatusPanelComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
@@ -48,25 +67,65 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const revenueSC = s?.totalRevenue;
     if (!s) return [];
     return [
-      { label: 'admin.stats.todayBookings', value: todaySC?.value ?? 0, icon: 'pi pi-calendar', iconBg: 'bg-accent-green/10', iconColor: 'text-accent-green', ...this.formatTrend(todaySC, '0%', true), progress: todaySC?.progressPercentage ?? 0, target: todaySC?.target ?? 0, color: 'from-accent-green to-accent-green-dark' },
-      { label: 'admin.stats.pendingBookings', value: pendingSC?.value ?? 0, icon: 'pi pi-clock', iconBg: 'bg-accent-yellow/10', iconColor: 'text-accent-yellow', ...this.formatTrend(pendingSC, '0%', false), progress: pendingSC?.progressPercentage ?? 0, target: pendingSC?.target ?? 0, color: 'from-accent-yellow to-accent-orange' },
-      { label: 'admin.stats.activeUsers', value: activeSC?.value ?? 0, icon: 'pi pi-users', iconBg: 'bg-accent-green/10', iconColor: 'text-accent-green', ...this.formatTrend(activeSC, '0%', true), progress: activeSC?.progressPercentage ?? 0, target: activeSC?.target ?? 0, color: 'from-accent-green to-green-700' },
-      { label: 'admin.stats.totalRevenue', value: revenueSC?.value ?? 0, icon: 'pi pi-dollar', iconBg: 'bg-accent-purple/10', iconColor: 'text-accent-purple', ...this.formatTrend(revenueSC, '0%', true), progress: revenueSC?.progressPercentage ?? 0, target: revenueSC?.target ?? 0, color: 'from-accent-purple to-purple-800' },
+      {
+        label: 'admin.stats.todayBookings',
+        value: todaySC?.value ?? 0,
+        icon: 'pi pi-calendar',
+        iconBg: 'bg-accent-green/10',
+        iconColor: 'text-accent-green',
+        ...this.formatTrend(todaySC, '0%', true),
+        progress: todaySC?.progressPercentage ?? 0,
+        target: todaySC?.target ?? 0,
+        color: 'from-accent-green to-accent-green-dark',
+      },
+      {
+        label: 'admin.stats.pendingBookings',
+        value: pendingSC?.value ?? 0,
+        icon: 'pi pi-clock',
+        iconBg: 'bg-accent-yellow/10',
+        iconColor: 'text-accent-yellow',
+        ...this.formatTrend(pendingSC, '0%', false),
+        progress: pendingSC?.progressPercentage ?? 0,
+        target: pendingSC?.target ?? 0,
+        color: 'from-accent-yellow to-accent-orange',
+      },
+      {
+        label: 'admin.stats.activeUsers',
+        value: activeSC?.value ?? 0,
+        icon: 'pi pi-users',
+        iconBg: 'bg-accent-green/10',
+        iconColor: 'text-accent-green',
+        ...this.formatTrend(activeSC, '0%', true),
+        progress: activeSC?.progressPercentage ?? 0,
+        target: activeSC?.target ?? 0,
+        color: 'from-accent-green to-green-700',
+      },
+      {
+        label: 'admin.stats.totalRevenue',
+        value: revenueSC?.value ?? 0,
+        icon: 'pi pi-dollar',
+        iconBg: 'bg-accent-purple/10',
+        iconColor: 'text-accent-purple',
+        ...this.formatTrend(revenueSC, '0%', true),
+        progress: revenueSC?.progressPercentage ?? 0,
+        target: revenueSC?.target ?? 0,
+        color: 'from-accent-purple to-purple-800',
+      },
     ];
   });
 
   readonly bookingTrendChartData = computed(() => {
-    const bt = this.store.bookingTrend()?.length ? this.store.bookingTrend() : this.store.stats()?.bookingTrend ?? [];
+    const bt = this.store.loadedBookingTrend() ? this.store.bookingTrend() : this.store.stats()?.bookingTrend ?? [];
     return buildBookingTrendChartData(bt);
   });
   readonly bookingTrendChartOptions = BOOKING_TREND_CHART_OPTIONS;
   readonly servicePopularityChartData = computed(() => {
-    const sp = this.store.servicePopularity()?.length ? this.store.servicePopularity() : this.store.stats()?.servicePopularity ?? [];
+    const sp = this.store.loadedServicePopularity() ? this.store.servicePopularity() : this.store.stats()?.servicePopularity ?? [];
     return buildServicePopularityChartData(sp);
   });
   readonly doughnutOptions = DOUGHNUT_CHART_OPTIONS;
   readonly timeDistributionChartData = computed(() => {
-    const td = this.store.timeDistribution()?.length ? this.store.timeDistribution() : this.store.stats()?.timeDistribution ?? [];
+    const td = this.store.loadedDistribution() ? this.store.timeDistribution() : this.store.stats()?.timeDistribution ?? [];
     return buildTimeDistributionChartData(td);
   });
   readonly barOptions = BAR_CHART_OPTIONS;
@@ -75,10 +134,26 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const h = this.vm().systemHealth;
     if (!h) return [];
     return [
-      { label: 'admin.system.server', status: h.server, color: h.server === 'Online' ? 'text-accent-green' : 'text-accent-red' },
-      { label: 'admin.system.database', status: h.database, color: h.database === 'Online' ? 'text-accent-green' : 'text-accent-red' },
-      { label: 'admin.system.api', status: h.api, color: h.api === 'Online' ? 'text-accent-green' : 'text-accent-red' },
-      { label: 'admin.system.redis', status: h.redis, color: h.redis === 'Online' ? 'text-accent-green' : 'text-accent-red' },
+      {
+        label: 'admin.system.server',
+        status: h.server,
+        color: h.server === 'Online' ? 'text-accent-green' : 'text-accent-red',
+      },
+      {
+        label: 'admin.system.database',
+        status: h.database,
+        color: h.database === 'Online' ? 'text-accent-green' : 'text-accent-red',
+      },
+      {
+        label: 'admin.system.api',
+        status: h.api,
+        color: h.api === 'Online' ? 'text-accent-green' : 'text-accent-red',
+      },
+      {
+        label: 'admin.system.redis',
+        status: h.redis,
+        color: h.redis === 'Online' ? 'text-accent-green' : 'text-accent-red',
+      },
       { label: 'admin.system.lastBackup', status: h.lastBackup, color: 'text-text-secondary' },
       { label: 'admin.system.uptime', status: h.uptime, color: 'text-text-secondary' },
     ];
@@ -90,23 +165,28 @@ export class DashboardComponent implements OnInit, OnDestroy {
   });
 
   readonly bookingRows = computed<BookingTableRow[]>(() =>
-    this.recentBookings().map(b => ({ booking: b, initials: getInitials(b.userName), initialsBg: getInitialsBg(b.userName), statusBadge: mapStatus(b.status) }))
+    this.recentBookings().map((b) => ({
+      booking: b,
+      initials: getInitials(b.userName),
+      initialsBg: getInitialsBg(b.userName),
+      statusBadge: mapStatus(b.status),
+    })),
   );
 
   readonly recentUsersRows = computed<RecentUserRow[]>(() =>
-    (this.vm().recentUsers ?? []).map(u => ({
+    (this.vm().recentUsers ?? []).map((u) => ({
       user: u,
       initials: getInitials(u.name),
       initialsBg: getInitialsBg(u.name),
       roleBadge: u.role === 'CUSTOMER' ? 'confirmed' : 'pending',
-    }))
+    })),
   );
 
   readonly recentServicesRows = computed<RecentServiceRow[]>(() =>
-    (this.vm().recentServices ?? []).map(s => ({
+    (this.vm().recentServices ?? []).map((s) => ({
       service: s,
       statusBadge: s.active ? 'confirmed' : 'cancelled',
-    }))
+    })),
   );
 
   ngOnInit(): void {
@@ -129,11 +209,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   onTimeRangeChange(selection: TimeRangeSelection): void {
     this.timeRange.set(selection.timeRange);
-    this.store.loadDistributionByTimeRange(selection.timeRange, selection.startDate, selection.endDate);
+    this.store.loadDistributionByTimeRange({
+      timeRange: selection.timeRange,
+      startDate: selection.startDate,
+      endDate: selection.endDate,
+    });
   }
 
   onPeriodChange(period: 'weekly' | 'monthly' | 'yearly'): void {
-    const rangeMap: Record<string, TimeRange> = { weekly: 'last7d', monthly: 'last30d', yearly: 'lastMonth' };
+    const rangeMap: Record<string, TimeRange> = {
+      weekly: 'last7d',
+      monthly: 'last30d',
+      yearly: 'lastMonth',
+    };
     this.store.loadBookingTrend(rangeMap[period]);
   }
 
@@ -152,7 +240,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  private formatTrend(sc: StatCard | undefined, fallback: string, fallbackUp: boolean): { trend: string; trendUp: boolean } {
+  private formatTrend(
+    sc: StatCard | undefined,
+    fallback: string,
+    fallbackUp: boolean,
+  ): { trend: string; trendUp: boolean } {
     if (!sc) return { trend: fallback, trendUp: fallbackUp };
     const sign = sc.isPositive ? '+' : '';
     return { trend: `${sign}${sc.changePercentage}%`, trendUp: sc.isPositive };
@@ -160,21 +252,22 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private loadRecentBookings(): void {
     this.adminService.getAdminAppointments({ limit: 5, page: 1 }).subscribe({
-      next: response => this.store.setAppointments(response.items, response.meta.total, response.meta.page),
+      next: (response) =>
+        this.store.setAppointments(response.items, response.meta.total, response.meta.page),
       error: () => {},
     });
   }
 
   private loadRecentUsers(): void {
     this.adminService.getUsers({ limit: 5, page: 1 }).subscribe({
-      next: response => this.store.setRecentUsers(response.items),
+      next: (response) => this.store.setRecentUsers(response.items),
       error: () => {},
     });
   }
 
   private loadRecentServices(): void {
     this.adminService.getAdminServices({ limit: 5, page: 1 }).subscribe({
-      next: response => this.store.setRecentServices(response.items),
+      next: (response) => this.store.setRecentServices(response.items),
       error: () => {},
     });
   }
@@ -182,14 +275,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private loadStats(timeRange?: TimeRange): void {
     this.store.setLoading(true);
     this.adminService.getStats(timeRange).subscribe({
-      next: stats => { this.store.setStats(stats); this.store.setLoading(false); },
-      error: err => { this.store.setError(err.message ?? 'Failed to load stats'); },
+      next: (stats) => {
+        this.store.setStats(stats);
+        this.store.setLoading(false);
+      },
+      error: (err) => {
+        this.store.setError(err.message ?? 'Failed to load stats');
+      },
     });
   }
 
   private loadSystemStatus(): void {
     this.adminService.getSystemStatus().subscribe({
-      next: health => { this.store.setSystemHealth(health); },
+      next: (health) => {
+        this.store.setSystemHealth(health);
+      },
       error: () => {},
     });
   }
@@ -211,12 +311,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   private setupAppointmentAutoRefresh(): void {
-    this.appointmentSubscription = this.socketService.subscribeToAppointmentStatusChanges().subscribe(() => {
-      this.loadStats(this.timeRange());
-      this.loadRecentBookings();
-      this.loadRecentUsers();
-      this.loadRecentServices();
-    });
+    this.appointmentSubscription = this.socketService
+      .subscribeToAppointmentStatusChanges()
+      .subscribe(() => {
+        this.loadStats(this.timeRange());
+        this.loadRecentBookings();
+        this.loadRecentUsers();
+        this.loadRecentServices();
+      });
   }
 
   private startPolling(): void {

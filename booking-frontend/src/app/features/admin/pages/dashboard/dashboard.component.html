@@ -1,12 +1,5 @@
 <div class="space-y-6">
-  <div class="flex items-start justify-between gap-4">
-    <div class="flex-1">
-      <app-welcome-card [today]="today" />
-    </div>
-    <div class="flex-shrink-0 mt-2">
-      <app-notification-bell />
-    </div>
-  </div>
+  <app-welcome-card [today]="today" />
 
   @if (vm().isLoading) {
     <div class="flex justify-center py-12">
@@ -30,9 +23,15 @@
     />
 
     <div class="grid grid-cols-1 gap-5">
-      <app-recent-bookings-panel [rows]="bookingRows()" (rowClick)="navigateTo('/admin/appointments')" />
+      <app-recent-bookings-panel
+        [rows]="bookingRows()"
+        (rowClick)="navigateTo('/admin/appointments')"
+      />
       <app-recent-users-panel [rows]="recentUsersRows()" (rowClick)="navigateTo('/admin/users')" />
-      <app-recent-services-panel [rows]="recentServicesRows()" (rowClick)="navigateTo('/admin/services')" />
+      <app-recent-services-panel
+        [rows]="recentServicesRows()"
+        (rowClick)="navigateTo('/admin/services')"
+      />
     </div>
 
     <div class="grid grid-cols-1 gap-5">

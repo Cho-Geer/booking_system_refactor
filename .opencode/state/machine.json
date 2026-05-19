@@ -4,7 +4,7 @@
     "version": "3.0.0",
     "project": "appointment-booking-system",
     "description": "v3.0.0: 五维状态追踪（类型检查/架构边界/格式化/Write-Time审计/安全）。双防线：Write-Time即时阻断 + Commit-Time全量扫描。强制16项约束规则。",
-    "lastUpdated": "2026-05-17T15:17:32.203Z"
+    "lastUpdated": "2026-05-18T07:33:07.054Z"
   },
   "feature_flags": {
     "write_time_audit": {
@@ -71,7 +71,19 @@
         "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/booking_system_refactor/booking_system_refactor/booking-frontend/src/app/features/admin/services/admin.service.spec.ts",
         "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/booking_system_refactor/booking_system_refactor/booking-frontend/src/app/features/admin/pages/appointment-management/appointment-management.component.spec.ts",
         "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/booking_system_refactor/booking-frontend/src/app/features/admin/pages/appointment-management/appointment-management.component.spec.ts",
-        "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/booking_system_refactor/booking-frontend/src/app/features/admin/pages/appointment-management/appointment-management.component.spec.ts"
+        "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/booking_system_refactor/booking-frontend/src/app/features/admin/pages/appointment-management/appointment-management.component.spec.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking-frontend/src/app/features/admin/pages/dashboard/dashboard.component.spec.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking_system_refactor/booking-frontend/src/app/features/admin/pages/dashboard/dashboard.component.spec.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking-frontend/src/app/shared/components/layouts/app-header/app-header.component.spec.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking-frontend/src/app/features/admin/pages/dashboard/dashboard.component.spec.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking_system_refactor/booking-frontend/src/app/shared/components/layouts/app-header/app-header.component.spec.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking_system_refactor/booking-frontend/src/app/features/admin/pages/dashboard/dashboard.component.spec.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking-frontend/src/app/features/admin/stores/admin.store.spec.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking-frontend/src/app/features/admin/pages/dashboard/dashboard.component.spec.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking_system_refactor/booking-frontend/src/app/features/admin/stores/admin.store.spec.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking_system_refactor/booking-frontend/src/app/features/admin/pages/dashboard/dashboard.component.spec.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking_system_refactor/booking-backend/src/common/database/prisma.service.spec.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking_system_refactor/booking-backend/src/modules/auth/auth.service.spec.ts"
       ],
       "initialized": true
     },
@@ -258,22 +270,65 @@
         "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/booking_system_refactor/booking-frontend/src/app/features/admin/pages/appointment-management/appointment-management.component.spec.ts",
         "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/booking_system_refactor/booking-frontend/src/app/features/admin/pages/appointment-management/appointment-management.component.ts",
         "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/booking_system_refactor/booking-frontend/src/app/features/admin/pages/appointment-management/appointment-management.component.spec.ts",
-        "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/booking_system_refactor/booking_system_refactor/booking-backend/src/modules/admin/controllers/admin-services.controller.ts"
+        "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/booking_system_refactor/booking_system_refactor/booking-backend/src/modules/admin/controllers/admin-services.controller.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking-frontend/src/app/features/admin/pages/dashboard/dashboard.component.spec.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking_system_refactor/booking-frontend/src/app/features/admin/pages/dashboard/dashboard.component.spec.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking-frontend/src/app/shared/components/layouts/app-header/app-header.component.html",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking-frontend/src/app/shared/components/layouts/app-header/app-header.component.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking-frontend/src/app/shared/components/layouts/app-header/app-header.component.spec.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking-frontend/src/app/features/admin/pages/dashboard/dashboard.component.html",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking-frontend/src/app/features/admin/pages/dashboard/dashboard.component.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking-frontend/src/app/features/admin/pages/dashboard/dashboard.component.spec.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking-frontend/src/app/features/admin/shared/dashboard-chart-factories.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking_system_refactor/booking-frontend/src/app/features/admin/shared/dashboard-chart-factories.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking_system_refactor/booking-frontend/src/app/shared/components/layouts/app-header/app-header.component.html",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking_system_refactor/booking-frontend/src/app/shared/components/layouts/app-header/app-header.component.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking_system_refactor/booking-frontend/src/app/shared/components/layouts/app-header/app-header.component.spec.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking_system_refactor/booking-frontend/src/app/features/admin/pages/dashboard/dashboard.component.html",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking_system_refactor/booking-frontend/src/app/features/admin/pages/dashboard/dashboard.component.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking_system_refactor/booking-frontend/src/app/features/admin/pages/dashboard/dashboard.component.spec.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking-frontend/src/app/features/admin/stores/admin.store.spec.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking-frontend/src/app/features/admin/pages/dashboard/dashboard.component.spec.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking_system_refactor/booking-frontend/src/app/features/admin/stores/admin.store.spec.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking_system_refactor/booking-frontend/src/app/features/admin/pages/dashboard/dashboard.component.spec.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking_system_refactor/booking-frontend/src/app/features/admin/stores/admin.store.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking_system_refactor/booking-frontend/src/app/features/admin/pages/dashboard/dashboard.component.ts",
+        "/home/zhaoge/workspace/opencode/work-one/docs/design/chart-js-token-map.md",
+        "/home/zhaoge/workspace/opencode/work-one/docs/design/chart-js-token-map.md",
+        "/home/zhaoge/workspace/opencode/work-one/docs/design/chart-js-token-map.md",
+        "/home/zhaoge/workspace/opencode/work-one/docs/design/chart-js-token-map.md",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking_system_refactor/booking-frontend/src/app/features/admin/stores/admin.store.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking_system_refactor/booking-frontend/src/app/features/admin/pages/dashboard/dashboard.component.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking_system_refactor/booking-frontend/src/app/features/admin/stores/admin.store.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking_system_refactor/booking-frontend/src/app/features/admin/pages/dashboard/dashboard.component.ts",
+        "/home/zhaoge/workspace/opencode/work-one/.task_temp/_global/multi-instance-audit-report.md",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking_system_refactor/booking-backend/src/common/database/prisma.service.spec.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking_system_refactor/booking-backend/src/modules/auth/auth.service.spec.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking_system_refactor/booking-frontend/src/environments/environment.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking_system_refactor/booking-frontend/proxy.conf.json",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking_system_refactor/scripts/start-instance.sh",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking_system_refactor/booking-frontend/angular.json",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking_system_refactor/scripts/start-instance.sh",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking_system_refactor/booking-backend/src/common/database/prisma.service.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking_system_refactor/booking-backend/src/modules/auth/auth.service.ts",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking_system_refactor/scripts/start-instance.sh",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking_system_refactor/booking-frontend/proxy.conf.json",
+        "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking_system_refactor/booking-backend/docker-compose.test.yml"
       ],
-      "checks_run": 123,
-      "checks_passed": 56,
-      "checks_failed": 67,
-      "violations_found": 67,
+      "checks_run": 166,
+      "checks_passed": 82,
+      "checks_failed": 84,
+      "violations_found": 84,
       "violations_resolved": 0,
-      "scope_violations_attempted": 37
+      "scope_violations_attempted": 54
     },
     "history": []
   },
   "type_check_state": {
     "$comment": "TypeScript 类型检查结果，Write-Time 增量 + Commit-Time 全量",
-    "last_incremental_check": "2026-05-17T15:17:32.202Z",
+    "last_incremental_check": "2026-05-18T07:32:01.080Z",
     "last_full_check": "2026-05-17T04:32:16.484Z",
-    "incremental_errors": 38,
+    "incremental_errors": 46,
     "full_errors": 2,
     "dirty_files": [
       "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/booking_system_refactor/booking-backend/src/modules/time-slots/time-slots.service.ts",
@@ -313,21 +368,29 @@
       "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/booking_system_refactor/booking-frontend/src/app/features/admin/pages/appointment-management/appointment-management.component.spec.ts",
       "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/booking_system_refactor/booking-frontend/src/app/features/admin/dto/admin.dto.ts",
       "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/booking_system_refactor/booking-frontend/src/app/features/admin/pages/appointment-management/appointment-management.component.ts",
-      "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/booking_system_refactor/booking-frontend/src/app/features/admin/pages/appointment-management/appointment-management.component.spec.ts"
+      "/home/zhaoge/workspace/opencode/Playground2.backup.20260426_012219/booking_system_refactor/booking-frontend/src/app/features/admin/pages/appointment-management/appointment-management.component.spec.ts",
+      "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking-frontend/src/app/features/admin/pages/dashboard/dashboard.component.spec.ts",
+      "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking-frontend/src/app/shared/components/layouts/app-header/app-header.component.ts",
+      "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking-frontend/src/app/shared/components/layouts/app-header/app-header.component.spec.ts",
+      "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking-frontend/src/app/features/admin/pages/dashboard/dashboard.component.ts",
+      "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking-frontend/src/app/features/admin/pages/dashboard/dashboard.component.spec.ts",
+      "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking-frontend/src/app/features/admin/shared/dashboard-chart-factories.ts",
+      "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking-frontend/src/app/features/admin/stores/admin.store.spec.ts",
+      "/home/zhaoge/workspace/opencode/work-one/booking_system_refactor/booking-frontend/src/app/features/admin/pages/dashboard/dashboard.component.spec.ts"
     ],
     "status": "dirty",
     "strict_mode": true
   },
   "dependency_state": {
     "$comment": "dependency-cruiser 扫描结果",
-    "last_check": "2026-05-17T15:17:32.203Z",
+    "last_check": "2026-05-18T07:32:01.080Z",
     "violations": [],
     "status": "clean",
-    "forbidden_rules_applied": 113
+    "forbidden_rules_applied": 156
   },
   "format_state": {
     "$comment": "Prettier 格式化检查结果",
-    "last_check": "2026-05-17T15:17:32.203Z",
+    "last_check": "2026-05-18T07:32:01.080Z",
     "unformatted_files": [
       ".opencode/state/gate-state.json",
       ".opencode/state/machine.json",
@@ -572,22 +635,22 @@
       "booking-backend/test/users.e2e-spec.ts",
       "contract.yaml"
     ],
-    "auto_fix_count": 25,
+    "auto_fix_count": 34,
     "status": "dirty"
   },
   "eslint_state": {
-    "last_full_scan": "2026-05-17T15:09:02.308Z",
+    "last_full_scan": "2026-05-18T07:33:07.054Z",
     "modules": {
       "all_modules": {
         "status": "clean",
         "violations": [],
-        "last_check": "2026-05-17T13:21:59.966Z",
+        "last_check": "2026-05-18T07:33:07.054Z",
         "waivers_applied": []
       },
       "unknown": {
         "status": "clean",
         "violations": [],
-        "last_check": "2026-05-17T15:09:02.308Z",
+        "last_check": "2026-05-18T04:46:07.654Z",
         "waivers_applied": []
       },
       "translations": {

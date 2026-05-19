@@ -13,6 +13,14 @@ import { TranslatePipe } from '../../../pipes/translate.pipe';
 })
 class StubThemeToggleComponent {}
 
+// Stub NotificationBellComponent
+@Component({
+  selector: 'app-notification-bell',
+  standalone: true,
+  template: '<div data-testid="notification-bell-stub">Notification Bell</div>',
+})
+class StubNotificationBellComponent {}
+
 describe('AppHeaderComponent', () => {
   let fixture: ComponentFixture<AppHeaderComponent>;
   let component: AppHeaderComponent;
@@ -46,7 +54,7 @@ describe('AppHeaderComponent', () => {
     })
       .overrideComponent(AppHeaderComponent, {
         set: {
-          imports: [StubThemeToggleComponent, TranslatePipe],
+          imports: [StubThemeToggleComponent, StubNotificationBellComponent, TranslatePipe],
         },
       })
       .compileComponents();
@@ -94,11 +102,30 @@ describe('AppHeaderComponent', () => {
     expect(component.navLinks()[1].label).toBe('Booking');
   });
 
-  it('should render notification badge with count', () => {
+  it('[Red] should render app-notification-bell when isAdmin is true', () => {
     setupDefaultInputs();
+    const bell = fixture.nativeElement.querySelector('[data-testid="notification-bell-stub"]');
+    expect(bell).toBeTruthy();
+    expect(bell.textContent).toContain('Notification Bell');
+  });
+
+  it('[Red] should render simple notification button when isAdmin is false', () => {
+    fixture.componentRef.setInput('navLinks', defaultNavLinks);
+    fixture.componentRef.setInput('userName', 'Test User');
+    fixture.componentRef.setInput('userRole', 'CUSTOMER');
+    fixture.componentRef.setInput('isAdmin', false);
+    fixture.componentRef.setInput('menuItems', defaultMenuItems);
+    fixture.componentRef.setInput('notificationCount', 5);
+    fixture.detectChanges();
+
+    // Stub should NOT be present for non-admin
+    const stub = fixture.nativeElement.querySelector('[data-testid="notification-bell-stub"]');
+    expect(stub).toBeFalsy();
+
+    // Simple badge should be present for non-admin
     const badge = fixture.nativeElement.querySelector('[data-testid="notification-badge"]');
     expect(badge).toBeTruthy();
-    expect(badge.textContent.trim()).toBe('3');
+    expect(badge.textContent.trim()).toBe('5');
   });
 
   it('should render user avatar and name', () => {
