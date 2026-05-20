@@ -70,10 +70,12 @@ export class AppModalComponent {
   /** Emitted when the dialog visibility changes. */
   readonly visibleChange = output<boolean>();
 
+  /** Computed style class with glass animation and size added. */
   get combinedStyleClass(): string {
     const base = this.styleClass() || '';
+    const animClass = 'animate-glass-in';
     const sizeClass = this.getSizeClass();
-    return [base, 'sharp-card', sizeClass].filter(Boolean).join(' ');
+    return [base, animClass, sizeClass].filter(Boolean).join(' ');
   }
 
   /** Get style class for modal size. */

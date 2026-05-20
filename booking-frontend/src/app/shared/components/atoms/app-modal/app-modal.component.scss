@@ -1,43 +1,23 @@
+/* AppModal - Atomic component wrapper for PrimeNG p-dialog */
+
+/* Glass-in animation for dialog open */
 :host ::ng-deep .p-dialog {
-  background: var(--color-bg-secondary, #162032);
-  border: 1px solid var(--color-border, #2a3a50);
-  border-radius: 8px;
-  color: var(--color-text-primary, #e2e8f0);
+  animation: var(--animate-glass-in, glassIn 300ms cubic-bezier(0.4, 0, 0.2, 1));
 }
 
-:host ::ng-deep .p-dialog-header {
-  background: transparent;
-  color: var(--color-text-primary, #e2e8f0);
-  border-bottom: 1px solid var(--color-border, #2a3a50);
-  padding: 1rem 1.25rem;
+/* Ensure glass animation also works through styleClass */
+.animate-glass-in {
+  animation: var(--animate-glass-in, glassIn 300ms cubic-bezier(0.4, 0, 0.2, 1));
 }
 
-:host ::ng-deep .p-dialog-content {
-  background: transparent;
-  color: var(--color-text-primary, #e2e8f0);
-  padding: 1rem 1.25rem;
-}
-
-:host ::ng-deep .p-dialog-footer {
-  background: transparent;
-  border-top: 1px solid var(--color-border, #2a3a50);
-  padding: 1rem 1.25rem;
-}
-
-:host ::ng-deep .p-dialog .p-dialog-header-icon {
-  color: var(--color-text-secondary, #94a3b8);
-}
-
-:host ::ng-deep .p-dialog .p-dialog-header-icon:hover {
-  color: #2ecc71;
-}
-
+/* Modal body with flex layout */
 .app-modal-body {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
+/* Modal footer with flex layout (responsive row reverse on mobile) */
 .app-modal-footer {
   display: flex;
   flex-direction: row-reverse;
@@ -45,39 +25,13 @@
   margin-top: 1.5rem;
 }
 
-/* Dialog form inputs: consistent hover/focus with green border + glow */
-:host ::ng-deep .p-inputtext,
-:host ::ng-deep .p-textarea,
-:host ::ng-deep .p-select,
-:host ::ng-deep .p-inputnumber,
-:host ::ng-deep .p-datepicker .p-datepicker-dropdown {
-  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
-}
-
-:host ::ng-deep .p-inputtext:enabled:hover,
-:host ::ng-deep .p-textarea:enabled:hover,
-:host ::ng-deep .p-select:not(.p-disabled):hover,
-:host ::ng-deep .p-inputnumber .p-inputtext:enabled:hover,
-:host ::ng-deep .p-datepicker .p-datepicker-dropdown:not(:disabled):hover {
-  border-color: var(--color-accent-green, #2ecc71) !important;
-}
-
-:host ::ng-deep .p-inputtext:enabled:focus,
-:host ::ng-deep .p-textarea:enabled:focus {
-  border-color: var(--color-accent-green, #2ecc71) !important;
-  box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.2) !important;
-}
-
-:host ::ng-deep .p-select:not(.p-disabled).p-focus {
-  border-color: var(--color-accent-green, #2ecc71) !important;
-  box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.2) !important;
-}
-
 @media (max-width: 640px) {
   .app-modal-footer {
     flex-direction: column-reverse;
   }
 }
+
+/* Modal size presets */
 :host ::ng-deep .app-modal--sm {
   width: 90vw !important;
   max-width: 400px !important;
@@ -98,3 +52,4 @@
   border-radius: 0 !important;
   margin: 0 !important;
 }
+

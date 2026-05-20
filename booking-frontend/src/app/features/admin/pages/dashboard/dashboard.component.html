@@ -1,51 +1,172 @@
 <div class="space-y-6">
-  <app-welcome-card [today]="today" />
+  <!-- Page Header -->
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+    <div>
+      <p class="text-sm text-text-secondary dashboard-date">{{ today | date:'longDate' }}</p>
+    </div>
+  </div>
 
+  <!-- Quick Actions -->
+  <div class="flex flex-wrap gap-3">
+    <app-button label="New Booking" variant="primary" icon="pi pi-plus"></app-button>
+    <app-button label="Add Service" variant="secondary" icon="pi pi-plus-circle"></app-button>
+    <app-button label="Manage Users" variant="secondary" icon="pi pi-users"></app-button>
+    <app-button label="View Reports" variant="ghost" icon="pi pi-chart-line"></app-button>
+  </div>
+
+  <!-- Loading State -->
   @if (vm().isLoading) {
     <div class="flex justify-center py-12">
-      <div class="loading-spinner"></div>
+      <i class="pi pi-spin pi-spinner text-4xl text-primary-500"></i>
     </div>
   }
 
   @if (!vm().isLoading && vm().stats) {
-    <app-stats-cards-row [cards]="statsCards()" />
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 w-full stats-grid">
+      <!-- Total Bookings -->
+      <app-card variant="elevated" styleClass="app-dashboard-card-hover">
+        <div class="flex items-center gap-4 p-2">
+          <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+            <i class="pi pi-calendar text-blue-600 text-xl"></i>
+          </div>
+          <div>
+            <p class="text-3xl font-bold text-text-primary">{{ vm().stats!.totalBookings | number }}</p>
+            <p class="text-sm text-text-secondary">Total Bookings</p>
+            <div class="flex items-center gap-1 mt-1 text-xs text-green-600">
+              <i class="pi pi-arrow-up"></i>
+              <span>+12% from last month</span>
+            </div>
+          </div>
+        </div>
+      </app-card>
 
-    <app-charts-section
-      [bookingTrendData]="bookingTrendChartData()"
-      [bookingTrendOptions]="bookingTrendChartOptions"
-      [doughnutData]="servicePopularityChartData()"
-      [barData]="timeDistributionChartData()"
-      [doughnutOptions]="doughnutOptions"
-      [barOptions]="barOptions"
-      [timeRange]="timeRange()"
-      (timeRangeChange)="onTimeRangeChange($event)"
-      (periodChange)="onPeriodChange($event)"
-    />
+      <!-- Today's Bookings -->
+      <app-card variant="elevated" styleClass="app-dashboard-card-hover">
+        <div class="flex items-center gap-4 p-2">
+          <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+            <i class="pi pi-clock text-green-600 text-xl"></i>
+          </div>
+          <div>
+            <p class="text-3xl font-bold text-text-primary">{{ vm().stats!.todayBookings | number }}</p>
+            <p class="text-sm text-text-secondary">Today's Bookings</p>
+            <div class="flex items-center gap-1 mt-1 text-xs text-green-600">
+              <i class="pi pi-arrow-up"></i>
+              <span>+5% from yesterday</span>
+            </div>
+          </div>
+        </div>
+      </app-card>
 
-    <div class="grid grid-cols-1 gap-5">
-      <app-recent-bookings-panel
-        [rows]="bookingRows()"
-        (rowClick)="navigateTo('/admin/appointments')"
-      />
-      <app-recent-users-panel [rows]="recentUsersRows()" (rowClick)="navigateTo('/admin/users')" />
-      <app-recent-services-panel
-        [rows]="recentServicesRows()"
-        (rowClick)="navigateTo('/admin/services')"
-      />
+      <!-- Active Users -->
+      <app-card variant="elevated" styleClass="app-dashboard-card-hover">
+        <div class="flex items-center gap-4 p-2">
+          <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
+            <i class="pi pi-users text-purple-600 text-xl"></i>
+          </div>
+          <div>
+            <p class="text-3xl font-bold text-text-primary">{{ vm().stats!.activeUsers | number }}</p>
+            <p class="text-sm text-text-secondary">Active Users</p>
+            <div class="flex items-center gap-1 mt-1 text-xs text-green-600">
+              <i class="pi pi-arrow-up"></i>
+              <span>+8% this week</span>
+            </div>
+          </div>
+        </div>
+      </app-card>
+
+      <!-- Total Revenue -->
+      <app-card variant="elevated" styleClass="app-dashboard-card-hover">
+        <div class="flex items-center gap-4 p-2">
+          <div class="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
+            <i class="pi pi-dollar text-amber-600 text-xl"></i>
+          </div>
+          <div>
+            <p class="text-3xl font-bold text-text-primary">{{ vm().stats!.totalRevenue | currency:'USD' }}</p>
+            <p class="text-sm text-text-secondary">Total Revenue</p>
+            <div class="flex items-center gap-1 mt-1 text-xs text-green-600">
+              <i class="pi pi-arrow-up"></i>
+              <span>+15% from last month</span>
+            </div>
+          </div>
+        </div>
+      </app-card>
     </div>
 
-    <div class="grid grid-cols-1 gap-5">
-      <app-system-status-panel
-        [statusItems]="systemStatus()"
-        [metrics]="systemMetrics()"
-        (expandChange)="onExpandSystemStatus()"
-      />
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+      <app-card header="Booking Trend (Last 7 Days)" variant="elevated">
+        @if (hasBookingTrendData()) {
+          <app-chart
+            type="line"
+            [data]="bookingTrendChartData()"
+            [options]="bookingTrendChartOptions"
+            height="300px"
+          ></app-chart>
+        } @else {
+          <div class="flex flex-col items-center justify-center py-12 text-text-secondary chart-container">
+            <i class="pi pi-chart-line text-4xl mb-4 opacity-50"></i>
+            <p>No booking data available</p>
+          </div>
+        }
+      </app-card>
+
+      <app-card header="Service Popularity" variant="elevated">
+        @if (hasServicePopularityData()) {
+          <app-chart
+            type="doughnut"
+            [data]="servicePopularityChartData()"
+            height="300px"
+          ></app-chart>
+        } @else {
+          <div class="flex flex-col items-center justify-center py-12 text-text-secondary chart-container">
+            <i class="pi pi-chart-pie text-4xl mb-4 opacity-50"></i>
+            <p>No service data available</p>
+          </div>
+        }
+      </app-card>
     </div>
+
+    <!-- Recent Bookings -->
+    <app-card header="Recent Bookings" subheader="Last 5 bookings" variant="elevated">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-border text-left text-text-secondary">
+              <th class="pb-4 font-medium">Service</th>
+              <th class="pb-4 font-medium">Customer</th>
+              <th class="pb-4 font-medium">Date</th>
+              <th class="pb-4 font-medium">Status</th>
+              <th class="pb-4 font-medium text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (booking of recentBookings(); track booking.id) {
+              <tr class="border-b border-border-light hover:bg-bg-secondary transition-colors">
+                <td class="py-4 text-text-primary font-medium">{{ booking.serviceName }}</td>
+                <td class="py-4 text-text-secondary">{{ booking.userName }}</td>
+                <td class="py-4 text-text-secondary">{{ booking.appointmentDate | date:'MMM d, y' }}</td>
+                <td class="py-4">
+                  <app-badge [status]="mapStatus(booking.status)"></app-badge>
+                </td>
+                <td class="py-4 text-right">
+                  <app-button label="View" variant="ghost" size="sm" icon="pi pi-eye"></app-button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="mt-6 text-right">
+        <a routerLink="/admin/appointments" class="text-primary-start text-sm hover:underline view-all-link">View All</a>
+      </div>
+    </app-card>
   }
 
+  <!-- Error State -->
   @if (vm().error) {
-    <div class="sharp-card p-5 bg-card-bg border-l-4 border-accent-red">
-      <p class="text-sm text-accent-red">{{ vm().error }}</p>
+    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+      {{ vm().error }}
     </div>
   }
 </div>
