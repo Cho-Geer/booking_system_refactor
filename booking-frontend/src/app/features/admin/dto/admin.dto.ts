@@ -59,7 +59,7 @@ export enum ContactType {
 }
 
 export interface SendCreateUserCodeRequest {
-  contact_type: ContactType;
+  contactType: ContactType;
   email?: string;
   phone?: string;
 }
@@ -86,7 +86,7 @@ export interface CreateAdminUserRequest {
   phone?: string;
   role: AdminUserRole;
   password?: string;
-  verification_code?: string;
+  verificationCode?: string;
 }
 
 export interface UpdateAdminUserRequest {

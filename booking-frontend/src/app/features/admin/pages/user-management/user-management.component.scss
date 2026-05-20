@@ -2,6 +2,65 @@
   display: block;
 }
 
+/* Step Indicator — theme-aware classes matching _auth-form.scss pattern */
+.step-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.step-number {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  background: var(--border-color, #e0e0e0);
+  color: var(--text-secondary, #666);
+  transition: all 0.3s ease;
+}
+
+.step.active .step-number,
+.step.completed .step-number {
+  background: var(--color-primary, #2ecc71);
+  color: #fff;
+}
+
+.step-connector {
+  width: 3rem;
+  height: 2px;
+  background: var(--border-color, #e0e0e0);
+  transition: all 0.3s ease;
+}
+
+.step-connector.completed {
+  background: var(--color-primary, #2ecc71);
+}
+
+.step-label {
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  color: var(--text-secondary, #666);
+  white-space: nowrap;
+  transition: all 0.3s ease;
+}
+
+.step.active .step-label {
+  color: var(--color-primary, #2ecc71);
+  font-weight: 600;
+}
+
 /* Table row hover and striped overrides */
 ::ng-deep .p-datatable .p-datatable-tbody > tr {
   transition: background-color 0.15s ease;
