@@ -1,9 +1,9 @@
-.notification-bell {
+.messages-dropdown {
   position: relative;
   display: inline-block;
 }
 
-.bell-button {
+.envelope-button {
   position: relative;
   width: 40px;
   height: 40px;
@@ -19,14 +19,14 @@
   }
 }
 
-.badge {
+.unread-badge {
   position: absolute;
   top: -4px;
   right: -4px;
   min-width: 18px;
   height: 18px;
   border-radius: 9px;
-  background: #ef4444;
+  background: #3b82f6;
   color: #fff;
   font-size: 10px;
   font-weight: 700;
@@ -77,12 +77,12 @@
   line-height: 1;
 }
 
-.notifications-list {
+.messages-list {
   overflow-y: auto;
   flex: 1;
 }
 
-.notification-item {
+.message-item {
   padding: 12px 16px;
   cursor: pointer;
   transition: background 0.15s;
@@ -90,11 +90,6 @@
 
   &:hover {
     background: var(--color-bg-secondary, #162032);
-  }
-
-  &.unread {
-    background: rgba(59, 130, 246, 0.05);
-    border-left: 3px solid #3b82f6;
   }
 }
 

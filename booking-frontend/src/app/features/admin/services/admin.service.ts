@@ -31,6 +31,7 @@ import {
   UnreadCount,
   SendCreateUserCodeRequest,
   SendCodeResponse,
+  MessageListResponse,
 } from '../dto/admin.dto';
 
 @Injectable({ providedIn: 'root' })
@@ -183,6 +184,23 @@ export class AdminService {
 
   getSystemMetrics(): Observable<SystemHealthDetail> {
     return this.http.get<ApiResponse<SystemHealthDetail>>(`${this.apiUrl}/admin/system/metrics`)
+      .pipe(map(response => response.data), catchError(this.handleError));
+  }
+
+  // ==========================================
+  // Messages (MSG-001)
+  // ==========================================
+
+  getMessages(page: number = 1, limit: number = 20): Observable<MessageListResponse> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('limit', limit.toString());
+    return this.http.get<ApiResponse<MessageListResponse>>(`${this.apiUrl}/admin/messages`, { params })
+      .pipe(map(response => response.data), catchError(this.handleError));
+  }
+
+  getMessageUnreadCount(): Observable<UnreadCount> {
+    return this.http.get<ApiResponse<UnreadCount>>(`${this.apiUrl}/admin/messages/unread-count`)
       .pipe(map(response => response.data), catchError(this.handleError));
   }
 

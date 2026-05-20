@@ -6748,6 +6748,401 @@
       "confirmed_at": null,
       "consumed_at": null,
       "audit": null
+    },
+    "cg_ses_1779154314205": {
+      "session_id": "cg_ses_1779154314205",
+      "created_at": "2026-05-19T01:31:54.207Z",
+      "task_description": "Dispatch Coder-BE to examine, fix, and verify TypeScript errors (TS2353) in booking-backend/src/modules/users/users.service.ts related to Prisma schema type mismatch for 'role' and 'preferredTimezone' fields during backend startup",
+      "gate_status": "failed",
+      "last_check_failed_items": [
+        {
+          "id": "agent_role_violation",
+          "desc": "CAT4.1: 1 unresolved role violations found in machine.json.compliance_records. Last: @Coder-BE wrote .opencode/scripts/framework-self-test.js",
+          "severity": "HIGH"
+        }
+      ],
+      "plan_summary": null,
+      "confirmed_at": null,
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1779154349323": {
+      "session_id": "cg_ses_1779154349323",
+      "created_at": "2026-05-19T01:32:29.323Z",
+      "task_description": "Dispatch Coder-BE to examine, fix, and verify TypeScript errors (TS2353) in booking-backend/src/modules/users/users.service.ts related to Prisma schema type mismatch for 'role' and 'preferredTimezone' fields during backend startup",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix TS2353 errors in users.service.ts by running prisma generate to sync Prisma client types, then verify with tsc",
+      "confirmed_at": "2026-05-19T01:37:23.762Z",
+      "consumed_at": "2026-05-19T01:40:18.647Z",
+      "audit": {
+        "execution_summary": "Dispatched Coder-BE to fix TS2353 errors in users.service.ts. Root cause: stale @prisma/client types. Fixed by running npx prisma generate. Zero TS2353 errors remaining. No source code changes needed.",
+        "completed_at": "2026-05-19T01:40:18.647Z"
+      }
+    },
+    "cg_ses_1779154720153": {
+      "session_id": "cg_ses_1779154720153",
+      "created_at": "2026-05-19T01:38:40.154Z",
+      "task_description": "Fix TypeScript TS2353 errors in booking-backend/src/modules/users/users.service.ts by running 'npx prisma generate' to regenerate @prisma/client types, then verify with 'npx tsc --noEmit'. The 'role' and 'preferredTimezone' fields exist in schema.prisma but generated types are stale.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix TS2353 in users.service.ts: run npx prisma generate to regenerate stale @prisma/client types, verify with npx tsc --noEmit. Root cause confirmed: role and preferredTimezone fields exist in schema.prisma but generated types are out of sync. No source code changes needed.",
+      "confirmed_at": "2026-05-19T01:39:11.285Z",
+      "consumed_at": "2026-05-19T01:39:54.281Z",
+      "audit": {
+        "execution_summary": "Fixed TS2353 errors in users.service.ts by running npx prisma generate to regenerate stale @prisma/client types. Prisma Client v6.19.3 regenerated successfully. tsc --noEmit confirmed 0 TS2353 errors. No source code was modified. Root cause: fields role and preferredTimezone exist in schema.prisma but generated types were stale. ESLint audit: 0 violations.",
+        "completed_at": "2026-05-19T01:39:54.281Z"
+      }
+    },
+    "cg_ses_1779157675202": {
+      "session_id": "cg_ses_1779157675202",
+      "created_at": "2026-05-19T02:27:55.203Z",
+      "task_description": "Investigate and fix notification panel close button and toggle behavior issues",
+      "gate_status": "armed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix notification panel not closing: RED phase (write failing tests) + GREEN phase (stopPropagation fix) + Guardian review",
+      "confirmed_at": "2026-05-19T02:47:14.725Z",
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1779159002830": {
+      "session_id": "cg_ses_1779159002830",
+      "created_at": "2026-05-19T02:50:02.830Z",
+      "task_description": "RED Phase: Write failing tests for notification-bell.component.ts - Create notification-bell.component.spec.ts with tests proving event propagation bug where clicking close button (X) or bell toggle does NOT close the dropdown panel. Tests must FAIL initially to prove the bug exists. No implementation changes.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "RED Phase: Write 4 failing tests for notification-bell dropdown event propagation bug. Create spec file only, no implementation changes. Test close button click, bell click, initial state, and toggleDropdown.",
+      "confirmed_at": "2026-05-19T02:50:25.836Z",
+      "consumed_at": "2026-05-19T02:52:23.349Z",
+      "audit": {
+        "execution_summary": "RED Phase: Wrote notification-bell.component.spec.ts with 4 tests for event propagation bug. Tests executed: 1 failed (close button click — bug confirmed), 3 passed. Exit code: 1 (expected for RED phase). No implementation files modified. ESLint audit: 0 violations.",
+        "completed_at": "2026-05-19T02:52:23.349Z"
+      }
+    },
+    "cg_ses_1779159235575": {
+      "session_id": "cg_ses_1779159235575",
+      "created_at": "2026-05-19T02:53:55.576Z",
+      "task_description": "GREEN Phase: Fix notification-bell.component.html event propagation by adding $event.stopPropagation() to close button and dropdown overlay click handlers to prevent event bubbling that re-opens dropdown after close",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "GREEN Phase: Fix notification-bell event propagation - add $event.stopPropagation() to close button, dropdown overlay, and dropdown panel to prevent click bubbling that re-opens dropdown after close",
+      "confirmed_at": "2026-05-19T02:54:59.207Z",
+      "consumed_at": "2026-05-19T02:56:21.361Z",
+      "audit": {
+        "execution_summary": "GREEN phase: Fixed notification-bell component event propagation bug by adding $event.stopPropagation() to close button (line 14), dropdown overlay (line 10), and dropdown panel (line 11). All 4 tests pass. ESLint audit: 0 violations.",
+        "completed_at": "2026-05-19T02:56:21.361Z"
+      }
+    },
+    "cg_ses_1779159493849": {
+      "session_id": "cg_ses_1779159493849",
+      "created_at": "2026-05-19T02:58:13.850Z",
+      "task_description": "Guardian review of notification-bell fix for compliance and quality: verify test execution evidence, code quality, TDD cycle, HANDOVER.md completeness, and produce PASS/FAIL verdict.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Guardian review of notification-bell fix: Layer A auto gate checks (8 checks PASS), proceed to Layer B manual review including test execution evidence verification, code quality scan, TDD cycle check, HANDOVER.md review, and final PASS/FAIL verdict.",
+      "confirmed_at": "2026-05-19T02:58:37.528Z",
+      "consumed_at": "2026-05-19T03:12:59.842Z",
+      "audit": {
+        "execution_summary": "Guardian review of notification-bell fix (FE-NOTIFICATION-BELL-FIX): Layer A auto gate (8/8 PASS), Layer B manual review (B1-B8 all PASS). ESLint audit passed (0 violations). Code quality: minimal, correct fix using $event.stopPropagation(). All 4 tests pass. Verdict: PASS.",
+        "completed_at": "2026-05-19T03:12:59.842Z"
+      }
+    },
+    "cg_ses_1779161207197": {
+      "session_id": "cg_ses_1779161207197",
+      "created_at": "2026-05-19T03:26:47.198Z",
+      "task_description": "Investigate and fix: 1) Add Confirm Password to Admin New User dialog, 2) Add password visibility toggle, 3) Fix save button behavior",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix 3 issues in Admin New User dialog: 1) Add Confirm Password field with validation, 2) Add password visibility toggle (eye/eye-slash icon), 3) Fix save button - move error display inside modal so API errors are visible and add isSaving state to prevent double-clicks",
+      "confirmed_at": "2026-05-19T04:30:21.758Z",
+      "consumed_at": "2026-05-19T04:57:41.924Z",
+      "audit": {
+        "execution_summary": "GREEN Phase complete: Fixed 3 issues in Admin New User dialog. 1) Added Confirm Password field with match validation. 2) Added password visibility toggle (eye/eye-slash) on both password fields. 3) Fixed save button - added isSaving state to prevent double-clicks, moved error display inside modal so API errors are visible. All 5 new tests pass (17/18 total, 1 pre-existing date-dependent failure). ESLint audit: 0 violations, clean state.",
+        "completed_at": "2026-05-19T04:57:41.924Z"
+      }
+    },
+    "cg_ses_1779165222414": {
+      "session_id": "cg_ses_1779165222414",
+      "created_at": "2026-05-19T04:33:42.426Z",
+      "task_description": "RED Phase: Write failing tests for Admin New User dialog in user-management.component.spec.ts - Add tests for Confirm Password field, password visibility toggle, password match validation, in-dialog error display, and loading state. Tests must fail initially proving bugs exist.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "RED Phase: Write 5 failing tests for Admin New User dialog - Confirm Password field, password visibility toggle, password match validation, in-dialog error display, loading state. Tests must fail initially. No business code changes.",
+      "confirmed_at": "2026-05-19T04:34:13.121Z",
+      "consumed_at": "2026-05-19T04:36:48.544Z",
+      "audit": {
+        "execution_summary": "RED Phase completed: Added 5 failing test cases to user-management.component.spec.ts covering Confirm Password field, password match validation, password visibility toggle, in-dialog API error display, and save button loading state. All 5 new tests fail as expected (exit_code=1). 12 pre-existing tests remain passing. ESLint audit: 0 violations.",
+        "completed_at": "2026-05-19T04:36:48.544Z"
+      }
+    },
+    "cg_ses_1779166289618": {
+      "session_id": "cg_ses_1779166289618",
+      "created_at": "2026-05-19T04:51:29.619Z",
+      "task_description": "GREEN Phase: Fix Admin New User dialog - implement Confirm Password, password visibility toggle, dialog error display, and save button loading state in user-management component (TypeScript + HTML)",
+      "gate_status": "armed",
+      "last_check_failed_items": [],
+      "plan_summary": "GREEN Phase: Implement confirm password field, password visibility toggles, dialog error display, and save button loading state in user-management component (TS + HTML)",
+      "confirmed_at": "2026-05-19T04:52:00.619Z",
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1779167756750": {
+      "session_id": "cg_ses_1779167756750",
+      "created_at": "2026-05-19T05:15:56.751Z",
+      "task_description": "Add missing translation keys admin.users.confirmPassword and admin.users.confirmPasswordPlaceholder to translation files",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Add missing translation keys admin.users.confirmPassword and admin.users.confirmPasswordPlaceholder to FALLBACK_MAP in translation.service.ts",
+      "confirmed_at": "2026-05-19T06:48:11.316Z",
+      "consumed_at": "2026-05-19T06:48:47.468Z",
+      "audit": {
+        "execution_summary": "Added missing translation keys admin.users.confirmPassword and admin.users.confirmPasswordPlaceholder to FALLBACK_MAP in translation.service.ts. Keys now resolve to 'Confirm Password' and 'Confirm password' respectively. ESLint audit: 0 violations. All tests pass (36/37, 1 pre-existing date-dependent failure).",
+        "completed_at": "2026-05-19T06:48:47.468Z"
+      }
+    },
+    "cg_ses_1779184115862": {
+      "session_id": "cg_ses_1779184115862",
+      "created_at": "2026-05-19T09:48:35.863Z",
+      "task_description": "Change notification icon style on navbar to align with envelope icon",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Change admin notification bell button style to align with envelope icon: remove border, remove solid background, change to rounded-lg, update icon color to text-text-secondary",
+      "confirmed_at": "2026-05-19T09:49:54.196Z",
+      "consumed_at": "2026-05-19T09:50:35.199Z",
+      "audit": {
+        "execution_summary": "Changed admin notification bell icon style to align with envelope icon: icon color from text-text-primary to text-text-secondary, button border-radius from 50% to 8px (rounded-lg), removed border and solid background, keeping transparent with hover effect. All 4 tests pass. ESLint audit: 0 violations.",
+        "completed_at": "2026-05-19T09:50:35.199Z"
+      }
+    },
+    "cg_ses_1779184590776": {
+      "session_id": "cg_ses_1779184590776",
+      "created_at": "2026-05-19T09:56:30.776Z",
+      "task_description": "Investigate and formulate a plan to add email/phone code verification feature to admin New User dialog form submission flow (like login page verification).",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Admin New User Verification Code Feature: 7 tasks (4 waves). Wave1: @Architect updates contract.yaml + repays WV-2026-005 tech debt. Wave2: @Coder-BE + @Coder-FE write TDD-RED tests. Wave3: @Coder-BE + @Coder-FE implement TDD-GREEN (send-code endpoint + 3-step verification UI). Wave4: @Guardian security/compliance review. All tasks follow contract.yaml as single source of truth. Verification flow mirrors existing login page pattern with anti-enumeration, rate limiting, 300s TTL, max 3 attempts.",
+      "confirmed_at": "2026-05-19T14:59:14.917Z",
+      "consumed_at": "2026-05-19T15:00:00.313Z",
+      "audit": {
+        "execution_summary": "@Meta-Planner completed planning phase: investigated login verification feature (Angular 17+ + NestJS), admin user management page (UserManagementComponent), and full backend API structure. Generated Project.graph (architecture overview, component responsibilities, data model changes, API changes, security design, tech-debt scan) and Task.DAG.json v1.0.0 (7 tasks across 4 parallel waves: contract update, TDD-RED tests, TDD-GREEN implementation, security review, and WV-2026-005 tech-debt repayment). No business code written — planning documents only.",
+        "completed_at": "2026-05-19T15:00:00.313Z"
+      }
+    },
+    "cg_ses_1779184743364": {
+      "session_id": "cg_ses_1779184743364",
+      "created_at": "2026-05-19T09:59:03.364Z",
+      "task_description": "Investigate why nothing happens when clicking the envelope icon on the navbar",
+      "gate_status": "checked",
+      "last_check_failed_items": [],
+      "plan_summary": null,
+      "confirmed_at": null,
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1779202953784": {
+      "session_id": "cg_ses_1779202953784",
+      "created_at": "2026-05-19T15:02:33.785Z",
+      "task_description": "Parse Task.DAG.json v1.0.0 and schedule all 7 tasks for Admin New User Verification Code feature. Waves: Wave1 parallel (T-ADMIN-VERIFY-001 + T-TECHDEBT-WV-005 to @Architect), Wave2 parallel (T-ADMIN-VERIFY-002 to @Coder-BE RED + T-ADMIN-VERIFY-004 to @Coder-FE RED), Wave3 parallel (T-ADMIN-VERIFY-003 to @Coder-BE GREEN + T-ADMIN-VERIFY-005 to @Coder-FE GREEN), Wave4 (T-ADMIN-VERIFY-006 to @Guardian). All tasks must follow contract.yaml as single source of truth.",
+      "gate_status": "armed",
+      "last_check_failed_items": [],
+      "plan_summary": "Schedule Task.DAG.json v1.0.0 for Admin New User Verification Code: Wave1 (Architect: contract.yaml update + DEPRECATED.md deployment), Wave2 (Coder-BE RED tests + Coder-FE RED tests), Wave3 (Coder-BE GREEN impl + Coder-FE GREEN impl), Wave4 (Guardian security review). All tasks follow TDD iron rule and contract.yaml as single source of truth.",
+      "confirmed_at": "2026-05-19T15:29:31.961Z",
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1779205053967": {
+      "session_id": "cg_ses_1779205053967",
+      "created_at": "2026-05-19T15:37:33.968Z",
+      "task_description": "T-ADMIN-VERIFY-001: Update contract.yaml with admin verification code endpoints. Add POST /v1/admin/users/send-code and modify POST /v1/admin/users with verificationCode field.",
+      "gate_status": "checked",
+      "last_check_failed_items": [],
+      "plan_summary": null,
+      "confirmed_at": null,
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1779205188672": {
+      "session_id": "cg_ses_1779205188672",
+      "created_at": "2026-05-19T15:39:48.672Z",
+      "task_description": "T-ADMIN-VERIFY-001: Update contract.yaml with admin verification code endpoints - Add POST /v1/admin/users/send-code endpoint and modify POST /v1/admin/users to add verificationCode field",
+      "gate_status": "armed",
+      "last_check_failed_items": [],
+      "plan_summary": "T-ADMIN-VERIFY-001: Update contract.yaml (v1.8.0) with admin verification code endpoints. 1) Read existing contract.yaml and design docs. 2) Add POST /v1/admin/users/send-code endpoint. 3) Modify POST /v1/admin/users to add verificationCode field. 4) Run keystone:hash. 5) Call compliance_gate_complete. Auto-confirmed per user request.",
+      "confirmed_at": "2026-05-19T15:40:02.351Z",
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1779205196898": {
+      "session_id": "cg_ses_1779205196898",
+      "created_at": "2026-05-19T15:39:56.898Z",
+      "task_description": "T-TECHDEBT-WV-005: Deploy DEPRECATED.md files for 3 deprecated skills (salesforce-dx-expert, playwright-mcp-expert, devops-architect) and update skill-invocation-standard.md §3.1 status from active to deprecated.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "T-TECHDEBT-WV-005: Create 3 DEPRECATED.md files for deprecated skills (salesforce-dx-expert, playwright-mcp-expert, devops-architect) and update skill-invocation-standard.md §3.1 status from active to deprecated. Date: 2026-05-18. Reason: draft placeholders never developed.",
+      "confirmed_at": "2026-05-19T15:41:02.638Z",
+      "consumed_at": "2026-05-19T15:44:24.934Z",
+      "audit": {
+        "execution_summary": "T-TECHDEBT-WV-005 completed: Created 3 DEPRECATED.md files (salesforce-dx-expert, playwright-mcp-expert, devops-architect) in their respective .opencode/skills/ directories, and updated skill-invocation-standard.md v2.1.3→v2.1.4 with §3.1 status changed to ❌废弃, §4.11-4.13 metadata updated to status:deprecated with reasons, §5.3 quick checklist updated with deprecation notes.",
+        "completed_at": "2026-05-19T15:44:24.934Z"
+      }
+    },
+    "cg_ses_1779205595713": {
+      "session_id": "cg_ses_1779205595713",
+      "created_at": "2026-05-19T15:46:35.713Z",
+      "task_description": "T-ADMIN-VERIFY-002: [TDD-RED] Backend Verification Code Tests - Write failing test cases for AdminUsersController and AdminUsersService covering POST /v1/admin/users/send-code (7 scenarios) and POST /v1/admin/users with verificationCode (5 scenarios)",
+      "gate_status": "checked",
+      "last_check_failed_items": [],
+      "plan_summary": null,
+      "confirmed_at": null,
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1779205604992": {
+      "session_id": "cg_ses_1779205604992",
+      "created_at": "2026-05-19T15:46:44.992Z",
+      "task_description": "[TDD-RED] T-ADMIN-VERIFY-004: Write failing test cases for verification code UI in UserManagementComponent - covering step switching, send code interaction, code validation, anti-enumeration, and API call verification (13+ tests)",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "[TDD-RED] T-ADMIN-VERIFY-004: Write 13+ failing test cases for verification code UI covering step switching, send code interaction, code validation, anti-enumeration, and API call verification. All tests must fail because implementation doesn't exist yet.",
+      "confirmed_at": "2026-05-19T15:49:07.390Z",
+      "consumed_at": "2026-05-19T15:49:11.562Z",
+      "audit": {
+        "execution_summary": "[TDD-RED] T-ADMIN-VERIFY-004: Wrote 13+ failing test cases for verification code UI in UserManagementComponent. All tests fail as expected because the implementation (signals: verificationStep, contactType, countdown, verificationCode, isCodeValid, isSendDisabled, dialogMessage; methods: sendCode, verifyCodeAndProceed, cancelVerification, toggleContactType, startCountdown, createUserWithCode; service: adminService.sendCode) doesn't exist yet. Results: 17 failed, 17 passed, 34 total. Exit code ≠ 0. Test report written to .task_temp/T-ADMIN-VERIFY-004/test_report.json.",
+        "completed_at": "2026-05-19T15:49:11.562Z"
+      }
+    },
+    "cg_ses_1779205802753": {
+      "session_id": "cg_ses_1779205802753",
+      "created_at": "2026-05-19T15:50:02.754Z",
+      "task_description": "[TDD-GREEN] Backend Verification Code Implementation - Implement sendVerificationCode, update DTOs, controller, service, and verification service to make RED-phase tests pass",
+      "gate_status": "armed",
+      "last_check_failed_items": [],
+      "plan_summary": "[TDD-GREEN] Implement backend verification code flow: DTO updates, send-code endpoint, service logic with anti-enumeration, module imports, fix unused test imports",
+      "confirmed_at": "2026-05-19T15:53:41.999Z",
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1779205813342": {
+      "session_id": "cg_ses_1779205813342",
+      "created_at": "2026-05-19T15:50:13.342Z",
+      "task_description": "[TDD-GREEN] T-ADMIN-VERIFY-005: Implement verification code UI in admin New User dialog - minimal implementation to pass all tests from T-ADMIN-VERIFY-004",
+      "gate_status": "checked",
+      "last_check_failed_items": [],
+      "plan_summary": null,
+      "confirmed_at": null,
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1779256523132": {
+      "session_id": "cg_ses_1779256523132",
+      "created_at": "2026-05-20T05:55:23.134Z",
+      "task_description": "Orchestrator: Execute Task.DAG.json messages feature - Schedule 9 tasks across 5 phases for Messages Inbox feature (Approach B): Phase 1 contract+backend RED, Phase 2 backend GREEN+frontend RED parallel, Phase 3 frontend components, Phase 4 header integration, Phase 5 Guardian review",
+      "gate_status": "armed",
+      "last_check_failed_items": [],
+      "plan_summary": "Execute Task.DAG.json for Messages Inbox feature — 9 tasks across 5 phases: Phase 1 contract+backend RED, Phase 2 backend GREEN+frontend RED parallel, Phase 3 frontend component+service, Phase 4 header+store integration, Phase 5 Guardian review",
+      "confirmed_at": "2026-05-20T05:56:57.471Z",
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1779256906344": {
+      "session_id": "cg_ses_1779256906344",
+      "created_at": "2026-05-20T06:01:46.344Z",
+      "task_description": "B-MSG-RED-001 - Backend RED phase: Write failing tests for AdminMessagesController and AdminMessagesService (MSG-001 + MSG-004 endpoints)",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "B-MSG-RED-001 RED phase: Write failing tests for AdminMessagesController (MSG-001 GET /admin/messages, MSG-004 unread-count) and AdminMessagesService (findAll, findUnreadCount). Files: controller spec + service spec. Tests must FAIL since implementation does not exist.",
+      "confirmed_at": "2026-05-20T06:02:08.769Z",
+      "consumed_at": "2026-05-20T06:05:06.995Z",
+      "audit": {
+        "execution_summary": "B-MSG-RED-001 RED phase completed: Created 2 failing test files for AdminMessagesController (MSG-001 GET /admin/messages, MSG-004 GET /admin/messages/unread-count) and AdminMessagesService (findAll, findUnreadCount). Both test suites FAIL with TS2307 module-not-found errors (expected RED behavior). Exit code: 1. ESLint audit: 0 violations. Artifacts: TASK_LOG.md, HANDOVER.md, test_report.json, write_audit_log.json generated.",
+        "completed_at": "2026-05-20T06:05:06.995Z"
+      }
+    },
+    "cg_ses_1779257211970": {
+      "session_id": "cg_ses_1779257211970",
+      "created_at": "2026-05-20T06:06:51.971Z",
+      "task_description": "B-MSG-GREEN-001: Implement AdminMessagesController + AdminMessagesService - GREEN phase - Create DTOs, service implementation, controller implementation for admin messaging endpoints (MSG-001, MSG-004) based on existing RED-phase test files",
+      "gate_status": "armed",
+      "last_check_failed_items": [],
+      "plan_summary": "B-MSG-GREEN-001: Create AdminMessagesDto, AdminMessagesService, AdminMessagesController, register in admin.module.ts, make RED tests pass",
+      "confirmed_at": "2026-05-20T06:08:44.583Z",
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1779258171265": {
+      "session_id": "cg_ses_1779258171265",
+      "created_at": "2026-05-20T06:22:51.266Z",
+      "task_description": "B-MSG-RED-FE - Frontend RED phase: Write failing tests for MessagesDropdown component + AdminService getMessages()/getMessageUnreadCount() + header wiring tests",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Frontend RED phase: Write failing tests for MessagesDropdownComponent (new), AdminService.getMessages/getMessageUnreadCount (new methods), and header wiring. Tests MUST FAIL on initial run. No implementation code.",
+      "confirmed_at": "2026-05-20T06:26:40.354Z",
+      "consumed_at": "2026-05-20T06:28:37.224Z",
+      "audit": {
+        "execution_summary": "B-MSG-RED-FE completed. Created messages-dropdown.component.spec.ts (6 tests) and extended admin.service.spec.ts (4 tests). All new tests FAIL as expected (RED phase). Component/Methods don't exist yet. 0 ESLint violations. 23 existing tests pass with no regressions.",
+        "completed_at": "2026-05-20T06:28:37.224Z"
+      }
+    },
+    "cg_ses_1779258577710": {
+      "session_id": "cg_ses_1779258577710",
+      "created_at": "2026-05-20T06:29:37.710Z",
+      "task_description": "B-MSG-GREEN-FE-SERVICE: Add DTOs (MessageItem, MessageListResponse, UnreadCount) to admin.dto.ts and service methods (getMessages, getMessageUnreadCount) to admin.service.ts in booking-frontend. Then run tests to ensure all pass.",
+      "gate_status": "armed",
+      "last_check_failed_items": [],
+      "plan_summary": "GREEN phase: Add MessageItem/MessageListResponse DTOs to admin.dto.ts and getMessages/getMessageUnreadCount service methods to admin.service.ts following existing ApiResponse pattern. Run tests to verify all 27 pass.",
+      "confirmed_at": "2026-05-20T06:31:41.622Z",
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1779258609064": {
+      "session_id": "cg_ses_1779258609064",
+      "created_at": "2026-05-20T06:30:09.064Z",
+      "task_description": "GREEN Phase: Implement MessagesDropdownComponent (TypeScript, HTML, SCSS) to make 6 existing RED tests pass. Create component with signal-based inputs (messages, messageCount), envelope icon button, dropdown toggle, close button, unread badge, and AdminService-free design.",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Implement MessagesDropdownComponent (3 files) to pass 6 existing RED tests. Component uses input() signals, no AdminService dependency, envelope icon button, dropdown toggle, close button, unread badge.",
+      "confirmed_at": "2026-05-20T06:34:18.299Z",
+      "consumed_at": "2026-05-20T06:37:31.198Z",
+      "audit": {
+        "execution_summary": "GREEN Phase for B-MSG-GREEN-FE-COMPONENT: Created MessagesDropdownComponent (TS, HTML, SCSS) — standalone Angular 21 component with model-based messageCount, signal-based dropdown control, envelope icon button, unread count badge, dropdown panel with overlay and close button. All 6 RED tests PASS (0 failures). ESLint audit clean. Used model() instead of input() for messageCount since InputSignal lacks .set() in Angular 21, which the test requires.",
+        "completed_at": "2026-05-20T06:37:31.198Z"
+      }
+    },
+    "cg_ses_1779260238076": {
+      "session_id": "cg_ses_1779260238076",
+      "created_at": "2026-05-20T06:57:18.077Z",
+      "task_description": "GREEN Phase implementation for B-MSG-GREEN-FE-HEADER: Wire MessagesDropdownComponent into app-header and app-layout with messageCount and messages inputs. Modify app-header.component.ts/html, app-layout.component.ts/html, add test cases, ensure all tests pass.",
+      "gate_status": "armed",
+      "last_check_failed_items": [],
+      "plan_summary": "B-MSG-GREEN-FE-HEADER: Wire MessagesDropdownComponent into AppHeader and AppLayout. RED phase (failing tests) first, then GREEN implementation. 4 files modified, run jest tests.",
+      "confirmed_at": "2026-05-20T06:57:28.681Z",
+      "consumed_at": null,
+      "audit": null
+    },
+    "cg_ses_1779260826632": {
+      "session_id": "cg_ses_1779260826632",
+      "created_at": "2026-05-20T07:07:06.632Z",
+      "task_description": "Fix translation keys sidebar.messages and admin.messages.empty, harmonize hover animations, and fix panel styles for light/dark mode",
+      "gate_status": "completed",
+      "last_check_failed_items": [],
+      "plan_summary": "Fix 3 issues: 1) Add sidebar.messages and admin.messages.empty to FALLBACK_MAP, 2) Change bell/envelope hover to use var(--card-bg-light) consistently with other navbar icons, 3) Fix panel CSS variables for light/dark mode support",
+      "confirmed_at": "2026-05-20T07:08:50.040Z",
+      "consumed_at": "2026-05-20T07:09:48.315Z",
+      "audit": {
+        "execution_summary": "Fixed 3 issues: 1) Added sidebar.messages='Messages' and admin.messages.empty='No messages yet' to FALLBACK_MAP in translation.service.ts. 2) Harmonized bell/envelope button hover to use var(--card-bg-light) with background-color 0.15s ease transition, matching other navbar icons. 3) Updated panel styles: panel background now uses var(--bg-primary, #ffffff) and borders use var(--border-color, #e5e7eb) with light-mode-friendly fallbacks. All 10 tests pass. ESLint: 0 violations.",
+        "completed_at": "2026-05-20T07:09:48.315Z"
+      }
+    },
+    "cg_ses_1779262515201": {
+      "session_id": "cg_ses_1779262515201",
+      "created_at": "2026-05-20T07:35:15.202Z",
+      "task_description": "Fix app-layout.component.ts build error preventing frontend from compiling",
+      "gate_status": "checked",
+      "last_check_failed_items": [],
+      "plan_summary": null,
+      "confirmed_at": null,
+      "consumed_at": null,
+      "audit": null
     }
   }
 }

@@ -1,0 +1,37 @@
+<div class="messages-dropdown" (keydown.escape)="closeDropdown()">
+  <button class="envelope-button" (click)="toggleDropdown()" [attr.aria-label]="'admin.messages.title' | t">
+    <i class="pi pi-envelope text-lg text-text-secondary"></i>
+    @if (messageCount() > 0) {
+      <span class="unread-badge">{{ messageCount() > 99 ? '99+' : messageCount() }}</span>
+    }
+  </button>
+
+  @if (dropdownOpen()) {
+    <div class="dropdown-overlay" (click)="closeDropdown(); $event.stopPropagation()"></div>
+    <div class="dropdown-panel" (click)="$event.stopPropagation()">
+      <div class="dropdown-header">
+        <h3 class="text-sm font-bold text-text-primary">{{ 'sidebar.messages' | t }}</h3>
+        <button class="close-btn" (click)="closeDropdown(); $event.stopPropagation()" [attr.aria-label]="'global.close' | t">&times;</button>
+      </div>
+      <div class="messages-list">
+        @for (msg of messages(); track msg.id) {
+          <div class="message-item">
+            <div class="flex items-start gap-3">
+              <div class="min-w-0 flex-1">
+                <p class="text-xs font-semibold text-text-primary truncate">{{ msg.senderName }}</p>
+                <p class="text-xs text-text-secondary truncate">{{ msg.subject }}</p>
+                <p class="text-xs text-text-secondary/60 line-clamp-2">{{ msg.body }}</p>
+                <p class="text-[10px] text-text-secondary/60 mt-1">{{ msg.createdAt }}</p>
+              </div>
+            </div>
+          </div>
+        } @empty {
+          <div class="empty-state">
+            <i class="pi pi-inbox text-text-secondary/40 text-2xl"></i>
+            <p class="text-xs text-text-secondary/60 mt-2">{{ 'admin.messages.empty' | t }}</p>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

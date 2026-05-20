@@ -1,17 +1,17 @@
 <div class="notification-bell" (click)="toggleDropdown()" (keydown.escape)="closeDropdown()">
   <button class="bell-button" [attr.aria-label]="'admin.notifications.title' | t">
-    <i class="pi pi-bell text-lg text-text-primary"></i>
+    <i class="pi pi-bell text-lg text-text-secondary"></i>
     @if (unreadCount() > 0) {
       <span class="badge">{{ unreadCount() > 99 ? '99+' : unreadCount() }}</span>
     }
   </button>
 
   @if (dropdownOpen()) {
-    <div class="dropdown-overlay" (click)="closeDropdown()"></div>
-    <div class="dropdown-panel">
+    <div class="dropdown-overlay" (click)="closeDropdown(); $event.stopPropagation()"></div>
+    <div class="dropdown-panel" (click)="$event.stopPropagation()">
       <div class="dropdown-header">
         <h3 class="text-sm font-bold text-text-primary">{{ 'sidebar.notifications' | t }}</h3>
-        <button class="close-btn" (click)="closeDropdown()" [attr.aria-label]="'global.close' | t">&times;</button>
+        <button class="close-btn" (click)="closeDropdown(); $event.stopPropagation()" [attr.aria-label]="'global.close' | t">&times;</button>
       </div>
       <div class="notifications-list">
         @for (notif of notifications(); track notif.id) {

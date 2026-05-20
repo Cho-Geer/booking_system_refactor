@@ -36,6 +36,15 @@ export class AppLayoutComponent implements OnInit {
   readonly notificationCount = computed(() => {
     if (!this.isAdminRoute()) return 0;
     return this.adminStore.unreadCount();
+ 
+  });
+  readonly messageCount = computed(() => {
+    if (!this.isAdminRoute()) return 0;
+    return this.adminStore.messageCount();
+  });
+
+  readonly messages = computed<any[]>(() => {
+    return [];
   });
 
   readonly navLinks = computed<NavLink[]>(() => {

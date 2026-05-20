@@ -66,12 +66,9 @@
       }
 
       <!-- Messages -->
-      <button
-        class="relative hidden sm:flex w-10 h-10 items-center justify-center rounded-lg hover:bg-card-bg-light transition-colors"
-        [attr.aria-label]="'global.messages' | t"
-      >
-        <i class="pi pi-envelope text-text-secondary text-lg"></i>
-      </button>
+      <div class="hidden sm:flex">
+        <app-messages-dropdown [messageCount]="messageCount()" [messages]="messages()" />
+      </div>
 
       <!-- Settings -->
       <button

@@ -1,6 +1,6 @@
 <div data-testid="layout-container" class="layout-container">
   <div data-testid="layout-wrapper"
-       class="layout-wrapper transition-colors duration-300"
+       class="layout-wrapper transition-colors duration-300 min-h-screen"
        [class.gradient-page-bg]="!isAdminRoute()">
     <app-header [navLinks]="navLinks()"
                 [userName]="userName()"
@@ -9,6 +9,8 @@
                 [menuItems]="menuItems()"
                 [showSearch]="showSearchInHeader()"
                 [notificationCount]="notificationCount()"
+                 [messageCount]="messageCount()"
+                 [messages]="messages()"
                 (menuToggle)="onMenuToggle()"
                 (logout)="onLogout()" />
 
@@ -24,9 +26,9 @@
                  (logout)="onLogout()" />
 
       <!-- Main content area -->
-      <main class="main-content transition-all duration-300 z-[1] relative w-full"
+      <main class="main-content transition-all duration-300 z-[1] relative w-full pt-16 lg:pl-60 min-h-screen"
             [class.bg-grid]="isAdminRoute()">
-        <div class="w-full p-4 lg:p-6 animate-page-enter">
+        <div class="max-w-7xl mx-auto w-full p-4 lg:p-6 animate-page-enter">
           <router-outlet />
         </div>
       </main>

@@ -12,12 +12,14 @@ import { AdminUsersController } from './controllers/admin-users.controller';
 import { AdminServicesController } from './controllers/admin-services.controller';
 import { AdminAppointmentsController } from './controllers/admin-appointments.controller';
 import { AdminNotificationsController } from './controllers/admin-notifications.controller';
+import { AdminMessagesController } from './controllers/admin-messages.controller';
 import { AdminSettingsController } from './controllers/admin-settings.controller';
 import { AdminStatsService } from './services/admin-stats.service';
 import { AdminUsersService } from './services/admin-users.service';
 import { AdminServicesService } from './services/admin-services.service';
 import { AdminAppointmentsService } from './services/admin-appointments.service';
 import { AdminNotificationsService } from './services/admin-notifications.service';
+import { AdminMessagesService } from './services/admin-messages.service';
 import { AdminSettingsService } from './services/admin-settings.service';
 
 @Module({
@@ -28,6 +30,7 @@ import { AdminSettingsService } from './services/admin-settings.service';
     AdminServicesController,
     AdminAppointmentsController,
     AdminNotificationsController,
+    AdminMessagesController,
     AdminSettingsController,
   ],
   providers: [
@@ -36,6 +39,7 @@ import { AdminSettingsService } from './services/admin-settings.service';
     AdminServicesService,
     AdminAppointmentsService,
     AdminNotificationsService,
+    AdminMessagesService,
     AdminSettingsService,
   ],
   exports: [AdminSettingsService],

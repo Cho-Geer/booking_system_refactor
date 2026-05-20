@@ -320,6 +320,26 @@ export interface UnreadCount {
 }
 
 // ==========================================
+// Messages (MSG-001)
+// ==========================================
+
+export interface MessageItem {
+  id: string;
+  sender: string;
+  subject: string;
+  body: string;
+  read: boolean;
+  createdAt: string;
+}
+
+export interface MessageListResponse {
+  items: MessageItem[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+// ==========================================
 // Business Hours
 // ==========================================
 

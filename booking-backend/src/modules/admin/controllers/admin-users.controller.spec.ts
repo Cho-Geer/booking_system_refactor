@@ -222,7 +222,7 @@ describe('AdminUsersController', () => {
     });
 
     it('[RED] should return 400 for invalid contactType', async () => {
-      const invalidDto = { contactType: 'INVALID', email: 'admin@example.com' };
+      const invalidDto = { contactType: 'INVALID' as any, email: 'admin@example.com' };
       mockAdminUsersService.sendCode.mockRejectedValue({
         status: 400,
         message: 'Bad Request',

@@ -61,6 +61,10 @@ export class TranslationService implements OnDestroy {
       'users.confirmPassword': 'Confirm Password',
       'users.confirmPasswordPlaceholder': 'Confirm password',
       'users.contactType': 'Contact Type',
+      'messages.empty': 'No messages yet',
+    },
+    sidebar: {
+      'messages': 'Messages',
     },
   };
 

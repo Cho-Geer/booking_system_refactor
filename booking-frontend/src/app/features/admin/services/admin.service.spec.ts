@@ -460,6 +460,89 @@ describe('AdminService', () => {
   });
 
   // ==========================================
+  // Messages (MSG-001, MSG-004)
+  // ==========================================
+
+  describe('getMessages()', () => {
+    it('[Red] should call GET /api/admin/messages with page and limit params', () => {
+      const mockResponse = {
+        items: [
+          {
+            id: 'msg-1',
+            sender: 'System Admin',
+            subject: 'Welcome to the Booking System',
+            body: 'Your account has been created successfully.',
+            read: false,
+            created_at: '2026-05-19T10:00:00Z',
+          },
+          {
+            id: 'msg-2',
+            sender: 'Support Team',
+            subject: 'Scheduled Maintenance',
+            body: 'The system will be down for maintenance on Sunday.',
+            read: true,
+            created_at: '2026-05-18T08:30:00Z',
+          },
+        ],
+        total: 2,
+        page: 1,
+        limit: 20,
+      };
+
+      service.getMessages(1, 20).subscribe(response => {
+        expect(response.items.length).toBe(2);
+        expect(response.total).toBe(2);
+        expect(response.items[0].sender).toBe('System Admin');
+        expect(response.items[0].subject).toBe('Welcome to the Booking System');
+      });
+
+      const req = httpMock.expectOne(r => r.url === `${apiUrl}/admin/messages`);
+      expect(req.request.method).toBe('GET');
+      expect(req.request.params.get('page')).toBe('1');
+      expect(req.request.params.get('limit')).toBe('20');
+      req.flush(mockResponse);
+    });
+
+    it('[Red] should handle error when fetching messages', () => {
+      service.getMessages(1, 20).subscribe({
+        next: () => fail('expected error'),
+        error: (error) => {
+          expect(error).toBeTruthy();
+        },
+      });
+
+      const req = httpMock.expectOne(r => r.url === `${apiUrl}/admin/messages`);
+      req.flush({ message: 'Unauthorized' }, { status: 401, statusText: 'Unauthorized' });
+    });
+  });
+
+  describe('getMessageUnreadCount()', () => {
+    it('[Red] should call GET /api/admin/messages/unread-count and return count', () => {
+      const mockResponse = { count: 5 };
+
+      service.getMessageUnreadCount().subscribe(response => {
+        expect(response.count).toBe(5);
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/admin/messages/unread-count`);
+      expect(req.request.method).toBe('GET');
+      req.flush(mockResponse);
+    });
+
+    it('[Red] should handle error when fetching unread count', () => {
+      service.getMessageUnreadCount().subscribe({
+        next: () => fail('expected error'),
+        error: (error) => {
+          expect(error).toBeTruthy();
+        },
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/admin/messages/unread-count`);
+      req.flush({ message: 'Forbidden' }, { status: 403, statusText: 'Forbidden' });
+    });
+  });
+
+  // ==========================================
   // Error Handling
   // ==========================================
 

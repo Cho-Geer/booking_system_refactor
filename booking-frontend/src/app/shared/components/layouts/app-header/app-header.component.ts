@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { Menu } from 'primeng/menu';
 import { ThemeToggleComponent } from '../../molecules/theme-toggle/theme-toggle.component';
+import { MessagesDropdownComponent } from '../../../../features/admin/molecules/messages-dropdown/messages-dropdown.component';
 import { NotificationBellComponent } from '../../../../features/admin/molecules/notification-bell/notification-bell.component';
 import { TranslatePipe } from '../../../pipes/translate.pipe';
 
@@ -21,6 +22,7 @@ export interface NavLink {
     Menu,
     ThemeToggleComponent,
     NotificationBellComponent,
+    MessagesDropdownComponent,
     NgTemplateOutlet,
     TranslatePipe,
   ],
@@ -36,6 +38,8 @@ export class AppHeaderComponent {
   readonly isAdmin = input<boolean>(false);
   readonly menuItems = input<MenuItem[]>([]);
   readonly notificationCount = input<number>(0);
+  readonly messageCount = input<number>(0);
+  readonly messages = input<any[]>([]);
   readonly showSearch = input<boolean>(true);
   readonly extraActions = input<TemplateRef<unknown> | null>(null);
 

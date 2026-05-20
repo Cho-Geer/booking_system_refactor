@@ -17,6 +17,9 @@ class StubAppHeaderComponent {
   isAdmin = input<boolean>(false);
   menuItems = input<any[]>([]);
   showSearch = input<boolean>(true);
+  notificationCount = input<number>(0);
+  messageCount = input<number>(0);
+  messages = input<any[]>([]);
   menuToggle = output<void>();
   logout = output<void>();
 }

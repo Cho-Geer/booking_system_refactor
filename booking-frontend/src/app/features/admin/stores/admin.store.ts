@@ -76,6 +76,8 @@ export interface AdminState {
 
   // Notifications
   unreadCount: number;
+ 
+  messageCount: number;
 
   // Loaded flags (BUG-1: distinguish "not yet loaded" from "loaded but empty")
   loadedServicePopularity: boolean;
@@ -116,6 +118,7 @@ export const initialAdminState: AdminState = {
   appointmentsTotal: 0,
   appointmentsPage: 1,
   unreadCount: 0,
+   messageCount: 0,
   // Loaded flags: default to false (data not yet fetched)
   loadedServicePopularity: false,
   loadedBookingTrend: false,
@@ -368,6 +371,19 @@ export const AdminStore = signalStore(
         patchState(store, { unreadCount: result.count });
       } catch {
         patchState(store, { unreadCount: 0 });
+      }
+    },
+
+    setMessageCount(count: number): void {
+      patchState(store, { messageCount: count });
+    },
+
+    async loadMessageCount(): Promise<void> {
+      try {
+        const result = await lastValueFrom(adminService.getMessageUnreadCount());
+        patchState(store, { messageCount: result.count });
+      } catch {
+        patchState(store, { messageCount: 0 });
       }
     },
 

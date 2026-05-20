@@ -831,19 +831,51 @@ api:
             success:
               status: 200
 
-      unread_message_count:
-        method: "GET"
-        path: "/v1/admin/messages/unread-count"
-        authentication: true
-        authorization: ["ADMIN", "SUPER_ADMIN"]
-        rate_limit: "30次/分钟/IP"
-        response:
-          success:
-            status: 200
-            body:
-              type: "object"
-              properties:
-                count: { type: "integer" }
+      messages:
+        list:
+          method: "GET"
+          path: "/v1/admin/messages"
+          authentication: true
+          authorization: ["ADMIN", "SUPER_ADMIN"]
+          rate_limit: "60次/分钟/IP"
+          description: "MSG-001: 获取管理员消息列表（分页）"
+          query_parameters:
+            page: { type: "integer", default: 1, description: "页码" }
+            limit: { type: "integer", default: 20, description: "每页条数" }
+          response:
+            success:
+              status: 200
+              body:
+                type: "object"
+                properties:
+                  items:
+                    type: "array"
+                    items:
+                      type: "object"
+                      properties:
+                        id: { type: "string", format: "uuid", description: "消息ID" }
+                        sender: { type: "string", description: "发送者名称" }
+                        subject: { type: "string", description: "消息主题" }
+                        body: { type: "string", description: "消息正文" }
+                        read: { type: "boolean", description: "是否已读（readAt !== null）" }
+                        created_at: { type: "string", format: "date-time", description: "发送时间" }
+                  total: { type: "integer" }
+                  page: { type: "integer" }
+                  limit: { type: "integer" }
+        unread_count:
+          method: "GET"
+          path: "/v1/admin/messages/unread-count"
+          authentication: true
+          authorization: ["ADMIN", "SUPER_ADMIN"]
+          rate_limit: "30次/分钟/IP"
+          description: "MSG-004: 获取未读消息数量（用于信封图标角标）"
+          response:
+            success:
+              status: 200
+              body:
+                type: "object"
+                properties:
+                  count: { type: "integer" }
 
       settings:
         get_business_hours:
@@ -3173,3 +3205,12 @@ metadata:
     last_update: "2026-05-13 (v1.7.7: translation endpoints + 5 indentation fixes + password optional + DOC-UPDATE: synced x-keystone-state-hash, added v1.7.6 changelog for admin.settings/contract fixes, TECH_DEBT_REGISTRY populated, cross-doc-consistency plan status updated)"
     approval: "PENDING"
 
+
+# ============================================
+# v1.10.0 (2026-05-20): MSG-001 Messages List
+# ============================================
+#   - [新增] admin.messages.list: 新增 GET /v1/admin/messages 端点（管理员消息列表，分页查询）
+#   - [新增] MessageItemDto: { id, sender, subject, body, read, createdAt }
+#   - [新增] MessageListResponseDto: { items, total, page, limit }
+#   - [新增] data_models.message: Message 数据模型更新
+#   - [限流] admin.messages.list: api tier 限流 60次/分钟/IP

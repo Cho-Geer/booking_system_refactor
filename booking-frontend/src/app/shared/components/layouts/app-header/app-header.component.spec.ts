@@ -21,6 +21,17 @@ class StubThemeToggleComponent {}
 })
 class StubNotificationBellComponent {}
 
+// Stub MessagesDropdownComponent
+@Component({
+  selector: 'app-messages-dropdown',
+  standalone: true,
+  template: '<div data-testid="messages-dropdown-stub">Messages</div>',
+})
+class StubMessagesDropdownComponent {
+  readonly messages = input<any[]>([]);
+  readonly messageCount = input<number>(0);
+}
+
 describe('AppHeaderComponent', () => {
   let fixture: ComponentFixture<AppHeaderComponent>;
   let component: AppHeaderComponent;
@@ -54,7 +65,7 @@ describe('AppHeaderComponent', () => {
     })
       .overrideComponent(AppHeaderComponent, {
         set: {
-          imports: [StubThemeToggleComponent, StubNotificationBellComponent, TranslatePipe],
+          imports: [StubThemeToggleComponent, StubNotificationBellComponent, StubMessagesDropdownComponent, TranslatePipe],
         },
       })
       .compileComponents();
@@ -188,5 +199,39 @@ describe('AppHeaderComponent', () => {
 
     const searchInput = fixture.nativeElement.querySelector('input');
     expect(searchInput).toBeFalsy();
+  });
+
+  // ── MessagesDropdown integration tests ────────────────
+
+  it('[Red] should render app-messages-dropdown stub', () => {
+    fixture.componentRef.setInput('navLinks', defaultNavLinks);
+    fixture.componentRef.setInput('userName', 'Test User');
+    fixture.componentRef.setInput('menuItems', defaultMenuItems);
+    fixture.detectChanges();
+
+    const dropdown = fixture.nativeElement.querySelector('[data-testid="messages-dropdown-stub"]');
+    expect(dropdown).toBeTruthy();
+  });
+
+  it('[Red] should pass messageCount to app-messages-dropdown', () => {
+    fixture.componentRef.setInput('navLinks', defaultNavLinks);
+    fixture.componentRef.setInput('userName', 'Test User');
+    fixture.componentRef.setInput('menuItems', defaultMenuItems);
+    fixture.componentRef.setInput('messageCount', 7);
+    fixture.detectChanges();
+
+    expect(component.messageCount()).toBe(7);
+  });
+
+  it('[Red] should pass messages to app-messages-dropdown', () => {
+    fixture.componentRef.setInput('navLinks', defaultNavLinks);
+    fixture.componentRef.setInput('userName', 'Test User');
+    fixture.componentRef.setInput('menuItems', defaultMenuItems);
+    const testMessages = [{ id: '1', senderName: 'Alice', subject: 'Hello', body: 'Test', createdAt: '2025-01-01' }];
+    fixture.componentRef.setInput('messages', testMessages);
+    fixture.detectChanges();
+
+    expect(component.messages().length).toBe(1);
+    expect(component.messages()[0].senderName).toBe('Alice');
   });
 });
