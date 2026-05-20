@@ -384,7 +384,7 @@ export class UserManagementComponent implements OnInit {
   sendCode(): void {
     this.dialogError.set('');
     this.dialogMessage.set(null);
-    const payload: Record<string, string> = { contact_type: this.contactType() };
+    const payload: Record<string, string> = { contactType: this.contactType() };
     if (this.contactType() === ContactType.EMAIL) {
       payload['email'] = this.formEmail;
     } else {
@@ -474,7 +474,7 @@ export class UserManagementComponent implements OnInit {
       phone: this.formPhone || undefined,
       role: this.formRole,
       password: this.formPassword,
-      verification_code: this.verificationCode() || undefined,
+      verificationCode: this.verificationCode() || undefined,
     };
 
     this.adminService.createUser(dto).subscribe({

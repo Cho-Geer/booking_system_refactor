@@ -176,21 +176,21 @@
 
       @if (!isEdit() && !isViewMode()) {
         <!-- Step Indicator -->
-        <div class="flex items-center justify-center gap-2 mb-2">
-          <span class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold"
-                [class.bg-primary-start]="verificationStep() >= 1"
-                [class.text-white]="verificationStep() >= 1"
-                [class.bg-gray-200]="verificationStep() < 1">1</span>
-          <span class="w-12 h-0.5" [class.bg-primary-start]="verificationStep() >= 2" [class.bg-gray-200]="verificationStep() < 2"></span>
-          <span class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold"
-                [class.bg-primary-start]="verificationStep() >= 2"
-                [class.text-white]="verificationStep() >= 2"
-                [class.bg-gray-200]="verificationStep() < 2">2</span>
-          <span class="w-12 h-0.5" [class.bg-primary-start]="verificationStep() >= 3" [class.bg-gray-200]="verificationStep() < 3"></span>
-          <span class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold"
-                [class.bg-primary-start]="verificationStep() >= 3"
-                [class.text-white]="verificationStep() >= 3"
-                [class.bg-gray-200]="verificationStep() < 3">3</span>
+        <div class="step-indicator">
+          <div class="step" [class.active]="verificationStep() === 1" [class.completed]="verificationStep() > 1">
+            <span class="step-number">1</span>
+            <span class="step-label">Send</span>
+          </div>
+          <div class="step-connector" [class.completed]="verificationStep() > 1"></div>
+          <div class="step" [class.active]="verificationStep() === 2" [class.completed]="verificationStep() > 2">
+            <span class="step-number">2</span>
+            <span class="step-label">Verify</span>
+          </div>
+          <div class="step-connector" [class.completed]="verificationStep() > 2"></div>
+          <div class="step" [class.active]="verificationStep() === 3" [class.completed]="verificationStep() > 3">
+            <span class="step-number">3</span>
+            <span class="step-label">Create</span>
+          </div>
         </div>
 
         <!-- Dialog Message -->

@@ -409,6 +409,7 @@ describe('UserManagementComponent', () => {
       jest.advanceTimersByTime(60000);
       expect(component['countdown']()).toBe(0);
       jest.useRealTimers();
+    });
 
     it('[RED] should re-enable send button when countdown reaches 0', () => {
       // isSendDisabled computed does not exist yet
@@ -478,7 +479,7 @@ describe('UserManagementComponent', () => {
       component['sendCode']();
       // FAILS: adminService.sendCode is not a function
       expect(mockAdminService['sendCode']).toHaveBeenCalledWith({
-        contact_type: 'EMAIL',
+        contactType: 'EMAIL',
         email: 'admin@test.com',
       });
     });
@@ -497,9 +498,165 @@ describe('UserManagementComponent', () => {
         expect.objectContaining({
           name: 'New User',
           email: 'new@test.com',
-          verification_code: '654321',
+          verificationCode: '654321',
         }),
       );
+    });
+  });
+
+  // ==========================================
+  // [T-ADMIN-VERIFY-005] RED Phase: Step Indicator — Theme-Aware Classes
+  // These tests MUST FAIL because the template (lines 179-194) still uses
+  // hardcoded Tailwind classes (bg-gray-200, w-8 h-8 rounded-full, w-12 h-0.5)
+  // instead of the theme-aware .step-indicator class system from _auth-form.scss.
+  // GREEN phase will replace hardcoded classes with:
+  //   .step-indicator container → .step > .step-number / .step-connector / .step-label
+  //   .active / .completed state classes with CSS variables
+  // ==========================================
+
+  describe('[RED] Step Indicator — Theme-Aware CSS Classes', () => {
+    beforeEach(() => {
+      component.openNew();
+      component['verificationStep'].set(1);
+      fixture.detectChanges();
+    });
+
+    it('[RED] should use .step-indicator container class instead of raw flex classes', () => {
+      // FAILS: Template uses "flex items-center justify-center gap-2 mb-2"
+      // instead of class="step-indicator"
+      const stepIndicator = fixture.nativeElement.querySelector('.step-indicator');
+      expect(stepIndicator).toBeTruthy();
+    });
+
+    it('[RED] should wrap each step in a .step div with .active / .completed state classes', () => {
+      // FAILS: No .step wrapper divs exist — hardcoded <span> elements are used directly
+      const steps = fixture.nativeElement.querySelectorAll('.step');
+      expect(steps.length).toBe(3);
+      // Step 1 should be active (verificationStep() === 1), not completed
+      expect(steps[0].classList.contains('active')).toBe(true);
+      expect(steps[0].classList.contains('completed')).toBe(false);
+      // Steps 2 and 3 should not be active yet
+      expect(steps[1].classList.contains('active')).toBe(false);
+      expect(steps[2].classList.contains('active')).toBe(false);
+    });
+
+    it('[RED] should render step numbers using .step-number class (not w-8 h-8)', () => {
+      // FAILS: Circles use "w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold"
+      // instead of "step-number"
+      const stepNumbers = fixture.nativeElement.querySelectorAll('.step-number');
+      expect(stepNumbers.length).toBe(3);
+      expect(stepNumbers[0].textContent?.trim()).toBe('1');
+      expect(stepNumbers[1].textContent?.trim()).toBe('2');
+      expect(stepNumbers[2].textContent?.trim()).toBe('3');
+    });
+
+    it('[RED] should use .step-connector class for connector lines (not w-12 h-0.5)', () => {
+      // FAILS: Connectors use "w-12 h-0.5" instead of "step-connector"
+      const connectors = fixture.nativeElement.querySelectorAll('.step-connector');
+      expect(connectors.length).toBe(2);
+    });
+
+    it('[RED] should render step labels using .step-label class', () => {
+      // FAILS: No .step-label elements exist in the template
+      const stepLabels = fixture.nativeElement.querySelectorAll('.step-label');
+      expect(stepLabels.length).toBe(3);
+    });
+
+    it('[RED] should apply .active / .completed state transitions correctly on step change', () => {
+      // FAILS: No .step or .step-number / .step-label elements exist with state classes
+      component['verificationStep'].set(2);
+      fixture.detectChanges();
+
+      const steps = fixture.nativeElement.querySelectorAll('.step');
+      expect(steps.length).toBe(3);
+      // Step 1 should now be completed
+      expect(steps[0].classList.contains('completed')).toBe(true);
+      expect(steps[0].classList.contains('active')).toBe(false);
+      // Step 2 should now be active
+      expect(steps[1].classList.contains('active')).toBe(true);
+      // Step 3 should still be inactive
+      expect(steps[2].classList.contains('active')).toBe(false);
+      expect(steps[2].classList.contains('completed')).toBe(false);
+    });
+
+    it('[RED] should use CSS variables for theming instead of hardcoded Tailwind color classes', () => {
+      // FAILS: Template uses hardcoded bg-gray-200 / bg-primary-start / text-white
+      // instead of CSS variables like var(--border-color) / var(--color-primary)
+      const stepIndicator = fixture.nativeElement.querySelector('.step-indicator');
+      expect(stepIndicator).toBeTruthy();
+
+      const stepNumbers = fixture.nativeElement.querySelectorAll('.step-number');
+      expect(stepNumbers.length).toBe(3);
+
+      // Inactive step .step-number should NOT have hardcoded gray-200 background
+      // when CSS variable theming is properly implemented
+      const inactiveStepNumber = stepNumbers[0];
+      const stepStyles = getComputedStyle(inactiveStepNumber);
+      // FAILS: Currently background IS hardcoded gray-200 (rgb(229, 231, 235))
+      // When CSS variables are used, background will come from var(--border-color)
+      expect(stepStyles.backgroundColor).not.toBe('rgb(229, 231, 235)');
+    });
+  });
+
+  // ==========================================
+  // [RED] DTO camelCase Field Names
+  // These tests MUST FAIL because the implementation
+  // still uses snake_case field names (contact_type,
+  // verification_code) while the backend expects
+  // camelCase (contactType, verificationCode).
+  // GREEN phase will update DTO interfaces and
+  // component code to use camelCase.
+  // ==========================================
+
+  describe('[RED] DTO camelCase Field Names', () => {
+    beforeEach(() => {
+      component.openNew();
+    });
+
+    it('[RED] sendCode() should send contactType (camelCase) in request body', () => {
+      component['contactType'].set('EMAIL');
+      component['formEmail'] = 'admin@test.com';
+      component['sendCode']();
+      // FAILS: Implementation still sends contact_type (snake_case)
+      expect(mockAdminService.sendCode).toHaveBeenCalledWith(
+        expect.objectContaining({ contactType: 'EMAIL' }),
+      );
+    });
+
+    it('[RED] createUserWithCode() should send verificationCode (camelCase) in request body', () => {
+      component['verificationStep'].set(3);
+      component['formName'] = 'New User';
+      component['formEmail'] = 'new@test.com';
+      component['formRole'] = 'CUSTOMER';
+      component['formPassword'] = 'Pass1234';
+      component['verificationCode'].set('654321');
+      component['createUserWithCode']();
+      // FAILS: Implementation still sends verification_code (snake_case)
+      expect(mockAdminService.createUser).toHaveBeenCalledWith(
+        expect.objectContaining({ verificationCode: '654321' }),
+      );
+    });
+
+    it('[RED] SendCreateUserCodeRequest payload should have contactType field', () => {
+      component['contactType'].set('PHONE');
+      component['formPhone'] = '+1234567890';
+      component['sendCode']();
+      // FAILS: sendCode payload uses contact_type key, not contactType
+      const callArg = mockAdminService.sendCode.mock.calls[0][0];
+      expect(callArg).toHaveProperty('contactType');
+    });
+
+    it('[RED] CreateAdminUserRequest payload should have verificationCode field', () => {
+      component['verificationStep'].set(3);
+      component['formName'] = 'Test User';
+      component['formEmail'] = 'test@test.com';
+      component['formRole'] = 'CUSTOMER';
+      component['formPassword'] = 'Pass1234';
+      component['verificationCode'].set('123456');
+      component['createUserWithCode']();
+      // FAILS: createUserWithCode payload uses verification_code key, not verificationCode
+      const callArg = mockAdminService.createUser.mock.calls[0][0];
+      expect(callArg).toHaveProperty('verificationCode');
     });
   });
 });
