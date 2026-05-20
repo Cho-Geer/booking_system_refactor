@@ -5,6 +5,8 @@ import { ServicesModule } from '../services/services.module';
 import { AppointmentsModule } from '../appointments/appointments.module';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { EmailModule } from '../email/email.module';
+import { VerificationModule } from '../verification/verification.module';
+import { EncryptionModule } from '../encryption/encryption.module';
 import { AdminStatsController } from './controllers/admin-stats.controller';
 import { AdminUsersController } from './controllers/admin-users.controller';
 import { AdminServicesController } from './controllers/admin-services.controller';
@@ -19,7 +21,7 @@ import { AdminNotificationsService } from './services/admin-notifications.servic
 import { AdminSettingsService } from './services/admin-settings.service';
 
 @Module({
-  imports: [StatsModule, UsersModule, ServicesModule, AppointmentsModule, EmailModule, NotificationsModule],
+  imports: [StatsModule, UsersModule, ServicesModule, AppointmentsModule, EmailModule, NotificationsModule, VerificationModule, EncryptionModule],
   controllers: [
     AdminStatsController,
     AdminUsersController,

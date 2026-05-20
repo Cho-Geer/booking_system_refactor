@@ -22,6 +22,8 @@ import {
   TimeDistributionItem,
   SystemHealth,
   TimeRange,
+  SendCreateUserCodeRequest,
+  SendCodeResponse,
 } from '../dto/admin.dto';
 import { AdminService } from '../services/admin.service';
 
@@ -421,6 +423,20 @@ export const AdminStore = signalStore(
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Failed to create user';
         patchState(store, { error: message, isLoading: false });
+      }
+    },
+
+    /**
+     * Send verification code for creating a new admin user.
+     */
+    async sendCreateUserCode(dto: SendCreateUserCodeRequest): Promise<SendCodeResponse> {
+      patchState(store, { error: null });
+      try {
+        return await lastValueFrom(adminService.sendCode(dto));
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Failed to send verification code';
+        patchState(store, { error: message });
+        throw err;
       }
     },
 

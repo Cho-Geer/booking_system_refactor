@@ -1,20 +1,23 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { NotFoundException } from '@nestjs/common';
+import { NotFoundException, ConflictException } from '@nestjs/common';
 import { AdminUsersService } from './admin-users.service';
 import { PrismaService } from '../../../common/database/prisma.service';
 import { UsersService } from '../../users/users.service';
+import { VerificationService } from '../../verification/verification.service';
 import {
   AdminUsersQueryDto,
   CreateAdminUserDto,
   UpdateAdminUserDto,
   AdminUserDto,
 } from '../dto/admin-user.dto';
+import { ContactType } from '../../auth/dto/register-send-code.dto';
 import {
   toAdminUserDto,
   fromCreateAdminUserDto,
   fromUpdateAdminUserDto,
 } from '../mappers/user.mapper';
-import { PaginatedResponseDto, MetaDto } from '../../../common/dto/base.dto';
+
+import { InvalidVerificationCodeException } from '../../verification/exceptions/verification.exceptions';
 
 // Mock PrismaService
 const mockPrismaService = {
@@ -22,6 +25,16 @@ const mockPrismaService = {
     findMany: jest.fn(),
     count: jest.fn(),
   },
+};
+
+// Mock VerificationService
+const mockVerificationService = {
+  generateCode: jest.fn(),
+  verifyCode: jest.fn(),
+  deleteCode: jest.fn(),
+  exists: jest.fn(),
+  getAttempts: jest.fn(),
+  getCode: jest.fn(),
 };
 
 // Mock UsersService
@@ -49,6 +62,10 @@ describe('AdminUsersService', () => {
         {
           provide: UsersService,
           useValue: mockUsersService,
+        },
+        {
+          provide: VerificationService,
+          useValue: mockVerificationService,
         },
       ],
     }).compile();
@@ -398,6 +415,125 @@ describe('AdminUsersService', () => {
       );
 
       await expect(service.remove('nonexistent')).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  // ============================================================
+  // sendCode — POST /v1/admin/users/send-code (T-ADMIN-VERIFY-002)
+  // ============================================================
+  describe('sendCode', () => {
+    const sendCodeDto = {
+      contactType: ContactType.EMAIL,
+      email: 'admin@example.com',
+    };
+
+    it('[RED] should generate code and return maskedContact for existing user email', async () => {
+      mockVerificationService.generateCode.mockResolvedValue('123456');
+      const result = await service.sendCode(sendCodeDto);
+
+      expect(mockVerificationService.generateCode).toHaveBeenCalledWith(
+        sendCodeDto.email,
+        'ADMIN_VERIFY',
+      );
+      expect(result).toHaveProperty('maskedContact');
+      expect(result).toHaveProperty('expiresIn', 300);
+    });
+
+    it('[RED] should return null maskedContact for non-existent email (anti-enumeration)', async () => {
+      mockVerificationService.generateCode.mockResolvedValue('123456');
+      const result = await service.sendCode({ ...sendCodeDto, email: 'nonexistent@example.com' });
+
+      expect(result.maskedContact).toBeNull();
+      expect(result.expiresIn).toBe(300);
+    });
+
+    it('[RED] should enforce minimum ~100ms delay for non-existent user (anti-timing attack)', async () => {
+      const start = Date.now();
+      mockVerificationService.generateCode.mockResolvedValue('123456');
+      await service.sendCode({ ...sendCodeDto, email: 'ghost@example.com' });
+      const elapsed = Date.now() - start;
+
+      expect(elapsed).toBeGreaterThanOrEqual(80);
+    });
+  });
+
+  // ============================================================
+  // create with verificationCode (T-ADMIN-VERIFY-002)
+  // ============================================================
+  describe('create with verificationCode', () => {
+    const createWithCodeDto = {
+      name: 'Code Verified Admin',
+      email: 'code-verify@example.com',
+      password: 'SecurePass123!',
+      role: 'ADMIN',
+      verificationCode: '123456',
+    };
+
+    const mockCreatedUser = {
+      id: 'new-user-1',
+      name: 'Code Verified Admin',
+      email: 'code-verify@example.com',
+      role: 'ADMIN',
+      status: 'ACTIVE',
+      createdAt: new Date('2024-01-01'),
+    };
+
+    it('[RED] should verify code and create user when verificationCode is valid', async () => {
+      mockVerificationService.verifyCode.mockResolvedValue({ success: true });
+      mockUsersService.create.mockResolvedValue(mockCreatedUser);
+
+      const result = await service.create(createWithCodeDto as any);
+
+      expect(mockVerificationService.verifyCode).toHaveBeenCalledWith(
+        createWithCodeDto.email,
+        createWithCodeDto.verificationCode,
+        'ADMIN_VERIFY',
+      );
+      expect(usersService.create).toHaveBeenCalled();
+      expect(result).toEqual(toAdminUserDto(mockCreatedUser));
+    });
+
+    it('[RED] should throw InvalidVerificationCodeException when code does not match', async () => {
+      mockVerificationService.verifyCode.mockRejectedValue(
+        new InvalidVerificationCodeException('Invalid verification code'),
+      );
+
+      await expect(service.create(createWithCodeDto as any)).rejects.toThrow(
+        InvalidVerificationCodeException,
+      );
+      expect(usersService.create).not.toHaveBeenCalled();
+    });
+
+    it('[RED] should throw InvalidVerificationCodeException when code is expired', async () => {
+      mockVerificationService.verifyCode.mockRejectedValue(
+        new InvalidVerificationCodeException('Invalid or expired verification code'),
+      );
+
+      await expect(service.create(createWithCodeDto as any)).rejects.toThrow(
+        InvalidVerificationCodeException,
+      );
+      expect(usersService.create).not.toHaveBeenCalled();
+    });
+
+    it('[RED] should throw MaxAttemptsExceededException on 4th wrong attempt', async () => {
+      const { MaxAttemptsExceededException } = require('../../verification/exceptions/verification.exceptions');
+      mockVerificationService.verifyCode.mockRejectedValue(
+        new MaxAttemptsExceededException(),
+      );
+
+      await expect(service.create(createWithCodeDto as any)).rejects.toThrow(
+        'Too many attempts',
+      );
+      expect(usersService.create).not.toHaveBeenCalled();
+    });
+
+    it('[RED] should throw ConflictException when email already exists', async () => {
+      mockVerificationService.verifyCode.mockResolvedValue({ success: true });
+      mockUsersService.create.mockRejectedValue(
+        new ConflictException('Email already exists'),
+      );
+
+      await expect(service.create(createWithCodeDto as any)).rejects.toThrow(ConflictException);
     });
   });
 });

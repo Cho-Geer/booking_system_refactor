@@ -1,7 +1,8 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsNumber, IsString, IsEnum, MinLength, Matches } from 'class-validator';
+import { IsOptional, IsNumber, IsString, IsEnum, MinLength, Matches, IsEmail } from 'class-validator';
 import { Type } from 'class-transformer';
 import { SystemRole, UserStatus } from '@prisma/client';
+import { ContactType } from '../../auth/dto/register-send-code.dto';
 
 export class AdminUserDto {
   @ApiProperty()
@@ -26,6 +27,22 @@ export class AdminUserDto {
   createdAt!: Date;
 }
 
+export class SendCreateUserCodeDto {
+  @ApiProperty({ enum: ContactType, description: 'Contact type (email or phone)' })
+  @IsEnum(ContactType, { message: 'Contact type must be email or phone' })
+  contactType!: ContactType;
+
+  @ApiPropertyOptional({ description: 'Email address' })
+  @IsOptional()
+  @IsEmail()
+  email?: string;
+
+  @ApiPropertyOptional({ description: 'Phone number' })
+  @IsOptional()
+  @IsString()
+  phone?: string;
+}
+
 export class CreateAdminUserDto {
   @ApiProperty()
   name!: string;
@@ -48,6 +65,12 @@ export class CreateAdminUserDto {
   })
   @IsOptional()
   password?: string;
+
+  @ApiPropertyOptional({ description: '6-digit verification code', example: '123456' })
+  @IsOptional()
+  @IsString()
+  @Matches(/^\d{6}$/, { message: 'Verification code must be a 6-digit number' })
+  verificationCode?: string;
 }
 
 export class UpdateAdminUserDto {

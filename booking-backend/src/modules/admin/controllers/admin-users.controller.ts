@@ -18,8 +18,10 @@ import {
   CreateAdminUserDto,
   UpdateAdminUserDto,
   AdminUserDto,
+  SendCreateUserCodeDto,
 } from '../dto/admin-user.dto';
 import { PaginatedResponseDto } from '../../../common/dto/base.dto';
+import { SendCodeResponseDto } from '../../auth/dto/auth-response.dto';
 import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../../common/guards/roles.guard';
 import { Roles } from '../../../common/decorators/roles.decorator';
@@ -42,6 +44,17 @@ export class AdminUsersController {
   })
   async findAll(@Query() query: AdminUsersQueryDto): Promise<PaginatedResponseDto<AdminUserDto>> {
     return this.adminUsersService.findAll(query);
+  }
+
+  @Post('send-code')
+  @Roles('SUPER_ADMIN')
+  @RateLimit({ tier: 'auth', key: 'email', limit: 5 })
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Send verification code for creating admin user (SUPER_ADMIN only)' })
+  @ApiResponse({ status: 201, description: 'Verification code sent' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  async sendCode(@Body() dto: SendCreateUserCodeDto): Promise<SendCodeResponseDto> {
+    return this.adminUsersService.sendCode(dto);
   }
 
   @Post()

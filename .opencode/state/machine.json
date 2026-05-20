@@ -4,7 +4,7 @@
     "version": "3.0.0",
     "project": "appointment-booking-system",
     "description": "v3.0.0: 五维状态追踪（类型检查/架构边界/格式化/Write-Time审计/安全）。双防线：Write-Time即时阻断 + Commit-Time全量扫描。强制16项约束规则。",
-    "lastUpdated": "2026-05-18T07:33:07.054Z"
+    "lastUpdated": "2026-05-19T15:46:19.907Z"
   },
   "feature_flags": {
     "write_time_audit": {
@@ -712,8 +712,8 @@
   "contracts": {
     "backend-api": {
       "file": "contract.yaml",
-      "hash": "sha256-642f608b4bd16d6fc91885166cd5e0c996fca804b5f779cb70d072734242de35",
-      "lastValidated": "2026-05-15T07:49:44.042Z",
+      "hash": "sha256-8d9f5021d739eae7e53d9b20a7c40d705e5e22ea80682e03eff2e2ad0ae97f8f",
+      "lastValidated": "2026-05-19T15:46:19.907Z",
       "owner": "@Architect"
     },
     "prisma-schema": {
@@ -731,8 +731,8 @@
     },
     "frontend-environment": {
       "file": "booking-frontend/src/environments/environment.ts",
-      "hash": "sha256-b537cc0106e4059f46291c959dea0cf6df50e8fab8e9d79ea39132e45b1b07d7",
-      "lastValidated": "2026-04-20T20:43:58.083Z",
+      "hash": "sha256-eb598ff4d8d8f6085be348f647dfc89171fac183a86b99e02599f8b3d3eb6aac",
+      "lastValidated": "2026-05-19T15:46:19.907Z",
       "owner": "@Coder-FE"
     }
   },
@@ -1034,6 +1034,20 @@
       "action": "SCHEMA_UPGRADE",
       "target": "machine.json",
       "details": "v3.0.0: 五维状态追踪（type_check/dependency/format/write_audit/mutation/security）+ 双防线模型 + 16项约束规则"
+    },
+    {
+      "timestamp": "2026-05-19T15:46:19.907Z",
+      "agent": "@Orchestrator",
+      "action": "HASH_UPDATE",
+      "target": "backend-api",
+      "details": "Hash updated from sha256-642f608b4bd16... to sha256-8d9f5021d739e..."
+    },
+    {
+      "timestamp": "2026-05-19T15:46:19.907Z",
+      "agent": "@Orchestrator",
+      "action": "HASH_UPDATE",
+      "target": "frontend-environment",
+      "details": "Hash updated from sha256-b537cc0106e40... to sha256-eb598ff4d8d8f..."
     }
   ],
   "contract_hash": "sha256-1394c2baecd4be40a88c6b2bb641651953d42070d2ba3c3559cae637529d0309",

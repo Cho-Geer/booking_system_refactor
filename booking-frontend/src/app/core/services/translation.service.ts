@@ -58,6 +58,9 @@ export class TranslationService implements OnDestroy {
       'services.disablePending': '{count} pending appointment(s) will be cancelled',
       'services.disableConfirmed': '{count} confirmed appointment(s) remain unchanged',
       'services.disableConfirm': 'Disable Service',
+      'users.confirmPassword': 'Confirm Password',
+      'users.confirmPasswordPlaceholder': 'Confirm password',
+      'users.contactType': 'Contact Type',
     },
   };
 

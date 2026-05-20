@@ -1936,6 +1936,14 @@ const DEFAULT_TRANSLATIONS: TranslationSeedEntry[] = [
     isCustom: false,
     tenantId: null,
   },
+  {
+    domain: 'admin',
+    key: 'users.contactType',
+    locale: 'en',
+    value: 'Contact Type',
+    isCustom: false,
+    tenantId: null,
+  },
   // -- admin.services
   {
     domain: 'admin',

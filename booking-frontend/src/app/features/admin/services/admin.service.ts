@@ -29,6 +29,8 @@ import {
   TimeRange,
   NotificationList,
   UnreadCount,
+  SendCreateUserCodeRequest,
+  SendCodeResponse,
 } from '../dto/admin.dto';
 
 @Injectable({ providedIn: 'root' })
@@ -242,6 +244,15 @@ export class AdminService {
 
   getServiceAffectedAppointments(serviceId: string): Observable<{pendingCount: number; confirmedCount: number}> {
     return this.http.get<ApiResponse<{pendingCount: number; confirmedCount: number}>>(`${this.apiUrl}/admin/services/${serviceId}/affected-appointments`)
+      .pipe(map(r => r.data), catchError(this.handleError));
+  }
+
+  // ==========================================
+  // Verification Code (T-ADMIN-VERIFY-005)
+  // ==========================================
+
+  sendCode(dto: SendCreateUserCodeRequest): Observable<SendCodeResponse> {
+    return this.http.post<ApiResponse<SendCodeResponse>>(`${this.apiUrl}/admin/users/send-code`, dto)
       .pipe(map(r => r.data), catchError(this.handleError));
   }
 

@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal, DestroyRef } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
@@ -13,6 +13,7 @@ import {
   AdminUserStatus,
   CreateAdminUserRequest,
   UpdateAdminUserRequest,
+  ContactType,
 } from '../../dto/admin.dto';
 import { AppCardComponent } from '../../../../shared/components/atoms/app-card/app-card.component';
 import { AppButtonComponent } from '../../../../shared/components/atoms/app-button/app-button.component';
@@ -82,9 +83,29 @@ export class UserManagementComponent implements OnInit {
   formRole: AdminUserRole = 'CUSTOMER';
   formStatus: AdminUserStatus = 'ACTIVE';
   formPassword = '';
+  formConfirmPassword = '';
 
   // Form validation
-  formErrors: { name?: string; email?: string; password?: string } = {};
+  formErrors: { name?: string; email?: string; password?: string; confirmPassword?: string } = {};
+
+  // Dialog UI state
+  readonly passwordVisible = signal(false);
+  readonly confirmPasswordVisible = signal(false);
+  readonly isSaving = signal(false);
+  readonly dialogError = signal('');
+
+  // Verification code state (T-ADMIN-VERIFY-005)
+  readonly verificationStep = signal<1 | 2 | 3>(1);
+  readonly contactType = signal<ContactType>(ContactType.EMAIL);
+  readonly ContactType = ContactType;
+  readonly countdown = signal(0);
+  readonly verificationCode = signal('');
+  readonly maskedContact = signal<string | null>(null);
+  readonly dialogMessage = signal<string | null>(null);
+  private countdownInterval: ReturnType<typeof setInterval> | null = null;
+
+  readonly isCodeValid = computed(() => /^\d{6}$/.test(this.verificationCode()));
+  readonly isSendDisabled = computed(() => this.countdown() > 0);
 
   readonly roleOptions = [
     { label: 'CUSTOMER', value: 'CUSTOMER' as AdminUserRole },
@@ -205,12 +226,15 @@ export class UserManagementComponent implements OnInit {
   closeDialog(): void {
     this.userDialogVisible.set(false);
     this.selectedUser.set(null);
+    this.isSaving.set(false);
+    this.dialogError.set('');
     this.resetForm();
   }
 
   saveUser(): void {
     this.submitted.set(true);
     this.formErrors = {};
+    this.dialogError.set('');
 
     // Validation
     if (!this.formName.trim()) {
@@ -222,10 +246,15 @@ export class UserManagementComponent implements OnInit {
     if (!this.isEdit() && !this.formPassword.trim()) {
       this.formErrors.password = 'Password is required';
     }
+    if (!this.isEdit() && !this.isViewMode() && this.formPassword && this.formConfirmPassword && this.formPassword !== this.formConfirmPassword) {
+      this.formErrors.confirmPassword = 'Passwords do not match';
+    }
 
     if (Object.keys(this.formErrors).length > 0) {
       return;
     }
+
+    this.isSaving.set(true);
 
     if (this.isEdit() && this.selectedUser()) {
       const updates: UpdateAdminUserRequest = {
@@ -237,9 +266,14 @@ export class UserManagementComponent implements OnInit {
         next: () => {
           this.store.updateUserInList(this.selectedUser()!.id, updates);
           this.loadAllUsersForStats();
+          this.isSaving.set(false);
           this.closeDialog();
         },
-        error: (err) => this.store.setError(err.message ?? 'Failed to update user'),
+        error: (err) => {
+          this.store.setError(err.message ?? 'Failed to update user');
+          this.dialogError.set(err.message ?? 'Failed to update user');
+          this.isSaving.set(false);
+        },
       });
     } else {
       const dto: CreateAdminUserRequest = {
@@ -257,9 +291,14 @@ export class UserManagementComponent implements OnInit {
             this.store.usersPage(),
           );
           this.loadAllUsersForStats();
+          this.isSaving.set(false);
           this.closeDialog();
         },
-        error: (err) => this.store.setError(err.message ?? 'Failed to create user'),
+        error: (err) => {
+          this.store.setError(err.message ?? 'Failed to create user');
+          this.dialogError.set(err.message ?? 'Failed to create user');
+          this.isSaving.set(false);
+        },
       });
     }
   }
@@ -330,6 +369,133 @@ export class UserManagementComponent implements OnInit {
     }
   }
 
+  togglePasswordVisibility(): void {
+    this.passwordVisible.update((v) => !v);
+  }
+
+  toggleConfirmPasswordVisibility(): void {
+    this.confirmPasswordVisible.update((v) => !v);
+  }
+
+  // ==========================================
+  // Verification Code Methods (T-ADMIN-VERIFY-005)
+  // ==========================================
+
+  sendCode(): void {
+    this.dialogError.set('');
+    this.dialogMessage.set(null);
+    const payload: Record<string, string> = { contact_type: this.contactType() };
+    if (this.contactType() === ContactType.EMAIL) {
+      payload['email'] = this.formEmail;
+    } else {
+      payload['phone'] = this.formPhone;
+    }
+    this.adminService.sendCode(payload as any).subscribe({
+      next: (resp) => {
+        this.maskedContact.set(resp.maskedContact ?? null);
+        if (resp.maskedContact) {
+          this.dialogMessage.set(`Code sent to ${resp.maskedContact}`);
+        } else {
+          this.dialogMessage.set('If the contact exists, a verification code has been sent.');
+        }
+        this.verificationStep.set(2);
+        this.startCountdown();
+      },
+      error: (err) => {
+        this.dialogError.set(err.message ?? 'Failed to send code');
+      },
+    });
+  }
+
+  verifyCodeAndProceed(): void {
+    this.dialogError.set('');
+    this.dialogMessage.set(null);
+    // In production, the code is verified by the backend during user creation.
+    // We simply advance to step 3 here. The actual verification happens in createUserWithCode.
+    this.verificationStep.set(3);
+  }
+
+  cancelVerification(): void {
+    this.verificationStep.set(1);
+    this.verificationCode.set('');
+    this.dialogMessage.set(null);
+  }
+
+  toggleContactType(): void {
+    this.contactType.update((v) =>
+      v === ContactType.EMAIL ? ContactType.PHONE : ContactType.EMAIL,
+    );
+  }
+
+  startCountdown(): void {
+    this.countdown.set(60);
+    this.countdownInterval = setInterval(() => {
+      this.countdown.update((v) => {
+        if (v <= 1) {
+          if (this.countdownInterval) {
+            clearInterval(this.countdownInterval);
+            this.countdownInterval = null;
+          }
+          return 0;
+        }
+        return v - 1;
+      });
+    }, 1000);
+  }
+
+  createUserWithCode(): void {
+    this.submitted.set(true);
+    this.formErrors = {};
+    this.dialogError.set('');
+
+    // Validation
+    if (!this.formName.trim()) {
+      this.formErrors.name = 'Name is required';
+    }
+    if (!this.formEmail.trim()) {
+      this.formErrors.email = 'Email is required';
+    }
+    if (!this.formPassword.trim()) {
+      this.formErrors.password = 'Password is required';
+    }
+    if (this.formPassword && this.formConfirmPassword && this.formPassword !== this.formConfirmPassword) {
+      this.formErrors.confirmPassword = 'Passwords do not match';
+    }
+
+    if (Object.keys(this.formErrors).length > 0) {
+      return;
+    }
+
+    this.isSaving.set(true);
+
+    const dto: CreateAdminUserRequest = {
+      name: this.formName,
+      email: this.formEmail,
+      phone: this.formPhone || undefined,
+      role: this.formRole,
+      password: this.formPassword,
+      verification_code: this.verificationCode() || undefined,
+    };
+
+    this.adminService.createUser(dto).subscribe({
+      next: (user) => {
+        this.store.setUsers(
+          [...this.store.users(), user],
+          this.store.usersTotal() + 1,
+          this.store.usersPage(),
+        );
+        this.loadAllUsersForStats();
+        this.isSaving.set(false);
+        this.closeDialog();
+      },
+      error: (err) => {
+        this.store.setError(err.message ?? 'Failed to create user');
+        this.dialogError.set(err.message ?? 'Failed to create user');
+        this.isSaving.set(false);
+      },
+    });
+  }
+
   private resetForm(): void {
     this.formName = '';
     this.formEmail = '';
@@ -337,6 +503,18 @@ export class UserManagementComponent implements OnInit {
     this.formRole = 'CUSTOMER';
     this.formStatus = 'ACTIVE';
     this.formPassword = '';
+    this.formConfirmPassword = '';
     this.formErrors = {};
+    this.dialogError.set('');
+    this.verificationStep.set(1);
+    this.contactType.set(ContactType.EMAIL);
+    this.countdown.set(0);
+    this.verificationCode.set('');
+    this.maskedContact.set(null);
+    this.dialogMessage.set(null);
+    if (this.countdownInterval) {
+      clearInterval(this.countdownInterval);
+      this.countdownInterval = null;
+    }
   }
 }

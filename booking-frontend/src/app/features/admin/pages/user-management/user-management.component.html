@@ -167,64 +167,241 @@
     [styleClass]="'rounded-xl w-[480px]'"
   >
     <div class="flex flex-col gap-4 p-4">
-      <!-- Name -->
-      <div>
-        <label class="block font-medium mb-1 text-text-primary">{{ 'admin.users.name' | t }} *</label>
-        <input pInputText [(ngModel)]="formName" class="w-full" [placeholder]="'admin.users.namePlaceholder' | t" [class.ng-invalid]="submitted() && formErrors.name" [disabled]="isViewMode()" />
-        @if (submitted() && formErrors.name) {
-          <small class="text-danger">{{ formErrors.name }}</small>
-        }
-      </div>
-
-      @if (!isEdit() || isViewMode()) {
-        <!-- Email -->
-        <div>
-          <label class="block font-medium mb-1 text-text-primary">{{ 'admin.table.email' | t }}</label>
-          <input pInputText [(ngModel)]="formEmail" class="w-full" [placeholder]="'admin.users.emailPlaceholder' | t" [class.ng-invalid]="submitted() && formErrors.email" [disabled]="isViewMode()" />
-          @if (submitted() && formErrors.email) {
-            <small class="text-danger">{{ formErrors.email }}</small>
-          }
-        </div>
-
-        <!-- Phone -->
-        <div>
-          <label class="block font-medium mb-1 text-text-primary">{{ 'admin.users.phone' | t }}</label>
-          <input pInputText [(ngModel)]="formPhone" class="w-full" [placeholder]="'admin.users.phonePlaceholder' | t" [disabled]="isViewMode()" />
+      <!-- Dialog Error -->
+      @if (dialogError()) {
+        <div class="dialog-error bg-accent-red/10 border border-accent-red/30 text-accent-red px-4 py-3 rounded-lg text-sm">
+          {{ dialogError() }}
         </div>
       }
 
       @if (!isEdit() && !isViewMode()) {
-        <!-- Password -->
-        <div>
-          <label class="block font-medium mb-1 text-text-primary">{{ 'admin.users.password' | t }} *</label>
-          <input pInputText [(ngModel)]="formPassword" class="w-full" type="password" [placeholder]="'admin.users.passwordPlaceholder' | t" [class.ng-invalid]="submitted() && formErrors.password" />
-          @if (submitted() && formErrors.password) {
-            <small class="text-danger">{{ formErrors.password }}</small>
-          }
+        <!-- Step Indicator -->
+        <div class="flex items-center justify-center gap-2 mb-2">
+          <span class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold"
+                [class.bg-primary-start]="verificationStep() >= 1"
+                [class.text-white]="verificationStep() >= 1"
+                [class.bg-gray-200]="verificationStep() < 1">1</span>
+          <span class="w-12 h-0.5" [class.bg-primary-start]="verificationStep() >= 2" [class.bg-gray-200]="verificationStep() < 2"></span>
+          <span class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold"
+                [class.bg-primary-start]="verificationStep() >= 2"
+                [class.text-white]="verificationStep() >= 2"
+                [class.bg-gray-200]="verificationStep() < 2">2</span>
+          <span class="w-12 h-0.5" [class.bg-primary-start]="verificationStep() >= 3" [class.bg-gray-200]="verificationStep() < 3"></span>
+          <span class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold"
+                [class.bg-primary-start]="verificationStep() >= 3"
+                [class.text-white]="verificationStep() >= 3"
+                [class.bg-gray-200]="verificationStep() < 3">3</span>
         </div>
+
+        <!-- Dialog Message -->
+        @if (dialogMessage()) {
+          <div class="bg-accent-green/10 border border-accent-green/30 text-accent-green px-4 py-3 rounded-lg text-sm">
+            {{ dialogMessage() }}
+          </div>
+        }
+
+        @if (verificationStep() === 1) {
+          <!-- Step 1: Send Code -->
+          <!-- Contact Type Toggle -->
+          <div>
+            <label class="block font-medium mb-1 text-text-primary">{{ 'admin.users.contactType' | t }}</label>
+            <div class="flex gap-2">
+              <app-button
+                [label]="'Email'"
+                [variant]="contactType() === 'EMAIL' ? 'primary' : 'secondary'"
+                size="sm"
+                (onClick)="contactType.set(ContactType.EMAIL)"
+              ></app-button>
+              <app-button
+                [label]="'Phone'"
+                [variant]="contactType() === 'PHONE' ? 'primary' : 'secondary'"
+                size="sm"
+                (onClick)="contactType.set(ContactType.PHONE)"
+              ></app-button>
+            </div>
+          </div>
+
+          <!-- Contact Input -->
+          @if (contactType() === 'EMAIL') {
+            <div>
+              <label class="block font-medium mb-1 text-text-primary">{{ 'admin.table.email' | t }}</label>
+              <input pInputText [(ngModel)]="formEmail" class="w-full" [placeholder]="'admin.users.emailPlaceholder' | t" />
+            </div>
+          } @else {
+            <div>
+              <label class="block font-medium mb-1 text-text-primary">{{ 'admin.users.phone' | t }}</label>
+              <input pInputText [(ngModel)]="formPhone" class="w-full" [placeholder]="'admin.users.phonePlaceholder' | t" />
+            </div>
+          }
+
+          <!-- Send Code Button -->
+          <app-button
+            [label]="countdown() > 0 ? countdown() + 's' : 'Send Code'"
+            variant="primary"
+            (onClick)="sendCode()"
+            [disabled]="isSendDisabled()"
+          ></app-button>
+        }
+
+        @if (verificationStep() === 2) {
+          <!-- Step 2: Enter Verification Code -->
+          <div>
+            <label class="block font-medium mb-1 text-text-primary">Verification Code</label>
+            <input pInputText [(ngModel)]="verificationCode" class="w-full" maxlength="6" placeholder="6-digit code" />
+            @if (verificationCode() && !isCodeValid()) {
+              <small class="text-danger">Code must be 6 digits</small>
+            }
+          </div>
+
+          <div class="flex gap-2">
+            <app-button label="Verify" variant="primary" (onClick)="verifyCodeAndProceed()" [disabled]="!isCodeValid()"></app-button>
+            <app-button label="Cancel" variant="secondary" (onClick)="cancelVerification()"></app-button>
+          </div>
+        }
+
+        @if (verificationStep() === 3) {
+          <!-- Step 3: Set Password & Submit -->
+          <!-- Name -->
+          <div>
+            <label class="block font-medium mb-1 text-text-primary">{{ 'admin.users.name' | t }} *</label>
+            <input pInputText [(ngModel)]="formName" class="w-full" [placeholder]="'admin.users.namePlaceholder' | t" [class.ng-invalid]="submitted() && formErrors.name" />
+            @if (submitted() && formErrors.name) {
+              <small class="text-danger">{{ formErrors.name }}</small>
+            }
+          </div>
+
+          <!-- Email -->
+          <div>
+            <label class="block font-medium mb-1 text-text-primary">{{ 'admin.table.email' | t }}</label>
+            <input pInputText [(ngModel)]="formEmail" class="w-full" [placeholder]="'admin.users.emailPlaceholder' | t" [class.ng-invalid]="submitted() && formErrors.email" />
+            @if (submitted() && formErrors.email) {
+              <small class="text-danger">{{ formErrors.email }}</small>
+            }
+          </div>
+
+          <!-- Password -->
+          <div>
+            <label class="block font-medium mb-1 text-text-primary">{{ 'admin.users.password' | t }} *</label>
+            <div class="relative">
+              <input pInputText [(ngModel)]="formPassword" class="w-full pr-10" [type]="passwordVisible() ? 'text' : 'password'" [placeholder]="'admin.users.passwordPlaceholder' | t" [class.ng-invalid]="submitted() && formErrors.password" />
+              <button type="button" (click)="togglePasswordVisibility()" data-testid="password-toggle-btn" class="absolute right-2 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary">
+                <i [class]="passwordVisible() ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
+              </button>
+            </div>
+            @if (submitted() && formErrors.password) {
+              <small class="text-danger">{{ formErrors.password }}</small>
+            }
+          </div>
+
+          <!-- Confirm Password -->
+          <div>
+            <label class="block font-medium mb-1 text-text-primary">{{ 'admin.users.confirmPassword' | t }} *</label>
+            <div class="relative">
+              <input pInputText [(ngModel)]="formConfirmPassword" class="w-full pr-10" data-testid="confirm-password-input" [type]="confirmPasswordVisible() ? 'text' : 'password'" [placeholder]="'admin.users.confirmPasswordPlaceholder' | t" [class.ng-invalid]="submitted() && formErrors.confirmPassword" />
+              <button type="button" (click)="toggleConfirmPasswordVisibility()" class="absolute right-2 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary">
+                <i [class]="confirmPasswordVisible() ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
+              </button>
+            </div>
+            @if (submitted() && formErrors.confirmPassword) {
+              <small class="text-danger">{{ formErrors.confirmPassword }}</small>
+            }
+          </div>
+
+          <!-- Role -->
+          <div>
+            <label class="block font-medium mb-1 text-text-primary">{{ 'admin.table.role' | t }}</label>
+            <p-select [(ngModel)]="formRole" [options]="roleOptions" [placeholder]="'admin.users.selectRole' | t" class="w-full" appendTo="body" />
+          </div>
+        }
       }
 
-      <!-- Role -->
-      <div>
-        <label class="block font-medium mb-1 text-text-primary">{{ 'admin.table.role' | t }}</label>
-        <p-select [(ngModel)]="formRole" [options]="roleOptions" [placeholder]="'admin.users.selectRole' | t" class="w-full" appendTo="body" [disabled]="isViewMode()" />
-      </div>
-
       @if (isEdit() || isViewMode()) {
-        <!-- Status -->
+        <!-- Name -->
         <div>
-          <label class="block font-medium mb-1 text-text-primary">{{ 'admin.table.status' | t }}</label>
-          <p-select [(ngModel)]="formStatus" [options]="statusOptions" [placeholder]="'admin.users.selectStatus' | t" class="w-full" appendTo="body" [disabled]="isViewMode()" />
+          <label class="block font-medium mb-1 text-text-primary">{{ 'admin.users.name' | t }} *</label>
+          <input pInputText [(ngModel)]="formName" class="w-full" [placeholder]="'admin.users.namePlaceholder' | t" [class.ng-invalid]="submitted() && formErrors.name" [disabled]="isViewMode()" />
+          @if (submitted() && formErrors.name) {
+            <small class="text-danger">{{ formErrors.name }}</small>
+          }
         </div>
+
+        @if (!isEdit() || isViewMode()) {
+          <!-- Email -->
+          <div>
+            <label class="block font-medium mb-1 text-text-primary">{{ 'admin.table.email' | t }}</label>
+            <input pInputText [(ngModel)]="formEmail" class="w-full" [placeholder]="'admin.users.emailPlaceholder' | t" [class.ng-invalid]="submitted() && formErrors.email" [disabled]="isViewMode()" />
+            @if (submitted() && formErrors.email) {
+              <small class="text-danger">{{ formErrors.email }}</small>
+            }
+          </div>
+
+          <!-- Phone -->
+          <div>
+            <label class="block font-medium mb-1 text-text-primary">{{ 'admin.users.phone' | t }}</label>
+            <input pInputText [(ngModel)]="formPhone" class="w-full" [placeholder]="'admin.users.phonePlaceholder' | t" [disabled]="isViewMode()" />
+          </div>
+        }
+
+        @if (!isEdit() && !isViewMode()) {
+          <!-- Password -->
+          <div>
+            <label class="block font-medium mb-1 text-text-primary">{{ 'admin.users.password' | t }} *</label>
+            <div class="relative">
+              <input pInputText [(ngModel)]="formPassword" class="w-full pr-10" [type]="passwordVisible() ? 'text' : 'password'" [placeholder]="'admin.users.passwordPlaceholder' | t" [class.ng-invalid]="submitted() && formErrors.password" />
+              <button type="button" (click)="togglePasswordVisibility()" data-testid="password-toggle-btn" class="absolute right-2 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary">
+                <i [class]="passwordVisible() ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
+              </button>
+            </div>
+            @if (submitted() && formErrors.password) {
+              <small class="text-danger">{{ formErrors.password }}</small>
+            }
+          </div>
+
+          <!-- Confirm Password -->
+          <div>
+            <label class="block font-medium mb-1 text-text-primary">{{ 'admin.users.confirmPassword' | t }} *</label>
+            <div class="relative">
+              <input pInputText [(ngModel)]="formConfirmPassword" class="w-full pr-10" data-testid="confirm-password-input" [type]="confirmPasswordVisible() ? 'text' : 'password'" [placeholder]="'admin.users.confirmPasswordPlaceholder' | t" [class.ng-invalid]="submitted() && formErrors.confirmPassword" />
+              <button type="button" (click)="toggleConfirmPasswordVisibility()" class="absolute right-2 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary">
+                <i [class]="confirmPasswordVisible() ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
+              </button>
+            </div>
+            @if (submitted() && formErrors.confirmPassword) {
+              <small class="text-danger">{{ formErrors.confirmPassword }}</small>
+            }
+          </div>
+        }
+
+        <!-- Role -->
+        <div>
+          <label class="block font-medium mb-1 text-text-primary">{{ 'admin.table.role' | t }}</label>
+          <p-select [(ngModel)]="formRole" [options]="roleOptions" [placeholder]="'admin.users.selectRole' | t" class="w-full" appendTo="body" [disabled]="isViewMode()" />
+        </div>
+
+        @if (isEdit() || isViewMode()) {
+          <!-- Status -->
+          <div>
+            <label class="block font-medium mb-1 text-text-primary">{{ 'admin.table.status' | t }}</label>
+            <p-select [(ngModel)]="formStatus" [options]="statusOptions" [placeholder]="'admin.users.selectStatus' | t" class="w-full" appendTo="body" [disabled]="isViewMode()" />
+          </div>
+        }
       }
     </div>
     <div app-modal-footer>
       <div class="flex flex-col-reverse sm:flex-row gap-2 sm:gap-2">
         @if (isViewMode()) {
           <app-button [label]="'global.close' | t" variant="primary" (onClick)="closeDialog()"></app-button>
-        } @else {
+        } @else if (isEdit()) {
           <app-button [label]="'global.cancel' | t" variant="secondary" (onClick)="closeDialog()"></app-button>
-          <app-button [label]="'global.save' | t" variant="primary" (onClick)="saveUser()"></app-button>
+          <app-button [label]="'global.save' | t" variant="primary" (onClick)="saveUser()" [disabled]="isSaving()" [attr.disabled]="isSaving() ? '' : null" data-testid="save-user-btn"></app-button>
+        } @else {
+          @if (verificationStep() === 1 || verificationStep() === 2) {
+            <app-button [label]="'global.cancel' | t" variant="secondary" (onClick)="closeDialog()"></app-button>
+          }
+          @if (verificationStep() === 3) {
+            <app-button [label]="'global.cancel' | t" variant="secondary" (onClick)="closeDialog()"></app-button>
+            <app-button [label]="'Create User'" variant="primary" (onClick)="createUserWithCode()" [disabled]="isSaving()" [attr.disabled]="isSaving() ? '' : null" data-testid="save-user-btn"></app-button>
+          }
         }
       </div>
     </div>

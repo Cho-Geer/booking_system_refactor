@@ -49,6 +49,26 @@ export interface AdminStats {
 export type AdminUserRole = 'CUSTOMER' | 'ADMIN' | 'SUPER_ADMIN';
 export type AdminUserStatus = 'ACTIVE' | 'INACTIVE' | 'BLOCKED';
 
+// ==========================================
+// Verification Code
+// ==========================================
+
+export enum ContactType {
+  EMAIL = 'EMAIL',
+  PHONE = 'PHONE',
+}
+
+export interface SendCreateUserCodeRequest {
+  contact_type: ContactType;
+  email?: string;
+  phone?: string;
+}
+
+export interface SendCodeResponse {
+  maskedContact?: string;
+  expiresIn: number;
+}
+
 export interface AdminUser {
   id: string;
   name: string;
@@ -65,7 +85,8 @@ export interface CreateAdminUserRequest {
   email: string;
   phone?: string;
   role: AdminUserRole;
-  password: string;
+  password?: string;
+  verification_code?: string;
 }
 
 export interface UpdateAdminUserRequest {

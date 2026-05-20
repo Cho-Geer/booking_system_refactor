@@ -7,7 +7,8 @@ import {
   UpdateAdminUserDto,
   AdminUserDto,
 } from '../dto/admin-user.dto';
-import { PaginatedResponseDto, MetaDto } from '../../../common/dto/base.dto';
+import { ContactType } from '../../auth/dto/register-send-code.dto';
+import { MetaDto } from '../../../common/dto/base.dto';
 import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../../common/guards/roles.guard';
 
@@ -18,6 +19,7 @@ const mockAdminUsersService = {
   create: jest.fn(),
   update: jest.fn(),
   remove: jest.fn(),
+  sendCode: jest.fn(),
 };
 
 describe('AdminUsersController', () => {
@@ -189,6 +191,147 @@ describe('AdminUsersController', () => {
 
       expect(service.remove).toHaveBeenCalledWith('user-1');
       expect(result).toBeUndefined();
+    });
+  });
+
+  // ============================================================
+  // POST /v1/admin/users/send-code (T-ADMIN-VERIFY-002)
+  // ============================================================
+  describe('POST /admin/users/send-code', () => {
+    const validDto = { contactType: ContactType.EMAIL, email: 'admin@example.com' };
+
+    it('[RED] should return 200 with maskedContact when SUPER_ADMIN sends code to existing email', async () => {
+      const response = { maskedContact: 'a***@example.com', expiresIn: 300 };
+      mockAdminUsersService.sendCode.mockResolvedValue(response);
+
+      const result = await controller.sendCode(validDto);
+
+      expect(service.sendCode).toHaveBeenCalledWith(validDto);
+      expect(result).toEqual(response);
+      expect(result.maskedContact).toBeDefined();
+    });
+
+    it('[RED] should return 200 without maskedContact for anti-enumeration (non-existent email)', async () => {
+      const antiEnumResponse = { maskedContact: null, expiresIn: 300 };
+      mockAdminUsersService.sendCode.mockResolvedValue(antiEnumResponse);
+
+      const result = await controller.sendCode(validDto);
+
+      expect(service.sendCode).toHaveBeenCalledWith(validDto);
+      expect(result.maskedContact).toBeNull();
+    });
+
+    it('[RED] should return 400 for invalid contactType', async () => {
+      const invalidDto = { contactType: 'INVALID', email: 'admin@example.com' };
+      mockAdminUsersService.sendCode.mockRejectedValue({
+        status: 400,
+        message: 'Bad Request',
+      });
+
+      await expect(controller.sendCode(invalidDto)).rejects.toMatchObject({ status: 400 });
+    });
+
+    it('[RED] should return 429 when rate limit exceeded (6th request in 1 minute)', async () => {
+      mockAdminUsersService.sendCode.mockRejectedValue({
+        status: 429,
+        message: 'Too Many Requests',
+      });
+
+      await expect(controller.sendCode(validDto)).rejects.toMatchObject({ status: 429 });
+    });
+
+    it('[RED] should enforce ~100ms minimum response for non-existent user (anti-timing)', async () => {
+      const start = Date.now();
+      mockAdminUsersService.sendCode.mockResolvedValue({ maskedContact: null, expiresIn: 300 });
+
+      await controller.sendCode(validDto);
+
+      const elapsed = Date.now() - start;
+      expect(elapsed).toBeGreaterThanOrEqual(80);
+    });
+
+    it('[RED] should return 401 when unauthenticated (no JWT)', async () => {
+      mockAdminUsersService.sendCode.mockRejectedValue({
+        status: 401,
+        message: 'Unauthorized',
+      });
+
+      await expect(controller.sendCode(validDto)).rejects.toMatchObject({ status: 401 });
+    });
+
+    it('[RED] should return 403 when user is ADMIN (not SUPER_ADMIN)', async () => {
+      mockAdminUsersService.sendCode.mockRejectedValue({
+        status: 403,
+        message: 'Forbidden',
+      });
+
+      await expect(controller.sendCode(validDto)).rejects.toMatchObject({ status: 403 });
+    });
+  });
+
+  // ============================================================
+  // POST /v1/admin/users with verificationCode (T-ADMIN-VERIFY-002)
+  // ============================================================
+  describe('POST /admin/users with verificationCode', () => {
+    const createDto = {
+      name: 'New Admin',
+      email: 'admin@example.com',
+      password: 'SecurePass123!',
+      role: 'ADMIN',
+      verificationCode: '123456',
+    };
+
+    it('[RED] should return 201 with AdminUserDto when verificationCode is valid', async () => {
+      const createdUser = {
+        id: 'new-user-1',
+        name: 'New Admin',
+        email: 'admin@example.com',
+        role: 'ADMIN',
+        status: 'ACTIVE',
+        createdAt: new Date('2024-01-01'),
+      };
+      mockAdminUsersService.create.mockResolvedValue(createdUser);
+
+      const result = await controller.create(createDto);
+
+      expect(service.create).toHaveBeenCalledWith(createDto);
+      expect(result).toEqual(createdUser);
+    });
+
+    it('[RED] should return 400 when verificationCode is invalid (wrong 6-digit code)', async () => {
+      mockAdminUsersService.create.mockRejectedValue({
+        status: 400,
+        message: 'Invalid or expired verification code',
+      });
+
+      await expect(controller.create(createDto)).rejects.toMatchObject({ status: 400 });
+    });
+
+    it('[RED] should return 400 when verificationCode is expired', async () => {
+      mockAdminUsersService.create.mockRejectedValue({
+        status: 400,
+        message: 'Invalid or expired verification code',
+      });
+
+      await expect(controller.create(createDto)).rejects.toMatchObject({ status: 400 });
+    });
+
+    it('[RED] should return 429 when max verification attempts exceeded (4th attempt)', async () => {
+      mockAdminUsersService.create.mockRejectedValue({
+        status: 429,
+        message: 'Too many attempts. Please request a new code.',
+      });
+
+      await expect(controller.create(createDto)).rejects.toMatchObject({ status: 429 });
+    });
+
+    it('[RED] should return 409 when email already exists', async () => {
+      mockAdminUsersService.create.mockRejectedValue({
+        status: 409,
+        message: 'Email already exists',
+      });
+
+      await expect(controller.create(createDto)).rejects.toMatchObject({ status: 409 });
     });
   });
 });
