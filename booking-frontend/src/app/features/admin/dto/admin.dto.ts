@@ -54,8 +54,8 @@ export type AdminUserStatus = 'ACTIVE' | 'INACTIVE' | 'BLOCKED';
 // ==========================================
 
 export enum ContactType {
-  EMAIL = 'EMAIL',
-  PHONE = 'PHONE',
+  EMAIL = 'email',
+  PHONE = 'phone',
 }
 
 export interface SendCreateUserCodeRequest {
