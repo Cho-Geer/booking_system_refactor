@@ -1,114 +1,110 @@
 # booking_system_refactor
 
-> Booking System — NestJS 11 + Angular 21 monorepo
+> Booking System — NestJS 11 + Angular 21 モノレポ
 
-This repository is the **monorepo for the refactored booking system**.
-It contains:
+本リポジトリは **リファクタリング済み予約システムのモノレポ** です。
+以下の構成を含みます。
 
-- **`booking-backend/`** — NestJS 11 backend with Prisma ORM and BullMQ queue
-- **`booking-frontend/`** — Angular 21 SPA with PrimeNG, NgRx Signals, and Vitest
-- **`e2e/`** — Playwright end-to-end tests
-- **`contracts/contract.yaml`** — API contract (currently v1.10.0)
-- **13 GitHub Actions workflows** for CI/CD, keystone validation, and orchestration
+- **`booking-backend/`** — Prisma ORM と BullMQ キューを採用した NestJS 11 バックエンド
+- **`booking-frontend/`** — PrimeNG、NgRx Signals、Vitest を採用した Angular 21 SPA
+- **`e2e/`** — Playwright によるエンドツーエンドテスト
+- **`contracts/contract.yaml`** — API コントラクト(現在 v1.10.0)
+- **13 個の GitHub Actions ワークフロー**(CI/CD、キーストーン検証、オーケストレーション用)
 
 ---
 
-## 📌 Project state
+## 📌 プロジェクト状況
 
-| Area | Status |
+| 項目 | ステータス |
 | --- | --- |
-| **Active refinement** | Phase 4 (API Integration) + Phase 5 (Responsive/Mobile) in active review |
-| **API contract** | v1.10.0 (`contracts/contract.yaml`) |
-| **Quality gate artifacts** | `REVIEW_REPORT.md`, `TECH_DEBT_REGISTRY.md` (tracked) |
-| **Default branch** | `main` |
+| **進行中のリファインメント** | フェーズ 4(API 統合)+ フェーズ 5(レスポンシブ/モバイル)を現在レビュー中 |
+| **API コントラクト** | v1.10.0(`contracts/contract.yaml`) |
+| **品質ゲートの成果物** | `REVIEW_REPORT.md`、`TECH_DEBT_REGISTRY.md`(追跡管理) |
+| **デフォルトブランチ** | `main` |
 
-This repository is an **actively worked-on refactor**: the architecture is in place
-(NestJS backend, Angular frontend, API contract, CI matrix), with individual phases being
-reviewed and iterated. See `REVIEW_REPORT.md` for the current phase review notes and
-`TECH_DEBT_REGISTRY.md` for the tracked debt. The codebase is functional — `npm start` in
-each subdirectory will run it locally.
+本リポジトリは **現在進行形でリファクタリング中** のリポジトリです。アーキテクチャ(NestJS バックエンド、Angular フロントエンド、API コントラクト、CI マトリクス)は整っており、各フェーズをレビューしながら反復改善しています。現在のフェーズのレビュー内容は `REVIEW_REPORT.md` を、追跡中の技術的負債は `TECH_DEBT_REGISTRY.md` を参照してください。コードベースは動作可能な状態です。各サブディレクトリで `npm start` を実行すればローカルで起動できます。
 
 ---
 
-## 🏗 Layout
+## 🏗 ディレクトリ構成
 
 ```
 booking_system_refactor/
 ├── booking-backend/        # NestJS 11 + Prisma + BullMQ
 │   ├── src/
-│   │   ├── modules/        # 19 modules: admin / appointments / auth / cache / email /
+│   │   ├── modules/        # 19 モジュール:admin / appointments / auth / cache / email /
 │   │   │                   #   encryption / health / notifications / rate-limiter /
 │   │   │                   #   retention / services / stats / time-slots / translations /
 │   │   │                   #   users / verification
-│   │   ├── common/         # shared: guards / filters / interceptors / dto / middleware
+│   │   ├── common/         # 共通:guards / filters / interceptors / dto / middleware
 │   │   └── config/
 │   ├── docs/               # auth-design / error-codes / high-concurrency-design
-│   ├── prisma/             # schema + migrations
+│   ├── prisma/             # スキーマ + マイグレーション
 │   └── test/
 ├── booking-frontend/       # Angular 21 + PrimeNG + NgRx Signals
 │   ├── src/app/
 │   │   ├── core/           # config / guards / interceptors
-│   │   ├── shared/         # shared components / directives / pipes
-│   │   └── features/       # feature modules
+│   │   ├── shared/         # 共通コンポーネント / ディレクティブ / パイプ
+│   │   └── features/       # 機能モジュール
 │   └── docs/               # design-system / risk-assessment-auth-ui
-├── e2e/                    # Playwright tests
+├── e2e/                    # Playwright テスト
 ├── contracts/
-│   └── contract.yaml       # API contract (v1.10.0)
+│   └── contract.yaml       # API コントラクト(v1.10.0)
 ├── scripts/
-│   ├── keystone-cli.js     # state hash validation
+│   ├── keystone-cli.js     # ステートハッシュ検証
 │   ├── orchestrator-task-scheduler.js
 │   ├── update-machine-hash.js
 │   └── SECURITY-AUDIT-README.md
-├── .opencode/state/        # keystone state files (machine.json + state hash)
+├── .opencode/state/        # キーストーン状態ファイル(machine.json + state hash)
 ├── docker-compose.{ci,dev,prod}.yml
-├── REVIEW_REPORT.md        # Phase review notes
-├── TECH_DEBT_REGISTRY.md   # tracked tech debt
-└── playwright.config.ts    # Playwright config
+├── REVIEW_REPORT.md        # フェーズレビュー記録
+├── TECH_DEBT_REGISTRY.md   # 追跡中の技術的負債
+└── playwright.config.ts    # Playwright 設定
 ```
 
 ---
 
-## ⚙️ Stack
+## ⚙️ 技術スタック
 
-### Backend (`booking-backend/`)
+### バックエンド(`booking-backend/`)
 - **NestJS 11** + `@nestjs/throttler` + `@nestjs/bullmq`
-- **Prisma ORM** (PostgreSQL)
-- **BullMQ** (Redis-based queue)
-- **JWT auth** + role-based / permission-based guards
-- **CLS** (Continuation Local Storage) for request context
-- **Jest** (unit + integration + e2e) + Stryker (mutation) + k6 (performance)
-- **commitlint** (conventional commits) + **Husky** (pre-commit hooks)
+- **Prisma ORM**(PostgreSQL)
+- **BullMQ**(Redis ベースのキュー)
+- **JWT 認証** + ロールベース/権限ベースのガード
+- **CLS**(Continuation Local Storage)によるリクエストコンテキスト
+- **Jest**(ユニット + 統合 + E2E)+ Stryker(ミューテーション)+ k6(性能)
+- **commitlint**(Conventional Commits)+ **Husky**(pre-commit フック)
 
-### Frontend (`booking-frontend/`)
-- **Angular 21.2** standalone components
+### フロントエンド(`booking-frontend/`)
+- **Angular 21.2** スタンドアロンコンポーネント
 - **PrimeNG 21** + **Chart.js** + **date-fns** + **lodash-es**
-- **NgRx Signals 21** for state management
-- **Functional HTTP interceptors** for `snake_case ↔ camelCase` transformation
-- **Vitest** for unit tests
-- **Glassmorphism design system** (see `docs/design-system.md`)
+- **NgRx Signals 21** による状態管理
+- `snake_case ↔ camelCase` 変換のための **関数型 HTTP インターセプタ**
+- ユニットテスト用 **Vitest**
+- **グラスモーフィズム デザインシステム**(`docs/design-system.md` 参照)
 
 ### CI/CD
-- 13 GitHub Actions workflows:
-  - `backend-ci.yml`, `frontend-ci.yml`, `e2e-ci.yml`
+- 13 個の GitHub Actions ワークフロー:
+  - `backend-ci.yml`、`frontend-ci.yml`、`e2e-ci.yml`
   - `keystone-contract-check.yml`
-  - `arbiter-waiver.yml`, `cascade-close.yml` (workflow automation)
-  - `test-gates.yml` (28KB — comprehensive test orchestration)
-  - `orchestrator.yml`, `ci-cd-agent-workflow.yml`, `task-template.yml`
-  - `reusable-deploy.yml`, `reusable-test.yml`
-  - `lint-test.yml`, `framework-ci.yml`
+  - `arbiter-waiver.yml`、`cascade-close.yml`(ワークフロー自動化)
+  - `test-gates.yml`(28KB — 包括的なテストオーケストレーション)
+  - `orchestrator.yml`、`ci-cd-agent-workflow.yml`、`task-template.yml`
+  - `reusable-deploy.yml`、`reusable-test.yml`
+  - `lint-test.yml`、`framework-ci.yml`
 
 ---
 
-## 🚀 Quick start
+## 🚀 クイックスタート
 
 ```bash
-# Backend
+# バックエンド
 cd booking-backend
 npm install
 npm run prisma:migrate:dev
 npm run start:dev            # http://localhost:3000
 
-# Frontend (in another shell)
+# フロントエンド(別のシェルで)
 cd booking-frontend
 npm install
 npm start                    # http://localhost:4200
@@ -120,57 +116,57 @@ npm run test:e2e:all
 
 ---
 
-## 🧪 Quality gates
+## 🧪 品質ゲート
 
 ```bash
-# Backend
+# バックエンド
 cd booking-backend
-npm run test                 # Unit (Jest)
-npm run test:integration     # Integration (Testcontainers)
-npm run test:mutation        # Stryker mutation testing
-npm run test:performance     # k6 load test
+npm run test                 # ユニット(Jest)
+npm run test:integration     # 統合(Testcontainers)
+npm run test:mutation        # Stryker ミューテーションテスト
+npm run test:performance     # k6 負荷テスト
 
-# Frontend
+# フロントエンド
 cd booking-frontend
-npm test                     # Unit (Vitest)
-npm run test:audit-coverage  # Coverage audit
+npm test                     # ユニット(Vitest)
+npm run test:audit-coverage  # カバレッジ監査
 ```
 
-CI runs all of these via `test-gates.yml` before merge.
+CI はマージ前に `test-gates.yml` を通じてこれらすべてを実行します。
 
 ---
 
-## 📜 API contract
+## 📜 API コントラクト
 
-The API contract is the source of truth: **`contracts/contract.yaml`** (v1.10.0).
-The contract is enforced by `keystone-contract-check.yml` on every PR.
-Wire format is `snake_case`; TypeScript DTOs use `camelCase` — transformation happens
-in `booking-frontend/src/app/core/interceptors/api-transform.interceptor.ts`.
-
----
-
-## ⚠️ Open items
-
-See `REVIEW_REPORT.md` and `TECH_DEBT_REGISTRY.md` for the current list of in-progress items.
-The codebase is being iterated; some test suites and DTO alignments are currently being
-addressed as part of the Phase 4 / Phase 5 work.
+API コントラクトは single source of truth です:**`contracts/contract.yaml`**(v1.10.0)。
+このコントラクトは PR ごとに `keystone-contract-check.yml` で強制されます。
+ワイヤー形式は `snake_case`、TypeScript DTO は `camelCase` で、変換は
+`booking-frontend/src/app/core/interceptors/api-transform.interceptor.ts` で行われます。
 
 ---
 
-## 🔗 Related
+## ⚠️ オープンアイテム
 
-- [opencode_framework](https://github.com/Cho-Geer/opencode_framework) — the agent framework used to develop this
-- [qoderwork](https://github.com/Cho-Geer/qoderwork) — personal workspace
-
----
-
-## 📄 License
-
-`package.json` declares `"license": "ISC"`, but no LICENSE file is included at this level.
-**Read-only access** by default; redistribution or modification requires prior notice (Issue).
+進行中の項目一覧は `REVIEW_REPORT.md` および `TECH_DEBT_REGISTRY.md` を参照してください。
+本コードベースは反復開発中であり、一部のテストスイートや DTO 整合はフェーズ 4 / フェーズ 5 の作業として現在対応中です。
 
 ---
 
-## 🇯🇵 日本語版
+## 🔗 関連リポジトリ
 
-- [日本語版](./README.ja.md)
+- [opencode_framework](https://github.com/Cho-Geer/opencode_framework) — 本リポジトリの開発に使用したエージェントフレームワーク
+- [qoderwork](https://github.com/Cho-Geer/qoderwork) — 個人ワークスペース
+
+---
+
+## 📄 ライセンス
+
+`package.json` では `"license": "ISC"` と宣言されていますが、本レベルには LICENSE ファイルは含まれていません。
+デフォルトは **読み取り専用アクセス** であり、再配布または改変には事前通知(Issue)が必要です。
+
+---
+
+## 🇬🇧 English | 🇨🇳 中文
+
+- [English version](./README.en.md)
+- [中文版本](./README.zh.md)
