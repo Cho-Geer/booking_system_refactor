@@ -349,7 +349,7 @@ describe('UserManagementComponent', () => {
 
     it('[RED] should transition from Step 1 to Step 2 when sendCode succeeds with maskedContact', () => {
       // sendCode() method and verificationStep signal do not exist yet
-      component['contactType'].set('EMAIL');
+      component['contactType'].set('email');
       component['formEmail'] = 'admin@test.com';
       component['sendCode']();
       // FAILS: No sendCode method or verificationStep signal exists
@@ -382,16 +382,16 @@ describe('UserManagementComponent', () => {
     it('[RED] should have contactType signal default to EMAIL', () => {
       // contactType signal does not exist yet
       expect(component['contactType']).toBeDefined();
-      expect(component['contactType']()).toBe('EMAIL');
+      expect(component['contactType']()).toBe('email');
     });
 
     it('[RED] should toggle contactType from EMAIL to PHONE', () => {
       // contactType signal and toggleContactType method do not exist yet
       expect(component['contactType']).toBeDefined();
-      component['contactType'].set('EMAIL');
+      component['contactType'].set('email');
       component['toggleContactType']();
       // FAILS: No toggleContactType method exists
-      expect(component['contactType']()).toBe('PHONE');
+      expect(component['contactType']()).toBe('phone');
     });
 
     it('[RED] should disable send button when countdown is greater than 0', () => {
@@ -458,7 +458,7 @@ describe('UserManagementComponent', () => {
 
     it('[RED] should show generic success message when sendCode returns no maskedContact (anti-enumeration)', () => {
       // maskedContact signal does not exist yet; dialogMessage signal does not exist yet
-      component['contactType'].set('EMAIL');
+      component['contactType'].set('email');
       component['formEmail'] = 'unknown@test.com';
       component['sendCode']();
       // FAILS: No dialogMessage signal exists to show generic message
@@ -474,12 +474,12 @@ describe('UserManagementComponent', () => {
 
     it('[RED] should call adminService.sendCode with correct contact type and email payload', () => {
       // adminService.sendCode does not exist yet
-      component['contactType'].set('EMAIL');
+      component['contactType'].set('email');
       component['formEmail'] = 'admin@test.com';
       component['sendCode']();
       // FAILS: adminService.sendCode is not a function
       expect(mockAdminService['sendCode']).toHaveBeenCalledWith({
-        contactType: 'EMAIL',
+        contactType: 'email',
         email: 'admin@test.com',
       });
     });
@@ -614,12 +614,12 @@ describe('UserManagementComponent', () => {
     });
 
     it('[RED] sendCode() should send contactType (camelCase) in request body', () => {
-      component['contactType'].set('EMAIL');
+      component['contactType'].set('email');
       component['formEmail'] = 'admin@test.com';
       component['sendCode']();
       // FAILS: Implementation still sends contact_type (snake_case)
       expect(mockAdminService.sendCode).toHaveBeenCalledWith(
-        expect.objectContaining({ contactType: 'EMAIL' }),
+        expect.objectContaining({ contactType: 'email' }),
       );
     });
 
@@ -638,7 +638,7 @@ describe('UserManagementComponent', () => {
     });
 
     it('[RED] SendCreateUserCodeRequest payload should have contactType field', () => {
-      component['contactType'].set('PHONE');
+      component['contactType'].set('phone');
       component['formPhone'] = '+1234567890';
       component['sendCode']();
       // FAILS: sendCode payload uses contact_type key, not contactType
